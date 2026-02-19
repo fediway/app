@@ -1,0 +1,48 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.output
+.nuxt
+
+# Turbo
+.turbo
+
+# IDE
+.idea
+.vscode
+.claude
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage
+
+# Capacitor
+apps/mobile/android/.gradle
+apps/mobile/android/app/build
+apps/mobile/android/build
+apps/mobile/android/local.properties
+apps/mobile/ios/App/Pods
+apps/mobile/ios/App/App.xcworkspace/xcuserdata
+apps/mobile/ios/App/App.xcodeproj/xcuserdata
+*.xcuserstate
+
+# Misc
+*.tgz
+.cache

@@ -1,0 +1,15 @@
+{
+  "name": "@repo/types",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "masto": "^7.10.1"
+  }
+}

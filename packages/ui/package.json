@@ -1,0 +1,32 @@
+{
+  "name": "@repo/ui",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.vue"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "vue-tsc --noEmit",
+    "lint": "eslint .",
+    "type-check": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest --watch"
+  },
+  "dependencies": {
+    "@repo/types": "*",
+    "@tanstack/vue-virtual": "^3.13.18",
+    "isomorphic-dompurify": "^2.36.0",
+    "swiper": "^12.0.3",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@repo/config": "*",
+    "typescript": "^5.4.0",
+    "vue-tsc": "^2.0.6"
+  }
+}

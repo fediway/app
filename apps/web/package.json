@@ -1,0 +1,31 @@
+{
+  "name": "@repo/web",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint": "eslint .",
+    "type-check": "nuxt typecheck",
+    "clean": "rm -rf .nuxt .output node_modules"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "@repo/api": "*",
+    "@repo/types": "*",
+    "@repo/ui": "*",
+    "nuxt": "^3.14.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.0",
+    "@repo/config": "*",
+    "typescript": "^5.4.0",
+    "vue-tsc": "^2.0.6"
+  }
+}
