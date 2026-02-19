@@ -21,10 +21,10 @@ function closeModal() {
   <div class="px-4 py-6 space-y-6">
     <header class="text-center">
       <h1 class="text-2xl font-bold text-gray-900">
-        Monorepo Mobile
+        Fediway
       </h1>
       <p class="mt-2 text-gray-600">
-        Built with Capacitor + Vue
+        Social meets taste — built with Capacitor + Vue
       </p>
     </header>
 
@@ -47,14 +47,22 @@ function closeModal() {
     </div>
 
     <div class="flex flex-col gap-3">
+      <router-link to="/demo" class="block">
+        <button
+          type="button"
+          class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Demo
+        </button>
+      </router-link>
       <button
         type="button"
-        class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        class="w-full px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
         @click="openModal"
       >
         Open Modal (with Haptics)
       </button>
-      <router-link to="/settings">
+      <router-link to="/settings" class="block">
         <button
           type="button"
           class="w-full px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"

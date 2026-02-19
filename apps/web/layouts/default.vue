@@ -76,8 +76,10 @@ registerBackHandler(50, () => {
   return false;
 });
 
-// Initialize Capacitor back button listener
-initCapacitorBackButton();
+// Initialize Capacitor back button listener (client-only to avoid SSR crash)
+onMounted(() => {
+  initCapacitorBackButton();
+});
 
 function handlePost(data: { content: string; spoilerText: string; visibility: string }) {
   addPost({
