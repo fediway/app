@@ -1,0 +1,143 @@
+import type { FediwayStatus } from '@repo/types';
+import { useClient } from './useClient';
+import { useStatusStore } from './useStatusStore';
+
+export interface StatusActionError {
+  action: 'favourite' | 'reblog' | 'bookmark' | 'delete';
+  statusId: string;
+  error: Error;
+}
+
+export interface UseStatusActionsOptions {
+  onError?: (error: StatusActionError) => void;
+}
+
+export interface UseStatusActionsReturn {
+  toggleFavourite: (id: string) => Promise<void>;
+  toggleReblog: (id: string) => Promise<void>;
+  toggleBookmark: (id: string) => Promise<void>;
+  deleteStatus: (id: string) => Promise<void>;
+}
+
+export function useStatusActions(options?: UseStatusActionsOptions): UseStatusActionsReturn {
+  const client = useClient();
+  const store = useStatusStore();
+
+  async function toggleFavourite(id: string): Promise<void> {
+    const current = store.get(id);
+    if (!current)
+      return;
+
+    const snapshot = { ...current } as FediwayStatus;
+    const wasFavourited = current.favourited;
+
+    // Optimistic update
+    store.patch(id, {
+      favourited: !wasFavourited,
+      favouritesCount: wasFavourited
+        ? Math.max(0, current.favouritesCount - 1)
+        : current.favouritesCount + 1,
+    });
+
+    try {
+      const updated = wasFavourited
+        ? await client.rest.v1.statuses.$select(id).unfavourite()
+        : await client.rest.v1.statuses.$select(id).favourite();
+      store.set(updated as FediwayStatus);
+    }
+    catch (err) {
+      store.set(snapshot);
+      options?.onError?.({
+        action: 'favourite',
+        statusId: id,
+        error: err instanceof Error ? err : new Error('Failed to toggle favourite'),
+      });
+    }
+  }
+
+  async function toggleReblog(id: string): Promise<void> {
+    const current = store.get(id);
+    if (!current)
+      return;
+
+    const snapshot = { ...current } as FediwayStatus;
+    const wasReblogged = current.reblogged;
+
+    // Optimistic update
+    store.patch(id, {
+      reblogged: !wasReblogged,
+      reblogsCount: wasReblogged
+        ? Math.max(0, current.reblogsCount - 1)
+        : current.reblogsCount + 1,
+    });
+
+    try {
+      const updated = wasReblogged
+        ? await client.rest.v1.statuses.$select(id).unreblog()
+        : await client.rest.v1.statuses.$select(id).reblog();
+      store.set(updated as FediwayStatus);
+    }
+    catch (err) {
+      store.set(snapshot);
+      options?.onError?.({
+        action: 'reblog',
+        statusId: id,
+        error: err instanceof Error ? err : new Error('Failed to toggle reblog'),
+      });
+    }
+  }
+
+  async function toggleBookmark(id: string): Promise<void> {
+    const current = store.get(id);
+    if (!current)
+      return;
+
+    const snapshot = { ...current } as FediwayStatus;
+    const wasBookmarked = current.bookmarked;
+
+    // Optimistic update
+    store.patch(id, {
+      bookmarked: !wasBookmarked,
+    });
+
+    try {
+      const updated = wasBookmarked
+        ? await client.rest.v1.statuses.$select(id).unbookmark()
+        : await client.rest.v1.statuses.$select(id).bookmark();
+      store.set(updated as FediwayStatus);
+    }
+    catch (err) {
+      store.set(snapshot);
+      options?.onError?.({
+        action: 'bookmark',
+        statusId: id,
+        error: err instanceof Error ? err : new Error('Failed to toggle bookmark'),
+      });
+    }
+  }
+
+  async function deleteStatus(id: string): Promise<void> {
+    const current = store.get(id);
+    if (!current)
+      return;
+
+    try {
+      await client.rest.v1.statuses.$select(id).remove();
+      store.remove(id);
+    }
+    catch (err) {
+      options?.onError?.({
+        action: 'delete',
+        statusId: id,
+        error: err instanceof Error ? err : new Error('Failed to delete status'),
+      });
+    }
+  }
+
+  return {
+    toggleFavourite,
+    toggleReblog,
+    toggleBookmark,
+    deleteStatus,
+  };
+}

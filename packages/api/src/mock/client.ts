@@ -325,6 +325,12 @@ export function createMockClient(): MastoClient {
               }
               return status!;
             },
+            async remove() {
+              await delay();
+              const idx = timelineStatuses.findIndex(s => s.id === id);
+              if (idx >= 0)
+                timelineStatuses.splice(idx, 1);
+            },
           };
         },
       },

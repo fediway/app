@@ -5,4 +5,6 @@ export { useAuth } from './useAuth';
 export { useClient } from './useClient';
 export { type SharedContent, type ShareReceivedEvent, useShareTarget } from './useShareTarget';
 export { useStatus, type UseStatusReturn } from './useStatus';
+export { type StatusActionError, useStatusActions, type UseStatusActionsOptions, type UseStatusActionsReturn } from './useStatusActions';
+export { useStatusStore, type UseStatusStoreReturn } from './useStatusStore';
 export { type TimelineOptions, type TimelineType, useTimeline, type UseTimelineReturn } from './useTimeline';
