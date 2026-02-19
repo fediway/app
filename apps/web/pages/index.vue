@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { useTimeline } from '@repo/api';
 import { Status as StatusComponent } from '@repo/ui';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
@@ -10,23 +11,21 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 definePageMeta({ keepalive: true });
 
 const router = useRouter();
-const { getHomeTimeline, getProfileUrl } = useData();
+const { getProfileUrl } = useData();
 const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
-const PAGE_SIZE = 5;
-const visibleCount = ref(PAGE_SIZE);
+const timeline = useTimeline({ type: 'home' });
+timeline.fetch();
 
-const rawStatuses = computed(() => getHomeTimeline());
+const rawStatuses = computed(() => timeline.statuses.value ?? []);
 const allStatuses = computed(() => withOverridesAll(rawStatuses.value));
-const statuses = computed(() => allStatuses.value.slice(0, visibleCount.value));
-const hasMore = computed(() => visibleCount.value < allStatuses.value.length);
 
 // Split statuses for inserting follow suggestions after second post
-const firstStatuses = computed(() => statuses.value.slice(0, 2));
-const remainingStatuses = computed(() => statuses.value.slice(2));
+const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
+const remainingStatuses = computed(() => allStatuses.value.slice(2));
 
 function handleStatusClick(statusId: string) {
   router.push(`/status/${statusId}`);
@@ -65,16 +64,35 @@ function handleTagClick(tag: Tag) {
 }
 
 function handleLoadMore() {
-  visibleCount.value += PAGE_SIZE;
+  timeline.loadMore();
 }
 
 function handleMediaClick(attachments: MediaAttachment[], index: number) {
   openLightbox(attachments, index);
 }
+
+onActivated(() => {
+  timeline.startPolling(30_000);
+});
+
+onDeactivated(() => {
+  timeline.stopPolling();
+});
 </script>
 
 <template>
   <section class="w-full py-2">
+    <!-- New posts banner -->
+    <div v-if="timeline.newStatusCount.value > 0" class="flex justify-center py-2">
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+        @click="timeline.showNew()"
+      >
+        {{ timeline.newStatusCount.value }} new {{ timeline.newStatusCount.value === 1 ? 'post' : 'posts' }}
+      </button>
+    </div>
+
     <!-- First 2 posts -->
     <StatusComponent
       v-for="status in firstStatuses"
@@ -113,7 +131,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
     />
 
     <!-- Load more button -->
-    <div v-if="hasMore" class="flex justify-center py-4">
+    <div v-if="timeline.hasMore.value" class="flex justify-center py-4">
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"

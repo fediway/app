@@ -23,6 +23,23 @@ function delay(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function paginateArray(items: Status[], params?: { limit?: number; maxId?: string; sinceId?: string }): Status[] {
+  let start = 0;
+  let end = items.length;
+  if (params?.maxId) {
+    const idx = items.findIndex(s => s.id === params.maxId);
+    if (idx !== -1)
+      start = idx + 1;
+    else return [];
+  }
+  if (params?.sinceId) {
+    const idx = items.findIndex(s => s.id === params.sinceId);
+    if (idx !== -1)
+      end = idx;
+  }
+  return items.slice(start, Math.min(start + (params?.limit ?? 20), end));
+}
+
 let nextId = 5000;
 
 export function createMockClient(): MastoClient {
@@ -166,9 +183,9 @@ export function createMockClient(): MastoClient {
     v1: {
       timelines: {
         home: {
-          async list() {
+          async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
             await delay();
-            return timelineStatuses;
+            return paginateArray(timelineStatuses, params);
           },
         },
         tag: {
@@ -346,11 +363,11 @@ export function createMockClient(): MastoClient {
         $select(id: string) {
           return {
             statuses: {
-              async list() {
+              async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
                 await delay();
                 const account = findAccountById(id);
                 if (account) {
-                  return mockAccountStatuses[account.acct] || [];
+                  return paginateArray(mockAccountStatuses[account.acct] || [], params);
                 }
                 return [];
               },
