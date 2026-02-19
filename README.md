@@ -188,6 +188,10 @@ Shared configurations:
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start all apps in development mode |
+| `npm run dev:mock` | Start all apps with mock data |
+| `npm run dev:web` | Start web app only |
+| `npm run dev:web:mock` | Start web app with mock data |
+| `npm run dev:web:live` | Start web app with real Mastodon API |
 | `npm run build` | Build all packages and apps |
 | `npm run lint` | Lint all packages |
 | `npm run type-check` | Type check all packages |
@@ -197,7 +201,6 @@ Shared configurations:
 | `npm run test:ui` | Test `@repo/ui` only |
 | `npm run test:mobile` | Test `@repo/mobile` only |
 | `npm run clean` | Clean all build outputs and dependencies |
-| `npm run format` | Format code with Prettier |
 
 ## License
 

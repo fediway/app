@@ -10,6 +10,9 @@ export { createMastoClient, type MastoClient, type MastoClientConfig } from './c
 // Composables
 export * from './composables';
 
+// Client factory (real vs mock)
+export { createClient, type CreateClientConfig } from './createClient';
+
 // Errors
 export {
   FediwayAPIError,
@@ -20,6 +23,9 @@ export {
 
 // Fediway API
 export { createFediwayAPI, type CreateStatusParams, type FediwayAPI, type GetItemStatusesOptions } from './fediway-api';
+
+// Mock client
+export { createMockClient } from './mock';
 
 // Platform
 export {

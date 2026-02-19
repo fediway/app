@@ -1,6 +1,5 @@
 import { useAuth } from '@repo/api';
 import { defineStore } from 'pinia';
-import { useDataMode } from '~/composables/useDataMode';
 
 export interface MenuItem {
   id: string;
@@ -29,17 +28,14 @@ export const useNavigationStore = defineStore('navigation', () => {
   const pageTitle = ref('Home');
 
   const currentUser = computed<CurrentUser>(() => {
-    const { mode } = useDataMode();
-    if (mode.value === 'live') {
-      const { currentUser: authUser } = useAuth();
-      if (authUser.value) {
-        return {
-          name: authUser.value.displayName || authUser.value.username,
-          username: authUser.value.username,
-          acct: authUser.value.acct,
-          avatar: authUser.value.avatar,
-        };
-      }
+    const { currentUser: authUser } = useAuth();
+    if (authUser.value) {
+      return {
+        name: authUser.value.displayName || authUser.value.username,
+        username: authUser.value.username,
+        acct: authUser.value.acct,
+        avatar: authUser.value.avatar,
+      };
     }
     return mockUser;
   });

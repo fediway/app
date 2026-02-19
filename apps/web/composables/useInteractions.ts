@@ -1,7 +1,6 @@
 import type { Status } from '@repo/types';
-import { useAuth } from '@repo/api';
+import { useClient } from '@repo/api';
 import { reactive } from 'vue';
-import { useDataMode } from './useDataMode';
 
 // Module-level state — persists across page navigations
 const overrides = reactive(new Map<string, {
@@ -19,11 +18,13 @@ function callApi(fn: () => Promise<unknown>) {
 }
 
 export function useInteractions() {
-  const { mode } = useDataMode();
-
   function getClient() {
-    const { getClient } = useAuth();
-    return getClient();
+    try {
+      return useClient();
+    }
+    catch {
+      return null;
+    }
   }
 
   function toggleFavourite(statusId: string, statuses: Status[]) {
@@ -39,18 +40,16 @@ export function useInteractions() {
       favouritesCount: count + (isFav ? -1 : 1),
     });
 
-    if (mode.value === 'live') {
-      const client = getClient();
-      if (client) {
-        callApi(async () => {
-          if (isFav) {
-            await client.rest.v1.statuses.$select(statusId).unfavourite();
-          }
-          else {
-            await client.rest.v1.statuses.$select(statusId).favourite();
-          }
-        });
-      }
+    const client = getClient();
+    if (client) {
+      callApi(async () => {
+        if (isFav) {
+          await client.rest.v1.statuses.$select(statusId).unfavourite();
+        }
+        else {
+          await client.rest.v1.statuses.$select(statusId).favourite();
+        }
+      });
     }
   }
 
@@ -67,18 +66,16 @@ export function useInteractions() {
       reblogsCount: count + (isReblogged ? -1 : 1),
     });
 
-    if (mode.value === 'live') {
-      const client = getClient();
-      if (client) {
-        callApi(async () => {
-          if (isReblogged) {
-            await client.rest.v1.statuses.$select(statusId).unreblog();
-          }
-          else {
-            await client.rest.v1.statuses.$select(statusId).reblog();
-          }
-        });
-      }
+    const client = getClient();
+    if (client) {
+      callApi(async () => {
+        if (isReblogged) {
+          await client.rest.v1.statuses.$select(statusId).unreblog();
+        }
+        else {
+          await client.rest.v1.statuses.$select(statusId).reblog();
+        }
+      });
     }
   }
 
@@ -93,18 +90,16 @@ export function useInteractions() {
       bookmarked: !isBookmarked,
     });
 
-    if (mode.value === 'live') {
-      const client = getClient();
-      if (client) {
-        callApi(async () => {
-          if (isBookmarked) {
-            await client.rest.v1.statuses.$select(statusId).unbookmark();
-          }
-          else {
-            await client.rest.v1.statuses.$select(statusId).bookmark();
-          }
-        });
-      }
+    const client = getClient();
+    if (client) {
+      callApi(async () => {
+        if (isBookmarked) {
+          await client.rest.v1.statuses.$select(statusId).unbookmark();
+        }
+        else {
+          await client.rest.v1.statuses.$select(statusId).bookmark();
+        }
+      });
     }
   }
 

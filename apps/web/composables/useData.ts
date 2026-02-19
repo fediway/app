@@ -1,11 +1,9 @@
 import type { Account, Context, Notification, Status, Tag } from '@repo/types';
 import type { Ref } from 'vue';
-import { useAuth } from '@repo/api';
+import { useClient } from '@repo/api';
 import { ref } from 'vue';
-import { useDataMode } from './useDataMode';
-import { useMockData } from './useMockData';
 
-// Module-level reactive caches for live mode
+// Module-level reactive caches
 const homeTimeline = ref<Status[]>([]);
 const notifications = ref<Notification[]>([]);
 const favouritedStatuses = ref<Status[]>([]);
@@ -70,23 +68,13 @@ export function clearLiveCache() {
 }
 
 export function useData() {
-  const { mode } = useDataMode();
-  const mock = useMockData();
-
   function getClient() {
-    const { getClient } = useAuth();
-    const client = getClient();
-    if (!client)
-      throw new Error('API client not initialized');
-    return client;
+    return useClient();
   }
 
   // --- Home Timeline ---
 
   function getHomeTimeline(): Status[] {
-    if (mode.value === 'mock')
-      return mock.getHomeTimeline();
-
     if (markFetched('homeTimeline')) {
       fireAndForget('homeTimeline', async () => {
         const result = await getClient().rest.v1.timelines.home.list({ limit: 40 });
@@ -99,9 +87,6 @@ export function useData() {
   // --- Status by ID ---
 
   function getStatusById(id: string): Status | undefined {
-    if (mode.value === 'mock')
-      return mock.getStatusById(id);
-
     const cached = getOrCreateRef(statusCache, id, undefined as Status | undefined);
     if (markFetched(`status:${id}`)) {
       fireAndForget(`status:${id}`, async () => {
@@ -114,9 +99,6 @@ export function useData() {
   // --- Status Context ---
 
   function getStatusContext(id: string): Context {
-    if (mode.value === 'mock')
-      return mock.getStatusContext(id);
-
     const empty: Context = { ancestors: [], descendants: [] };
     const cached = getOrCreateRef(contextCache, id, empty);
     if (markFetched(`context:${id}`)) {
@@ -130,9 +112,6 @@ export function useData() {
   // --- Account by acct ---
 
   function getAccountByAcct(acct: string): Account | undefined {
-    if (mode.value === 'mock')
-      return mock.getAccountByAcct(acct);
-
     const cached = getOrCreateRef(accountCache, acct, undefined as Account | undefined);
     if (markFetched(`account:${acct}`)) {
       fireAndForget(`account:${acct}`, async () => {
@@ -145,9 +124,6 @@ export function useData() {
   // --- Account Statuses ---
 
   function getAccountStatuses(acct: string): Status[] {
-    if (mode.value === 'mock')
-      return mock.getAccountStatuses(acct);
-
     const cached = getOrCreateRef(accountStatusesCache, acct, [] as Status[]);
     if (markFetched(`accountStatuses:${acct}`)) {
       fireAndForget(`accountStatuses:${acct}`, async () => {
@@ -165,9 +141,6 @@ export function useData() {
   // --- Notifications ---
 
   function getNotifications(): Notification[] {
-    if (mode.value === 'mock')
-      return mock.getNotifications();
-
     if (markFetched('notifications')) {
       fireAndForget('notifications', async () => {
         const result = await getClient().rest.v1.notifications.list({ limit: 30 });
@@ -180,9 +153,6 @@ export function useData() {
   // --- Favourited Statuses ---
 
   function getFavouritedStatuses(): Status[] {
-    if (mode.value === 'mock')
-      return mock.getFavouritedStatuses();
-
     if (markFetched('favourites')) {
       fireAndForget('favourites', async () => {
         favouritedStatuses.value = await getClient().rest.v1.favourites.list({ limit: 40 });
@@ -194,9 +164,6 @@ export function useData() {
   // --- Bookmarked Statuses ---
 
   function getBookmarkedStatuses(): Status[] {
-    if (mode.value === 'mock')
-      return mock.getBookmarkedStatuses();
-
     if (markFetched('bookmarks')) {
       fireAndForget('bookmarks', async () => {
         bookmarkedStatuses.value = await getClient().rest.v1.bookmarks.list({ limit: 40 });
@@ -208,9 +175,6 @@ export function useData() {
   // --- Trending Tags ---
 
   function getTrendingTags(): Tag[] {
-    if (mode.value === 'mock')
-      return mock.getTrendingTags();
-
     if (markFetched('trendingTags')) {
       fireAndForget('trendingTags', async () => {
         trendingTags.value = await getClient().rest.v1.trends.tags.list();
@@ -222,9 +186,6 @@ export function useData() {
   // --- Statuses by Tag ---
 
   function getStatusesByTag(tagName: string): Status[] {
-    if (mode.value === 'mock')
-      return mock.getStatusesByTag(tagName);
-
     const normalized = tagName.toLowerCase().replace(/^#/, '');
     const cached = getOrCreateRef(tagStatusesCache, normalized, [] as Status[]);
     if (markFetched(`tag:${normalized}`)) {
@@ -238,9 +199,6 @@ export function useData() {
   // --- Tag Info ---
 
   function getTagInfo(tagName: string): Tag | undefined {
-    if (mode.value === 'mock')
-      return mock.getTagInfo(tagName);
-
     const normalized = tagName.toLowerCase().replace(/^#/, '');
     const tags = getTrendingTags();
     const found = tags.find(t => t.name.toLowerCase() === normalized);
@@ -256,9 +214,6 @@ export function useData() {
   // --- Statuses by Link ---
 
   function getStatusesByLink(linkUrl: string): Status[] {
-    if (mode.value === 'mock')
-      return mock.getStatusesByLink(linkUrl);
-
     const decodedUrl = decodeURIComponent(linkUrl);
     const cached = getOrCreateRef(linkStatusesCache, decodedUrl, [] as Status[]);
     if (markFetched(`link:${decodedUrl}`)) {
@@ -273,9 +228,6 @@ export function useData() {
   // --- Link Info ---
 
   function getLinkInfo(linkUrl: string): { url: string; title: string; source: string } | undefined {
-    if (mode.value === 'mock')
-      return mock.getLinkInfo(linkUrl);
-
     const decodedUrl = decodeURIComponent(linkUrl);
 
     const cached = linkStatusesCache.get(decodedUrl);
@@ -307,8 +259,6 @@ export function useData() {
   // --- Search ---
 
   function searchAccounts(query: string): Account[] {
-    if (mode.value === 'mock')
-      return mock.searchAccounts(query);
     if (!query.trim())
       return [];
 
@@ -323,8 +273,6 @@ export function useData() {
   }
 
   function searchStatuses(query: string): Status[] {
-    if (mode.value === 'mock')
-      return mock.searchStatuses(query);
     if (!query.trim())
       return [];
 
@@ -339,8 +287,6 @@ export function useData() {
   }
 
   function searchTags(query: string): Tag[] {
-    if (mode.value === 'mock')
-      return mock.searchTags(query);
     if (!query.trim())
       return [];
 
@@ -357,9 +303,6 @@ export function useData() {
   // --- Suggested Accounts ---
 
   function getSuggestedAccounts(): Account[] {
-    if (mode.value === 'mock')
-      return mock.getSuggestedAccounts();
-
     if (markFetched('suggestions')) {
       fireAndForget('suggestions', async () => {
         const result = await getClient().rest.v2.suggestions.list({ limit: 10 });
@@ -372,9 +315,6 @@ export function useData() {
   // --- All Accounts (explore/people, SendMessageModal) ---
 
   function getAllAccounts(): Account[] {
-    if (mode.value === 'mock')
-      return mock.getAllAccounts();
-
     if (markFetched('allAccounts')) {
       fireAndForget('allAccounts', async () => {
         allAccountsList.value = await getClient().rest.v1.directory.list({ limit: 40, order: 'active' });

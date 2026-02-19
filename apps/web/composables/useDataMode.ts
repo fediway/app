@@ -9,6 +9,12 @@ const mode = ref<DataMode>('mock');
 let initialized = false;
 
 function loadFromStorage(): DataMode {
+  // Env var takes priority (set by dev scripts)
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'live')
+    return 'live';
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'mock')
+    return 'mock';
+  // Fall back to localStorage
   if (typeof localStorage === 'undefined')
     return 'mock';
   const stored = localStorage.getItem(STORAGE_KEY);

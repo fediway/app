@@ -1,7 +1,6 @@
 import type { Relationship } from '@repo/types';
-import { useAuth } from '@repo/api';
+import { useClient } from '@repo/api';
 import { reactive } from 'vue';
-import { useDataMode } from './useDataMode';
 
 // Module-level state — persists across page navigations
 const followState = reactive(new Map<string, boolean>());
@@ -14,33 +13,33 @@ function callApi(fn: () => Promise<unknown>) {
 }
 
 export function useFollows() {
-  const { mode } = useDataMode();
-
   function getClient() {
-    const { getClient } = useAuth();
-    return getClient();
+    try {
+      return useClient();
+    }
+    catch {
+      return null;
+    }
   }
 
   function toggleFollow(accountId: string) {
     const current = followState.get(accountId) ?? false;
     followState.set(accountId, !current);
 
-    if (mode.value === 'live') {
-      const client = getClient();
-      if (client) {
-        callApi(async () => {
-          let rel: Relationship;
-          if (current) {
-            rel = await client.rest.v1.accounts.$select(accountId).unfollow();
-          }
-          else {
-            rel = await client.rest.v1.accounts.$select(accountId).follow();
-          }
-          // Sync server state back
-          followState.set(accountId, rel.following);
-          relationshipCache.set(accountId, rel);
-        });
-      }
+    const client = getClient();
+    if (client) {
+      callApi(async () => {
+        let rel: Relationship;
+        if (current) {
+          rel = await client.rest.v1.accounts.$select(accountId).unfollow();
+        }
+        else {
+          rel = await client.rest.v1.accounts.$select(accountId).follow();
+        }
+        // Sync server state back
+        followState.set(accountId, rel.following);
+        relationshipCache.set(accountId, rel);
+      });
     }
   }
 
@@ -58,21 +57,18 @@ export function useFollows() {
       };
     }
 
-    // Fetch from API in live mode
-    if (mode.value === 'live') {
-      const client = getClient();
-      if (client && !relationshipCache.has(accountId)) {
-        callApi(async () => {
-          const rels = await client.rest.v1.accounts.relationships.fetch({ id: [accountId] });
-          if (rels[0]) {
-            relationshipCache.set(accountId, rels[0]);
-            // Initialize follow state from server if not locally overridden
-            if (!followState.has(accountId)) {
-              followState.set(accountId, rels[0].following);
-            }
+    // Fetch from API
+    const client = getClient();
+    if (client && !relationshipCache.has(accountId)) {
+      callApi(async () => {
+        const rels = await client.rest.v1.accounts.relationships.fetch({ id: [accountId] });
+        if (rels[0]) {
+          relationshipCache.set(accountId, rels[0]);
+          if (!followState.has(accountId)) {
+            followState.set(accountId, rels[0].following);
           }
-        });
-      }
+        }
+      });
     }
 
     return {

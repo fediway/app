@@ -1,0 +1,211 @@
+import type { FediwayStatus, ItemAggregation } from '@repo/types';
+import { emilyAccount, janeAccount, marcusAccount, sarahAccount } from './accounts';
+
+function createFediwayStatus(
+  id: string,
+  account: import('@repo/types').Account,
+  content: string,
+  item: import('@repo/types').Item,
+  rating: number,
+  createdAt: string,
+  stats: { replies: number; reblogs: number; favourites: number },
+): FediwayStatus {
+  const domain = account.acct.split('@')[1] || 'social.network';
+  return {
+    id,
+    uri: `https://${domain}/statuses/${id}`,
+    createdAt,
+    editedAt: null,
+    account,
+    content: `<p>${content}</p>`,
+    visibility: 'public',
+    sensitive: false,
+    spoilerText: '',
+    mediaAttachments: [],
+    application: { name: 'Web' },
+    mentions: [],
+    tags: [],
+    emojis: [],
+    reblogsCount: stats.reblogs,
+    favouritesCount: stats.favourites,
+    repliesCount: stats.replies,
+    quotesCount: 0,
+    quoteApproval: {
+      automatic: ['public'],
+      manual: [],
+      currentUser: 'automatic',
+    },
+    url: `https://${domain}/@${account.username}/${id}`,
+    inReplyToId: null,
+    inReplyToAccountId: null,
+    reblog: null,
+    poll: null,
+    card: null,
+    language: 'en',
+    text: null,
+    favourited: false,
+    reblogged: false,
+    muted: false,
+    bookmarked: false,
+    pinned: false,
+    item,
+    rating: { value: rating },
+  } as FediwayStatus;
+}
+
+const duneItem = {
+  url: 'https://openlibrary.org/works/OL893415W',
+  type: 'book' as const,
+  title: 'Dune',
+  description: 'Set on the desert planet Arrakis, Dune is the story of Paul Atreides, who would become the mysterious man known as Muad\'Dib.',
+  image: 'https://picsum.photos/seed/dune-cover/300/450',
+  author: 'Frank Herbert',
+  year: 1965,
+  genre: 'Science Fiction',
+};
+
+const eeaaoItem = {
+  url: 'https://www.imdb.com/title/tt6710474',
+  type: 'movie' as const,
+  title: 'Everything Everywhere All at Once',
+  description: 'A middle-aged Chinese immigrant is swept up in an insane adventure where she alone can save existence.',
+  image: 'https://picsum.photos/seed/eeaao-poster/300/450',
+  director: 'Daniel Kwan, Daniel Scheinert',
+  year: 2022,
+  genre: 'Action, Adventure, Comedy',
+};
+
+const runningUpThatHillItem = {
+  url: 'https://open.spotify.com/track/75FEaRjZTKLhTrFGsfMUXR',
+  type: 'song' as const,
+  title: 'Running Up That Hill (A Deal with God)',
+  description: 'From the album "Hounds of Love"',
+  image: 'https://picsum.photos/seed/kate-bush-album/300/300',
+  artist: 'Kate Bush',
+  album: 'Hounds of Love',
+  year: 1985,
+  genre: 'Synth-pop',
+};
+
+export const mockItemAggregations: Record<string, ItemAggregation> = {
+  'https://openlibrary.org/works/OL893415W': {
+    item: duneItem,
+    averageRating: 4.2,
+    ratingCount: 847,
+    ratingDistribution: [12, 34, 89, 312, 400],
+    friendsTakes: [
+      createFediwayStatus(
+        'item-dune-friend-1',
+        sarahAccount,
+        'I just read "Dune" by Frank Herbert. An absolute masterpiece of world-building.',
+        duneItem,
+        4,
+        new Date(Date.now() - 6.5 * 60 * 60 * 1000).toISOString(),
+        { replies: 12, reblogs: 5, favourites: 89 },
+      ),
+      createFediwayStatus(
+        'item-dune-friend-2',
+        janeAccount,
+        'Finally got around to reading Dune. The spice must flow!',
+        duneItem,
+        5,
+        new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+        { replies: 8, reblogs: 2, favourites: 45 },
+      ),
+    ],
+    recentTakes: [
+      createFediwayStatus(
+        'item-dune-recent-1',
+        marcusAccount,
+        'Re-reading Dune for the third time. Still finding new details.',
+        duneItem,
+        5,
+        new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+        { replies: 6, reblogs: 1, favourites: 34 },
+      ),
+      createFediwayStatus(
+        'item-dune-recent-2',
+        emilyAccount,
+        'Dune was good but I found the pacing slow in the middle section.',
+        duneItem,
+        3,
+        new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+        { replies: 15, reblogs: 0, favourites: 22 },
+      ),
+    ],
+  },
+  'https://www.imdb.com/title/tt6710474': {
+    item: eeaaoItem,
+    averageRating: 4.7,
+    ratingCount: 2341,
+    ratingDistribution: [8, 15, 67, 423, 1828],
+    friendsTakes: [
+      createFediwayStatus(
+        'item-eeaao-friend-1',
+        marcusAccount,
+        'I just watched "Everything Everywhere All at Once". Genre-defying masterpiece.',
+        eeaaoItem,
+        5,
+        new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+        { replies: 34, reblogs: 18, favourites: 267 },
+      ),
+    ],
+    recentTakes: [
+      createFediwayStatus(
+        'item-eeaao-recent-1',
+        emilyAccount,
+        'This movie made me laugh and cry in the same scene. Incredible filmmaking.',
+        eeaaoItem,
+        5,
+        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        { replies: 12, reblogs: 4, favourites: 89 },
+      ),
+      createFediwayStatus(
+        'item-eeaao-recent-2',
+        sarahAccount,
+        'Finally watched EEAAO. The multiverse scenes were visually stunning.',
+        eeaaoItem,
+        4,
+        new Date(Date.now() - 96 * 60 * 60 * 1000).toISOString(),
+        { replies: 7, reblogs: 2, favourites: 56 },
+      ),
+    ],
+  },
+  'https://open.spotify.com/track/75FEaRjZTKLhTrFGsfMUXR': {
+    item: runningUpThatHillItem,
+    averageRating: 3.8,
+    ratingCount: 1567,
+    ratingDistribution: [45, 123, 456, 567, 376],
+    friendsTakes: [
+      createFediwayStatus(
+        'item-ruth-friend-1',
+        emilyAccount,
+        'Stranger Things brought this back and I\'m not mad about it.',
+        runningUpThatHillItem,
+        3,
+        new Date(Date.now() - 14 * 60 * 60 * 1000).toISOString(),
+        { replies: 8, reblogs: 3, favourites: 56 },
+      ),
+    ],
+    recentTakes: [
+      createFediwayStatus(
+        'item-ruth-recent-1',
+        janeAccount,
+        'Timeless synth-pop. Kate Bush was ahead of her time.',
+        runningUpThatHillItem,
+        4,
+        new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString(),
+        { replies: 3, reblogs: 1, favourites: 28 },
+      ),
+      createFediwayStatus(
+        'item-ruth-recent-2',
+        marcusAccount,
+        'Great song but I prefer "Cloudbusting" from the same album.',
+        runningUpThatHillItem,
+        3,
+        new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+        { replies: 5, reblogs: 0, favourites: 19 },
+      ),
+    ],
+  },
+};

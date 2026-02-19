@@ -10,6 +10,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:mock": "VITE_API_MODE=mock turbo run dev",
+    "dev:web": "turbo run dev --filter=@repo/web",
+    "dev:web:mock": "VITE_API_MODE=mock turbo run dev --filter=@repo/web",
+    "dev:web:live": "VITE_API_MODE=live turbo run dev --filter=@repo/web",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules",

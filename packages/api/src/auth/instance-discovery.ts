@@ -18,7 +18,7 @@ export function normalizeInstanceUrl(input: string): string {
   domain = domain.replace(/^https?:\/\//, '');
   domain = domain.replace(/\/+$/, '');
   // Remove any path segments — we just want the domain
-  domain = domain.split('/')[0];
+  domain = domain.split('/')[0]!;
   return `https://${domain}`;
 }
 
@@ -31,8 +31,8 @@ function parseVersion(version: string): number[] {
 }
 
 function isVersionAtLeast(version: string, minimum: string): boolean {
-  const [majA, minA, patchA] = parseVersion(version);
-  const [majB, minB, patchB] = parseVersion(minimum);
+  const [majA = 0, minA = 0, patchA = 0] = parseVersion(version);
+  const [majB = 0, minB = 0, patchB = 0] = parseVersion(minimum);
   if (majA !== majB)
     return majA > majB;
   if (minA !== minB)

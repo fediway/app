@@ -1,8 +1,7 @@
 import type { Account, Status } from '@repo/types';
-import { useAuth } from '@repo/api';
+import { useAuth, useClient } from '@repo/api';
 import { reactive } from 'vue';
 import { clearLiveCache } from './useData';
-import { useDataMode } from './useDataMode';
 
 // Module-level state — persists across page navigations
 const userPosts = reactive<Status[]>([]);
@@ -34,8 +33,6 @@ const currentUserAccount: Account = {
 } as unknown as Account;
 
 export function usePosts() {
-  const { mode } = useDataMode();
-
   function addPost(opts: {
     content: string;
     spoilerText?: string;
@@ -43,71 +40,6 @@ export function usePosts() {
     inReplyToId?: string | null;
     inReplyToAccountId?: string | null;
   }): Status {
-    if (mode.value === 'live') {
-      return addPostLive(opts);
-    }
-    return addPostMock(opts);
-  }
-
-  function addPostMock(opts: {
-    content: string;
-    spoilerText?: string;
-    visibility?: string;
-    inReplyToId?: string | null;
-    inReplyToAccountId?: string | null;
-  }): Status {
-    const id = `user-${nextId++}`;
-    const status: Status = {
-      id,
-      uri: `https://social.network/statuses/${id}`,
-      createdAt: new Date().toISOString(),
-      editedAt: null,
-      account: currentUserAccount,
-      content: `<p>${escapeHtml(opts.content)}</p>`,
-      visibility: (opts.visibility ?? 'public') as Status['visibility'],
-      sensitive: false,
-      spoilerText: opts.spoilerText ?? '',
-      mediaAttachments: [],
-      application: { name: 'Web' },
-      mentions: [],
-      tags: [],
-      emojis: [],
-      reblogsCount: 0,
-      favouritesCount: 0,
-      repliesCount: 0,
-      quotesCount: 0,
-      quoteApproval: {
-        automatic: ['public'],
-        manual: [],
-        currentUser: 'automatic',
-      },
-      url: `https://social.network/@jane/${id}`,
-      inReplyToId: opts.inReplyToId ?? null,
-      inReplyToAccountId: opts.inReplyToAccountId ?? null,
-      reblog: null,
-      poll: null,
-      card: null,
-      language: 'en',
-      text: null,
-      favourited: false,
-      reblogged: false,
-      muted: false,
-      bookmarked: false,
-      pinned: false,
-    } as unknown as Status;
-
-    userPosts.unshift(status);
-    return status;
-  }
-
-  function addPostLive(opts: {
-    content: string;
-    spoilerText?: string;
-    visibility?: string;
-    inReplyToId?: string | null;
-    inReplyToAccountId?: string | null;
-  }): Status {
-    // Create a temporary placeholder that will show immediately
     const tempId = `temp-${nextId++}`;
     const { currentUser } = useAuth();
     const account = currentUser.value ?? currentUserAccount;
@@ -153,9 +85,15 @@ export function usePosts() {
 
     userPosts.unshift(placeholder);
 
-    // Fire the real API call
-    const { getClient } = useAuth();
-    const client = getClient();
+    // Fire the real API call (works for both mock and live clients)
+    let client;
+    try {
+      client = useClient();
+    }
+    catch {
+      // No client available — placeholder stays as-is
+    }
+
     if (client) {
       (async () => {
         try {
