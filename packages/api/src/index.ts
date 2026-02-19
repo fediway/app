@@ -1,8 +1,12 @@
 // Auth utilities
 export { discoverInstance, type InstanceInfo, normalizeInstanceUrl } from './auth/instance-discovery';
-
 // Multi-account storage
 export { loadAccountList, loadActiveAccountKey, scopedStorageKey } from './auth/storage';
+
+// Cache
+export { type CachedStatus, db, FediwayDB } from './cache';
+
+export { useTimelineCache } from './cache';
 
 // Client
 export { createMastoClient, type MastoClient, type MastoClientConfig } from './client';

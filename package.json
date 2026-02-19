@@ -24,12 +24,14 @@
     "test:watch": "turbo run test:watch",
     "test:api": "turbo run test --filter=@repo/api",
     "test:ui": "turbo run test --filter=@repo/ui",
-    "test:mobile": "turbo run test --filter=@repo/mobile"
+    "test:mobile": "turbo run test --filter=@repo/mobile",
+    "check-size": "node scripts/check-bundle-size.mjs"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.4.3",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.39.2",
+    "fake-indexeddb": "^6.2.5",
     "happy-dom": "^15.7.4",
     "lint-staged": "^16.2.7",
     "simple-git-hooks": "^2.13.1",

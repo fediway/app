@@ -33,6 +33,7 @@ function getDomain(url: string): string {
           <img
             :src="card.image"
             :alt="card.title || ''"
+            loading="lazy"
             class="w-full h-full object-cover"
           >
         </div>
@@ -53,6 +54,7 @@ function getDomain(url: string): string {
           <img
             :src="card.image"
             :alt="card.title || ''"
+            loading="lazy"
             class="w-full h-full object-cover"
           >
         </div>

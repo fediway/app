@@ -29,3 +29,6 @@ export {
 
 // Timeline components
 export { Timeline } from './components/timeline';
+
+// Utilities
+export { decodeBlurhash, isBlurhashValid } from './utils';

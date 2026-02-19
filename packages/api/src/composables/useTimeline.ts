@@ -1,6 +1,7 @@
-import type { Status } from '@repo/types';
+import type { FediwayStatus, Status } from '@repo/types';
 import type { ComputedRef } from 'vue';
 import { computed, ref, shallowRef } from 'vue';
+import { useTimelineCache } from '../cache/timeline-cache';
 import { useClient } from './useClient';
 
 export type TimelineType = 'home' | 'public' | 'local' | 'hashtag' | 'list' | 'account';
@@ -20,6 +21,8 @@ export interface TimelineOptions {
   excludeReplies?: boolean;
   /** Exclude reblogs */
   excludeReblogs?: boolean;
+  /** Enable IndexedDB cache for cold-start rendering */
+  cache?: boolean;
 }
 
 export interface UseTimelineReturn {
@@ -43,6 +46,20 @@ export interface UseTimelineReturn {
 const DEFAULT_LIMIT = 20;
 
 /**
+ * Derive a cache key from timeline options.
+ */
+function getCacheKey(options: TimelineOptions): string {
+  switch (options.type) {
+    case 'home': return 'home';
+    case 'public': return 'public';
+    case 'local': return 'local';
+    case 'hashtag': return `hashtag:${options.hashtag}`;
+    case 'list': return `list:${options.listId}`;
+    case 'account': return `account:${options.accountId}`;
+  }
+}
+
+/**
  * Composable for fetching and managing timeline data with polling, gap detection, and deduplication.
  */
 export function useTimeline(options: TimelineOptions): UseTimelineReturn {
@@ -56,6 +73,10 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
   const hasGap = ref(false);
 
   const newStatusCount = computed(() => pendingStatuses.value.length);
+
+  // Cache setup
+  const cacheEnabled = options.cache === true;
+  const timelineCache = cacheEnabled ? useTimelineCache(getCacheKey(options)) : null;
 
   // Pagination cursors
   let maxId: string | undefined;
@@ -155,25 +176,50 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
 
   /**
    * Initial fetch. Resets all state.
+   * When cache is enabled, loads cached data first for instant render,
+   * then fetches fresh data in the background.
    */
   async function fetch() {
-    isLoading.value = true;
-    error.value = null;
     maxId = undefined;
     sinceId = undefined;
     knownIds.clear();
     pendingStatuses.value = [];
     hasGap.value = false;
+    error.value = null;
+
+    // 1. Try loading from cache (non-blocking, silent on error)
+    if (timelineCache) {
+      try {
+        const cached = await timelineCache.load();
+        if (cached.length > 0) {
+          trackIds(cached);
+          statuses.value = cached;
+        }
+      }
+      catch { /* cache errors are silent */ }
+    }
+
+    // 2. Only show loading spinner if no cached data
+    isLoading.value = statuses.value.length === 0;
 
     try {
       const result = await fetchTimeline();
+
+      // Reset dedup set and re-track from fresh data
+      knownIds.clear();
       trackIds(result);
+
       statuses.value = result;
       hasMore.value = result.length >= DEFAULT_LIMIT;
 
       if (result.length > 0) {
         maxId = result[result.length - 1]!.id;
         sinceId = result[0]!.id;
+      }
+
+      // 3. Save to cache (fire-and-forget)
+      if (timelineCache && result.length > 0) {
+        timelineCache.save(result as FediwayStatus[]).catch(() => {});
       }
     }
     catch (err) {

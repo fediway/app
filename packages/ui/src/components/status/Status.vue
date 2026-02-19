@@ -162,3 +162,9 @@ function handleStatusClick(event: MouseEvent) {
     </div>
   </article>
 </template>
+
+<style scoped>
+.status {
+  contain: layout style paint;
+}
+</style>

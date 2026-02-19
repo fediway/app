@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status as StatusType, Tag } from '@repo/types';
+import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import { computed } from 'vue';
 import Status from '../status/Status.vue';
 
 interface Props {
@@ -32,6 +34,15 @@ const emit = defineEmits<{
   mediaClick: [attachments: MediaAttachment[], index: number];
 }>();
 
+const virtualizer = useWindowVirtualizer(computed(() => ({
+  count: props.statuses.length,
+  estimateSize: () => 200,
+  overscan: 5,
+})));
+
+const totalSize = computed(() => virtualizer.value.getTotalSize());
+const virtualItems = computed(() => virtualizer.value.getVirtualItems());
+
 function getProfileUrlForStatus(status: StatusType): string | undefined {
   if (props.getProfileUrl) {
     const displayStatus = status.reblog ?? status;
@@ -43,22 +54,44 @@ function getProfileUrlForStatus(status: StatusType): string | undefined {
 
 <template>
   <div class="timeline">
-    <!-- Status list -->
-    <Status
-      v-for="status in statuses"
-      :key="status.id"
-      :status="status"
-      :profile-url="getProfileUrlForStatus(status)"
-      @reply="emit('reply', $event)"
-      @reblog="emit('reblog', $event)"
-      @favourite="emit('favourite', $event)"
-      @bookmark="emit('bookmark', $event)"
-      @share="emit('share', $event)"
-      @send-message="emit('sendMessage', $event)"
-      @tag-click="emit('tagClick', $event)"
-      @status-click="emit('statusClick', $event)"
-      @media-click="(attachments, index) => emit('mediaClick', attachments, index)"
-    />
+    <!-- Empty state -->
+    <div v-if="!loading && statuses.length === 0" class="text-center py-12 text-gray-500">
+      <p>No posts yet</p>
+    </div>
+
+    <!-- Virtualized status list -->
+    <div
+      v-else-if="statuses.length > 0"
+      :style="{ height: `${totalSize}px`, width: '100%', position: 'relative' }"
+    >
+      <div
+        v-for="item in virtualItems"
+        :key="statuses[item.index]!.id"
+        :ref="(el) => { if (el) virtualizer.measureElement(el as HTMLElement) }"
+        :data-index="item.index"
+        :style="{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          transform: `translateY(${item.start}px)`,
+        }"
+      >
+        <Status
+          :status="statuses[item.index]!"
+          :profile-url="getProfileUrlForStatus(statuses[item.index]!)"
+          @reply="emit('reply', $event)"
+          @reblog="emit('reblog', $event)"
+          @favourite="emit('favourite', $event)"
+          @bookmark="emit('bookmark', $event)"
+          @share="emit('share', $event)"
+          @send-message="emit('sendMessage', $event)"
+          @tag-click="emit('tagClick', $event)"
+          @status-click="emit('statusClick', $event)"
+          @media-click="(attachments, index) => emit('mediaClick', attachments, index)"
+        />
+      </div>
+    </div>
 
     <!-- Loading indicator -->
     <div v-if="loading" class="flex justify-center py-8">
@@ -74,11 +107,6 @@ function getProfileUrlForStatus(status: StatusType): string | undefined {
       >
         Load more
       </button>
-    </div>
-
-    <!-- Empty state -->
-    <div v-else-if="!loading && statuses.length === 0" class="text-center py-12 text-gray-500">
-      <p>No posts yet</p>
     </div>
   </div>
 </template>
