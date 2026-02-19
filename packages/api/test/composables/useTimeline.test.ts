@@ -277,4 +277,34 @@ describe('useTimeline', () => {
       timeline.stopPolling();
     });
   });
+
+  it('initialization does not throw when useClient would throw (SSR safety)', () => {
+    // Simulate SSR: useClient throws because no client is initialized
+    const origClient = mockClient;
+    mockClient = undefined as unknown as ReturnType<typeof createMockClient>;
+
+    const [timeline] = withSetup(() => useTimeline({ type: 'home' }));
+
+    // Composable should return valid refs without throwing
+    expect(timeline.statuses.value).toEqual([]);
+    expect(timeline.isLoading.value).toBe(false);
+    expect(timeline.newStatusCount.value).toBe(0);
+    expect(timeline.hasMore.value).toBe(true);
+
+    mockClient = origClient;
+  });
+
+  it('fetch() fails gracefully when useClient throws (SSR safety)', async () => {
+    const origClient = mockClient;
+    mockClient = undefined as unknown as ReturnType<typeof createMockClient>;
+
+    const [timeline] = withSetup(() => useTimeline({ type: 'home' }));
+    await timeline.fetch();
+
+    // Should set error, not crash
+    expect(timeline.error.value).toBeInstanceOf(Error);
+    expect(timeline.statuses.value).toEqual([]);
+
+    mockClient = origClient;
+  });
 });

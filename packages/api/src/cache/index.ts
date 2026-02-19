@@ -1,2 +1,2 @@
-export { type CachedStatus, db, FediwayDB } from './db';
+export { type CachedStatus, FediwayDB, getDb } from './db';
 export { useTimelineCache } from './timeline-cache';

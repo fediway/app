@@ -63,8 +63,6 @@ function getCacheKey(options: TimelineOptions): string {
  * Composable for fetching and managing timeline data with polling, gap detection, and deduplication.
  */
 export function useTimeline(options: TimelineOptions): UseTimelineReturn {
-  const client = useClient();
-
   const statuses = shallowRef<Status[]>([]);
   const pendingStatuses = shallowRef<Status[]>([]);
   const isLoading = ref(false);
@@ -117,6 +115,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
    * Fetch timeline based on type, supporting both maxId and sinceId.
    */
   async function fetchTimeline(opts?: { olderThan?: string; newerThan?: string }): Promise<Status[]> {
+    const client = useClient();
     const params: Record<string, unknown> = {
       limit: DEFAULT_LIMIT,
     };

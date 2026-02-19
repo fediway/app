@@ -1,6 +1,6 @@
 import type { FediwayStatus } from '@repo/types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { db } from '../../src/cache/db';
+import { getDb } from '../../src/cache/db';
 import { useTimelineCache } from '../../src/cache/timeline-cache';
 import 'fake-indexeddb/auto';
 
@@ -43,11 +43,11 @@ function makeStatus(id: string, content = ''): FediwayStatus {
 }
 
 beforeEach(async () => {
-  await db.timelineCache.clear();
+  await getDb().timelineCache.clear();
 });
 
 afterEach(async () => {
-  await db.timelineCache.clear();
+  await getDb().timelineCache.clear();
 });
 
 describe('useTimelineCache', () => {
@@ -126,7 +126,7 @@ describe('useTimelineCache', () => {
 
     // Manually insert an old entry
     const eightDaysAgo = Date.now() - (8 * 24 * 60 * 60 * 1000);
-    await db.timelineCache.put({
+    await getDb().timelineCache.put({
       timelineKey: 'home',
       statusId: 'old-1',
       status: makeStatus('old-1'),

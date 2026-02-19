@@ -1,5 +1,5 @@
 import type { FediwayStatus } from '@repo/types';
-import { db } from './db';
+import { getDb } from './db';
 
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const MAX_PER_TIMELINE = 200;
@@ -9,11 +9,7 @@ export function useTimelineCache(timelineKey: string) {
    * Load cached statuses for this timeline, newest first.
    */
   async function load(): Promise<FediwayStatus[]> {
-    const entries = await db.timelineCache
-      .where('timelineKey')
-      .equals(timelineKey)
-      .reverse()
-      .sortBy('cachedAt');
+    const entries = await getDb().timelineCache.where('timelineKey').equals(timelineKey).reverse().sortBy('cachedAt');
     return entries.map(e => e.status);
   }
 
@@ -28,7 +24,7 @@ export function useTimelineCache(timelineKey: string) {
       status,
       cachedAt: now,
     }));
-    await db.timelineCache.bulkPut(entries);
+    await getDb().timelineCache.bulkPut(entries);
     await prune();
   }
 
@@ -39,18 +35,15 @@ export function useTimelineCache(timelineKey: string) {
     const cutoff = Date.now() - MAX_AGE_MS;
 
     // Delete old entries across all timelines
-    await db.timelineCache.where('cachedAt').below(cutoff).delete();
+    await getDb().timelineCache.where('cachedAt').below(cutoff).delete();
 
     // Trim to max per timeline
-    const entries = await db.timelineCache
-      .where('timelineKey')
-      .equals(timelineKey)
-      .sortBy('cachedAt');
+    const entries = await getDb().timelineCache.where('timelineKey').equals(timelineKey).sortBy('cachedAt');
 
     if (entries.length > MAX_PER_TIMELINE) {
       const toDelete = entries.slice(0, entries.length - MAX_PER_TIMELINE);
       const keys = toDelete.map(e => [e.timelineKey, e.statusId] as [string, string]);
-      await db.timelineCache.bulkDelete(keys);
+      await getDb().timelineCache.bulkDelete(keys);
     }
   }
 
@@ -58,7 +51,7 @@ export function useTimelineCache(timelineKey: string) {
    * Delete all cached entries for this timeline.
    */
   async function clear(): Promise<void> {
-    await db.timelineCache.where('timelineKey').equals(timelineKey).delete();
+    await getDb().timelineCache.where('timelineKey').equals(timelineKey).delete();
   }
 
   return { load, save, prune, clear };

@@ -19,4 +19,11 @@ export class FediwayDB extends Dexie {
   }
 }
 
-export const db = new FediwayDB();
+let _db: FediwayDB | null = null;
+
+export function getDb(): FediwayDB {
+  if (!_db) {
+    _db = new FediwayDB();
+  }
+  return _db;
+}
