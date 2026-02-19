@@ -1,4 +1,5 @@
 import { createRestAPIClient } from 'masto';
+import { getPlatformAdapter } from '../platform';
 
 export interface OAuthRegistration {
   clientId: string;
@@ -37,9 +38,13 @@ function base64UrlEncode(bytes: Uint8Array): string {
 
 /**
  * Get the OAuth redirect URI for the current environment.
+ * Returns a custom URL scheme on native (Capacitor) platforms.
  */
 export function getRedirectUri(): string {
-  if (typeof window !== 'undefined') {
+  if (getPlatformAdapter().isNative()) {
+    return 'com.fediway.app://oauth/callback';
+  }
+  if (typeof window !== 'undefined' && window.location) {
     return `${window.location.origin}/oauth/callback`;
   }
   return 'http://localhost:3333/oauth/callback';

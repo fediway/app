@@ -137,12 +137,12 @@ describe('request', () => {
       const timeoutError = new DOMException('Signal timed out', 'TimeoutError');
       mockFetch.mockRejectedValue(timeoutError);
 
-      await expect(request('https://example.com/api/test'))
+      await expect(request('https://example.com/api/test', { retries: 0 }))
         .rejects
         .toThrow('Request timed out');
 
       try {
-        await request('https://example.com/api/test');
+        await request('https://example.com/api/test', { retries: 0 });
       }
       catch (err) {
         expect(err).toBeInstanceOf(FediwayNetworkError);
@@ -233,13 +233,119 @@ describe('request', () => {
       mockFetch.mockRejectedValue(fetchError);
 
       try {
-        await request('https://example.com/api/test');
+        await request('https://example.com/api/test', { retries: 0 });
         expect.fail('should have thrown');
       }
       catch (err) {
         expect(err).toBeInstanceOf(FediwayNetworkError);
         expect((err as FediwayNetworkError).cause).toBe(fetchError);
       }
+    });
+
+    it('does not retry on API errors', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: () => Promise.resolve({}),
+      });
+
+      await expect(request('https://example.com/api/test', { retries: 2 }))
+        .rejects
+        .toThrow(FediwayAPIError);
+
+      // API errors are never retried — fetch called exactly once
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('retry', () => {
+    it('retries on network error and succeeds', async () => {
+      const fetchError = new TypeError('Failed to fetch');
+      mockFetch
+        .mockRejectedValueOnce(fetchError)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ id: '1' }),
+        });
+
+      const result = await request<{ id: string }>('https://example.com/api/test', { retries: 1, retryDelay: 0 });
+
+      expect(result).toEqual({ id: '1' });
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('retries on timeout and succeeds', async () => {
+      const timeoutError = new DOMException('Signal timed out', 'TimeoutError');
+      mockFetch
+        .mockRejectedValueOnce(timeoutError)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ ok: true }),
+        });
+
+      const result = await request('https://example.com/api/test', { retries: 1, retryDelay: 0 });
+
+      expect(result).toEqual({ ok: true });
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('exhausts all retries and throws last error', async () => {
+      mockFetch.mockRejectedValue(new TypeError('Failed to fetch'));
+
+      await expect(request('https://example.com/api/test', { retries: 2, retryDelay: 0 }))
+        .rejects
+        .toThrow(FediwayNetworkError);
+      // 1 initial + 2 retries = 3 total
+      expect(mockFetch).toHaveBeenCalledTimes(3);
+    });
+
+    it('does not retry when retries is 0', async () => {
+      mockFetch.mockRejectedValue(new TypeError('Failed to fetch'));
+
+      await expect(request('https://example.com/api/test', { retries: 0 }))
+        .rejects
+        .toThrow(FediwayNetworkError);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses exponential backoff between retries', async () => {
+      const callTimes: number[] = [];
+      mockFetch.mockImplementation(() => {
+        callTimes.push(performance.now());
+        return Promise.reject(new TypeError('Failed to fetch'));
+      });
+
+      // Use small delay (10ms base) so the test runs fast but timing is measurable
+      await expect(request('https://example.com/api/test', { retries: 2, retryDelay: 10 }))
+        .rejects
+        .toThrow(FediwayNetworkError);
+
+      expect(callTimes).toHaveLength(3);
+      // First retry delay: ~10ms (base * 2^0)
+      expect(callTimes[1]! - callTimes[0]!).toBeGreaterThanOrEqual(8);
+      // Second retry delay: ~20ms (base * 2^1)
+      expect(callTimes[2]! - callTimes[1]!).toBeGreaterThanOrEqual(16);
+    });
+
+    it('succeeds on second retry after two failures', async () => {
+      const fetchError = new TypeError('Failed to fetch');
+      mockFetch
+        .mockRejectedValueOnce(fetchError)
+        .mockRejectedValueOnce(fetchError)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ recovered: true }),
+        });
+
+      const result = await request('https://example.com/api/test', { retries: 2, retryDelay: 0 });
+
+      expect(result).toEqual({ recovered: true });
+      expect(mockFetch).toHaveBeenCalledTimes(3);
     });
   });
 

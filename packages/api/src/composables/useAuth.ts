@@ -11,6 +11,7 @@ import {
   registerApp,
 } from '../auth/oauth';
 import { createMastoClient } from '../client';
+import { getPlatformAdapter } from '../platform';
 
 // PKCE state persisted between redirect and callback
 const oauthState = ref<{
@@ -105,15 +106,17 @@ export function useAuth() {
         redirectUri,
       };
 
-      // Also persist to sessionStorage so it survives the redirect
+      // Persist OAuth state so it survives the redirect / app process death
+      const stateJson = JSON.stringify(oauthState.value);
+      await getPlatformAdapter().secureSet('fediway_oauth_state', stateJson);
       if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem('fediway_oauth_state', JSON.stringify(oauthState.value));
+        sessionStorage.setItem('fediway_oauth_state', stateJson);
       }
 
       const authUrl = buildAuthUrl(url, registration, codeChallenge);
 
-      // Redirect to the instance's OAuth page
-      window.location.href = authUrl;
+      // Open the instance's OAuth page (Browser.open on native, window.open on web)
+      await getPlatformAdapter().openUrl(authUrl);
     }
     catch (err) {
       store.error.value = err instanceof Error ? err : new Error('OAuth login failed');
@@ -130,10 +133,17 @@ export function useAuth() {
     store.error.value = null;
 
     try {
-      // Restore OAuth state from sessionStorage if needed
+      // Restore OAuth state: in-memory → sessionStorage → secure storage
       let oauth = oauthState.value;
       if (!oauth && typeof sessionStorage !== 'undefined') {
         const raw = sessionStorage.getItem('fediway_oauth_state');
+        if (raw) {
+          oauth = JSON.parse(raw);
+          oauthState.value = oauth;
+        }
+      }
+      if (!oauth) {
+        const raw = await getPlatformAdapter().secureGet('fediway_oauth_state');
         if (raw) {
           oauth = JSON.parse(raw);
           oauthState.value = oauth;
@@ -155,11 +165,12 @@ export function useAuth() {
         oauth.codeVerifier,
       );
 
-      // Clean up OAuth state
+      // Clean up OAuth state from all storage locations
       oauthState.value = null;
       if (typeof sessionStorage !== 'undefined') {
         sessionStorage.removeItem('fediway_oauth_state');
       }
+      await getPlatformAdapter().secureRemove('fediway_oauth_state');
 
       // Create a temporary client to verify credentials
       const tempClient = createMastoClient({ url: oauth.instanceUrl, accessToken });

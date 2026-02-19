@@ -1,7 +1,13 @@
+import { App as CapacitorApp } from '@capacitor/app';
+import { setPlatformAdapter, useAuth } from '@repo/api';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
+import { CapacitorPlatformAdapter } from './platform-capacitor';
 import './assets/main.css';
+
+// Set native platform adapter BEFORE any auth calls
+setPlatformAdapter(new CapacitorPlatformAdapter());
 
 const router = createRouter({
   history: createWebHistory(),
@@ -10,6 +16,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('./pages/Home.vue'),
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('./pages/Login.vue'),
     },
     {
       path: '/settings',
@@ -38,6 +49,35 @@ const router = createRouter({
     { path: '/demo/splash', component: () => import('./pages/demo/playground/PlaySplash.vue') },
   ],
 });
+
+// Listen for OAuth deep links (com.fediway.app://oauth/callback?code=...)
+CapacitorApp.addListener('appUrlOpen', async (data) => {
+  if (data.url.includes('oauth/callback')) {
+    const url = new URL(data.url);
+    const code = url.searchParams.get('code');
+    const error = url.searchParams.get('error');
+
+    if (error) {
+      router.push({ path: '/login', query: { error } });
+      return;
+    }
+
+    if (code) {
+      try {
+        const { handleOAuthCallback } = useAuth();
+        await handleOAuthCallback(code);
+        router.push('/');
+      }
+      catch {
+        router.push({ path: '/login', query: { error: 'callback_failed' } });
+      }
+    }
+  }
+});
+
+// Restore session from secure storage on cold start
+const { restoreSession } = useAuth();
+restoreSession().catch(() => { /* stay unauthenticated */ });
 
 const app = createApp(App);
 app.use(router);
