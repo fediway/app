@@ -1,5 +1,5 @@
 import { App as CapacitorApp } from '@capacitor/app';
-import { setPlatformAdapter, useAppLifecycle, useAuth } from '@repo/api';
+import { setPlatformAdapter, useAppLifecycle, useAuth, useShareTarget } from '@repo/api';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
@@ -107,6 +107,22 @@ lifecycle.restoreState().then((saved) => {
     router.push(saved.route);
   }
 }).catch(() => { /* no state to restore */ });
+
+// --- Share Target ---
+
+const shareTarget = useShareTarget();
+
+// TODO: Wire share target plugin once installed (D23)
+// ShareTarget.addListener('shareReceived', (event) => {
+//   shareTarget.handleShare(event);
+// });
+
+// Navigate to compose on share
+shareTarget.onShare((content) => {
+  if (content.urls.length > 0) {
+    router.push({ path: '/demo/compose', query: { url: content.urls[0] } });
+  }
+});
 
 // --- Mount ---
 

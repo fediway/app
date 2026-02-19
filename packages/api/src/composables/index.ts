@@ -3,5 +3,6 @@ export { useAccount, type UseAccountReturn } from './useAccount';
 export { type AppRestoredResult, type SavedAppState, useAppLifecycle, type UseAppLifecycleOptions } from './useAppLifecycle';
 export { useAuth } from './useAuth';
 export { useClient } from './useClient';
+export { type SharedContent, type ShareReceivedEvent, useShareTarget } from './useShareTarget';
 export { useStatus, type UseStatusReturn } from './useStatus';
 export { type TimelineOptions, type TimelineType, useTimeline, type UseTimelineReturn } from './useTimeline';
