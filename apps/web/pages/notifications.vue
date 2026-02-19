@@ -4,6 +4,8 @@ import { Avatar, RelativeTime, StatusContent } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 
+definePageMeta({ keepalive: true });
+
 const router = useRouter();
 const { getNotifications, getProfileUrl } = useData();
 const notifications = computed(() => getNotifications());

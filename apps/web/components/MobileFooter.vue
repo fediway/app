@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { usePostComposer } from '~/composables/usePostComposer';
+import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
+const router = useRouter();
 const navigation = useNavigationStore();
-const route = useRoute();
 const { open: openComposer } = usePostComposer();
+const { activeTab, switchTab } = useTabNavigation();
 
-// Update active item based on current route
-watchEffect(() => {
-  const item = navigation.mobileFooterItems.find(item => item.to === route.path);
-  if (item) {
-    navigation.setActiveItem(item.id);
+function handleTabTap(itemId: string) {
+  if (itemId === 'new-post') {
+    openComposer();
+    return;
   }
-});
+  switchTab(itemId as any, path => router.push(path));
+}
 </script>
 
 <template>
@@ -24,20 +26,21 @@ watchEffect(() => {
           v-if="item.id === 'new-post'"
           type="button"
           class="flex items-center justify-center rounded-full transition-colors w-12 h-12 bg-gray-900 text-white hover:bg-gray-700"
-          @click="openComposer()"
+          @click="handleTabTap(item.id)"
         >
           <NavIcon :name="item.icon" :size="24" />
         </button>
-        <!-- Regular navigation links -->
-        <NuxtLink
+        <!-- Tab buttons -->
+        <button
           v-else
-          :to="item.to"
-          class="flex items-center justify-center rounded-full transition-colors no-underline w-11 h-11 hover:bg-gray-100" :class="[
-            navigation.activeItemId === item.id ? 'text-gray-900' : 'text-gray-500',
+          type="button"
+          class="flex items-center justify-center rounded-full transition-colors no-underline w-11 h-11 hover:bg-gray-100 border-none bg-transparent cursor-pointer" :class="[
+            activeTab === item.id ? 'text-gray-900' : 'text-gray-500',
           ]"
+          @click="handleTabTap(item.id)"
         >
           <NavIcon :name="item.icon" :size="22" />
-        </NuxtLink>
+        </button>
       </template>
     </nav>
   </footer>

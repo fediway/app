@@ -7,6 +7,8 @@ import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
+definePageMeta({ keepalive: true });
+
 const router = useRouter();
 const { getHomeTimeline, getProfileUrl } = useData();
 const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();

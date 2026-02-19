@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
 import { MediaLightbox } from '@repo/ui';
+import { useBackButton } from '~/composables/useBackButton';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useMessages } from '~/composables/useMessages';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { usePosts } from '~/composables/usePosts';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
+import { useTabNavigation } from '~/composables/useTabNavigation';
+import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
+const navigation = useNavigationStore();
 const { isOpen, replyingTo, close } = usePostComposer();
 const { addPost } = usePosts();
 const { shareStatus } = useMessages();
@@ -22,6 +26,58 @@ const {
   initialIndex: lightboxIndex,
   close: closeLightbox,
 } = useMediaLightbox();
+
+// Tab navigation — router guards
+const { onRouteChange, saveCurrentScroll, canGoBack } = useTabNavigation();
+
+router.beforeEach(() => {
+  saveCurrentScroll();
+});
+
+router.afterEach((to, from) => {
+  onRouteChange(to.path, from.path);
+});
+
+// Back button — register handlers by priority
+const { register: registerBackHandler, initCapacitorBackButton } = useBackButton();
+
+// Priority 100: Modals
+registerBackHandler(100, () => {
+  if (isOpen.value) {
+    close();
+    return true;
+  }
+  if (isSendMessageOpen.value) {
+    closeSendMessage();
+    return true;
+  }
+  if (isLightboxOpen.value) {
+    closeLightbox();
+    return true;
+  }
+  return false;
+});
+
+// Priority 90: Mobile sidebar
+registerBackHandler(90, () => {
+  if (navigation.isSidebarOpen) {
+    navigation.closeSidebar();
+    return true;
+  }
+  return false;
+});
+
+// Priority 50: Tab navigation (go back within tab)
+registerBackHandler(50, () => {
+  if (canGoBack.value) {
+    router.back();
+    return true;
+  }
+  return false;
+});
+
+// Initialize Capacitor back button listener
+initCapacitorBackButton();
 
 function handlePost(data: { content: string; spoilerText: string; visibility: string }) {
   addPost({

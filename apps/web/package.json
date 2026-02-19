@@ -10,6 +10,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "type-check": "nuxt typecheck",
     "clean": "rm -rf .nuxt .output node_modules"
   },

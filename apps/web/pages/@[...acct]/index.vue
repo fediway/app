@@ -13,6 +13,8 @@ import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
+definePageMeta({ keepalive: true });
+
 const route = useRoute();
 const router = useRouter();
 const { getAccountByAcct, getAccountStatuses, getProfileUrl } = useData();

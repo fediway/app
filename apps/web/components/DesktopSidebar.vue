@@ -3,16 +3,7 @@ import { usePostComposer } from '~/composables/usePostComposer';
 import { useNavigationStore } from '~/stores/navigation';
 
 const navigation = useNavigationStore();
-const route = useRoute();
 const { open: openComposer } = usePostComposer();
-
-// Update active item based on current route
-watchEffect(() => {
-  const item = navigation.menuItems.find(item => item.to === route.path);
-  if (item) {
-    navigation.setActiveItem(item.id);
-  }
-});
 </script>
 
 <template>

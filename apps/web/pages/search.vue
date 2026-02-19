@@ -6,6 +6,8 @@ import { useData } from '~/composables/useData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
+definePageMeta({ keepalive: true });
+
 const route = useRoute();
 const router = useRouter();
 const { searchStatuses, searchAccounts, searchTags, getProfileUrl } = useData();
