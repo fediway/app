@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.monorepo.app',
-  appName: 'Monorepo App',
+  appId: 'com.fediway.app',
+  appName: 'Fediway',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
@@ -14,6 +14,9 @@ const config: CapacitorConfig = {
     Keyboard: {
       resize: 'body',
       resizeOnFullScreen: true,
+    },
+    SplashScreen: {
+      launchAutoHide: false,
     },
   },
 };
