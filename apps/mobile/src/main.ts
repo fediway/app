@@ -1,5 +1,5 @@
 import { App as CapacitorApp } from '@capacitor/app';
-import { setPlatformAdapter, useAuth } from '@repo/api';
+import { setPlatformAdapter, useAppLifecycle, useAuth } from '@repo/api';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
@@ -50,6 +50,8 @@ const router = createRouter({
   ],
 });
 
+// --- Auth ---
+
 // Listen for OAuth deep links (com.fediway.app://oauth/callback?code=...)
 CapacitorApp.addListener('appUrlOpen', async (data) => {
   if (data.url.includes('oauth/callback')) {
@@ -78,6 +80,35 @@ CapacitorApp.addListener('appUrlOpen', async (data) => {
 // Restore session from secure storage on cold start
 const { restoreSession } = useAuth();
 restoreSession().catch(() => { /* stay unauthenticated */ });
+
+// --- App Lifecycle ---
+
+const lifecycle = useAppLifecycle();
+
+// Save current route on pause
+lifecycle.onPause(async () => {
+  await lifecycle.saveState({
+    route: router.currentRoute.value.fullPath,
+  });
+});
+
+// Wire Capacitor lifecycle events
+CapacitorApp.addListener('pause', () => lifecycle.handlePause());
+CapacitorApp.addListener('resume', () => lifecycle.handleResume());
+
+// Handle Android activity restoration (e.g. Camera killed by OS)
+CapacitorApp.addListener('appRestoredResult', (data) => {
+  lifecycle.appRestoredResult.value = data;
+});
+
+// Restore route from previous session if within 30-minute window
+lifecycle.restoreState().then((saved) => {
+  if (saved?.route) {
+    router.push(saved.route);
+  }
+}).catch(() => { /* no state to restore */ });
+
+// --- Mount ---
 
 const app = createApp(App);
 app.use(router);
