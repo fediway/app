@@ -8,13 +8,26 @@ export interface CachedStatus {
   cachedAt: number;
 }
 
+export interface QueuedAction {
+  id?: number;
+  type: 'favourite' | 'unfavourite' | 'reblog' | 'unreblog' | 'bookmark' | 'unbookmark';
+  statusId: string;
+  createdAt: number;
+  attempts: number;
+}
+
 export class FediwayDB extends Dexie {
   timelineCache!: Dexie.Table<CachedStatus>;
+  actionQueue!: Dexie.Table<QueuedAction, number>;
 
   constructor() {
     super('fediway');
     this.version(1).stores({
       timelineCache: '[timelineKey+statusId], timelineKey, cachedAt',
+    });
+    this.version(2).stores({
+      timelineCache: '[timelineKey+statusId], timelineKey, cachedAt',
+      actionQueue: '++id, statusId, createdAt',
     });
   }
 }

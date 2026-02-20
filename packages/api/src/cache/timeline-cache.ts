@@ -1,8 +1,43 @@
 import type { FediwayStatus } from '@repo/types';
+import type { CachedStatus } from './db';
 import { getDb } from './db';
 
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const MAX_PER_TIMELINE = 200;
+
+/**
+ * Prune all timelines at once — run on app startup.
+ * Removes entries older than 7 days and trims each timeline to 200 entries.
+ */
+export async function pruneAllTimelines(): Promise<void> {
+  const cutoff = Date.now() - MAX_AGE_MS;
+
+  // Delete entries older than 7 days (all timelines)
+  await getDb().timelineCache.where('cachedAt').below(cutoff).delete();
+
+  // Trim each timeline to MAX_PER_TIMELINE
+  const allEntries = await getDb().timelineCache.orderBy('cachedAt').toArray();
+  const byTimeline = new Map<string, CachedStatus[]>();
+  for (const entry of allEntries) {
+    const list = byTimeline.get(entry.timelineKey) ?? [];
+    list.push(entry);
+    byTimeline.set(entry.timelineKey, list);
+  }
+
+  const toDelete: [string, string][] = [];
+  for (const [, entries] of byTimeline) {
+    if (entries.length > MAX_PER_TIMELINE) {
+      const excess = entries.slice(0, entries.length - MAX_PER_TIMELINE);
+      for (const e of excess) {
+        toDelete.push([e.timelineKey, e.statusId]);
+      }
+    }
+  }
+
+  if (toDelete.length > 0) {
+    await getDb().timelineCache.bulkDelete(toDelete);
+  }
+}
 
 export function useTimelineCache(timelineKey: string) {
   /**
