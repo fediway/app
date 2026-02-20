@@ -32,6 +32,7 @@
     "@capacitor/network": "^6.0.4",
     "@capacitor/splash-screen": "^6.0.4",
     "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/text-zoom": "^6.0.4",
     "@headlessui/vue": "^1.7.19",
     "@repo/api": "*",
     "@repo/types": "*",

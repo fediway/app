@@ -1,4 +1,6 @@
 import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { TextZoom } from '@capacitor/text-zoom';
 import { setPlatformAdapter, useAppLifecycle, useAuth, useShareTarget } from '@repo/api';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -8,6 +10,11 @@ import './assets/main.css';
 
 // Set native platform adapter BEFORE any auth calls
 setPlatformAdapter(new CapacitorPlatformAdapter());
+
+// Lock text zoom to 1.0 on native to prevent OS-level font scaling
+if (Capacitor.isNativePlatform()) {
+  TextZoom.set({ value: 1.0 });
+}
 
 const router = createRouter({
   history: createWebHistory(),
