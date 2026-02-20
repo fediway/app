@@ -1,0 +1,9 @@
+{
+  "extends": "../../packages/config/typescript/base.json",
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./*"]
+    }
+  },
+  "include": ["composables/**/*.ts", "stores/**/*.ts"]
+}

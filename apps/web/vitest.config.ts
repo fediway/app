@@ -8,6 +8,9 @@ export default mergeConfig(baseConfig, defineConfig({
     include: ['composables/**/*.test.ts', 'stores/**/*.test.ts'],
     environment: 'happy-dom',
   },
+  esbuild: {
+    tsconfigRaw: '{}',
+  },
   resolve: {
     alias: {
       '~': path.resolve(__dirname),
