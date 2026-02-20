@@ -1,7 +1,7 @@
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { TextZoom } from '@capacitor/text-zoom';
-import { setPlatformAdapter, useAppLifecycle, useAuth, useShareTarget } from '@repo/api';
+import { setPlatformAdapter, useAppLifecycle, useAuth, useDeepLinks, useShareTarget } from '@repo/api';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
@@ -59,8 +59,11 @@ const router = createRouter({
 
 // --- Auth ---
 
-// Listen for OAuth deep links (com.fediway.app://oauth/callback?code=...)
+// Listen for deep links and OAuth callbacks
+const deepLinks = useDeepLinks();
+
 CapacitorApp.addListener('appUrlOpen', async (data) => {
+  // OAuth callback takes priority
   if (data.url.includes('oauth/callback')) {
     const url = new URL(data.url);
     const code = url.searchParams.get('code');
@@ -81,6 +84,14 @@ CapacitorApp.addListener('appUrlOpen', async (data) => {
         router.push({ path: '/login', query: { error: 'callback_failed' } });
       }
     }
+
+    return;
+  }
+
+  // Deep link routing (/@user, /items/*, /tags/*)
+  const route = deepLinks.resolveUrl(data.url);
+  if (route) {
+    router.push(route);
   }
 });
 
