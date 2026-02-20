@@ -16,9 +16,31 @@ export interface QueuedAction {
   attempts: number;
 }
 
+export interface DraftData {
+  content: string;
+  spoilerText: string;
+  visibility: 'public' | 'unlisted' | 'private' | 'direct';
+  inReplyToId?: string;
+  itemUrl?: string;
+  itemType?: string;
+  rating?: number;
+}
+
+export interface StoredDraft extends DraftData {
+  accountKey: string;
+  updatedAt: number;
+}
+
+export interface MetadataEntry {
+  key: string;
+  value: string;
+}
+
 export class FediwayDB extends Dexie {
   timelineCache!: Dexie.Table<CachedStatus>;
   actionQueue!: Dexie.Table<QueuedAction, number>;
+  drafts!: Dexie.Table<StoredDraft, string>;
+  metadata!: Dexie.Table<MetadataEntry, string>;
 
   constructor() {
     super('fediway');
@@ -28,6 +50,12 @@ export class FediwayDB extends Dexie {
     this.version(2).stores({
       timelineCache: '[timelineKey+statusId], timelineKey, cachedAt',
       actionQueue: '++id, statusId, createdAt',
+    });
+    this.version(3).stores({
+      timelineCache: '[timelineKey+statusId], timelineKey, cachedAt',
+      actionQueue: '++id, statusId, createdAt',
+      drafts: 'accountKey',
+      metadata: 'key',
     });
   }
 }

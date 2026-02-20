@@ -73,3 +73,47 @@ describe('fediwayDB v2 schema', () => {
     expect(db2.isOpen()).toBe(false);
   });
 });
+
+describe('fediwayDB v3 schema', () => {
+  it('creates drafts and metadata tables alongside existing tables', () => {
+    const db = getDb();
+    expect(db.timelineCache).toBeDefined();
+    expect(db.actionQueue).toBeDefined();
+    expect(db.drafts).toBeDefined();
+    expect(db.metadata).toBeDefined();
+  });
+
+  it('storedDraft round-trips correctly', async () => {
+    const db = getDb();
+    const now = Date.now();
+    await db.drafts.put({
+      accountKey: 'mastodon.social:alice',
+      content: 'Hello world',
+      spoilerText: '',
+      visibility: 'public',
+      itemUrl: 'https://example.com',
+      itemType: 'link',
+      rating: 4,
+      updatedAt: now,
+    });
+
+    const retrieved = await db.drafts.get('mastodon.social:alice');
+    expect(retrieved).toBeDefined();
+    expect(retrieved!.accountKey).toBe('mastodon.social:alice');
+    expect(retrieved!.content).toBe('Hello world');
+    expect(retrieved!.visibility).toBe('public');
+    expect(retrieved!.itemUrl).toBe('https://example.com');
+    expect(retrieved!.rating).toBe(4);
+    expect(retrieved!.updatedAt).toBe(now);
+  });
+
+  it('metadataEntry round-trips correctly', async () => {
+    const db = getDb();
+    await db.metadata.put({ key: 'idb_sentinel', value: '1' });
+
+    const retrieved = await db.metadata.get('idb_sentinel');
+    expect(retrieved).toBeDefined();
+    expect(retrieved!.key).toBe('idb_sentinel');
+    expect(retrieved!.value).toBe('1');
+  });
+});

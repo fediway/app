@@ -4,7 +4,7 @@ export { discoverInstance, type InstanceInfo, normalizeInstanceUrl } from './aut
 export { loadAccountList, loadActiveAccountKey, scopedStorageKey } from './auth/storage';
 
 // Cache
-export { type CachedStatus, FediwayDB, getDb, pruneAllTimelines, type QueuedAction } from './cache';
+export { type CachedStatus, checkDbIntegrity, type DraftData, FediwayDB, getDb, type MetadataEntry, pruneAllTimelines, type QueuedAction, type StoredDraft, writeSentinel } from './cache';
 
 export { useTimelineCache } from './cache';
 

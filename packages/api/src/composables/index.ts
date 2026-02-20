@@ -4,6 +4,7 @@ export { type ActionQueueError, useActionQueue, type UseActionQueueOptions, type
 export { type AppRestoredResult, type SavedAppState, useAppLifecycle, type UseAppLifecycleOptions } from './useAppLifecycle';
 export { useAuth } from './useAuth';
 export { useClient } from './useClient';
+export { useDraft, type UseDraftReturn } from './useDraft';
 export { type CreateFilterParams, type FilterError, type UpdateFilterParams, useFilters, type UseFiltersOptions, type UseFiltersReturn } from './useFilters';
 export { type ModerationError, type MuteAccountParams, useModeration, type UseModerationOptions, type UseModerationReturn } from './useModeration';
 export { type ReportCategory, type ReportError, type SubmitReportParams, useReport, type UseReportOptions, type UseReportReturn } from './useReport';
