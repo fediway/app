@@ -8,7 +8,7 @@
     "./typescript": "./typescript/base.json",
     "./typescript/nuxt": "./typescript/nuxt.json",
     "./tailwind": "./tailwind/base.js",
-    "./vitest": "./vitest/base.ts"
+    "./vitest": "./vitest/base.js"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1",
