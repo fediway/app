@@ -1,7 +1,7 @@
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { TextZoom } from '@capacitor/text-zoom';
-import { setPlatformAdapter, useAppLifecycle, useAuth, useDeepLinks, useShareTarget } from '@repo/api';
+import { setPlatformAdapter, useAppLifecycle, useAuth, useDarkMode, useDeepLinks, useShareTarget } from '@repo/api';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
@@ -98,6 +98,11 @@ CapacitorApp.addListener('appUrlOpen', async (data) => {
 // Restore session from secure storage on cold start
 const { restoreSession } = useAuth();
 restoreSession().catch(() => { /* stay unauthenticated */ });
+
+// --- Dark Mode ---
+
+const darkMode = useDarkMode();
+darkMode.init().catch(() => { /* use system default */ });
 
 // --- App Lifecycle ---
 

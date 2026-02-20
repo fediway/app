@@ -4,6 +4,7 @@ export { type ActionQueueError, useActionQueue, type UseActionQueueOptions, type
 export { type AppRestoredResult, type SavedAppState, useAppLifecycle, type UseAppLifecycleOptions } from './useAppLifecycle';
 export { useAuth } from './useAuth';
 export { useClient } from './useClient';
+export { type ThemePreference, useDarkMode, type UseDarkModeReturn } from './useDarkMode';
 export { type DeepLinkRoute, useDeepLinks, type UseDeepLinksReturn } from './useDeepLinks';
 export { useDraft, type UseDraftReturn } from './useDraft';
 export { type CreateFilterParams, type FilterError, type UpdateFilterParams, useFilters, type UseFiltersOptions, type UseFiltersReturn } from './useFilters';

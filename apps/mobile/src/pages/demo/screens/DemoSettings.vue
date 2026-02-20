@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { PluginListenerHandle } from '@capacitor/core';
-import { Capacitor } from '@capacitor/core';
+import type { ThemePreference } from '@repo/api';
 import { Network } from '@capacitor/network';
-import { StatusBar, Style } from '@capacitor/status-bar';
+import { useDarkMode } from '@repo/api';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 interface NetworkInfo {
@@ -10,25 +10,15 @@ interface NetworkInfo {
   connectionType: string;
 }
 
-const isDark = ref(document.documentElement.classList.contains('dark'));
+const { theme, isDark, setTheme } = useDarkMode();
 const networkStatus = ref<NetworkInfo | null>(null);
 const listeners: PluginListenerHandle[] = [];
 
-async function toggleDarkMode() {
-  isDark.value = !isDark.value;
-  document.documentElement.classList.toggle('dark', isDark.value);
-
-  if (Capacitor.isNativePlatform()) {
-    try {
-      await StatusBar.setStyle({
-        style: isDark.value ? Style.Dark : Style.Light,
-      });
-    }
-    catch {
-      // StatusBar may not be available
-    }
-  }
-}
+const themeOptions: { value: ThemePreference; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+];
 
 onMounted(async () => {
   try {
@@ -71,27 +61,30 @@ onUnmounted(() => {
     </header>
 
     <div class="px-4 py-6 space-y-4">
-      <!-- Dark mode toggle -->
+      <!-- Dark mode -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between mb-3">
           <div>
             <div class="font-medium text-gray-900 dark:text-gray-100">
-              Dark Mode
+              Appearance
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400">
-              Toggle dark color scheme
+              {{ isDark ? 'Dark' : 'Light' }} mode active
             </div>
           </div>
+        </div>
+        <div class="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <button
+            v-for="option in themeOptions"
+            :key="option.value"
             type="button"
-            class="relative w-11 h-6 rounded-full transition-colors"
-            :class="isDark ? 'bg-blue-600' : 'bg-gray-300'"
-            @click="toggleDarkMode"
+            class="flex-1 py-2 text-sm font-medium transition-colors"
+            :class="theme === option.value
+              ? 'bg-blue-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'"
+            @click="setTheme(option.value)"
           >
-            <span
-              class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"
-              :class="isDark ? 'translate-x-5' : 'translate-x-0'"
-            />
+            {{ option.label }}
           </button>
         </div>
       </div>

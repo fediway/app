@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { onMounted } from 'vue';
+import { useDarkMode } from '@repo/api';
+import { watch } from 'vue';
 
-onMounted(async () => {
+const { isDark } = useDarkMode();
+
+watch(isDark, async (dark) => {
   if (Capacitor.isNativePlatform()) {
-    await StatusBar.setStyle({ style: Style.Light });
+    // Style.Dark = light text (for dark backgrounds)
+    // Style.Light = dark text (for light backgrounds)
+    await StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light });
   }
-});
+}, { immediate: true });
 </script>
 
 <template>
