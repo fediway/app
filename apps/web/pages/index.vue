@@ -18,7 +18,10 @@ const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
 const timeline = useTimeline({ type: 'home' });
-timeline.fetch();
+
+if (import.meta.client) {
+  timeline.fetch();
+}
 
 const rawStatuses = computed(() => timeline.statuses.value ?? []);
 const allStatuses = computed(() => withOverridesAll(rawStatuses.value));
@@ -110,8 +113,8 @@ onDeactivated(() => {
       @media-click="handleMediaClick"
     />
 
-    <!-- Follow suggestions slider -->
-    <FollowSuggestions />
+    <!-- Follow suggestions slider (only show when feed has content) -->
+    <FollowSuggestions v-if="allStatuses.length > 0" />
 
     <!-- Remaining posts -->
     <StatusComponent

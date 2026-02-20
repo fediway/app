@@ -27,3 +27,11 @@ export function getDb(): FediwayDB {
   }
   return _db;
 }
+
+/** Reset the singleton — for tests only. */
+export function resetDb(): void {
+  if (_db) {
+    _db.close();
+    _db = null;
+  }
+}

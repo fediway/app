@@ -23,8 +23,8 @@ const mockUser: CurrentUser = {
 };
 
 export const useNavigationStore = defineStore('navigation', () => {
+  const route = useRoute();
   const isSidebarOpen = ref(false);
-  const activeItemId = ref('home');
   const pageTitle = ref('Home');
 
   const currentUser = computed<CurrentUser>(() => {
@@ -73,8 +73,23 @@ export const useNavigationStore = defineStore('navigation', () => {
     isSidebarOpen.value = !isSidebarOpen.value;
   }
 
+  const activeItemId = computed(() => {
+    const path = route.path;
+    // Check all menu items for a match (exact or prefix)
+    // Home must be exact '/' to avoid matching everything
+    for (const item of menuItems.value) {
+      if (item.to === '/') {
+        if (path === '/')
+          return item.id;
+      }
+      else if (path === item.to || path.startsWith(`${item.to}/`)) {
+        return item.id;
+      }
+    }
+    return 'home';
+  });
+
   function setActiveItem(id: string) {
-    activeItemId.value = id;
     const item = menuItems.value.find(item => item.id === id);
     if (item) {
       pageTitle.value = item.label;

@@ -6,11 +6,9 @@ let mockClientSingleton: MastoClient | null = null;
 
 function isMockMode(): boolean {
   try {
-    // Access Vite env var — available at build time in Vite apps
-    // Cast through unknown since ImportMeta doesn't include .env without Vite types
-    const meta = import.meta as unknown as Record<string, unknown>;
-    const env = meta.env as Record<string, string> | undefined;
-    return env?.VITE_API_MODE === 'mock';
+    // eslint-disable-next-line ts/ban-ts-comment
+    // @ts-ignore -- import.meta.env is typed in Nuxt/Vite consumers but not in base TS
+    return import.meta.env?.VITE_API_MODE === 'mock';
   }
   catch {
     return false;
