@@ -45,6 +45,42 @@ let nextId = 5000;
 export function createMockClient(): MastoClient {
   // In-memory state for the session
   const timelineStatuses = [...mockStatuses];
+  // Moderation state — Sets so block/unblock are idempotent like the real API
+  const blockedAccountIds = new Set<string>();
+  const mutedAccountIds = new Set<string>();
+  const mutedStatusIds = new Set<string>();
+  const blockedDomainsSet = new Set<string>();
+  const mockReports: Array<{ id: string; category: string; comment: string; statusIds: string[]; targetAccount: { id: string }; ruleIds: string[]; actionTaken: boolean; createdAt: string }> = [];
+  const mockFiltersList: Array<{ id: string; title: string; context: string[]; filterAction: string; expiresAt: string | null; keywords: Array<{ id: string; keyword: string; wholeWord: boolean }>; statuses: [] }> = [];
+  let nextFilterId = 1;
+  let nextFilterKeywordId = 1;
+  let nextReportId = 1;
+
+  const instanceRules = [
+    { id: '1', text: 'No spam or advertising', hint: 'Do not post unsolicited advertisements or spam content.' },
+    { id: '2', text: 'No harassment or abuse', hint: 'Be respectful to other users.' },
+    { id: '3', text: 'No illegal content', hint: 'Do not post content that violates applicable laws.' },
+    { id: '4', text: 'Use content warnings', hint: 'Use CW for sensitive or potentially triggering content.' },
+  ];
+
+  // Derives relationship from current Sets — used by both action endpoints and relationships.fetch
+  function buildRelationship(accountId: string): Relationship {
+    return {
+      id: accountId,
+      following: false,
+      followedBy: false,
+      blocking: blockedAccountIds.has(accountId),
+      blockedBy: false,
+      muting: mutedAccountIds.has(accountId),
+      mutingNotifications: mutedAccountIds.has(accountId),
+      requested: false,
+      requestedBy: false,
+      domainBlocking: false,
+      endorsed: false,
+      notifying: false,
+      note: '',
+    } as Relationship;
+  }
 
   function findStatusById(id: string): Status | undefined {
     // Check timeline
@@ -325,6 +361,24 @@ export function createMockClient(): MastoClient {
               }
               return status!;
             },
+            async mute() {
+              await delay();
+              const status = findStatusById(id);
+              if (status) {
+                mutedStatusIds.add(id);
+                status.muted = true;
+              }
+              return status!;
+            },
+            async unmute() {
+              await delay();
+              const status = findStatusById(id);
+              if (status) {
+                mutedStatusIds.delete(id);
+                status.muted = false;
+              }
+              return status!;
+            },
             async remove() {
               await delay();
               const idx = timelineStatuses.findIndex(s => s.id === id);
@@ -349,21 +403,7 @@ export function createMockClient(): MastoClient {
         relationships: {
           async fetch(params: { id: string[] }) {
             await delay();
-            return params.id.map(id => ({
-              id,
-              following: false,
-              followedBy: false,
-              blocking: false,
-              blockedBy: false,
-              muting: false,
-              mutingNotifications: false,
-              requested: false,
-              requestedBy: false,
-              domainBlocking: false,
-              endorsed: false,
-              notifying: false,
-              note: '',
-            } as Relationship));
+            return params.id.map(id => buildRelationship(id));
           },
         },
         $select(id: string) {
@@ -380,39 +420,32 @@ export function createMockClient(): MastoClient {
             },
             async follow() {
               await delay();
-              return {
-                id,
-                following: true,
-                followedBy: false,
-                blocking: false,
-                blockedBy: false,
-                muting: false,
-                mutingNotifications: false,
-                requested: false,
-                requestedBy: false,
-                domainBlocking: false,
-                endorsed: false,
-                notifying: false,
-                note: '',
-              } as Relationship;
+              const rel = buildRelationship(id);
+              return { ...rel, following: true } as Relationship;
             },
             async unfollow() {
               await delay();
-              return {
-                id,
-                following: false,
-                followedBy: false,
-                blocking: false,
-                blockedBy: false,
-                muting: false,
-                mutingNotifications: false,
-                requested: false,
-                requestedBy: false,
-                domainBlocking: false,
-                endorsed: false,
-                notifying: false,
-                note: '',
-              } as Relationship;
+              return buildRelationship(id);
+            },
+            async block() {
+              await delay();
+              blockedAccountIds.add(id);
+              return buildRelationship(id);
+            },
+            async unblock() {
+              await delay();
+              blockedAccountIds.delete(id);
+              return buildRelationship(id);
+            },
+            async mute(_params?: { notifications?: boolean; duration?: number }) {
+              await delay();
+              mutedAccountIds.add(id);
+              return buildRelationship(id);
+            },
+            async unmute() {
+              await delay();
+              mutedAccountIds.delete(id);
+              return buildRelationship(id);
             },
           };
         },
@@ -447,6 +480,56 @@ export function createMockClient(): MastoClient {
         async list() {
           await delay();
           return allAccounts();
+        },
+      },
+      blocks: {
+        async list() {
+          await delay();
+          return [...blockedAccountIds]
+            .map(id => findAccountById(id))
+            .filter((a): a is Account => a !== undefined);
+        },
+      },
+      mutes: {
+        async list() {
+          await delay();
+          return [...mutedAccountIds]
+            .map(id => findAccountById(id))
+            .filter((a): a is Account => a !== undefined);
+        },
+      },
+      domainBlocks: {
+        async list() {
+          await delay();
+          return [...blockedDomainsSet];
+        },
+        async create(params: { domain: string }) {
+          await delay();
+          blockedDomainsSet.add(params.domain);
+        },
+        async remove(params: { domain: string }) {
+          await delay();
+          blockedDomainsSet.delete(params.domain);
+        },
+      },
+      reports: {
+        async create(params: { accountId: string; statusIds?: string[]; comment?: string; forward?: boolean; category?: string; ruleIds?: string[] }) {
+          await delay();
+          const targetAccount = findAccountById(params.accountId);
+          if (!targetAccount)
+            throw new Error(`Account ${params.accountId} not found`);
+          const report = {
+            id: `${nextReportId++}`,
+            category: params.category ?? 'other',
+            comment: params.comment ?? '',
+            statusIds: params.statusIds ?? [],
+            targetAccount: { id: params.accountId },
+            ruleIds: params.ruleIds ?? [],
+            actionTaken: false,
+            createdAt: new Date().toISOString(),
+          };
+          mockReports.push(report);
+          return report;
         },
       },
     },
@@ -486,6 +569,103 @@ export function createMockClient(): MastoClient {
         async list() {
           await delay();
           return suggestedAccounts.map(account => ({ source: 'staff', account }));
+        },
+      },
+      instance: {
+        async fetch() {
+          await delay();
+          return {
+            domain: 'mock.fediway.local',
+            title: 'Fediway Mock',
+            version: '4.3.0',
+            rules: instanceRules,
+          };
+        },
+      },
+      filters: {
+        async list() {
+          await delay();
+          return [...mockFiltersList];
+        },
+        async create(params: { title: string; context: string[]; filterAction?: string; expiresIn?: number; keywordsAttributes?: Array<{ keyword: string; wholeWord?: boolean }> }) {
+          await delay();
+          const id = `${nextFilterId++}`;
+          const keywords = (params.keywordsAttributes ?? []).map(kw => ({
+            id: `${nextFilterKeywordId++}`,
+            keyword: kw.keyword,
+            wholeWord: kw.wholeWord ?? false,
+          }));
+          const filter = {
+            id,
+            title: params.title,
+            context: params.context,
+            filterAction: params.filterAction ?? 'warn',
+            expiresAt: params.expiresIn
+              ? new Date(Date.now() + params.expiresIn * 1000).toISOString()
+              : null,
+            keywords,
+            statuses: [] as [],
+          };
+          mockFiltersList.push(filter);
+          return filter;
+        },
+        $select(id: string) {
+          return {
+            async fetch() {
+              await delay();
+              const filter = mockFiltersList.find(f => f.id === id);
+              if (!filter)
+                throw new Error(`Filter ${id} not found`);
+              return { ...filter };
+            },
+            async update(params: { title?: string; context?: string[]; filterAction?: string; expiresIn?: number; keywordsAttributes?: Array<{ id?: string; keyword?: string; wholeWord?: boolean; _destroy?: boolean }> }) {
+              await delay();
+              const filter = mockFiltersList.find(f => f.id === id);
+              if (!filter)
+                throw new Error(`Filter ${id} not found`);
+              if (params.title !== undefined)
+                filter.title = params.title;
+              if (params.context !== undefined)
+                filter.context = params.context;
+              if (params.filterAction !== undefined)
+                filter.filterAction = params.filterAction;
+              if (params.expiresIn !== undefined) {
+                filter.expiresAt = params.expiresIn
+                  ? new Date(Date.now() + params.expiresIn * 1000).toISOString()
+                  : null;
+              }
+              if (params.keywordsAttributes) {
+                for (const kwAttr of params.keywordsAttributes) {
+                  if (kwAttr._destroy && kwAttr.id) {
+                    filter.keywords = filter.keywords.filter(k => k.id !== kwAttr.id);
+                  }
+                  else if (kwAttr.id) {
+                    const existing = filter.keywords.find(k => k.id === kwAttr.id);
+                    if (existing) {
+                      if (kwAttr.keyword !== undefined)
+                        existing.keyword = kwAttr.keyword;
+                      if (kwAttr.wholeWord !== undefined)
+                        existing.wholeWord = kwAttr.wholeWord;
+                    }
+                  }
+                  else if (kwAttr.keyword) {
+                    filter.keywords.push({
+                      id: `${nextFilterKeywordId++}`,
+                      keyword: kwAttr.keyword,
+                      wholeWord: kwAttr.wholeWord ?? false,
+                    });
+                  }
+                }
+              }
+              return { ...filter, keywords: [...filter.keywords] };
+            },
+            async remove() {
+              await delay();
+              const idx = mockFiltersList.findIndex(f => f.id === id);
+              if (idx >= 0)
+                mockFiltersList.splice(idx, 1);
+            },
+          };
         },
       },
     },

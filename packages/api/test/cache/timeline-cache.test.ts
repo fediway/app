@@ -2,7 +2,6 @@ import type { FediwayStatus } from '@repo/types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { getDb, resetDb } from '../../src/cache/db';
 import { useTimelineCache } from '../../src/cache/timeline-cache';
-import 'fake-indexeddb/auto';
 
 function makeStatus(id: string, content = ''): FediwayStatus {
   return {

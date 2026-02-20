@@ -5,6 +5,7 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 export default mergeConfig(baseConfig, defineConfig({
   test: {
     include: ['src/**/*.{test,spec}.ts', 'test/**/*.{test,spec}.ts'],
+    setupFiles: ['test/cache/setup.ts'],
   },
   resolve: {
     alias: {
