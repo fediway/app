@@ -14,8 +14,21 @@ export interface UseDarkModeReturn {
   init: () => Promise<void>;
 }
 
+// Synchronous initial read from localStorage (available in both web and Capacitor WebView).
+// On mobile, SecureStorage may hold a different value — init() corrects it async.
+// This avoids a flash of wrong theme on page load.
+function getInitialTheme(): ThemePreference {
+  if (typeof localStorage !== 'undefined') {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && VALID_THEMES.includes(saved as ThemePreference)) {
+      return saved as ThemePreference;
+    }
+  }
+  return 'system';
+}
+
 // Module-level refs — shared across all callers (same pattern as useAccountStore)
-const theme = ref<ThemePreference>('system');
+const theme = ref<ThemePreference>(getInitialTheme());
 const systemPrefersDark = ref(false);
 
 const isDark = computed<boolean>(() => {
@@ -60,7 +73,6 @@ export function useDarkMode(): UseDarkModeReturn {
     await getPlatformAdapter().secureSet(STORAGE_KEY, value);
   }
 
-  // TODO: prevent flash-of-light-theme on reload (needs inline script + CSS via Vite transformIndexHtml plugin)
   async function init(): Promise<void> {
     const saved = await getPlatformAdapter().secureGet(STORAGE_KEY);
     if (saved && VALID_THEMES.includes(saved as ThemePreference)) {

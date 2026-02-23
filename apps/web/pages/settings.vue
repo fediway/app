@@ -7,7 +7,11 @@ import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
-const { settings, setTheme, setDefaultVisibility, toggleNotification, toggleSensitiveMedia } = useSettings();
+const { settings, theme, setTheme, setDefaultVisibility, toggleNotification, toggleSensitiveMedia } = useSettings();
+// Use the cookie for the active button state — it's available during SSR,
+// unlike the useDarkMode ref which defaults to 'system' on the server.
+const themeCookie = useCookie('fediway_theme');
+const activeTheme = computed(() => themeCookie.value ?? theme.value);
 const { mode, setMode } = useDataMode();
 const { isAuthenticated, instanceUrl, logout: apiLogout } = useAuth();
 
@@ -109,16 +113,16 @@ function handleLogout() {
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</label>
         <div class="flex gap-2">
           <button
-            v-for="theme in ['light', 'dark', 'system'] as const"
-            :key="theme"
+            v-for="t in ['light', 'dark', 'system'] as const"
+            :key="t"
             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize" :class="[
-              settings.appearance.theme === theme
+              activeTheme === t
                 ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
             ]"
-            @click="setTheme(theme)"
+            @click="setTheme(t)"
           >
-            {{ theme }}
+            {{ t }}
           </button>
         </div>
       </div>
