@@ -5,7 +5,7 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 export default mergeConfig(baseConfig, defineConfig({
   test: {
     root: path.resolve(__dirname),
-    include: ['composables/**/*.test.ts', 'stores/**/*.test.ts'],
+    include: ['app/composables/**/*.test.ts', 'app/stores/**/*.test.ts'],
     environment: 'happy-dom',
   },
   esbuild: {
@@ -13,7 +13,7 @@ export default mergeConfig(baseConfig, defineConfig({
   },
   resolve: {
     alias: {
-      '~': path.resolve(__dirname),
+      '~': path.resolve(__dirname, 'app'),
     },
   },
 }));

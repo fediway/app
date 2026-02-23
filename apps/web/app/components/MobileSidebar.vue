@@ -5,7 +5,6 @@ const router = useRouter();
 const navigation = useNavigationStore();
 
 function handleItemClick(item: { id: string; to: string }) {
-  navigation.setActiveItem(item.id);
   navigation.closeSidebar();
   router.push(item.to);
 }

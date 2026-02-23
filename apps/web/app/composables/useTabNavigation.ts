@@ -80,7 +80,6 @@ export function useTabNavigation() {
     // Different tab
     saveCurrentScroll();
     activeTab.value = tabId;
-    navigation.setActiveItem(tabId);
 
     const state = getTabState(tabId);
     isTabSwitching.value = true;
@@ -100,7 +99,6 @@ export function useTabNavigation() {
 
     if (matchedTab) {
       activeTab.value = matchedTab;
-      navigation.setActiveItem(matchedTab);
       const state = getTabState(matchedTab);
       state.lastPath = toPath;
     }
