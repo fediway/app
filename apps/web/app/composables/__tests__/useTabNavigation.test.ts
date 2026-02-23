@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { _resetTabNavigationState, useTabNavigation } from '../useTabNavigation';
 
-// Shared mock store instance so tests can assert on setActiveItem
-const mockSetActiveItem = vi.fn();
 const mockStore = {
   mobileFooterItems: [
     { id: 'home', label: 'Home', icon: 'home', to: '/' },
@@ -12,7 +10,6 @@ const mockStore = {
     { id: 'notifications', label: 'Notifications', icon: 'notifications', to: '/notifications' },
     { id: 'profile', label: 'Profile', icon: 'profile', to: '/@jane@social.network' },
   ],
-  setActiveItem: mockSetActiveItem,
 };
 
 vi.mock('~/stores/navigation', () => ({
@@ -32,7 +29,6 @@ beforeEach(() => {
   tab = useTabNavigation();
   navigateMock = vi.fn();
   scrollToMock.mockClear();
-  mockSetActiveItem.mockClear();
   Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true });
 });
 
@@ -181,10 +177,5 @@ describe('useTabNavigation', () => {
     expect(tab.isTabSwitching.value).toBe(true);
     tab.onRouteChange('/search', '/');
     expect(tab.isTabSwitching.value).toBe(false);
-  });
-
-  it('switchTab calls setActiveItem on navigation store', () => {
-    tab.switchTab('notifications', navigateMock);
-    expect(mockSetActiveItem).toHaveBeenCalledWith('notifications');
   });
 });

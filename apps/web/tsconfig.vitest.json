@@ -2,8 +2,8 @@
   "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
     "paths": {
-      "~/*": ["./*"]
+      "~/*": ["./app/*"]
     }
   },
-  "include": ["composables/**/*.ts", "stores/**/*.ts"]
+  "include": ["app/composables/**/*.ts", "app/stores/**/*.ts"]
 }

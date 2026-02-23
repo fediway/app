@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
   devServer: {
@@ -8,7 +8,7 @@ export default defineNuxtConfig({
 
   css: ['../../packages/ui/src/styles/globals.css'],
 
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss'],
 
   ssr: true,
 
@@ -55,6 +55,7 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    envDir: new URL('.', import.meta.url).pathname,
     esbuild: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
     },
@@ -63,9 +64,5 @@ export default defineNuxtConfig({
         '@/': new URL('../../packages/ui/src/', import.meta.url).pathname,
       },
     },
-  },
-
-  future: {
-    compatibilityVersion: 4,
   },
 });
