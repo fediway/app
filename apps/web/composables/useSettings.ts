@@ -1,9 +1,8 @@
+import type { ThemePreference } from '@repo/api';
+import { useDarkMode } from '@repo/api';
 import { reactive, watch } from 'vue';
 
 export interface AppSettings {
-  appearance: {
-    theme: 'light' | 'dark' | 'system';
-  };
   notifications: {
     mentions: boolean;
     follows: boolean;
@@ -33,7 +32,6 @@ function loadFromStorage(): AppSettings {
 
 function getDefaults(): AppSettings {
   return {
-    appearance: { theme: 'light' },
     notifications: {
       mentions: true,
       follows: true,
@@ -57,40 +55,19 @@ if (typeof window !== 'undefined') {
   }, { deep: true });
 }
 
-/** Apply the theme class to <html> */
-function applyTheme(theme: AppSettings['appearance']['theme']) {
-  if (typeof document === 'undefined')
-    return;
-  const html = document.documentElement;
-
-  if (theme === 'dark') {
-    html.classList.add('dark');
-  }
-  else if (theme === 'system') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    html.classList.toggle('dark', prefersDark);
-  }
-  else {
-    html.classList.remove('dark');
-  }
-}
-
-// Apply on load
-if (typeof window !== 'undefined') {
-  applyTheme(settings.appearance.theme);
-
-  // Listen for system preference changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (settings.appearance.theme === 'system') {
-      applyTheme('system');
-    }
-  });
-}
-
 export function useSettings() {
-  function setTheme(theme: AppSettings['appearance']['theme']) {
-    settings.appearance.theme = theme;
-    applyTheme(theme);
+  const { theme, isDark, setTheme: setDarkModeTheme } = useDarkMode();
+  // Preference cookie — 'system'|'dark'|'light' (for settings button SSR).
+  const themeCookie = useCookie('fediway_theme', { maxAge: 60 * 60 * 24 * 365 });
+  // Resolved cookie — always 'dark'|'light' (for SSR .dark class on <html>).
+  const resolvedCookie = useCookie('fediway_theme_resolved', { maxAge: 60 * 60 * 24 * 365 });
+
+  function setTheme(value: ThemePreference) {
+    themeCookie.value = value;
+    setDarkModeTheme(value);
+    // Sync resolved cookie immediately so the next SSR has the right class.
+    // nextTick isn't needed — isDark is a computed that updates synchronously after setTheme.
+    resolvedCookie.value = isDark.value ? 'dark' : 'light';
   }
 
   function setDefaultVisibility(visibility: AppSettings['privacy']['defaultVisibility']) {
@@ -107,6 +84,7 @@ export function useSettings() {
 
   return {
     settings,
+    theme,
     setTheme,
     setDefaultVisibility,
     toggleNotification,

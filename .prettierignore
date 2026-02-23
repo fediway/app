@@ -1,0 +1,3 @@
+# This project uses ESLint for formatting (no Prettier).
+# This file prevents editor-level Prettier from reformatting on save.
+*
