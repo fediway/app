@@ -31,4 +31,5 @@ export {
 export { Timeline } from './components/timeline';
 
 // Utilities
+export { cn } from './lib/utils';
 export { decodeBlurhash, isBlurhashValid } from './utils';

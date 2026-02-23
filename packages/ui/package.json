@@ -6,7 +6,9 @@
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
-    "./components/*": "./src/components/*.vue"
+    "./components/*": "./src/components/*.vue",
+    "./lib/*": "./src/lib/*",
+    "./styles/*": "./src/styles/*"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -21,8 +23,13 @@
     "@repo/types": "*",
     "@tanstack/vue-virtual": "^3.13.18",
     "blurhash": "^2.0.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "isomorphic-dompurify": "^2.36.0",
+    "lucide-vue-next": "^0.575.0",
+    "reka-ui": "^2.8.2",
     "swiper": "^12.0.3",
+    "tailwind-merge": "^3.5.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {
