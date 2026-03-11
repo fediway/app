@@ -43,7 +43,7 @@ const typeConfig = {
   },
 } as const;
 
-const config = computed(() => props.item ? typeConfig[props.item.type] : undefined);
+const config = computed(() => typeConfig[props.item.type]);
 
 const creator = computed(() => {
   const field = config.value?.creatorField;
