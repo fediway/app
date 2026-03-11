@@ -65,17 +65,23 @@
   --card-foreground: hsl(240 10% 3.9%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(240 10% 3.9%);
-  --primary: hsl(240 5.9% 10%);
-  --primary-foreground: hsl(0 0% 98%);
-  --secondary: hsl(240 4.8% 95.9%);
-  --secondary-foreground: hsl(240 5.9% 10%);
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  --accent: hsl(240 4.8% 95.9%);
-  --accent-foreground: hsl(240 5.9% 10%);
+
+  --primary: #232B37;
+  --primary-foreground: #fff;
+
+  --secondary: #DBDDFF;
+  --secondary-foreground: var(--primary);
+
+  --muted: #F6F3EB;
+  --muted-foreground: var(--primary);
+
+  --accent: #EDE6D6;
+  --accent-foreground: var(--primary);
+
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 5.9% 90%);
+
+  --border: #EDE6D6;
   --input: hsl(240 5.9% 90%);
   --ring: hsl(240 5.9% 10%);
   --radius: 0.5rem;
@@ -83,6 +89,22 @@
   --red: #C23737;
   --red-foreground: #FFFFFF;
   --red-background: #FEE2E2;
+
+  --blue: #70A6E0;
+  --blue-foreground: #FFFFFF;
+  --blue-background: #DBEAFE;
+
+  --green: #4A9073;
+  --green-foreground: #FFFFFF;
+  --green-background: #D1FAE5;
+
+  --yellow: #DBA800;
+  --yellow-foreground: #FFFFFF;
+  --yellow-background: #FEF3C7;
+
+  --camel: #C8A148;
+  --camel-foreground: #FFFFFF;
+  --camel-background: #FEF3C7;
 }
 
 .dark {
