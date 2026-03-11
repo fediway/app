@@ -1,3 +1,5 @@
+import tailwindcss from '@tailwindcss/vite';
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
@@ -6,9 +8,7 @@ export default defineNuxtConfig({
     port: 3333,
   },
 
-  css: ['../../packages/ui/src/styles/globals.css'],
-
-  modules: ['@nuxtjs/tailwindcss'],
+  css: [new URL('../../packages/ui/src/styles/globals.css', import.meta.url).pathname],
 
   ssr: true,
 
@@ -16,11 +16,6 @@ export default defineNuxtConfig({
     public: {
       defaultInstance: process.env.NUXT_PUBLIC_DEFAULT_INSTANCE || 'fediway.com',
     },
-  },
-
-  tailwindcss: {
-    configPath: './tailwind.config.ts',
-    exposeConfig: true,
   },
 
   typescript: {
@@ -55,6 +50,7 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    plugins: [tailwindcss() as any],
     envDir: new URL('.', import.meta.url).pathname,
     esbuild: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],

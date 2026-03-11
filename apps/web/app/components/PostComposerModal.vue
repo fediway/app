@@ -239,7 +239,7 @@ function handleKeydown(event: KeyboardEvent) {
                 v-model="spoilerText"
                 type="text"
                 placeholder="Write your warning here"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
             </div>
 
@@ -248,7 +248,7 @@ function handleKeydown(event: KeyboardEvent) {
               <textarea
                 v-model="content"
                 :placeholder="showContentWarning ? 'Write the content behind the warning...' : 'What\'s on your mind?'"
-                class="w-full min-h-[150px] p-0 text-[17px] leading-relaxed resize-none border-none outline-none placeholder-gray-400"
+                class="w-full min-h-[150px] p-0 text-[17px] leading-relaxed resize-none border-none outline-hidden placeholder-gray-400"
                 autofocus
               />
             </div>
@@ -288,7 +288,7 @@ function handleKeydown(event: KeyboardEvent) {
                   :key="index"
                   class="flex items-center gap-2"
                 >
-                  <div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                  <div class="shrink-0 w-5 h-5 flex items-center justify-center">
                     <div
                       class="border-2 border-gray-300" :class="[
                         pollMultiple ? 'w-4 h-4 rounded' : 'w-4 h-4 rounded-full',
@@ -300,12 +300,12 @@ function handleKeydown(event: KeyboardEvent) {
                     type="text"
                     :placeholder="`Option ${index + 1}`"
                     maxlength="50"
-                    class="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    class="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                   <button
                     v-if="pollOptions.length > MIN_POLL_OPTIONS"
                     type="button"
-                    class="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    class="shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
                     title="Remove option"
                     @click="removePollOption(index)"
                   >
@@ -342,7 +342,7 @@ function handleKeydown(event: KeyboardEvent) {
                   </svg>
                   <select
                     v-model="pollDuration"
-                    class="text-sm bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    class="text-sm bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-hidden focus:ring-2 focus:ring-blue-500"
                   >
                     <option
                       v-for="option in pollDurationOptions"
