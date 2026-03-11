@@ -50,7 +50,7 @@ function getDomain(url: string): string {
 
       <!-- Compact layout (for video/rich embeds) -->
       <div v-else class="flex">
-        <div class="w-32 h-32 flex-shrink-0 bg-gray-100 overflow-hidden">
+        <div class="w-32 h-32 shrink-0 bg-gray-100 overflow-hidden">
           <img
             :src="card.image"
             :alt="card.title || ''"

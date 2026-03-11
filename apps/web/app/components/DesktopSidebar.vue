@@ -16,7 +16,7 @@ const { open: openComposer } = usePostComposer();
       <img
         :src="navigation.currentUser.avatar"
         :alt="navigation.currentUser.name"
-        class="w-10 h-10 rounded-full flex-shrink-0"
+        class="w-10 h-10 rounded-full shrink-0"
       >
       <div class="min-w-0">
         <div class="text-sm font-semibold truncate text-gray-900 dark:text-white">

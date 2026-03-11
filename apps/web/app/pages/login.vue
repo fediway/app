@@ -142,7 +142,7 @@ function handleKeydown(event: KeyboardEvent) {
               autocomplete="off"
               autocapitalize="none"
               spellcheck="false"
-              class="w-full pl-10 pr-4 py-3 text-base border border-gray-200 rounded-xl outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
+              class="w-full pl-10 pr-4 py-3 text-base border border-gray-200 rounded-xl outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
               @keydown="handleKeydown"
             >
           </div>
@@ -200,7 +200,7 @@ function handleKeydown(event: KeyboardEvent) {
                 type="password"
                 placeholder="Access token"
                 autocomplete="off"
-                class="w-full pl-10 pr-4 py-3 text-base border border-gray-200 rounded-xl outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
+                class="w-full pl-10 pr-4 py-3 text-base border border-gray-200 rounded-xl outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
                 @keydown="handleKeydown"
               >
             </div>

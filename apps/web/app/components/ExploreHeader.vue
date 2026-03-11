@@ -49,7 +49,7 @@ const tabs = [
         v-model="searchQuery"
         type="text"
         placeholder="Search..."
-        class="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full text-[15px] outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white transition-colors"
+        class="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full text-[15px] outline-hidden focus:ring-2 focus:ring-gray-300 focus:bg-white transition-colors"
         @keydown="handleSearchKeydown"
       >
       <button

@@ -23,7 +23,7 @@ defineProps<Props>();
 
     <!-- Profile Avatar (overlapping, positioned left) -->
     <div class="absolute left-4 bottom-0 translate-y-1/2">
-      <div class="rounded-full border-4 border-white shadow-sm bg-white">
+      <div class="rounded-full border-4 border-white shadow-xs bg-white">
         <Avatar
           :src="account.avatar"
           :alt="`${account.displayName}'s avatar`"

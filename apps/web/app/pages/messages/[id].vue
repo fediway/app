@@ -162,7 +162,7 @@ function handleSend() {
             v-model="newMessage"
             type="text"
             placeholder="Write a message..."
-            class="flex-1 px-4 py-2 bg-gray-100 rounded-full text-[15px] outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+            class="flex-1 px-4 py-2 bg-gray-100 rounded-full text-[15px] outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           >
           <button
             type="submit"

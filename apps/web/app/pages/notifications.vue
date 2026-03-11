@@ -54,7 +54,7 @@ function handleNotificationClick(notification: Notification) {
       >
         <div class="flex gap-3">
           <!-- Icon indicator -->
-          <div class="flex-shrink-0 w-8 flex justify-end">
+          <div class="shrink-0 w-8 flex justify-end">
             <!-- Favourite icon -->
             <svg
               v-if="notification.type === 'favourite'"
@@ -127,7 +127,7 @@ function handleNotificationClick(notification: Notification) {
               </div>
               <RelativeTime
                 :datetime="notification.createdAt"
-                class="text-xs text-gray-400 flex-shrink-0"
+                class="text-xs text-gray-400 shrink-0"
               />
             </div>
 

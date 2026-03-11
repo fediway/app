@@ -7,12 +7,9 @@
   "exports": {
     "./typescript": "./typescript/base.json",
     "./typescript/nuxt": "./typescript/nuxt.json",
-    "./tailwind": "./tailwind/base.js",
     "./vitest": "./vitest/base.js"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.1",
-    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.4.0"
   }
 }
