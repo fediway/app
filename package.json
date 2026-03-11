@@ -16,6 +16,8 @@
     "dev:web:live": "VITE_API_MODE=live turbo run dev --filter=@repo/web",
     "dev:mobile": "turbo run dev --filter=@repo/mobile",
     "dev:mobile:mock": "VITE_API_MODE=mock turbo run dev --filter=@repo/mobile",
+    "dev:storybook": "turbo run dev --filter=@repo/storybook",
+    "build:storybook": "turbo run build --filter=@repo/storybook",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules",
