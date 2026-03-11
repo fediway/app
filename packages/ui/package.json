@@ -22,6 +22,7 @@
   "dependencies": {
     "@repo/types": "*",
     "@tanstack/vue-virtual": "^3.13.18",
+    "@vueuse/core": "^14.2.1",
     "blurhash": "^2.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -30,6 +31,8 @@
     "reka-ui": "^2.8.2",
     "swiper": "^12.0.3",
     "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.1.0",
+    "tw-animate-css": "^1.2.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {

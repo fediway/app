@@ -53,7 +53,7 @@ function formatTime(dateString: string): string {
             <span class="font-semibold text-gray-900 truncate">
               {{ conversation.participant.displayName }}
             </span>
-            <span class="text-xs text-gray-500 flex-shrink-0">
+            <span class="text-xs text-gray-500 shrink-0">
               {{ formatTime(conversation.lastMessageAt) }}
             </span>
           </div>
@@ -67,7 +67,7 @@ function formatTime(dateString: string): string {
             </p>
             <span
               v-if="conversation.unreadCount > 0"
-              class="flex-shrink-0 w-5 h-5 bg-blue-500 text-white text-xs font-medium rounded-full flex items-center justify-center"
+              class="shrink-0 w-5 h-5 bg-blue-500 text-white text-xs font-medium rounded-full flex items-center justify-center"
             >
               {{ conversation.unreadCount }}
             </span>

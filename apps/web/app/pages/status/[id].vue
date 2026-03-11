@@ -136,7 +136,7 @@ function formatFullTimestamp(dateString: string): string {
 
           <article class="px-4 py-3">
             <div class="flex gap-3">
-              <NuxtLink :to="getProfileUrl(ancestor.account.acct)" class="flex-shrink-0" @click.stop>
+              <NuxtLink :to="getProfileUrl(ancestor.account.acct)" class="shrink-0" @click.stop>
                 <img
                   :src="ancestor.account.avatar"
                   :alt="ancestor.account.displayName"
@@ -249,7 +249,7 @@ function formatFullTimestamp(dateString: string): string {
         >
           <article class="px-4 py-3">
             <div class="flex gap-3">
-              <NuxtLink :to="getProfileUrl(reply.account.acct)" class="flex-shrink-0" @click.stop>
+              <NuxtLink :to="getProfileUrl(reply.account.acct)" class="shrink-0" @click.stop>
                 <img
                   :src="reply.account.avatar"
                   :alt="reply.account.displayName"

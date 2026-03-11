@@ -169,7 +169,7 @@ function stripHtml(html: string): string {
                   v-model="searchQuery"
                   type="text"
                   placeholder="Search for people..."
-                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
                 >
 
                 <!-- Search Results Dropdown -->
@@ -212,7 +212,7 @@ function stripHtml(html: string): string {
                 v-model="message"
                 placeholder="Add a message..."
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 resize-none"
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100 resize-none"
               />
             </div>
 
@@ -224,7 +224,7 @@ function stripHtml(html: string): string {
                   <img
                     :src="status.account.avatar"
                     :alt="status.account.displayName"
-                    class="w-8 h-8 rounded-full flex-shrink-0"
+                    class="w-8 h-8 rounded-full shrink-0"
                   >
                   <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-1 text-sm">

@@ -29,7 +29,7 @@ const maxDistribution = computed(() => Math.max(...duneAggregation.ratingDistrib
         v-if="item.image"
         :src="item.image"
         :alt="item.title"
-        class="w-24 h-36 object-cover rounded-lg flex-shrink-0"
+        class="w-24 h-36 object-cover rounded-lg shrink-0"
       >
       <div class="flex-1 min-w-0">
         <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">

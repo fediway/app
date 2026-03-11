@@ -25,7 +25,7 @@ function handleFollow(accountId: string) {
         class="px-4 py-3 hover:bg-gray-50 transition-colors"
       >
         <div class="flex items-start gap-3">
-          <NuxtLink :to="getProfileUrl(account.acct)" class="flex-shrink-0">
+          <NuxtLink :to="getProfileUrl(account.acct)" class="shrink-0">
             <img
               :src="account.avatar"
               :alt="account.displayName"
@@ -44,7 +44,7 @@ function handleFollow(accountId: string) {
               </NuxtLink>
               <button
                 type="button"
-                class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full transition-colors" :class="[
+                class="shrink-0 px-4 py-1.5 text-sm font-medium rounded-full transition-colors" :class="[
                   isFollowing(account.id)
                     ? 'text-gray-700 bg-white border border-gray-300 hover:border-red-300 hover:text-red-600'
                     : 'text-white bg-gray-900 hover:bg-gray-700',

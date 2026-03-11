@@ -72,7 +72,7 @@ function getLinkPageUrl(url: string): string {
         class="block px-4 py-4 hover:bg-gray-50 transition-colors no-underline"
       >
         <div class="flex items-start gap-3">
-          <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+          <div class="shrink-0 w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
             <img
               :src="link.favicon"
               :alt="link.source"

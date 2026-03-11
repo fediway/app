@@ -89,7 +89,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
         class="block no-underline"
       >
         <div class="flex items-start gap-3">
-          <div class="flex-shrink-0 w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
+          <div class="shrink-0 w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
             <svg class="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
@@ -103,7 +103,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
               {{ linkInfo.source }}
             </p>
           </div>
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="w-5 h-5 text-gray-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
             <polyline points="15 3 21 3 21 9" />
             <line x1="10" y1="14" x2="21" y2="3" />
