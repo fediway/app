@@ -1,9 +1,34 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@source "../../";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Text Style Reference (Figma → Tailwind)
+ * H1:         text-xl font-bold          (22px/700)
+ * H2:         text-lg font-bold           (18px/700)
+ * H3:         text-base font-bold         (16px/700)
+ * Body:       text-base leading-[22px]    (16px/400/22px)
+ * Caption:    text-sm                     (14px/400)
+ * Navigation: text-xs                     (12px/400)
+ * Button:     text-base font-semibold     (16px/600) — applied in button CVA
+ * Button sm:  text-sm font-semibold       (14px/600) — applied in button CVA
+ * Tab label:  text-base font-medium       (16px/500)
+ * Tab active: text-base font-bold         (16px/700)
+ */
+
+@font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 300; src: url('../fonts/asta-sans-v3-latin-300.woff2') format('woff2'); }
+@font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 400; src: url('../fonts/asta-sans-v3-latin-regular.woff2') format('woff2'); }
+@font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 500; src: url('../fonts/asta-sans-v3-latin-500.woff2') format('woff2'); }
+@font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 600; src: url('../fonts/asta-sans-v3-latin-600.woff2') format('woff2'); }
+@font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 700; src: url('../fonts/asta-sans-v3-latin-700.woff2') format('woff2'); }
+@font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 800; src: url('../fonts/asta-sans-v3-latin-800.woff2') format('woff2'); }
+
 @theme inline {
+  --font-sans: 'Asta Sans', ui-sans-serif, system-ui, sans-serif;
+  --text-xl: 22px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -26,6 +51,26 @@
   --color-red: var(--red);
   --color-red-foreground: var(--red-foreground);
   --color-red-background: var(--red-background);
+
+  --color-blue: var(--blue);
+  --color-blue-foreground: var(--blue-foreground);
+  --color-blue-background: var(--blue-background);
+
+  --color-green: var(--green);
+  --color-green-foreground: var(--green-foreground);
+  --color-green-background: var(--green-background);
+
+  --color-yellow: var(--yellow);
+  --color-yellow-foreground: var(--yellow-foreground);
+  --color-yellow-background: var(--yellow-background);
+
+  --color-camel: var(--camel);
+  --color-camel-foreground: var(--camel-foreground);
+  --color-camel-background: var(--camel-background);
+
+  --color-gray: var(--gray);
+  --color-gray-foreground: var(--gray-foreground);
+  --color-gray-background: var(--gray-background);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -87,24 +132,28 @@
   --radius: 0.5rem;
 
   --red: #C23737;
-  --red-foreground: #FFFFFF;
-  --red-background: #FEE2E2;
+  --red-foreground: #CC6633;
+  --red-background: #F7E8E0;
 
   --blue: #70A6E0;
-  --blue-foreground: #FFFFFF;
-  --blue-background: #DBEAFE;
+  --blue-foreground: #2877CB;
+  --blue-background: #DFEBF7;
 
   --green: #4A9073;
-  --green-foreground: #FFFFFF;
-  --green-background: #D1FAE5;
+  --green-foreground: #228419;
+  --green-background: #DEEDDD;
 
   --yellow: #DBA800;
-  --yellow-foreground: #FFFFFF;
-  --yellow-background: #FEF3C7;
+  --yellow-foreground: #CB9200;
+  --yellow-background: #FFF2D2;
 
   --camel: #C8A148;
   --camel-foreground: #FFFFFF;
   --camel-background: #FEF3C7;
+
+  --gray: #232B37CC;
+  --gray-foreground: #000000;
+  --gray-background: #E9E9E9;
 }
 
 .dark {

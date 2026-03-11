@@ -8,11 +8,11 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      options: ['default', 'secondary', 'muted'],
     },
     size: {
       control: 'select',
-      options: ['default', 'sm', 'lg', 'icon', 'icon-sm', 'icon-lg'],
+      options: ['default', 'sm', 'icon'],
     },
   },
   args: {
@@ -37,28 +37,47 @@ export const Secondary: Story = {
   args: { variant: 'secondary' },
 };
 
-export const Destructive: Story = {
-  args: { variant: 'destructive' },
-};
-
-export const Outline: Story = {
-  args: { variant: 'outline' },
-};
-
-export const Ghost: Story = {
-  args: { variant: 'ghost' },
-};
-
-export const Link: Story = {
-  args: { variant: 'link' },
+export const Muted: Story = {
+  args: { variant: 'muted' },
 };
 
 export const Small: Story = {
   args: { size: 'sm' },
 };
 
-export const Large: Story = {
-  args: { size: 'lg' },
+export const Icon: Story = {
+  render: () => ({
+    components: { Button },
+    template: `
+      <Button size="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </Button>
+    `,
+  }),
+};
+
+export const IconLeft: Story = {
+  render: () => ({
+    components: { Button },
+    template: `
+      <Button>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        Follow
+      </Button>
+    `,
+  }),
+};
+
+export const IconRight: Story = {
+  render: () => ({
+    components: { Button },
+    template: `
+      <Button>
+        Top
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </Button>
+    `,
+  }),
 };
 
 export const AllVariants: Story = {
@@ -68,10 +87,7 @@ export const AllVariants: Story = {
       <div class="flex flex-wrap items-center gap-4">
         <Button variant="default">Default</Button>
         <Button variant="secondary">Secondary</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
+        <Button variant="muted">Muted</Button>
       </div>
     `,
   }),
@@ -82,9 +98,11 @@ export const AllSizes: Story = {
     components: { Button },
     template: `
       <div class="flex flex-wrap items-center gap-4">
-        <Button size="sm">Small</Button>
         <Button size="default">Default</Button>
-        <Button size="lg">Large</Button>
+        <Button size="sm">Small</Button>
+        <Button size="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </Button>
       </div>
     `,
   }),
