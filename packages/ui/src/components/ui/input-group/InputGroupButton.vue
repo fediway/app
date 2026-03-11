@@ -6,7 +6,7 @@ import { Button } from '../button';
 
 const props = withDefaults(defineProps<InputGroupButtonProps>(), {
   size: 'xs',
-  variant: 'ghost',
+  variant: 'muted',
 });
 </script>
 

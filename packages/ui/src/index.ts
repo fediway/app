@@ -15,6 +15,9 @@ export { MediaCarousel, MediaGallery, MediaLightbox } from './components/media';
 // Primitives
 export { Avatar, RelativeTime, RichText } from './components/primitives';
 
+// Profile components
+export { ProfileHeader } from './components/profile';
+
 // Status components
 export {
   Status,
