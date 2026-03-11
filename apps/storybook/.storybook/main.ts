@@ -1,5 +1,6 @@
 import type { StorybookConfig } from '@storybook/vue3-vite';
 import { resolve } from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
 const config: StorybookConfig = {
@@ -34,9 +35,9 @@ const config: StorybookConfig = {
       allow: [resolve(__dirname, '../../..')],
     };
 
-    // Add Vue plugin if not already present
     config.plugins = config.plugins || [];
     config.plugins.push(vue());
+    config.plugins.push(tailwindcss());
 
     return config;
   },
