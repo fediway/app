@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { RichText } from '@repo/ui';
+import { AccountDisplayName, AccountHandle, RichText } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useFollows } from '~/composables/useFollows';
@@ -35,24 +36,24 @@ function handleFollow(accountId: string) {
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between gap-3">
               <NuxtLink :to="getProfileUrl(account.acct)" class="min-w-0 no-underline">
-                <div class="font-semibold text-gray-900 truncate">
-                  {{ account.displayName }}
-                </div>
-                <div class="text-sm text-gray-500 truncate">
-                  @{{ account.acct }}
-                </div>
+                <AccountDisplayName
+                  :name="account.displayName || account.username"
+                  :emojis="account.emojis"
+                  class="truncate block"
+                />
+                <AccountHandle :acct="account.acct" class="text-sm truncate block" />
               </NuxtLink>
-              <button
-                type="button"
-                class="shrink-0 px-4 py-1.5 text-sm font-medium rounded-full transition-colors" :class="[
+              <Button
+                size="sm"
+                class="shrink-0" :class="[
                   isFollowing(account.id)
-                    ? 'text-gray-700 bg-white border border-gray-300 hover:border-red-300 hover:text-red-600'
-                    : 'text-white bg-gray-900 hover:bg-gray-700',
+                    ? 'bg-white text-gray-700 border border-gray-300 hover:border-red-300 hover:text-red-600 hover:bg-white'
+                    : '',
                 ]"
                 @click="handleFollow(account.id)"
               >
                 {{ isFollowing(account.id) ? 'Following' : 'Follow' }}
-              </button>
+              </Button>
             </div>
             <RichText v-if="account.note" :content="account.note" :emojis="account.emojis" class="text-sm text-gray-600 mt-1 line-clamp-2" />
             <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">

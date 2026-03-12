@@ -1,24 +1,15 @@
 <script setup lang="ts">
+import { AccountDisplayName, AccountHandle } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { useData } from '~/composables/useData';
+import { formatCount } from '~/utils/format';
 
 import 'swiper/css';
-
-const TRAILING_DOT_ZERO_RE = /\.0$/;
 
 const { getSuggestedAccounts, getProfileUrl } = useData();
 const { toggleFollow, isFollowing } = useFollows();
 const suggestions = computed(() => getSuggestedAccounts());
-
-function formatCount(count: number): string {
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1).replace(TRAILING_DOT_ZERO_RE, '')}M`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1).replace(TRAILING_DOT_ZERO_RE, '')}K`;
-  }
-  return count.toString();
-}
 </script>
 
 <template>
@@ -52,26 +43,30 @@ function formatCount(count: number): string {
               :alt="account.displayName"
               class="w-14 h-14 rounded-full mb-2"
             >
-            <div class="font-semibold text-gray-900 text-sm truncate w-full">
-              {{ account.displayName }}
-            </div>
-            <div class="text-xs text-gray-500 truncate w-full mb-2">
-              @{{ account.acct.split('@')[0] }}
-            </div>
+            <AccountDisplayName
+              :name="account.displayName || account.username"
+              :emojis="account.emojis"
+              class="text-sm truncate w-full block"
+            />
+            <AccountHandle
+              :acct="account.acct"
+              :show-instance="false"
+              class="text-xs truncate w-full block mb-2"
+            />
             <div class="text-xs text-gray-400 mb-3">
               {{ formatCount(account.followersCount) }} followers
             </div>
-            <button
-              type="button"
-              class="w-full py-1.5 px-3 text-xs font-medium rounded-full transition-colors" :class="[
+            <Button
+              size="sm"
+              class="w-full h-8 text-xs" :class="[
                 isFollowing(account.id)
-                  ? 'text-gray-700 bg-white border border-gray-300 hover:border-red-300 hover:text-red-600'
-                  : 'text-white bg-gray-900 hover:bg-gray-700',
+                  ? 'bg-white text-gray-700 border border-gray-300 hover:border-red-300 hover:text-red-600 hover:bg-white'
+                  : '',
               ]"
               @click.prevent.stop="toggleFollow(account.id)"
             >
               {{ isFollowing(account.id) ? 'Following' : 'Follow' }}
-            </button>
+            </Button>
           </div>
         </NuxtLink>
       </SwiperSlide>

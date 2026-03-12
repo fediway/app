@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
-import { Avatar, RelativeTime, StatusContent } from '@repo/ui';
+import { PhAt, PhHeart, PhRepeat, PhUserPlus } from '@phosphor-icons/vue';
+import { AccountDisplayName, Avatar, RelativeTime, StatusContent } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 
@@ -55,55 +56,10 @@ function handleNotificationClick(notification: Notification) {
         <div class="flex gap-3">
           <!-- Icon indicator -->
           <div class="shrink-0 w-8 flex justify-end">
-            <!-- Favourite icon -->
-            <svg
-              v-if="notification.type === 'favourite'"
-              class="w-5 h-5 text-red-500"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-            <!-- Reblog icon -->
-            <svg
-              v-else-if="notification.type === 'reblog'"
-              class="w-5 h-5 text-green-500"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M17 1l4 4-4 4" />
-              <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-              <path d="M7 23l-4-4 4-4" />
-              <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-            </svg>
-            <!-- Follow icon -->
-            <svg
-              v-else-if="notification.type === 'follow'"
-              class="w-5 h-5 text-blue-500"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="8.5" cy="7" r="4" />
-              <line x1="20" y1="8" x2="20" y2="14" />
-              <line x1="23" y1="11" x2="17" y2="11" />
-            </svg>
-            <!-- Mention icon -->
-            <svg
-              v-else-if="notification.type === 'mention'"
-              class="w-5 h-5 text-purple-500"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="4" />
-              <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" />
-            </svg>
+            <PhHeart v-if="notification.type === 'favourite'" :size="20" weight="fill" class="text-red-500" />
+            <PhRepeat v-else-if="notification.type === 'reblog'" :size="20" class="text-green-500" />
+            <PhUserPlus v-else-if="notification.type === 'follow'" :size="20" class="text-blue-500" />
+            <PhAt v-else-if="notification.type === 'mention'" :size="20" class="text-purple-500" />
           </div>
 
           <!-- Content -->
@@ -118,9 +74,10 @@ function handleNotificationClick(notification: Notification) {
                 />
               </NuxtLink>
               <div class="flex-1 min-w-0">
-                <span class="font-semibold text-gray-900">
-                  {{ notification.account.displayName }}
-                </span>
+                <AccountDisplayName
+                  :name="notification.account.displayName || notification.account.username"
+                  :emojis="notification.account.emojis"
+                />
                 <span class="text-gray-500 ml-1">
                   {{ getNotificationText(notification) }}
                 </span>

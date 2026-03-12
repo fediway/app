@@ -16,6 +16,7 @@
     "clean": "rm -rf .nuxt .output node_modules"
   },
   "dependencies": {
+    "@phosphor-icons/vue": "^2.2.1",
     "@repo/api": "*",
     "@repo/types": "*",
     "@repo/ui": "*",

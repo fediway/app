@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
+import { AccountDisplayName, AccountHandle, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 
 const suggestedAccounts = [
   {
@@ -51,24 +52,26 @@ function handleFollow(accountId: string) {
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                  <div class="text-[13px] font-semibold text-gray-900 truncate">
-                    {{ account.displayName }}
-                  </div>
-                  <div class="text-[12px] text-gray-500 truncate">
-                    {{ account.handle }}
-                  </div>
+                  <AccountDisplayName
+                    :name="account.displayName"
+                    class="text-[13px] truncate block"
+                  />
+                  <AccountHandle
+                    :acct="account.handle"
+                    class="text-[12px] truncate block"
+                  />
                 </div>
-                <button
-                  type="button"
-                  class="shrink-0 px-3 py-1 text-[12px] font-medium rounded-full transition-colors" :class="[
+                <Button
+                  size="sm"
+                  class="shrink-0 h-7 px-3 text-[12px] bg-white text-gray-900 border border-gray-300 hover:bg-gray-50" :class="[
                     isFollowing(account.id)
-                      ? 'text-gray-700 bg-white border border-gray-300 hover:border-red-300 hover:text-red-600'
-                      : 'text-gray-900 bg-white border border-gray-300 hover:bg-gray-50',
+                      ? 'text-gray-700 hover:border-red-300 hover:text-red-600 hover:bg-white'
+                      : '',
                   ]"
                   @click="handleFollow(account.id)"
                 >
                   {{ isFollowing(account.id) ? 'Following' : 'Follow' }}
-                </button>
+                </Button>
               </div>
               <p class="text-[12px] text-gray-600 mt-1 line-clamp-1">
                 {{ account.bio }}

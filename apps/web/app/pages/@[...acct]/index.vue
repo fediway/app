@@ -3,8 +3,8 @@ import type { MediaAttachment, Status, Tag } from '@repo/types';
 import {
   AccountActions,
   AccountBio,
-  AccountHeader,
   AccountStats,
+  ProfileHeader,
   Timeline,
 } from '@repo/ui';
 import { useData } from '~/composables/useData';
@@ -69,16 +69,31 @@ function handleSendMessage(status: Status) {
 function handleMediaClick(attachments: MediaAttachment[], index: number) {
   openLightbox(attachments, index);
 }
+
+function goBack() {
+  if (window.history.length > 1) {
+    router.back();
+  }
+  else {
+    router.push('/');
+  }
+}
 </script>
 
 <template>
   <div class="w-full">
     <div v-if="account" class="w-full">
-      <!-- Profile Header (banner + avatar) -->
-      <AccountHeader :account="account" />
+      <!-- Profile Header (banner + avatar + back) -->
+      <ProfileHeader
+        :header-image="account.header"
+        :avatar-src="account.avatar"
+        :avatar-alt="`${account.displayName}'s avatar`"
+        :follows-you="relationship?.followedBy ?? false"
+        @back="goBack"
+      />
 
       <!-- Actions row (positioned to align with avatar row) -->
-      <div class="px-4 pt-2 flex justify-end">
+      <div class="px-4 -mt-12 flex justify-end">
         <AccountActions
           :relationship="relationship"
           @follow="handleFollowToggle"

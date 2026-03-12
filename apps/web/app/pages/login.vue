@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed, ref } from 'vue';
 import { clearLiveCache } from '~/composables/useData';
 import { useDataMode } from '~/composables/useDataMode';
@@ -130,54 +133,42 @@ function handleKeydown(event: KeyboardEvent) {
         <!-- Form Fields -->
         <div class="space-y-4">
           <!-- Instance -->
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </div>
-            <input
+          <InputGroup class="rounded-xl h-12">
+            <InputGroupAddon>
+              <PhGlobe :size="20" />
+            </InputGroupAddon>
+            <InputGroupInput
               v-model="instanceDomain"
               type="text"
               placeholder="Instance (e.g. mastodon.social)"
               autocomplete="off"
               autocapitalize="none"
               spellcheck="false"
-              class="w-full pl-10 pr-4 py-3 text-base border border-gray-200 rounded-xl outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
+              class="h-12 text-base"
               @keydown="handleKeydown"
-            >
-          </div>
+            />
+          </InputGroup>
         </div>
 
         <!-- Buttons -->
         <div class="flex flex-col gap-3 mt-6">
-          <button
-            type="button"
+          <Button
             :disabled="!canSignIn"
-            class="w-full py-3 px-4 rounded-xl font-medium text-base transition-all" :class="[
-              canSignIn
-                ? 'bg-gray-900 text-white hover:bg-gray-700'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed',
-            ]"
+            class="w-full py-3 rounded-xl"
             @click="handleOAuthLogin"
           >
             <span v-if="isLoading" class="inline-flex items-center justify-center gap-2">
-              <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
+              <PhCircleNotch :size="20" class="animate-spin" />
             </span>
             <span v-else>Sign in</span>
-          </button>
-          <button
-            type="button"
-            class="w-full py-3 px-4 rounded-xl font-medium text-base border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+          </Button>
+          <Button
+            variant="secondary"
+            class="w-full py-3 rounded-xl"
             @click="handleMockMode"
           >
             Continue with mock data
-          </button>
+          </Button>
         </div>
 
         <!-- Developer Login Toggle -->
@@ -191,37 +182,30 @@ function handleKeydown(event: KeyboardEvent) {
           </button>
 
           <div v-if="showDevLogin" class="mt-3 space-y-3">
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-              </div>
-              <input
+            <InputGroup class="rounded-xl h-12">
+              <InputGroupAddon>
+                <PhLock :size="20" />
+              </InputGroupAddon>
+              <InputGroupInput
                 v-model="accessToken"
                 type="password"
                 placeholder="Access token"
                 autocomplete="off"
-                class="w-full pl-10 pr-4 py-3 text-base border border-gray-200 rounded-xl outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
+                class="h-12 text-base"
                 @keydown="handleKeydown"
-              >
-            </div>
+              />
+            </InputGroup>
             <p class="text-xs text-gray-400">
               Generate a token in your instance's Settings &gt; Development &gt; New Application
             </p>
-            <button
-              type="button"
+            <Button
+              size="sm"
               :disabled="!canDevLogin"
-              class="w-full py-2.5 px-4 rounded-xl font-medium text-sm transition-all" :class="[
-                canDevLogin
-                  ? 'bg-gray-700 text-white hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed',
-              ]"
+              class="w-full rounded-xl"
               @click="handleDevLogin"
             >
               Connect with token
-            </button>
+            </Button>
           </div>
         </div>
       </div>

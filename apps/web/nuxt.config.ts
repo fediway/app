@@ -1,8 +1,13 @@
+import { resolve } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  alias: {
+    '@ui': resolve(__dirname, '../../packages/ui/src'),
+  },
 
   devServer: {
     port: 3333,

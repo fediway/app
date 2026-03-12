@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
+import { PhChartBar, PhChatCircle, PhClock, PhEnvelope, PhGlobe, PhImage, PhLock, PhLockOpen, PhPlus, PhWarning, PhX } from '@phosphor-icons/vue';
+import { Input } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed, ref, watch } from 'vue';
 import { useSettings } from '~/composables/useSettings';
 
@@ -200,33 +203,27 @@ function handleKeydown(event: KeyboardEvent) {
         <div class="relative w-full max-w-[650px] bg-white rounded-2xl shadow-xl overflow-hidden">
           <!-- Header -->
           <header class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <button
-              type="button"
-              class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            <Button
+              variant="muted"
+              size="sm"
+              class="text-gray-600 hover:text-gray-900"
               @click="handleClose"
             >
               Cancel
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              size="sm"
               :disabled="!canPost"
-              class="px-4 py-1.5 rounded-full text-sm font-semibold transition-colors" :class="[
-                canPost
-                  ? 'bg-gray-900 text-white hover:bg-gray-700'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed',
-              ]"
               @click="handlePost"
             >
               {{ isSubmitting ? 'Posting...' : 'Post' }}
-            </button>
+            </Button>
           </header>
 
           <!-- Reply context -->
           <div v-if="replyTo" class="px-4 pt-3 pb-0">
             <div class="flex items-center gap-2 text-sm text-gray-500">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-              </svg>
+              <PhChatCircle :size="16" />
               <span>Replying to <strong class="text-gray-700">@{{ replyTo.account.acct }}</strong></span>
             </div>
           </div>
@@ -235,12 +232,12 @@ function handleKeydown(event: KeyboardEvent) {
           <div class="p-4">
             <!-- Content Warning Input -->
             <div v-if="showContentWarning" class="mb-3">
-              <input
+              <Input
                 v-model="spoilerText"
                 type="text"
                 placeholder="Write your warning here"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+                class="text-sm rounded-lg"
+              />
             </div>
 
             <!-- Main Textarea -->
@@ -274,10 +271,7 @@ function handleKeydown(event: KeyboardEvent) {
                   title="Remove poll"
                   @click="showPoll = false"
                 >
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <PhX :size="20" />
                 </button>
               </div>
 
@@ -295,13 +289,13 @@ function handleKeydown(event: KeyboardEvent) {
                       ]"
                     />
                   </div>
-                  <input
+                  <Input
                     v-model="pollOptions[index]"
                     type="text"
                     :placeholder="`Option ${index + 1}`"
                     maxlength="50"
-                    class="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
+                    class="flex-1 text-sm rounded-lg"
+                  />
                   <button
                     v-if="pollOptions.length > MIN_POLL_OPTIONS"
                     type="button"
@@ -309,10 +303,7 @@ function handleKeydown(event: KeyboardEvent) {
                     title="Remove option"
                     @click="removePollOption(index)"
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
+                    <PhX :size="16" />
                   </button>
                   <div v-else class="w-6" />
                 </div>
@@ -325,10 +316,7 @@ function handleKeydown(event: KeyboardEvent) {
                 class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 transition-colors mb-4"
                 @click="addPollOption"
               >
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <PhPlus :size="16" />
                 <span>Add option</span>
               </button>
 
@@ -336,10 +324,7 @@ function handleKeydown(event: KeyboardEvent) {
               <div class="flex flex-wrap items-center gap-4 pt-3 border-t border-gray-200">
                 <!-- Duration Selector -->
                 <div class="flex items-center gap-2">
-                  <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
+                  <PhClock :size="16" class="text-gray-500" />
                   <select
                     v-model="pollDuration"
                     class="text-sm bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-hidden focus:ring-2 focus:ring-blue-500"
@@ -394,23 +379,10 @@ function handleKeydown(event: KeyboardEvent) {
                   @click="visibility = option.value"
                 >
                   <!-- Visibility Icons -->
-                  <svg v-if="getVisibilityIcon(option.value) === 'globe'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                  </svg>
-                  <svg v-else-if="getVisibilityIcon(option.value) === 'unlock'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                  </svg>
-                  <svg v-else-if="getVisibilityIcon(option.value) === 'lock'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  <svg v-else-if="getVisibilityIcon(option.value) === 'mail'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
+                  <PhGlobe v-if="getVisibilityIcon(option.value) === 'globe'" :size="16" />
+                  <PhLockOpen v-else-if="getVisibilityIcon(option.value) === 'unlock'" :size="16" />
+                  <PhLock v-else-if="getVisibilityIcon(option.value) === 'lock'" :size="16" />
+                  <PhEnvelope v-else-if="getVisibilityIcon(option.value) === 'mail'" :size="16" />
                   <span>{{ option.label }}</span>
                 </button>
               </div>
@@ -428,11 +400,7 @@ function handleKeydown(event: KeyboardEvent) {
                 ]"
                 @click="showContentWarning = !showContentWarning"
               >
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                  <line x1="12" y1="9" x2="12" y2="13" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
+                <PhWarning :size="16" />
                 <span>CW</span>
               </button>
 
@@ -446,11 +414,7 @@ function handleKeydown(event: KeyboardEvent) {
                 ]"
                 @click="togglePoll"
               >
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="6" height="18" rx="1" />
-                  <rect x="12" y="8" width="6" height="13" rx="1" />
-                  <rect x="21" y="13" width="6" height="8" rx="1" transform="translate(-6 0)" />
-                </svg>
+                <PhChartBar :size="16" />
                 <span>Poll</span>
               </button>
 
@@ -460,11 +424,7 @@ function handleKeydown(event: KeyboardEvent) {
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                 title="Attach media (coming soon)"
               >
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
+                <PhImage :size="16" />
                 <span>Media</span>
               </button>
             </div>
