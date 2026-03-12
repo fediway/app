@@ -237,10 +237,13 @@ describe('useTimeline', () => {
 
       await mockClient.rest.v1.statuses.create({ status: 'Interval post' });
       await vi.advanceTimersByTimeAsync(1000);
+      // Flush the async poll() promise that setInterval fired
+      await vi.advanceTimersByTimeAsync(0);
       expect(timeline.pendingStatuses.value.length).toBe(1);
 
       await mockClient.rest.v1.statuses.create({ status: 'Second interval post' });
       await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(0);
       expect(timeline.pendingStatuses.value.length).toBe(2);
 
       timeline.stopPolling();
@@ -248,6 +251,7 @@ describe('useTimeline', () => {
       // After stop, new statuses should not be detected
       await mockClient.rest.v1.statuses.create({ status: 'Missed post' });
       await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(0);
       expect(timeline.pendingStatuses.value.length).toBe(2);
     });
 
