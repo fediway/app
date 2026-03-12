@@ -23,22 +23,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Cache node_modules
-        id: cache-deps
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Cache Turbo
