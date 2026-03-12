@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
+import { Input } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
+import Textarea from '@ui/components/ui/textarea/Textarea.vue';
 import { computed, ref, watch } from 'vue';
 import { useData } from '~/composables/useData';
 
@@ -122,16 +125,17 @@ function stripHtml(html: string): string {
             <h2 class="text-lg font-semibold text-gray-900">
               Send as message
             </h2>
-            <button
-              type="button"
-              class="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+            <Button
+              variant="muted"
+              size="icon"
+              class="size-8 text-gray-500 hover:text-gray-700"
               @click="handleClose"
             >
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
-            </button>
+            </Button>
           </header>
 
           <div class="p-4">
@@ -167,12 +171,12 @@ function stripHtml(html: string): string {
 
               <!-- Search Input -->
               <div class="relative">
-                <input
+                <Input
                   v-model="searchQuery"
                   type="text"
                   placeholder="Search for people..."
-                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
-                >
+                  class="rounded-lg text-sm"
+                />
 
                 <!-- Search Results Dropdown -->
                 <div
@@ -210,11 +214,11 @@ function stripHtml(html: string): string {
             <!-- Message Input -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label>
-              <textarea
+              <Textarea
                 v-model="message"
                 placeholder="Add a message..."
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-hidden focus:border-gray-400 focus:ring-2 focus:ring-gray-100 resize-none"
+                class="rounded-lg text-sm min-h-0 resize-none"
               />
             </div>
 
@@ -244,26 +248,21 @@ function stripHtml(html: string): string {
 
           <!-- Footer -->
           <footer class="flex items-center justify-end gap-3 px-4 py-3 border-t border-gray-200 bg-gray-50">
-            <button
-              type="button"
-              class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+            <Button
+              variant="muted"
+              size="sm"
               @click="handleClose"
             >
               Cancel
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              size="sm"
               :disabled="!canSend"
-              class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" :class="[
-                canSend
-                  ? 'bg-gray-900 text-white hover:bg-gray-700'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed',
-              ]"
               @click="handleSend"
             >
               <span v-if="isSubmitting">Sending...</span>
               <span v-else>Send</span>
-            </button>
+            </Button>
           </footer>
         </div>
       </div>

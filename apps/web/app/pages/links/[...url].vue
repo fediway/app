@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { Timeline } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
@@ -60,15 +61,16 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
     <!-- Header -->
     <div class="px-4 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
       <div class="flex items-center gap-3">
-        <button
-          type="button"
-          class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+        <Button
+          variant="muted"
+          size="icon"
+          class="size-9 -ml-2"
           @click="$router.back()"
         >
           <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-        </button>
+        </Button>
         <div>
           <h1 class="text-xl font-bold text-gray-900">
             Link

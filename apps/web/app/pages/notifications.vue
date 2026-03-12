@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
-import { Avatar, RelativeTime, StatusContent } from '@repo/ui';
+import { AccountDisplayName, Avatar, RelativeTime, StatusContent } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 
@@ -118,9 +118,10 @@ function handleNotificationClick(notification: Notification) {
                 />
               </NuxtLink>
               <div class="flex-1 min-w-0">
-                <span class="font-semibold text-gray-900">
-                  {{ notification.account.displayName }}
-                </span>
+                <AccountDisplayName
+                  :name="notification.account.displayName || notification.account.username"
+                  :emojis="notification.account.emojis"
+                />
                 <span class="text-gray-500 ml-1">
                   {{ getNotificationText(notification) }}
                 </span>

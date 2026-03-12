@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Button from '@ui/components/ui/button/Button.vue';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
@@ -10,31 +11,31 @@ const { canGoBack } = useTabNavigation();
 <template>
   <header class="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-[100]">
     <!-- Back arrow when on detail page, hamburger at tab root -->
-    <button
+    <Button
       v-if="canGoBack"
-      type="button"
-      class="flex items-center justify-center w-11 h-11 bg-transparent border-none cursor-pointer rounded-full hover:bg-gray-100 transition-colors"
+      variant="muted"
+      size="icon"
       @click="router.back()"
     >
       <NavIcon name="back" :size="24" />
-    </button>
-    <button
+    </Button>
+    <Button
       v-else
-      type="button"
-      class="flex items-center justify-center w-11 h-11 bg-transparent border-none cursor-pointer rounded-full hover:bg-gray-100 transition-colors"
+      variant="muted"
+      size="icon"
       @click="navigation.openSidebar"
     >
       <NavIcon name="menu" :size="24" />
-    </button>
+    </Button>
     <h1 class="text-lg font-semibold m-0 dark:text-white">
       {{ navigation.pageTitle }}
     </h1>
-    <button
-      type="button"
-      class="flex items-center justify-center w-11 h-11 bg-transparent border-none cursor-pointer rounded-full hover:bg-gray-100 transition-colors"
+    <Button
+      variant="muted"
+      size="icon"
       @click="router.push('/explore')"
     >
       <NavIcon name="explore" :size="24" />
-    </button>
+    </Button>
   </header>
 </template>

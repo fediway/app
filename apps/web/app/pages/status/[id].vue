@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { RelativeTime, RichText, StatusActions, StatusMedia, StatusTags } from '@repo/ui';
+import { AccountDisplayName, AccountHandle, RelativeTime, RichText, StatusActions, StatusMedia, StatusTags } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
@@ -92,15 +93,16 @@ function formatFullTimestamp(dateString: string): string {
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
       <div class="flex items-center gap-4">
-        <button
-          type="button"
-          class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
+        <Button
+          variant="muted"
+          size="icon"
+          class="size-9 -ml-2"
           @click="goBack"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-        </button>
+        </Button>
         <h1 class="text-lg font-semibold">
           Post
         </h1>
@@ -110,13 +112,14 @@ function formatFullTimestamp(dateString: string): string {
     <!-- Not found state -->
     <div v-if="!status" class="p-8 text-center text-gray-500">
       <p>Post not found</p>
-      <button
-        type="button"
-        class="mt-4 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+      <Button
+        variant="secondary"
+        size="sm"
+        class="mt-4"
         @click="router.push('/')"
       >
         Go to Home
-      </button>
+      </Button>
     </div>
 
     <template v-else>
@@ -145,10 +148,15 @@ function formatFullTimestamp(dateString: string): string {
               </NuxtLink>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-1 text-sm">
-                  <NuxtLink :to="getProfileUrl(ancestor.account.acct)" class="font-semibold truncate no-underline text-gray-900 hover:underline" @click.stop>
-                    {{ ancestor.account.displayName }}
-                  </NuxtLink>
-                  <span class="text-gray-500 truncate">@{{ ancestor.account.acct }}</span>
+                  <AccountDisplayName
+                    :name="ancestor.account.displayName || ancestor.account.username"
+                    :emojis="ancestor.account.emojis"
+                    :as-link="true"
+                    :href="getProfileUrl(ancestor.account.acct)"
+                    class="truncate text-sm"
+                    @click.stop
+                  />
+                  <AccountHandle :acct="ancestor.account.acct" class="truncate text-sm" />
                   <span class="text-gray-400">·</span>
                   <RelativeTime :datetime="ancestor.createdAt" class="text-gray-500 text-sm" />
                 </div>
@@ -175,12 +183,12 @@ function formatFullTimestamp(dateString: string): string {
               class="w-12 h-12 rounded-full"
             >
             <div>
-              <div class="font-semibold text-gray-900 hover:underline">
-                {{ status.account.displayName }}
-              </div>
-              <div class="text-gray-500 text-sm">
-                @{{ status.account.acct }}
-              </div>
+              <AccountDisplayName
+                :name="status.account.displayName || status.account.username"
+                :emojis="status.account.emojis"
+                class="hover:underline"
+              />
+              <AccountHandle :acct="status.account.acct" class="text-sm block" />
             </div>
           </NuxtLink>
         </div>
@@ -258,10 +266,15 @@ function formatFullTimestamp(dateString: string): string {
               </NuxtLink>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-1 text-sm flex-wrap">
-                  <NuxtLink :to="getProfileUrl(reply.account.acct)" class="font-semibold truncate no-underline text-gray-900 hover:underline" @click.stop>
-                    {{ reply.account.displayName }}
-                  </NuxtLink>
-                  <span class="text-gray-500 truncate">@{{ reply.account.acct }}</span>
+                  <AccountDisplayName
+                    :name="reply.account.displayName || reply.account.username"
+                    :emojis="reply.account.emojis"
+                    :as-link="true"
+                    :href="getProfileUrl(reply.account.acct)"
+                    class="truncate text-sm"
+                    @click.stop
+                  />
+                  <AccountHandle :acct="reply.account.acct" class="truncate text-sm" />
                   <span class="text-gray-400">·</span>
                   <RelativeTime :datetime="reply.createdAt" class="text-gray-500" />
                 </div>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
+import { Input } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed, ref, watch } from 'vue';
 import { useSettings } from '~/composables/useSettings';
 
@@ -200,25 +202,21 @@ function handleKeydown(event: KeyboardEvent) {
         <div class="relative w-full max-w-[650px] bg-white rounded-2xl shadow-xl overflow-hidden">
           <!-- Header -->
           <header class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <button
-              type="button"
-              class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            <Button
+              variant="muted"
+              size="sm"
+              class="text-gray-600 hover:text-gray-900"
               @click="handleClose"
             >
               Cancel
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              size="sm"
               :disabled="!canPost"
-              class="px-4 py-1.5 rounded-full text-sm font-semibold transition-colors" :class="[
-                canPost
-                  ? 'bg-gray-900 text-white hover:bg-gray-700'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed',
-              ]"
               @click="handlePost"
             >
               {{ isSubmitting ? 'Posting...' : 'Post' }}
-            </button>
+            </Button>
           </header>
 
           <!-- Reply context -->
@@ -235,12 +233,12 @@ function handleKeydown(event: KeyboardEvent) {
           <div class="p-4">
             <!-- Content Warning Input -->
             <div v-if="showContentWarning" class="mb-3">
-              <input
+              <Input
                 v-model="spoilerText"
                 type="text"
                 placeholder="Write your warning here"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+                class="text-sm rounded-lg"
+              />
             </div>
 
             <!-- Main Textarea -->
@@ -295,13 +293,13 @@ function handleKeydown(event: KeyboardEvent) {
                       ]"
                     />
                   </div>
-                  <input
+                  <Input
                     v-model="pollOptions[index]"
                     type="text"
                     :placeholder="`Option ${index + 1}`"
                     maxlength="50"
-                    class="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
+                    class="flex-1 text-sm rounded-lg"
+                  />
                   <button
                     v-if="pollOptions.length > MIN_POLL_OPTIONS"
                     type="button"

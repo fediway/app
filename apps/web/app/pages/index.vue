@@ -2,6 +2,7 @@
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { useTimeline } from '@repo/api';
 import { Status as StatusComponent } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -87,13 +88,13 @@ onDeactivated(() => {
   <section class="w-full py-2">
     <!-- New posts banner -->
     <div v-if="timeline.newStatusCount.value > 0" class="flex justify-center py-2">
-      <button
-        type="button"
-        class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+      <Button
+        variant="secondary"
+        size="sm"
         @click="timeline.showNew()"
       >
         {{ timeline.newStatusCount.value }} new {{ timeline.newStatusCount.value === 1 ? 'post' : 'posts' }}
-      </button>
+      </Button>
     </div>
 
     <!-- First 2 posts -->
@@ -135,13 +136,13 @@ onDeactivated(() => {
 
     <!-- Load more button -->
     <div v-if="timeline.hasMore.value" class="flex justify-center py-4">
-      <button
-        type="button"
-        class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+      <Button
+        variant="muted"
+        size="sm"
         @click="handleLoadMore"
       >
         Load more
-      </button>
+      </Button>
     </div>
   </section>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { Timeline } from '@repo/ui';
+import { AccountDisplayName, AccountHandle, Timeline } from '@repo/ui';
+import Button from '@ui/components/ui/button/Button.vue';
 import { computed, ref, watch } from 'vue';
 import { useData } from '~/composables/useData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -214,24 +215,24 @@ const tabs = computed(() => [
                 class="w-12 h-12 rounded-full"
               >
               <div class="flex-1 min-w-0">
-                <div class="font-semibold text-gray-900 truncate">
-                  {{ account.displayName }}
-                </div>
-                <div class="text-sm text-gray-500 truncate">
-                  @{{ account.acct }}
-                </div>
+                <AccountDisplayName
+                  :name="account.displayName || account.username"
+                  :emojis="account.emojis"
+                  class="truncate block"
+                />
+                <AccountHandle :acct="account.acct" class="text-sm truncate block" />
               </div>
-              <button
-                type="button"
-                class="px-4 py-1.5 text-sm font-medium rounded-full transition-colors" :class="[
+              <Button
+                size="sm"
+                class="bg-white text-gray-900 border border-gray-300 hover:bg-gray-50" :class="[
                   isFollowing(account.id)
-                    ? 'text-gray-700 bg-white border border-gray-300 hover:border-red-300 hover:text-red-600'
-                    : 'text-gray-900 bg-white border border-gray-300 hover:bg-gray-50',
+                    ? 'text-gray-700 hover:border-red-300 hover:text-red-600 hover:bg-white'
+                    : '',
                 ]"
                 @click.prevent.stop="toggleFollow(account.id)"
               >
                 {{ isFollowing(account.id) ? 'Following' : 'Follow' }}
-              </button>
+              </Button>
             </div>
           </NuxtLink>
         </div>

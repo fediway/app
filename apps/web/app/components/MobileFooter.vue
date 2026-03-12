@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Button from '@ui/components/ui/button/Button.vue';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
@@ -22,14 +23,14 @@ function handleTabTap(itemId: string) {
     <nav class="flex items-center justify-around h-full">
       <template v-for="item in navigation.mobileFooterItems" :key="item.id">
         <!-- New Post Button (opens modal) -->
-        <button
+        <Button
           v-if="item.id === 'new-post'"
-          type="button"
-          class="flex items-center justify-center rounded-full transition-colors w-12 h-12 bg-gray-900 text-white hover:bg-gray-700"
+          size="icon"
+          class="size-12"
           @click="handleTabTap(item.id)"
         >
           <NavIcon :name="item.icon" :size="24" />
-        </button>
+        </Button>
         <!-- Tab buttons -->
         <button
           v-else

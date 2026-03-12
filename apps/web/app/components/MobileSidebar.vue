@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Button from '@ui/components/ui/button/Button.vue';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
@@ -27,13 +28,14 @@ function handleOverlayClick() {
       >
         <!-- Close Button -->
         <div class="flex justify-end p-2">
-          <button
-            type="button"
-            class="flex items-center justify-center w-10 h-10 bg-transparent border-none cursor-pointer rounded-full hover:bg-gray-100 transition-colors"
+          <Button
+            variant="muted"
+            size="icon"
+            class="size-10"
             @click="navigation.closeSidebar"
           >
             <NavIcon name="close" :size="24" />
-          </button>
+          </Button>
         </div>
 
         <!-- User Profile Section -->
