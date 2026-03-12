@@ -27,7 +27,7 @@
     "@repo/config": "*",
     "@tailwindcss/vite": "^4.1.0",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.4.0",
-    "vue-tsc": "^2.0.6"
+    "typescript": "^5.8.3",
+    "vue-tsc": "^2.2.10"
   }
 }
