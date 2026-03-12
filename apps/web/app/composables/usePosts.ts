@@ -3,6 +3,11 @@ import { useAuth, useClient } from '@repo/api';
 import { reactive } from 'vue';
 import { clearLiveCache } from './useData';
 
+const AMPERSAND_RE = /&/g;
+const LESS_THAN_RE = /</g;
+const GREATER_THAN_RE = />/g;
+const NEWLINE_RE = /\n/g;
+
 // Module-level state — persists across page navigations
 const userPosts = reactive<Status[]>([]);
 
@@ -130,8 +135,8 @@ export function usePosts() {
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>');
+    .replace(AMPERSAND_RE, '&amp;')
+    .replace(LESS_THAN_RE, '&lt;')
+    .replace(GREATER_THAN_RE, '&gt;')
+    .replace(NEWLINE_RE, '<br>');
 }

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 
+const LEADING_HASH_RE = /^#/;
+
 const trendingTags = [
   { tag: '#photography', posts: '2.4k' },
   { tag: '#nature', posts: '1.8k' },
@@ -12,7 +14,7 @@ const trendingTags = [
 ];
 
 function getTagName(tag: string): string {
-  return tag.replace(/^#/, '');
+  return tag.replace(LEADING_HASH_RE, '');
 }
 </script>
 

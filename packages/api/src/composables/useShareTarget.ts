@@ -18,6 +18,7 @@ type ShareCallback = (content: SharedContent) => void | Promise<void>;
 
 const URL_REGEX = /https?:\/\/\S+/g;
 const TRAILING_PUNCT = /[)\].,]+$/;
+const WHITESPACE_RE = /\s+/g;
 
 /** Extract all URLs from an array of text strings, deduplicated */
 function extractUrls(texts: string[]): string[] {
@@ -45,7 +46,7 @@ function extractNonUrlText(texts: string[]): string {
   return texts
     .join(' ')
     .replace(URL_REGEX, '')
-    .replace(/\s+/g, ' ')
+    .replace(WHITESPACE_RE, ' ')
     .trim();
 }
 

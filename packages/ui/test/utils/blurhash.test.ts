@@ -46,7 +46,7 @@ describe('decodeBlurhash', () => {
 
   it('returns a data URL string', () => {
     const result = decodeBlurhash('LEHV6nWB2yk8pyo0adR*.7kCMdnj');
-    expect(result).toMatch(/^data:image\/png;base64,/);
+    expect(result).toMatch('data:image/png;base64,');
   });
 
   it('returns consistent output for same input (cache hit)', () => {

@@ -212,7 +212,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
       hasMore.value = result.length >= DEFAULT_LIMIT;
 
       if (result.length > 0) {
-        maxId = result[result.length - 1]!.id;
+        maxId = result.at(-1)!.id;
         sinceId = result[0]!.id;
       }
 
@@ -246,7 +246,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
       hasMore.value = result.length >= DEFAULT_LIMIT;
 
       if (result.length > 0) {
-        maxId = result[result.length - 1]!.id;
+        maxId = result.at(-1)!.id;
       }
     }
     catch (err) {
@@ -318,7 +318,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
     if (pendingStatuses.value.length === 0 || statuses.value.length === 0)
       return;
 
-    const oldestPending = pendingStatuses.value[pendingStatuses.value.length - 1];
+    const oldestPending = pendingStatuses.value.at(-1);
     const newestDisplayed = statuses.value[0];
     if (!oldestPending || !newestDisplayed)
       return;

@@ -14,13 +14,15 @@ vi.mock('masto', () => ({
 }));
 
 const mockCreateRestAPIClient = vi.mocked(createRestAPIClient);
+const BASE64URL_INVALID_CHARS_RE = /[+/=]/;
+const OAUTH_CALLBACK_RE = /\/oauth\/callback$/;
 
 describe('pkce', () => {
   it('generateCodeVerifier returns a base64url string', () => {
     const verifier = generateCodeVerifier();
     expect(verifier.length).toBeGreaterThan(0);
     // base64url: no +, /, or =
-    expect(verifier).not.toMatch(/[+/=]/);
+    expect(verifier).not.toMatch(BASE64URL_INVALID_CHARS_RE);
   });
 
   it('generateCodeVerifier produces unique values', () => {
@@ -39,7 +41,7 @@ describe('pkce', () => {
     const verifier = generateCodeVerifier();
     const challenge = await generateCodeChallenge(verifier);
     expect(challenge.length).toBeGreaterThan(0);
-    expect(challenge).not.toMatch(/[+/=]/);
+    expect(challenge).not.toMatch(BASE64URL_INVALID_CHARS_RE);
     expect(challenge).not.toBe(verifier);
   });
 
@@ -63,7 +65,7 @@ describe('getRedirectUri', () => {
   it('uses window.location.origin in browser', () => {
     // happy-dom provides window
     const uri = getRedirectUri();
-    expect(uri).toMatch(/\/oauth\/callback$/);
+    expect(uri).toMatch(OAUTH_CALLBACK_RE);
   });
 });
 

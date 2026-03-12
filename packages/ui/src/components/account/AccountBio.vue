@@ -49,16 +49,20 @@ function getFieldIcon(name: string): string {
   return 'link';
 }
 
+const HREF_RE = /<a[^>]*href="([^"]*)"[^>]*>/i;
+const ANCHOR_RE = /<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/i;
+const STRIP_TAGS_RE = /<[^>]*>/g;
+
 // Extract href URL from HTML value
 function extractHref(html: string): string | null {
-  const match = html.match(/<a[^>]*href="([^"]*)"[^>]*>/i);
+  const match = html.match(HREF_RE);
   return match && match[1] ? match[1] : null;
 }
 
 // Extract display text from HTML value (strip tags for badge display)
 function extractLinkText(html: string): string {
   // Try to extract href and text from anchor tags
-  const match = html.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/i);
+  const match = html.match(ANCHOR_RE);
   if (match && match[1] && match[2]) {
     const href = match[1];
     const text = match[2].trim();
@@ -76,7 +80,7 @@ function extractLinkText(html: string): string {
     }
   }
   // Strip all HTML tags
-  return html.replace(/<[^>]*>/g, '').trim();
+  return html.replace(STRIP_TAGS_RE, '').trim();
 }
 </script>
 

@@ -15,6 +15,8 @@ const emit = defineEmits<{
   send: [data: { recipients: Account[]; message: string; status: Status }];
 }>();
 
+const HTML_TAG_RE = /<[^>]*>/g;
+
 const { getAllAccounts } = useData();
 
 const searchQuery = ref('');
@@ -26,11 +28,11 @@ const isSubmitting = ref(false);
 const filteredAccounts = computed(() => {
   const accounts = getAllAccounts();
   if (!searchQuery.value.trim()) {
-    return accounts.filter(a => !selectedRecipients.value.find(r => r.id === a.id));
+    return accounts.filter(a => !selectedRecipients.value.some(r => r.id === a.id));
   }
   const query = searchQuery.value.toLowerCase();
   return accounts.filter(a =>
-    !selectedRecipients.value.find(r => r.id === a.id)
+    !selectedRecipients.value.some(r => r.id === a.id)
     && (a.displayName.toLowerCase().includes(query)
       || a.acct.toLowerCase().includes(query)
       || a.username.toLowerCase().includes(query)),
@@ -52,7 +54,7 @@ watch(() => props.isOpen, (isOpen) => {
 });
 
 function addRecipient(account: Account) {
-  if (!selectedRecipients.value.find(r => r.id === account.id)) {
+  if (!selectedRecipients.value.some(r => r.id === account.id)) {
     selectedRecipients.value.push(account);
   }
   searchQuery.value = '';
@@ -97,7 +99,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').trim();
+  return html.replace(HTML_TAG_RE, '').trim();
 }
 </script>
 
