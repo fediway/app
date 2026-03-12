@@ -22,6 +22,9 @@ const searchAccountsCache = new Map<string, Ref<Account[]>>();
 const searchStatusesCache = new Map<string, Ref<Status[]>>();
 const searchTagsCache = new Map<string, Ref<Tag[]>>();
 
+const LEADING_HASH_RE = /^#/;
+const LEADING_AT_RE = /^@/;
+
 // Track what's been fetched to avoid duplicate requests
 const fetched = new Set<string>();
 
@@ -186,7 +189,7 @@ export function useData() {
   // --- Statuses by Tag ---
 
   function getStatusesByTag(tagName: string): Status[] {
-    const normalized = tagName.toLowerCase().replace(/^#/, '');
+    const normalized = tagName.toLowerCase().replace(LEADING_HASH_RE, '');
     const cached = getOrCreateRef(tagStatusesCache, normalized, [] as Status[]);
     if (markFetched(`tag:${normalized}`)) {
       fireAndForget(`tag:${normalized}`, async () => {
@@ -199,7 +202,7 @@ export function useData() {
   // --- Tag Info ---
 
   function getTagInfo(tagName: string): Tag | undefined {
-    const normalized = tagName.toLowerCase().replace(/^#/, '');
+    const normalized = tagName.toLowerCase().replace(LEADING_HASH_RE, '');
     const tags = getTrendingTags();
     const found = tags.find(t => t.name.toLowerCase() === normalized);
     if (found)
@@ -326,7 +329,7 @@ export function useData() {
   // --- Profile URL (pure function, no API needed) ---
 
   function getProfileUrl(acct: string): string {
-    const cleanAcct = acct.replace(/^@/, '');
+    const cleanAcct = acct.replace(LEADING_AT_RE, '');
     return `/@${cleanAcct}`;
   }
 

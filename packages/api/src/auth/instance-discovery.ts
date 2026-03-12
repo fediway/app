@@ -8,6 +8,9 @@ export interface InstanceInfo {
 }
 
 const MIN_VERSION = '4.3.0';
+const PROTOCOL_RE = /^https?:\/\//;
+const TRAILING_SLASHES_RE = /\/+$/;
+const SEMVER_RE = /^(\d+)\.(\d+)\.(\d+)/;
 
 /**
  * Normalize user input to a clean instance URL.
@@ -15,8 +18,8 @@ const MIN_VERSION = '4.3.0';
  */
 export function normalizeInstanceUrl(input: string): string {
   let domain = input.trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, '');
-  domain = domain.replace(/\/+$/, '');
+  domain = domain.replace(PROTOCOL_RE, '');
+  domain = domain.replace(TRAILING_SLASHES_RE, '');
   // Remove any path segments — we just want the domain
   domain = domain.split('/')[0]!;
   return `https://${domain}`;
@@ -24,7 +27,7 @@ export function normalizeInstanceUrl(input: string): string {
 
 function parseVersion(version: string): number[] {
   // Handle versions like "4.3.0-alpha.1+glitch" — take only the semver part
-  const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
+  const match = version.match(SEMVER_RE);
   if (!match)
     return [0, 0, 0];
   return [Number(match[1]), Number(match[2]), Number(match[3])];

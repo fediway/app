@@ -4,16 +4,18 @@ import { useData } from '~/composables/useData';
 
 import 'swiper/css';
 
+const TRAILING_DOT_ZERO_RE = /\.0$/;
+
 const { getSuggestedAccounts, getProfileUrl } = useData();
 const { toggleFollow, isFollowing } = useFollows();
 const suggestions = computed(() => getSuggestedAccounts());
 
 function formatCount(count: number): string {
   if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
+    return `${(count / 1000000).toFixed(1).replace(TRAILING_DOT_ZERO_RE, '')}M`;
   }
   if (count >= 1000) {
-    return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+    return `${(count / 1000).toFixed(1).replace(TRAILING_DOT_ZERO_RE, '')}K`;
   }
   return count.toString();
 }

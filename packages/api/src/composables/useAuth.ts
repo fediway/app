@@ -13,6 +13,8 @@ import {
 import { createMastoClient } from '../client';
 import { getPlatformAdapter } from '../platform';
 
+const PROTOCOL_RE = /^https?:\/\//;
+
 // PKCE state persisted between redirect and callback
 const oauthState = ref<{
   instanceUrl: string;
@@ -54,7 +56,7 @@ export function useAuth() {
         domain = new URL(url).hostname;
       }
       catch {
-        domain = url.replace(/^https?:\/\//, '').split('/')[0] ?? url;
+        domain = url.replace(PROTOCOL_RE, '').split('/')[0] ?? url;
       }
 
       const opts: AddAccountOptions = {

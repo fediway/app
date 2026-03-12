@@ -1,6 +1,8 @@
 import type { Account, Status } from '@repo/types';
 import { reactive } from 'vue';
 
+const HTML_TAG_RE = /<[^>]*>/g;
+
 export interface SharedStatus {
   id: string;
   authorName: string;
@@ -91,7 +93,7 @@ let nextConversationId = 100;
 let nextMessageId = 1000;
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').trim();
+  return html.replace(HTML_TAG_RE, '').trim();
 }
 
 export function useMessages() {

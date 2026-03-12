@@ -7,12 +7,14 @@ interface Props {
 
 defineProps<Props>();
 
+const TRAILING_ZERO_RE = /\.0$/;
+
 function formatCount(count: number): string {
   if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1).replace(/\.0$/, '')}m`;
+    return `${(count / 1000000).toFixed(1).replace(TRAILING_ZERO_RE, '')}m`;
   }
   if (count >= 1000) {
-    return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+    return `${(count / 1000).toFixed(1).replace(TRAILING_ZERO_RE, '')}k`;
   }
   return count.toString();
 }

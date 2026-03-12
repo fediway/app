@@ -47,6 +47,8 @@ export function sanitizeHtml(html: string): string {
  * Escape a string for safe use in a RegExp constructor.
  * Prevents ReDoS from malicious emoji shortcodes.
  */
+const SPECIAL_CHARS_RE = /[.*+?^${}()|[\]\\]/g;
+
 export function escapeRegExp(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return str.replace(SPECIAL_CHARS_RE, '\\$&');
 }

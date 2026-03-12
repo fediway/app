@@ -4,6 +4,10 @@ import { computed, ref } from 'vue';
 import { clearLiveCache } from '~/composables/useData';
 import { useDataMode } from '~/composables/useDataMode';
 
+const PROTOCOL_RE = /^https?:\/\//;
+const TRAILING_SLASH_RE = /\/$/;
+const DOMAIN_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/;
+
 definePageMeta({
   layout: 'auth',
 });
@@ -22,15 +26,15 @@ const showDevLogin = ref(false);
 // Validation
 const normalizedUrl = computed(() => {
   let domain = instanceDomain.value.trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, '');
-  domain = domain.replace(/\/$/, '');
+  domain = domain.replace(PROTOCOL_RE, '');
+  domain = domain.replace(TRAILING_SLASH_RE, '');
   return `https://${domain}`;
 });
 
 const normalizedDomain = computed(() => {
   let domain = instanceDomain.value.trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, '');
-  domain = domain.replace(/\/$/, '');
+  domain = domain.replace(PROTOCOL_RE, '');
+  domain = domain.replace(TRAILING_SLASH_RE, '');
   return domain;
 });
 
@@ -38,8 +42,7 @@ const isValidDomain = computed(() => {
   const domain = normalizedDomain.value;
   if (!domain)
     return false;
-  const domainRegex = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/;
-  return domainRegex.test(domain);
+  return DOMAIN_RE.test(domain);
 });
 
 const canSignIn = computed(() => {

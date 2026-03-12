@@ -8,6 +8,9 @@ export interface OAuthRegistration {
 }
 
 const SCOPES = 'read write follow push';
+const PLUS_RE = /\+/g;
+const SLASH_RE = /\//g;
+const TRAILING_EQUALS_RE = /=+$/;
 
 /**
  * Generate a random code verifier for PKCE.
@@ -33,7 +36,7 @@ function base64UrlEncode(bytes: Uint8Array): string {
   for (const byte of bytes) {
     binary += String.fromCharCode(byte);
   }
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return btoa(binary).replace(PLUS_RE, '-').replace(SLASH_RE, '_').replace(TRAILING_EQUALS_RE, '');
 }
 
 /**

@@ -154,7 +154,7 @@ async function restoreSession(): Promise<void> {
   let key = loadActiveAccountKey();
 
   // If the stored active key is invalid, fall back to first account
-  if (!key || !accounts.value.find(a => a.key === key)) {
+  if (!key || !accounts.value.some(a => a.key === key)) {
     key = accounts.value[0]!.key;
   }
 

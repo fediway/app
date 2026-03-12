@@ -18,6 +18,12 @@ import {
   trendingTags,
 } from './fixtures';
 
+const HASH_PREFIX_RE = /^#/;
+const AMP_RE = /&/g;
+const LT_RE = /</g;
+const GT_RE = />/g;
+const NEWLINE_RE = /\n/g;
+
 function delay(): Promise<void> {
   const ms = 30 + Math.random() * 70;
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -229,7 +235,7 @@ export function createMockClient(): MastoClient {
             return {
               async list() {
                 await delay();
-                const normalized = tagName.toLowerCase().replace(/^#/, '');
+                const normalized = tagName.toLowerCase().replace(HASH_PREFIX_RE, '');
                 const dedicated = taggedStatuses[normalized] || [];
                 const fromTimeline = timelineStatuses.filter(status =>
                   status.tags.some(tag => tag.name.toLowerCase() === normalized),
@@ -259,7 +265,7 @@ export function createMockClient(): MastoClient {
             createdAt: new Date().toISOString(),
             editedAt: null,
             account: currentUserAccount,
-            content: `<p>${params.status.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>`,
+            content: `<p>${params.status.replace(AMP_RE, '&amp;').replace(LT_RE, '&lt;').replace(GT_RE, '&gt;').replace(NEWLINE_RE, '<br>')}</p>`,
             visibility: (params.visibility ?? 'public') as Status['visibility'],
             sensitive: false,
             spoilerText: params.spoilerText ?? '',
@@ -485,16 +491,14 @@ export function createMockClient(): MastoClient {
       blocks: {
         async list() {
           await delay();
-          return [...blockedAccountIds]
-            .map(id => findAccountById(id))
+          return Array.from(blockedAccountIds, id => findAccountById(id))
             .filter((a): a is Account => a !== undefined);
         },
       },
       mutes: {
         async list() {
           await delay();
-          return [...mutedAccountIds]
-            .map(id => findAccountById(id))
+          return Array.from(mutedAccountIds, id => findAccountById(id))
             .filter((a): a is Account => a !== undefined);
         },
       },
@@ -682,7 +686,7 @@ export function createMockClient(): MastoClient {
         createdAt: new Date().toISOString(),
         editedAt: null,
         account: currentUserAccount,
-        content: `<p>${params.status.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>`,
+        content: `<p>${params.status.replace(AMP_RE, '&amp;').replace(LT_RE, '&lt;').replace(GT_RE, '&gt;').replace(NEWLINE_RE, '<br>')}</p>`,
         visibility: (params.visibility ?? 'public') as FediwayStatus['visibility'],
         sensitive: false,
         spoilerText: '',
