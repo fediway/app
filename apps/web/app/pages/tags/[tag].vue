@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { PhArrowLeft } from '@phosphor-icons/vue';
 import { Timeline } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import { computed } from 'vue';
@@ -75,9 +76,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
           class="size-9 -ml-2"
           @click="$router.back()"
         >
-          <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <PhArrowLeft :size="20" class="text-gray-700" />
         </Button>
         <div>
           <h1 class="text-xl font-bold text-gray-900">

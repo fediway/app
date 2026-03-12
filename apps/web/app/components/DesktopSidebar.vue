@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhPlus } from '@phosphor-icons/vue';
 import Button from '@ui/components/ui/button/Button.vue';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useNavigationStore } from '~/stores/navigation';
@@ -35,10 +36,7 @@ const { open: openComposer } = usePostComposer();
         class="w-full py-3 text-[15px]"
         @click="openComposer()"
       >
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+        <PhPlus :size="20" />
         <span>New Post</span>
       </Button>
     </div>

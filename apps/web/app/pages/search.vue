@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { PhMagnifyingGlass, PhX } from '@phosphor-icons/vue';
 import { AccountDisplayName, AccountHandle, Timeline } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import { computed, ref, watch } from 'vue';
@@ -111,16 +112,7 @@ const tabs = computed(() => [
 
       <!-- Search Input -->
       <div class="relative">
-        <svg
-          class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
+        <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           v-model="searchQuery"
           type="text"
@@ -134,10 +126,7 @@ const tabs = computed(() => [
           class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           @click="clearSearch"
         >
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <PhX :size="20" />
         </button>
       </div>
 
@@ -165,10 +154,7 @@ const tabs = computed(() => [
     <!-- Empty State (no query) -->
     <div v-if="!isSearching" class="text-center py-16 px-4">
       <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-        <svg class="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
+        <PhMagnifyingGlass :size="32" class="text-gray-400" />
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">
         Search Fediway
@@ -181,10 +167,7 @@ const tabs = computed(() => [
     <!-- No Results -->
     <div v-else-if="!hasResults" class="text-center py-16 px-4">
       <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-        <svg class="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
+        <PhMagnifyingGlass :size="32" class="text-gray-400" />
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">
         No results found

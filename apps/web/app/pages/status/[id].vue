@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { PhArrowLeft, PhChatCircle, PhHeart, PhRepeat } from '@phosphor-icons/vue';
 import { AccountDisplayName, AccountHandle, RelativeTime, RichText, StatusActions, StatusMedia, StatusTags } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import { computed } from 'vue';
@@ -99,9 +100,7 @@ function formatFullTimestamp(dateString: string): string {
           class="size-9 -ml-2"
           @click="goBack"
         >
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <PhArrowLeft :size="20" />
         </Button>
         <h1 class="text-lg font-semibold">
           Post
@@ -287,9 +286,7 @@ function formatFullTimestamp(dateString: string): string {
                     class="flex items-center gap-1 hover:text-blue-500"
                     @click.stop="handleReply(reply)"
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                    </svg>
+                    <PhChatCircle :size="16" />
                     <span v-if="reply.repliesCount > 0">{{ reply.repliesCount }}</span>
                   </button>
                   <button
@@ -297,12 +294,7 @@ function formatFullTimestamp(dateString: string): string {
                     class="flex items-center gap-1 hover:text-green-500"
                     @click.stop="handleReblog(reply.id)"
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="17 1 21 5 17 9" />
-                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                      <polyline points="7 23 3 19 7 15" />
-                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                    </svg>
+                    <PhRepeat :size="16" />
                     <span v-if="reply.reblogsCount > 0">{{ reply.reblogsCount }}</span>
                   </button>
                   <button
@@ -310,9 +302,7 @@ function formatFullTimestamp(dateString: string): string {
                     class="flex items-center gap-1 hover:text-red-500"
                     @click.stop="handleFavourite(reply.id)"
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
+                    <PhHeart :size="16" />
                     <span v-if="reply.favouritesCount > 0">{{ reply.favouritesCount }}</span>
                   </button>
                 </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
+import { PhX } from '@phosphor-icons/vue';
 import { Input } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import Textarea from '@ui/components/ui/textarea/Textarea.vue';
@@ -131,10 +132,7 @@ function stripHtml(html: string): string {
               class="size-8 text-gray-500 hover:text-gray-700"
               @click="handleClose"
             >
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
+              <PhX :size="20" />
             </Button>
           </header>
 
@@ -161,10 +159,7 @@ function stripHtml(html: string): string {
                     class="ml-1 text-gray-400 hover:text-gray-600"
                     @click="removeRecipient(recipient.id)"
                   >
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
+                    <PhX :size="14" />
                   </button>
                 </span>
               </div>

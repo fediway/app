@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
@@ -134,11 +135,7 @@ function handleKeydown(event: KeyboardEvent) {
           <!-- Instance -->
           <InputGroup class="rounded-xl h-12">
             <InputGroupAddon>
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
+              <PhGlobe :size="20" />
             </InputGroupAddon>
             <InputGroupInput
               v-model="instanceDomain"
@@ -161,10 +158,7 @@ function handleKeydown(event: KeyboardEvent) {
             @click="handleOAuthLogin"
           >
             <span v-if="isLoading" class="inline-flex items-center justify-center gap-2">
-              <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
+              <PhCircleNotch :size="20" class="animate-spin" />
             </span>
             <span v-else>Sign in</span>
           </Button>
@@ -190,10 +184,7 @@ function handleKeydown(event: KeyboardEvent) {
           <div v-if="showDevLogin" class="mt-3 space-y-3">
             <InputGroup class="rounded-xl h-12">
               <InputGroupAddon>
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
+                <PhLock :size="20" />
               </InputGroupAddon>
               <InputGroupInput
                 v-model="accessToken"

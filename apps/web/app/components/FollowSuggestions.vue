@@ -3,24 +3,13 @@ import { AccountDisplayName, AccountHandle } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { useData } from '~/composables/useData';
+import { formatCount } from '~/utils/format';
 
 import 'swiper/css';
-
-const TRAILING_DOT_ZERO_RE = /\.0$/;
 
 const { getSuggestedAccounts, getProfileUrl } = useData();
 const { toggleFollow, isFollowing } = useFollows();
 const suggestions = computed(() => getSuggestedAccounts());
-
-function formatCount(count: number): string {
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1).replace(TRAILING_DOT_ZERO_RE, '')}M`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1).replace(TRAILING_DOT_ZERO_RE, '')}K`;
-  }
-  return count.toString();
-}
 </script>
 
 <template>

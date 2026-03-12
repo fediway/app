@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { PhArrowLeft, PhArrowSquareOut, PhLink } from '@phosphor-icons/vue';
 import { Timeline } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import { computed } from 'vue';
@@ -67,9 +68,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
           class="size-9 -ml-2"
           @click="$router.back()"
         >
-          <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <PhArrowLeft :size="20" class="text-gray-700" />
         </Button>
         <div>
           <h1 class="text-xl font-bold text-gray-900">
@@ -92,10 +91,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
       >
         <div class="flex items-start gap-3">
           <div class="shrink-0 w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
-            <svg class="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
+            <PhLink :size="24" class="text-gray-500" />
           </div>
           <div class="flex-1 min-w-0">
             <h2 class="text-base font-semibold text-gray-900 line-clamp-2">
@@ -105,11 +101,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
               {{ linkInfo.source }}
             </p>
           </div>
-          <svg class="w-5 h-5 text-gray-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
-          </svg>
+          <PhArrowSquareOut :size="20" class="text-gray-400 shrink-0" />
         </div>
       </a>
     </div>
@@ -117,10 +109,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
     <!-- Empty State -->
     <div v-if="statuses.length === 0" class="text-center py-16 px-4">
       <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-        <svg class="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-        </svg>
+        <PhLink :size="32" class="text-gray-400" />
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">
         No posts yet

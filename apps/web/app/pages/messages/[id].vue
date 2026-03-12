@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhArrowLeft, PhHeart, PhPaperPlaneRight } from '@phosphor-icons/vue';
 import { useMessages } from '~/composables/useMessages';
 
 const route = useRoute();
@@ -38,9 +39,7 @@ function handleSend() {
     <!-- Chat Header -->
     <div v-if="participant" class="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white sticky top-0 z-10">
       <NuxtLink to="/messages" class="text-gray-500 hover:text-gray-700 lg:hidden">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
+        <PhArrowLeft :size="24" />
       </NuxtLink>
       <img
         :src="participant.avatar"
@@ -143,9 +142,7 @@ function handleSend() {
                 class="text-red-500"
                 title="Favourited"
               >
-                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
+                <PhHeart :size="12" weight="fill" />
               </span>
               <span class="text-[11px] text-gray-400">
                 {{ formatTime(message.sentAt) }}
@@ -173,9 +170,7 @@ function handleSend() {
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed',
             ]"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            <PhPaperPlaneRight :size="20" />
           </button>
         </form>
       </div>
