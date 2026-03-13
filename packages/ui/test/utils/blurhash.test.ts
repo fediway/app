@@ -32,6 +32,7 @@ describe('decodeBlurhash', () => {
   }));
 
   beforeEach(() => {
+    mockCreateImageData.mockClear();
     mockToDataURL.mockReturnValue('data:image/png;base64,mockdata');
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
       createImageData: mockCreateImageData,

@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@repo/config": "*",
+    "@vitejs/plugin-vue": "^6.0.4",
     "typescript": "^5.4.0",
     "vue-tsc": "^2.0.6"
   }
