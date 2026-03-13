@@ -22,12 +22,12 @@ Object.defineProperty(window, 'scrollTo', { value: scrollToMock, writable: true 
 Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true });
 
 let tab: ReturnType<typeof useTabNavigation>;
-let navigateMock: ReturnType<typeof vi.fn>;
+let navigateMock: ReturnType<typeof vi.fn<(path: string) => void>>;
 
 beforeEach(() => {
   _resetTabNavigationState();
   tab = useTabNavigation();
-  navigateMock = vi.fn();
+  navigateMock = vi.fn<(path: string) => void>();
   scrollToMock.mockClear();
   Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true });
 });

@@ -6,6 +6,7 @@ describe('request', () => {
   const mockFetch = vi.fn();
 
   beforeEach(() => {
+    mockFetch.mockClear();
     vi.stubGlobal('fetch', mockFetch);
     setOn401Handler(null);
   });

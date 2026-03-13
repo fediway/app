@@ -25,7 +25,9 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: true,
+    // Disabled: vite-plugin-checker 0.12.0 broken with vue-tsc 3 (missing lib files)
+    // Use `npm run type-check` instead. Re-enable when vite-plugin-checker ships a fix.
+    typeCheck: false,
   },
 
   components: [
@@ -59,6 +61,23 @@ export default defineNuxtConfig({
     envDir: new URL('.', import.meta.url).pathname,
     esbuild: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+    },
+    optimizeDeps: {
+      include: [
+        'masto',
+        'dexie',
+        'swiper/vue',
+        'swiper/modules',
+        'reka-ui',
+        'clsx',
+        'tailwind-merge',
+        'class-variance-authority',
+        '@phosphor-icons/vue',
+        '@tanstack/vue-virtual',
+        '@vueuse/core',
+        'blurhash',
+        'isomorphic-dompurify',
+      ],
     },
     resolve: {
       alias: {

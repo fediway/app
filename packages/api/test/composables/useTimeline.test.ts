@@ -2,6 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMockClient } from '../../src/mock/client';
 import { withSetup } from '../utils/withSetup';
 
+/** Flush microtask queue enough times for async poll() chains to settle */
+async function flushMicrotasks(n = 10) {
+  for (let i = 0; i < n; i++) {
+    await new Promise<void>(resolve => queueMicrotask(resolve));
+  }
+}
+
 // Mock useClient to return a fresh mock client for each test
 let mockClient: ReturnType<typeof createMockClient>;
 
@@ -236,22 +243,19 @@ describe('useTimeline', () => {
       timeline.startPolling(1000);
 
       await mockClient.rest.v1.statuses.create({ status: 'Interval post' });
-      await vi.advanceTimersByTimeAsync(1000);
-      // Flush the async poll() promise that setInterval fired
-      await vi.advanceTimersByTimeAsync(0);
-      expect(timeline.pendingStatuses.value.length).toBe(1);
+      await vi.advanceTimersByTimeAsync(1100);
+      await vi.waitFor(() => expect(timeline.pendingStatuses.value.length).toBe(1));
 
       await mockClient.rest.v1.statuses.create({ status: 'Second interval post' });
-      await vi.advanceTimersByTimeAsync(1000);
-      await vi.advanceTimersByTimeAsync(0);
-      expect(timeline.pendingStatuses.value.length).toBe(2);
+      await vi.advanceTimersByTimeAsync(1100);
+      await vi.waitFor(() => expect(timeline.pendingStatuses.value.length).toBe(2));
 
       timeline.stopPolling();
 
       // After stop, new statuses should not be detected
       await mockClient.rest.v1.statuses.create({ status: 'Missed post' });
-      await vi.advanceTimersByTimeAsync(1000);
-      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(1100);
+      await flushMicrotasks();
       expect(timeline.pendingStatuses.value.length).toBe(2);
     });
 
@@ -276,7 +280,7 @@ describe('useTimeline', () => {
 
       // Wait for the async poll triggered by visibility change
       await vi.advanceTimersByTimeAsync(200);
-      expect(timeline.pendingStatuses.value.length).toBe(1);
+      await vi.waitFor(() => expect(timeline.pendingStatuses.value.length).toBe(1));
 
       timeline.stopPolling();
     });

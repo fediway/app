@@ -20,11 +20,11 @@
   "dependencies": {
     "@repo/types": "*",
     "dexie": "^4.3.0",
-    "masto": "^7.1.0"
+    "masto": "^7.10.1"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "vue": "^3.5.27",
-    "vue-tsc": "^2.2.10"
+    "vue": "^3.5.13",
+    "vue-tsc": "^3.2.5"
   }
 }
