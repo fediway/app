@@ -5,7 +5,8 @@
     "jsxImportSource": "vue",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@ui/*": ["../../packages/ui/src/*"]
     },
     "types": ["vite/client"]
   },
