@@ -64,7 +64,7 @@ function handleClick(e: Event) {
 </script>
 
 <template>
-  <div class="safe-area-bottom fixed inset-x-0 bottom-0 z-40" @click="handleClick">
+  <div class="safe-area-bottom fixed inset-x-0 bottom-0 z-40 px-4 pb-4" @click="handleClick">
     <MainNavigation :items="navItems" />
   </div>
 </template>

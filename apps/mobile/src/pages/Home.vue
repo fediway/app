@@ -1,19 +1,62 @@
 <script setup lang="ts">
+import { Timeline } from '@repo/ui';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useData } from '../composables/useData';
+import { useInteractions } from '../composables/useInteractions';
+
+defineOptions({ name: 'Home' });
+
+const router = useRouter();
+const { getHomeTimeline, getProfileUrl } = useData();
+const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+
+const statuses = computed(() => withOverridesAll(getHomeTimeline()));
+
+function handleStatusClick(id: string) {
+  router.push(`/status/${id}`);
+}
+
+function handleProfileClick(acct: string) {
+  router.push(getProfileUrl(acct));
+}
+
+function handleTagClick(tag: string) {
+  router.push(`/tags/${encodeURIComponent(tag)}`);
+}
+
+function handleFavourite(id: string) {
+  toggleFavourite(id, statuses.value);
+}
+
+function handleReblog(id: string) {
+  toggleReblog(id, statuses.value);
+}
+
+function handleBookmark(id: string) {
+  toggleBookmark(id, statuses.value);
+}
 </script>
 
 <template>
-  <div class="p-4">
-    <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-      Home
-    </h2>
-    <p class="mt-2 text-sm text-gray-500">
-      Timeline will go here.
-    </p>
-    <router-link
-      to="/demo"
-      class="mt-4 inline-block rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white"
-    >
-      Demo &amp; Playground
-    </router-link>
+  <div class="min-h-screen">
+    <Timeline
+      :statuses="statuses"
+      :loading="statuses.length === 0"
+      :has-more="false"
+      :get-profile-url="getProfileUrl"
+      @favourite="handleFavourite"
+      @reblog="handleReblog"
+      @bookmark="handleBookmark"
+      @status-click="handleStatusClick"
+      @profile-click="handleProfileClick"
+      @tag-click="handleTagClick"
+    />
+
+    <div v-if="statuses.length === 0" class="flex items-center justify-center py-20">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Loading timeline...
+      </p>
+    </div>
   </div>
 </template>

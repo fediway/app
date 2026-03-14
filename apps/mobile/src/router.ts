@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
+import { useTransition } from './composables/useTransition';
 
 const appRoutes: RouteRecordRaw[] = [
   // Tab roots
@@ -100,4 +101,35 @@ export const router = createRouter({
     ...appRoutes,
     ...demoRoutes,
   ],
+});
+
+// Track history depth to detect forward/back navigation
+let historyPosition = 0;
+
+router.afterEach(() => {
+  const pos = window.history.state?.position;
+  if (typeof pos === 'number') {
+    historyPosition = pos;
+  }
+});
+
+router.beforeEach((to) => {
+  const { setFade, setSlideLeft, setSlideRight } = useTransition();
+
+  const toIsTab = !!to.meta.tab;
+
+  if (toIsTab) {
+    // Navigating to a tab root: fade
+    setFade();
+  }
+  else {
+    // Stack navigation: compare history positions
+    const nextPosition = window.history.state?.position;
+    if (typeof nextPosition === 'number' && nextPosition < historyPosition) {
+      setSlideRight();
+    }
+    else {
+      setSlideLeft();
+    }
+  }
 });

@@ -1,13 +1,61 @@
 <script setup lang="ts">
+import { Timeline } from '@repo/ui';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useData } from '../composables/useData';
+import { useInteractions } from '../composables/useInteractions';
+
+const router = useRouter();
+const { getBookmarkedStatuses, getProfileUrl } = useData();
+const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+
+const statuses = computed(() => withOverridesAll(getBookmarkedStatuses()));
+
+function handleStatusClick(id: string) {
+  router.push(`/status/${id}`);
+}
+
+function handleProfileClick(acct: string) {
+  router.push(getProfileUrl(acct));
+}
+
+function handleTagClick(tag: string) {
+  router.push(`/tags/${encodeURIComponent(tag)}`);
+}
+
+function handleFavourite(id: string) {
+  toggleFavourite(id, statuses.value);
+}
+
+function handleReblog(id: string) {
+  toggleReblog(id, statuses.value);
+}
+
+function handleBookmark(id: string) {
+  toggleBookmark(id, statuses.value);
+}
 </script>
 
 <template>
-  <div class="p-4">
-    <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-      Bookmarks
-    </h2>
-    <p class="mt-2 text-sm text-gray-500">
-      Saved posts will go here.
-    </p>
+  <div class="w-full">
+    <Timeline
+      :statuses="statuses"
+      :loading="false"
+      :has-more="false"
+      :get-profile-url="getProfileUrl"
+      @reblog="handleReblog"
+      @favourite="handleFavourite"
+      @bookmark="handleBookmark"
+      @tag-click="handleTagClick"
+      @status-click="handleStatusClick"
+      @profile-click="handleProfileClick"
+    />
+
+    <div v-if="statuses.length === 0" class="py-12 text-center text-gray-500">
+      <p>No bookmarks yet</p>
+      <p class="mt-1 text-sm">
+        Posts you save will appear here
+      </p>
+    </div>
   </div>
 </template>
