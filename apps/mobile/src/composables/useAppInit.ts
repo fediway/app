@@ -4,6 +4,7 @@ import { TextZoom } from '@capacitor/text-zoom';
 import { setPlatformAdapter, useAppLifecycle, useAuth, useDarkMode, useDeepLinks, useShareTarget } from '@repo/api';
 import { useRouter } from 'vue-router';
 import { CapacitorPlatformAdapter } from '../platform-capacitor';
+import { useBackButton } from './useBackButton';
 
 let initialized = false;
 
@@ -30,6 +31,11 @@ export function useAppInit() {
     // Auth — restore session from secure storage
     const { restoreSession } = useAuth();
     await restoreSession().catch(() => { /* stay unauthenticated */ });
+
+    // Back button (Android hardware back)
+    if (Capacitor.isNativePlatform()) {
+      useBackButton().initListener();
+    }
 
     // Deep links + OAuth callbacks
     initDeepLinks();

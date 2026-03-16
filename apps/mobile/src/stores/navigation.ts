@@ -36,6 +36,7 @@ const DRAWER_ITEMS: Omit<MenuItem, 'to'>[] = [
 
 const DRAWER_ROUTES: Record<string, string> = {
   home: '/',
+  search: '/search',
   explore: '/explore',
   notifications: '/notifications',
   messages: '/messages',

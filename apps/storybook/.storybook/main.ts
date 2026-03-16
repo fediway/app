@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
 const config: StorybookConfig = {
+  telemetry: false,
+
   framework: {
     name: '@storybook/vue3-vite',
     options: {

@@ -1,23 +1,30 @@
 <script setup lang="ts">
-import type { Tag } from '@repo/types';
-import { AccountCard, Status } from '@repo/ui';
+import type { Account, Status, Tag } from '@repo/types';
+import { useClient } from '@repo/api';
+import { AccountCard, Status as StatusComponent } from '@repo/ui';
 import Input from '@ui/components/ui/input/Input.vue';
-import { ref, watch } from 'vue';
+import { TabsList, TabsRoot, TabsTrigger } from 'reka-ui';
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useData } from '../composables/useData';
-import { useInteractions } from '../composables/useInteractions';
+import { getProfileUrl, useStatusBridge } from '../composables/useStatusBridge';
 
 defineOptions({ name: 'SearchPage' });
 
 const router = useRouter();
-const { searchAccounts, searchStatuses, searchTags, getTrendingTags, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
 
 type SearchTab = 'all' | 'people' | 'posts' | 'tags';
 
 const query = ref('');
 const activeTab = ref<SearchTab>('all');
 const debouncedQuery = ref('');
+const loading = ref(false);
+
+const searchedAccounts = shallowRef<Account[]>([]);
+const searchedStatuses = shallowRef<Status[]>([]);
+const searchedTags = shallowRef<Tag[]>([]);
+const trendingTags = shallowRef<Tag[]>([]);
+
+const { statuses: displayStatuses, toggleFavourite, toggleReblog, toggleBookmark } = useStatusBridge(searchedStatuses);
 
 let debounceTimer: ReturnType<typeof setTimeout>;
 watch(query, (val) => {
@@ -27,28 +34,67 @@ watch(query, (val) => {
   }, 300);
 });
 
-const tabs: { id: SearchTab; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'people', label: 'People' },
-  { id: 'posts', label: 'Posts' },
-  { id: 'tags', label: 'Tags' },
-];
+onUnmounted(() => {
+  clearTimeout(debounceTimer);
+});
 
-function accounts() {
-  return debouncedQuery.value ? searchAccounts(debouncedQuery.value) : [];
+function getClient() {
+  try {
+    return useClient();
+  }
+  catch {
+    return null;
+  }
 }
 
-function statuses() {
-  return debouncedQuery.value ? withOverridesAll(searchStatuses(debouncedQuery.value)) : [];
+watch(debouncedQuery, async (val) => {
+  if (!val.trim()) {
+    searchedAccounts.value = [];
+    searchedStatuses.value = [];
+    searchedTags.value = [];
+    return;
+  }
+
+  const client = getClient();
+  if (!client)
+    return;
+
+  loading.value = true;
+  try {
+    const result = await client.rest.v2.search.list({ q: val, limit: 20 });
+    searchedAccounts.value = result.accounts;
+    searchedStatuses.value = result.statuses;
+    searchedTags.value = result.hashtags;
+  }
+  catch {
+    // Search errors are silent
+  }
+  finally {
+    loading.value = false;
+  }
+});
+
+async function loadTrending() {
+  const client = getClient();
+  if (!client)
+    return;
+  try {
+    trendingTags.value = await client.rest.v1.trends.tags.list({ limit: 10 });
+  }
+  catch {
+    // Silent
+  }
 }
 
-function tags() {
-  return debouncedQuery.value ? searchTags(debouncedQuery.value) : [];
-}
+loadTrending();
 
-function trendingTags() {
-  return getTrendingTags();
-}
+const showPeople = computed(() => activeTab.value === 'all' || activeTab.value === 'people');
+const showPosts = computed(() => activeTab.value === 'all' || activeTab.value === 'posts');
+const showTags = computed(() => activeTab.value === 'all' || activeTab.value === 'tags');
+
+const hasResults = computed(() =>
+  searchedAccounts.value.length > 0 || displayStatuses.value.length > 0 || searchedTags.value.length > 0,
+);
 
 function handleStatusClick(id: string) {
   router.push(`/status/${id}`);
@@ -60,18 +106,6 @@ function handleProfileClick(acct: string) {
 
 function handleTagClick(tag: Tag) {
   router.push(`/tags/${encodeURIComponent(tag.name)}`);
-}
-
-function handleFavourite(id: string) {
-  toggleFavourite(id, statuses());
-}
-
-function handleReblog(id: string) {
-  toggleReblog(id, statuses());
-}
-
-function handleBookmark(id: string) {
-  toggleBookmark(id, statuses());
 }
 </script>
 
@@ -87,67 +121,62 @@ function handleBookmark(id: string) {
       />
     </div>
 
-    <!-- Tabs -->
-    <div v-if="debouncedQuery" class="flex border-b border-gray-200 dark:border-gray-800">
-      <button
-        v-for="tab in tabs"
-        :key="tab.id"
-        class="flex-1 py-3 text-center text-sm font-medium transition-colors"
-        :class="activeTab === tab.id
-          ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
-          : 'text-gray-500 dark:text-gray-400'"
-        @click="activeTab = tab.id"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
     <!-- Results -->
-    <div v-if="debouncedQuery" class="divide-y divide-gray-200 dark:divide-gray-800">
-      <!-- People -->
-      <template v-if="activeTab === 'all' || activeTab === 'people'">
-        <div v-if="accounts().length > 0" class="px-4 py-3">
+    <template v-if="debouncedQuery">
+      <!-- Tabs -->
+      <TabsRoot v-model="activeTab">
+        <TabsList class="flex border-b border-gray-200 dark:border-gray-800">
+          <TabsTrigger
+            v-for="tab in (['all', 'people', 'posts', 'tags'] as const)"
+            :key="tab"
+            :value="tab"
+            class="flex-1 py-3 text-center text-sm font-medium transition-colors data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-gray-400"
+          >
+            {{ tab === 'all' ? 'All' : tab === 'people' ? 'People' : tab === 'posts' ? 'Posts' : 'Tags' }}
+          </TabsTrigger>
+        </TabsList>
+      </TabsRoot>
+
+      <div class="divide-y divide-gray-200 dark:divide-gray-800">
+        <!-- People -->
+        <div v-if="showPeople && searchedAccounts.length > 0" class="px-4 py-3">
           <h3 v-if="activeTab === 'all'" class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             People
           </h3>
           <div class="space-y-3">
-            <div v-for="account in accounts()" :key="account.id" @click="handleProfileClick(account.acct)">
+            <div v-for="account in searchedAccounts" :key="account.id" @click="handleProfileClick(account.acct)">
               <AccountCard :account="account" :profile-url="getProfileUrl(account.acct)" show-bio size="sm" />
             </div>
           </div>
         </div>
-      </template>
 
-      <!-- Posts -->
-      <template v-if="activeTab === 'all' || activeTab === 'posts'">
-        <div v-if="statuses().length > 0">
+        <!-- Posts -->
+        <div v-if="showPosts && displayStatuses.length > 0">
           <h3 v-if="activeTab === 'all'" class="px-4 pb-2 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Posts
           </h3>
-          <div v-for="status in statuses()" :key="status.id">
-            <Status
+          <div v-for="status in displayStatuses" :key="status.id">
+            <StatusComponent
               :status="status"
               :profile-url="getProfileUrl(status.account.acct)"
-              @favourite="handleFavourite(status.reblog?.id ?? status.id)"
-              @reblog="handleReblog(status.reblog?.id ?? status.id)"
-              @bookmark="handleBookmark(status.reblog?.id ?? status.id)"
+              @favourite="toggleFavourite(status.reblog?.id ?? status.id)"
+              @reblog="toggleReblog(status.reblog?.id ?? status.id)"
+              @bookmark="toggleBookmark(status.reblog?.id ?? status.id)"
               @status-click="handleStatusClick"
               @profile-click="handleProfileClick"
               @tag-click="handleTagClick"
             />
           </div>
         </div>
-      </template>
 
-      <!-- Tags -->
-      <template v-if="activeTab === 'all' || activeTab === 'tags'">
-        <div v-if="tags().length > 0" class="px-4 py-3">
+        <!-- Tags -->
+        <div v-if="showTags && searchedTags.length > 0" class="px-4 py-3">
           <h3 v-if="activeTab === 'all'" class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Tags
           </h3>
           <div class="space-y-2">
             <button
-              v-for="tag in tags()"
+              v-for="tag in searchedTags"
               :key="tag.name"
               class="block w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
               @click="handleTagClick(tag)"
@@ -156,27 +185,31 @@ function handleBookmark(id: string) {
             </button>
           </div>
         </div>
-      </template>
+      </div>
 
-      <!-- Empty state -->
-      <div
-        v-if="accounts().length === 0 && statuses().length === 0 && tags().length === 0"
-        class="flex items-center justify-center py-20"
-      >
+      <!-- Loading -->
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Searching...
+        </p>
+      </div>
+
+      <!-- Empty -->
+      <div v-else-if="!hasResults" class="flex items-center justify-center py-20">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           No results found
         </p>
       </div>
-    </div>
+    </template>
 
-    <!-- Trending tags (when no search query) -->
+    <!-- Trending tags (no query) -->
     <div v-else class="px-4 py-3">
       <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
         Trending
       </h3>
       <div class="space-y-2">
         <button
-          v-for="tag in trendingTags()"
+          v-for="tag in trendingTags"
           :key="tag.name"
           class="block w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
           @click="handleTagClick(tag)"

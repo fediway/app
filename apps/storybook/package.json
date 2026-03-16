@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "storybook dev -p 6006",
+    "dev": "storybook dev -p 6006 --no-open --host localhost",
     "build": "storybook build",
     "clean": "rm -rf storybook-static node_modules"
   },

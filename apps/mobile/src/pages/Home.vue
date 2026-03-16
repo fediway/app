@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import type { Tag } from '@repo/types';
+import { useTimeline } from '@repo/api';
 import { Timeline } from '@repo/ui';
-import { computed } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useData } from '../composables/useData';
-import { useInteractions } from '../composables/useInteractions';
+import { getProfileUrl, useStatusBridge } from '../composables/useStatusBridge';
 
 defineOptions({ name: 'Home' });
 
 const router = useRouter();
-const { getHomeTimeline, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
 
-const statuses = computed(() => withOverridesAll(getHomeTimeline()));
+const timeline = useTimeline({ type: 'home', cache: true });
+const { statuses, toggleFavourite, toggleReblog, toggleBookmark } = useStatusBridge(timeline.statuses);
+
+onMounted(async () => {
+  await timeline.fetch();
+  timeline.startPolling(30_000);
+});
+
+onUnmounted(() => {
+  timeline.stopPolling();
+});
 
 function handleStatusClick(id: string) {
   router.push(`/status/${id}`);
@@ -25,38 +33,40 @@ function handleProfileClick(acct: string) {
 function handleTagClick(tag: Tag) {
   router.push(`/tags/${encodeURIComponent(tag.name)}`);
 }
-
-function handleFavourite(id: string) {
-  toggleFavourite(id, statuses.value);
-}
-
-function handleReblog(id: string) {
-  toggleReblog(id, statuses.value);
-}
-
-function handleBookmark(id: string) {
-  toggleBookmark(id, statuses.value);
-}
 </script>
 
 <template>
   <div class="min-h-screen">
+    <!-- Error state -->
+    <div v-if="timeline.error.value && statuses.length === 0" class="flex flex-col items-center justify-center gap-4 py-20">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Couldn't load timeline
+      </p>
+      <button class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium dark:bg-gray-800" @click="timeline.fetch()">
+        Try again
+      </button>
+    </div>
+
+    <!-- Timeline -->
     <Timeline
+      v-else
       :statuses="statuses"
-      :loading="statuses.length === 0"
-      :has-more="false"
+      :loading="timeline.isLoading.value && statuses.length === 0"
+      :has-more="timeline.hasMore.value"
       :get-profile-url="getProfileUrl"
-      @favourite="handleFavourite"
-      @reblog="handleReblog"
-      @bookmark="handleBookmark"
+      @favourite="toggleFavourite"
+      @reblog="toggleReblog"
+      @bookmark="toggleBookmark"
       @status-click="handleStatusClick"
       @profile-click="handleProfileClick"
       @tag-click="handleTagClick"
+      @load-more="timeline.loadMore()"
     />
 
-    <div v-if="statuses.length === 0" class="flex items-center justify-center py-20">
+    <!-- Empty state -->
+    <div v-if="!timeline.isLoading.value && !timeline.error.value && statuses.length === 0" class="flex items-center justify-center py-20">
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        Loading timeline...
+        Your timeline is empty
       </p>
     </div>
   </div>

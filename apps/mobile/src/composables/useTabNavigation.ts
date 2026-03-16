@@ -29,16 +29,25 @@ export function useTabNavigation() {
     return TAB_ROOTS[tabId as keyof typeof TAB_ROOTS] ?? '/';
   }
 
-  function getTabState(tabId: TabId): TabState {
+  function ensureTabState(tabId: TabId): TabState {
     if (!tabStates.value.has(tabId)) {
       tabStates.value.set(tabId, { lastPath: getTabRoot(tabId), scrollY: 0 });
     }
     return tabStates.value.get(tabId)!;
   }
 
+  // Eagerly initialize all tab states so computed reads are pure
+  for (const id of ['home', 'search', 'notifications', 'profile'] as TabId[]) {
+    ensureTabState(id);
+  }
+
+  function getTabState(tabId: TabId): TabState {
+    return tabStates.value.get(tabId) ?? ensureTabState(tabId);
+  }
+
   const isAtTabRoot = computed(() => {
-    const state = getTabState(activeTab.value);
-    return state.lastPath === getTabRoot(activeTab.value);
+    const state = tabStates.value.get(activeTab.value);
+    return !state || state.lastPath === getTabRoot(activeTab.value);
   });
 
   const canGoBack = computed(() => !isAtTabRoot.value);
