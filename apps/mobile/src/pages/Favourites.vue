@@ -5,13 +5,11 @@ import { useRouter } from 'vue-router';
 import { useData } from '../composables/useData';
 import { useInteractions } from '../composables/useInteractions';
 
-defineOptions({ name: 'Home' });
-
 const router = useRouter();
-const { getHomeTimeline, getProfileUrl } = useData();
+const { getFavouritedStatuses, getProfileUrl } = useData();
 const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
 
-const statuses = computed(() => withOverridesAll(getHomeTimeline()));
+const statuses = computed(() => withOverridesAll(getFavouritedStatuses()));
 
 function handleStatusClick(id: string) {
   router.push(`/status/${id}`);
@@ -39,23 +37,24 @@ function handleBookmark(id: string) {
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="w-full">
     <Timeline
       :statuses="statuses"
-      :loading="statuses.length === 0"
+      :loading="false"
       :has-more="false"
       :get-profile-url="getProfileUrl"
-      @favourite="handleFavourite"
       @reblog="handleReblog"
+      @favourite="handleFavourite"
       @bookmark="handleBookmark"
+      @tag-click="handleTagClick"
       @status-click="handleStatusClick"
       @profile-click="handleProfileClick"
-      @tag-click="handleTagClick"
     />
 
-    <div v-if="statuses.length === 0" class="flex items-center justify-center py-20">
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Loading timeline...
+    <div v-if="statuses.length === 0" class="py-12 text-center text-gray-500">
+      <p>No favourites yet</p>
+      <p class="mt-1 text-sm">
+        Posts you like will appear here
       </p>
     </div>
   </div>

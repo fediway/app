@@ -5,8 +5,10 @@
     "jsxImportSource": "vue",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"],
+      "@ui/*": ["../../packages/ui/src/*"]
+    },
+    "types": ["vite/client"]
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "*.config.ts"],
   "exclude": ["node_modules", "dist", "ios", "android"]
