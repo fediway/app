@@ -16,7 +16,6 @@ const config: StorybookConfig = {
   ],
 
   addons: [
-    '@storybook/addon-essentials',
     '@storybook/addon-a11y',
     '@storybook/addon-themes',
   ],

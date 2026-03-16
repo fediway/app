@@ -13,14 +13,12 @@
     "@repo/ui": "*"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^8.6.14",
-    "@storybook/addon-essentials": "^8.6.14",
-    "@storybook/addon-themes": "^8.6.14",
-    "@storybook/blocks": "^8.6.14",
-    "@storybook/vue3-vite": "^8.6.14",
+    "@storybook/addon-a11y": "^10.2.19",
+    "@storybook/addon-themes": "^10.2.19",
+    "@storybook/vue3-vite": "^10.2.19",
     "@tailwindcss/vite": "^4.1.0",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "storybook": "^8.6.14",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "storybook": "^10.2.19",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.4.0",
     "vue": "^3.4.21"
