@@ -24,14 +24,14 @@ const config: StorybookConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias as Record<string, string>,
-      '@': resolve(__dirname, '../../../packages/ui/src'),
+      '@': resolve(import.meta.dirname, '../../../packages/ui/src'),
     };
 
     // Allow Vite to serve files from the monorepo root
     config.server = config.server || {};
     config.server.fs = {
       ...config.server.fs,
-      allow: [resolve(__dirname, '../../..')],
+      allow: [resolve(import.meta.dirname, '../../..')],
     };
 
     config.plugins = config.plugins || [];
