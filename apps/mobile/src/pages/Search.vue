@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Tag } from '@repo/types';
 import { AccountCard, Status } from '@repo/ui';
 import Input from '@ui/components/ui/input/Input.vue';
 import { ref, watch } from 'vue';
@@ -57,8 +58,8 @@ function handleProfileClick(acct: string) {
   router.push(getProfileUrl(acct));
 }
 
-function handleTagClick(tag: string) {
-  router.push(`/tags/${encodeURIComponent(tag)}`);
+function handleTagClick(tag: Tag) {
+  router.push(`/tags/${encodeURIComponent(tag.name)}`);
 }
 
 function handleFavourite(id: string) {
@@ -149,7 +150,7 @@ function handleBookmark(id: string) {
               v-for="tag in tags()"
               :key="tag.name"
               class="block w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-              @click="handleTagClick(tag.name)"
+              @click="handleTagClick(tag)"
             >
               <span class="font-medium text-gray-900 dark:text-gray-100">#{{ tag.name }}</span>
             </button>
@@ -178,7 +179,7 @@ function handleBookmark(id: string) {
           v-for="tag in trendingTags()"
           :key="tag.name"
           class="block w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-          @click="handleTagClick(tag.name)"
+          @click="handleTagClick(tag)"
         >
           <span class="font-medium text-gray-900 dark:text-gray-100">#{{ tag.name }}</span>
         </button>
