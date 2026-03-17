@@ -43,7 +43,7 @@ defineEmits<{
             ? 'bg-secondary text-foreground hover:bg-secondary/80'
             : 'bg-foreground text-background hover:bg-foreground/90',
         ]"
-        @click="$emit(props.following ? 'unfollow' : 'follow')"
+        @click="props.following ? $emit('unfollow') : $emit('follow')"
       >
         {{ props.requested ? 'Requested' : props.following ? 'Following' : 'Follow' }}
       </button>

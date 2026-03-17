@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   <div
     data-slot="divider"
     :role="orientation === 'vertical' ? 'separator' : 'separator'"
-    :aria-orientation="orientation"
+    :aria-orientation="orientation ?? undefined"
     :class="cn(dividerVariants({ orientation }), props.class)"
   />
 </template>
