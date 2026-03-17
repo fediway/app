@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Tag } from '@repo/types';
 import { Timeline } from '@repo/ui';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -21,8 +22,8 @@ function handleProfileClick(acct: string) {
   router.push(getProfileUrl(acct));
 }
 
-function handleTagClick(tag: string) {
-  router.push(`/tags/${encodeURIComponent(tag)}`);
+function handleTagClick(tag: Tag) {
+  router.push(`/tags/${encodeURIComponent(tag.name)}`);
 }
 
 function handleFavourite(id: string) {

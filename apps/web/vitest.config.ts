@@ -14,6 +14,7 @@ export default mergeConfig(baseConfig, defineConfig({
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'app'),
+      '@capacitor/app': path.resolve(__dirname, 'test/__mocks__/@capacitor/app.ts'),
     },
   },
 }));

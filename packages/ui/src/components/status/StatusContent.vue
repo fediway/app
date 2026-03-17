@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CustomEmoji } from '@repo/types';
 import { computed, ref, watch } from 'vue';
-import RichText from '../primitives/RichText.vue';
+import { RichText } from '../ui/rich-text';
 
 interface Props {
   /** HTML content */

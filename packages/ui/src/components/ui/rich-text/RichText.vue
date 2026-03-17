@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CustomEmoji } from '@repo/types';
 import { computed } from 'vue';
-import { escapeRegExp, sanitizeHtml } from '../../utils/sanitize';
+import { escapeRegExp, sanitizeHtml } from '../../../utils/sanitize';
 
 interface Props {
   /** HTML content to render */

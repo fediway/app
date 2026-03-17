@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Avatar from '@/components/primitives/Avatar.vue';
+import Avatar from '@/components/ui/avatar/Avatar.vue';
 
 const meta = {
-  title: 'Primitives/Avatar',
+  title: 'UI/Avatar',
   component: Avatar,
   tags: ['autodocs'],
   argTypes: {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { computed } from 'vue';
-import RichText from '../primitives/RichText.vue';
+import { RichText } from '../ui/rich-text';
 import AccountHandle from './AccountHandle.vue';
 
 interface Props {

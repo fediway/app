@@ -3,7 +3,7 @@ import type { Item, ItemType } from '@repo/types';
 import type { Component } from 'vue';
 import { PhBook, PhFilmSlate, PhLink, PhMusicNote } from '@phosphor-icons/vue';
 import { computed } from 'vue';
-import { TagItem } from '@/components/ui/tag-item';
+import { TagItem } from '../ui/tag-item';
 
 const props = defineProps<{
   item: Item;
