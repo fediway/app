@@ -18,11 +18,21 @@ export function useStatusBridge(source: ShallowRef<Status[]> | ShallowRef<Status
   const store = useStatusStore();
   const { impact, notification } = useHaptics();
 
-  const actions = useStatusActions({
-    onError: () => {
-      notification('error');
-    },
-  });
+  let actions: ReturnType<typeof useStatusActions> | null = null;
+
+  function getActions() {
+    if (!actions) {
+      try {
+        actions = useStatusActions({
+          onError: () => notification('error'),
+        });
+      }
+      catch {
+        return null;
+      }
+    }
+    return actions;
+  }
 
   // Populate store when source data arrives
   watchEffect(() => {
@@ -39,17 +49,17 @@ export function useStatusBridge(source: ShallowRef<Status[]> | ShallowRef<Status
 
   async function toggleFavourite(id: string) {
     impact('light');
-    await actions.toggleFavourite(id);
+    await getActions()?.toggleFavourite(id);
   }
 
   async function toggleReblog(id: string) {
     impact('medium');
-    await actions.toggleReblog(id);
+    await getActions()?.toggleReblog(id);
   }
 
   async function toggleBookmark(id: string) {
     impact('light');
-    await actions.toggleBookmark(id);
+    await getActions()?.toggleBookmark(id);
   }
 
   return {

@@ -2,8 +2,9 @@
 import type { Tag } from '@repo/types';
 import { useTimeline } from '@repo/api';
 import { Timeline } from '@repo/ui';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { usePullToRefresh } from '../composables/usePullToRefresh';
 import { getProfileUrl, useStatusBridge } from '../composables/useStatusBridge';
 
 defineOptions({ name: 'Home' });
@@ -13,9 +14,15 @@ const router = useRouter();
 const timeline = useTimeline({ type: 'home', cache: true });
 const { statuses, toggleFavourite, toggleReblog, toggleBookmark } = useStatusBridge(timeline.statuses);
 
+const containerRef = ref<HTMLElement>();
+const { isRefreshing, pullDistance, bind } = usePullToRefresh(() => timeline.refresh());
+
 onMounted(async () => {
   await timeline.fetch();
   timeline.startPolling(30_000);
+  if (containerRef.value) {
+    bind(containerRef.value);
+  }
 });
 
 onUnmounted(() => {
@@ -36,7 +43,16 @@ function handleTagClick(tag: Tag) {
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div ref="containerRef" class="min-h-screen">
+    <!-- Pull to refresh indicator -->
+    <div
+      v-if="pullDistance > 0 || isRefreshing"
+      class="flex items-center justify-center overflow-hidden text-sm text-gray-400 transition-[height] dark:text-gray-500"
+      :style="{ height: isRefreshing ? '48px' : `${pullDistance}px` }"
+    >
+      {{ isRefreshing ? 'Refreshing...' : pullDistance >= 80 ? 'Release to refresh' : 'Pull to refresh' }}
+    </div>
+
     <!-- Error state -->
     <div v-if="timeline.error.value && statuses.length === 0" class="flex flex-col items-center justify-center gap-4 py-20">
       <p class="text-sm text-gray-500 dark:text-gray-400">
