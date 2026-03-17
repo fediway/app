@@ -45,9 +45,11 @@ defineEmits<{
   share: [];
 }>();
 
+const TRAILING_ZEROS_RE = /\.?0+$/;
+
 function formatCount(n: number): string {
   if (n >= 1000) {
-    return `${(n / 1000).toFixed(n >= 10000 ? 0 : 3).replace(/\.?0+$/, '')}`;
+    return `${(n / 1000).toFixed(n >= 10000 ? 0 : 3).replace(TRAILING_ZEROS_RE, '')}`;
   }
   return n.toLocaleString();
 }
