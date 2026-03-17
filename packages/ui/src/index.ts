@@ -8,15 +8,26 @@ export {
   AccountHeader,
   AccountStats,
 } from './components/account';
+// Feed components
+export { ActionBar, FeedItem } from './components/feed';
+
+// Item components
+export { ItemCard, ItemHeader, Take } from './components/item';
 
 // Media components
 export { MediaCarousel, MediaGallery, MediaLightbox } from './components/media';
 
-// Primitives
-export { Avatar, RelativeTime, RichText } from './components/primitives';
+// Navigation components
+export { MainNavigation, MainNavigationItem, TabBar } from './components/navigation';
+
+export type { NavItem, TabItem } from './components/navigation';
 
 // Profile components
 export { ProfileHeader } from './components/profile';
+// Search & Discover components
+export { ListHeader, UserSuggestions } from './components/search-discover';
+
+export type { UserSuggestion } from './components/search-discover';
 
 // Status components
 export {
@@ -29,9 +40,15 @@ export {
   StatusQuote,
   StatusTags,
 } from './components/status';
-
 // Timeline components
 export { Timeline } from './components/timeline';
+
+// UI primitives
+export { Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonSK, ButtonText, Divider, Headline, RelativeTime, RichText, Section } from './components/ui';
+
+export type { AvatarStackItem } from './components/ui';
+
+export type { ButtonSKVariants, HeadlineVariants } from './components/ui';
 
 export {
   Card,

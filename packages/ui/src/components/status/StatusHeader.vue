@@ -2,8 +2,8 @@
 import type { Account } from '@repo/types';
 import AccountDisplayName from '../account/AccountDisplayName.vue';
 import AccountHandle from '../account/AccountHandle.vue';
-import Avatar from '../primitives/Avatar.vue';
-import RelativeTime from '../primitives/RelativeTime.vue';
+import { Avatar } from '../ui/avatar';
+import { RelativeTime } from '../ui/relative-time';
 
 interface Props {
   account: Account;
