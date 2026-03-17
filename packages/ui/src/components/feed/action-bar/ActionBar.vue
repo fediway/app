@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
 import {
+  PhArrowsClockwise,
   PhBookmarkSimple,
-  PhChatCircle,
+  PhChat,
   PhDotsThree,
   PhHeart,
-  PhRepeat,
 } from '@phosphor-icons/vue';
+import { computed } from 'vue';
 import { cn } from '../../../lib/utils';
 import { ButtonAction } from '../../ui/button-action';
 
@@ -15,6 +16,7 @@ interface Props {
   repliesCount?: number;
   reblogsCount?: number;
   favourited?: boolean;
+  replied?: boolean;
   reblogged?: boolean;
   bookmarked?: boolean;
   /** Direct messages and private posts cannot be boosted */
@@ -27,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   repliesCount: 0,
   reblogsCount: 0,
   favourited: false,
+  replied: false,
   reblogged: false,
   bookmarked: false,
   visibility: 'public',
@@ -40,7 +43,7 @@ const emit = defineEmits<{
   more: [];
 }>();
 
-const canReblog = $computed(() =>
+const canReblog = computed(() =>
   props.visibility !== 'direct' && props.visibility !== 'private',
 );
 </script>
@@ -50,14 +53,24 @@ const canReblog = $computed(() =>
     data-slot="action-bar"
     :class="cn('flex items-center justify-between', props.class)"
   >
-    <!-- Left cluster: reply, reblog, favourite (each fixed width to keep alignment) -->
+    <!-- Left cluster: favourite, reply, reblog (each fixed width to keep alignment) -->
     <div class="flex items-center gap-2">
+      <ButtonAction
+        :count="favouritesCount || null"
+        class="w-[60px]"
+        :class="{ 'text-red hover:text-red': favourited }"
+        @click="emit('favourite')"
+      >
+        <PhHeart :size="20" :weight="favourited ? 'fill' : 'regular'" />
+      </ButtonAction>
+
       <ButtonAction
         :count="repliesCount || null"
         class="w-[60px]"
+        :class="{ 'text-blue hover:text-blue': replied }"
         @click="emit('reply')"
       >
-        <PhChatCircle :size="20" />
+        <PhChat :size="20" :weight="replied ? 'fill' : 'regular'" />
       </ButtonAction>
 
       <ButtonAction
@@ -67,16 +80,7 @@ const canReblog = $computed(() =>
         :disabled="!canReblog"
         @click="canReblog && emit('reblog')"
       >
-        <PhRepeat :size="20" />
-      </ButtonAction>
-
-      <ButtonAction
-        :count="favouritesCount || null"
-        class="w-[60px]"
-        :class="{ 'text-red hover:text-red': favourited }"
-        @click="emit('favourite')"
-      >
-        <PhHeart :size="20" :weight="favourited ? 'fill' : 'regular'" />
+        <PhArrowsClockwise :size="20" />
       </ButtonAction>
     </div>
 

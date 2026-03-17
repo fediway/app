@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import UserSuggestions from '@/components/search-discover/UserSuggestions.vue';
+import UserSuggestions from '@/components/search-discover/user-suggestions/UserSuggestions.vue';
 
 const mockUsers = [
   {

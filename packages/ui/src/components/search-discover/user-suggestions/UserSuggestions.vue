@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
 import { cn } from '../../../lib/utils';
-import Avatar from '../../primitives/Avatar.vue';
+import { Avatar } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 
 export interface UserSuggestion {

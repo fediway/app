@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
 import { computed } from 'vue';
-import RelativeTime from '../primitives/RelativeTime.vue';
-import RichText from '../primitives/RichText.vue';
+import { RelativeTime } from '../ui/relative-time';
+import { RichText } from '../ui/rich-text';
 
 interface Props {
   status: Status;

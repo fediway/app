@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import ActionBar from '@/components/feed/ActionBar.vue';
+import ActionBar from '@/components/feed/action-bar/ActionBar.vue';
 
 const meta = {
   title: 'Feed/ActionBar',
@@ -8,6 +8,7 @@ const meta = {
   argTypes: {
     visibility: { control: 'select', options: ['public', 'unlisted', 'private', 'direct'] },
     favourited: { control: 'boolean' },
+    replied: { control: 'boolean' },
     reblogged: { control: 'boolean' },
     bookmarked: { control: 'boolean' },
   },
@@ -16,6 +17,7 @@ const meta = {
     reblogsCount: 4,
     favouritesCount: 1,
     favourited: false,
+    replied: false,
     reblogged: false,
     bookmarked: false,
     visibility: 'public',
@@ -30,6 +32,7 @@ export const Default: Story = {};
 export const AllActive: Story = {
   args: {
     favourited: true,
+    replied: true,
     reblogged: true,
     bookmarked: true,
   },

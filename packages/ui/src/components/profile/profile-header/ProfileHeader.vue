@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PhArrowLeft } from '@phosphor-icons/vue';
 import profileHeaderPlaceholder from '../../../assets/profile-header-placeholder.svg?url';
-import Avatar from '../../primitives/Avatar.vue';
+import { Avatar } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
 
 interface Props {
@@ -22,7 +22,7 @@ defineEmits<{ back: [] }>();
 </script>
 
 <template>
-  <div class="relative mb-16">
+  <div class="relative">
     <!-- Header Banner -->
     <div class="relative w-full h-[157px] overflow-hidden bg-border">
       <!-- Custom header image -->
@@ -57,24 +57,26 @@ defineEmits<{ back: [] }>();
       <PhArrowLeft :size="24" />
     </button>
 
-    <!-- Profile Avatar -->
-    <div class="absolute left-5 bottom-0 translate-y-1/2">
-      <Avatar
-        :src="avatarSrc"
-        :alt="avatarAlt"
-        class="!w-[100px] !h-[100px] !border-border"
-      />
+    <!-- Content below banner -->
+    <div class="flex items-start justify-between px-5">
+      <!-- Profile Avatar -->
+      <div class="-mt-[50px] relative z-10">
+        <Avatar
+          :src="avatarSrc"
+          :alt="avatarAlt"
+          class="!w-[100px] !h-[100px] !border-border"
+        />
+      </div>
+
+      <div class="flex items-center gap-2 mt-3">
+        <!-- Follows You Badge -->
+        <Badge v-if="followsYou">
+          Follows you
+        </Badge>
+
+        <!-- Additional badge/action slot -->
+        <slot name="badge" />
+      </div>
     </div>
-
-    <!-- Follows You Badge -->
-    <Badge
-      v-if="followsYou"
-      class="absolute left-[calc(50%+77px)] top-[177px]"
-    >
-      Follows you
-    </Badge>
-
-    <!-- Additional badge/action slot -->
-    <slot name="badge" />
   </div>
 </template>

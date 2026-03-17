@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import ListHeader from '@/components/search-discover/ListHeader.vue';
+import ListHeader from '@/components/search-discover/list-header/ListHeader.vue';
 
 const meta = {
   title: 'SearchDiscover/ListHeader',

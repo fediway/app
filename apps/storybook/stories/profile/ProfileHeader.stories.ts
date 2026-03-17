@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import ProfileHeader from '@/components/profile/ProfileHeader.vue';
+import ProfileHeader from '@/components/profile/profile-header/ProfileHeader.vue';
 
 const meta = {
   title: 'Profile/ProfileHeader',

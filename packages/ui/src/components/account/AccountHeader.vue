@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
-import Avatar from '../primitives/Avatar.vue';
+import { Avatar } from '../ui/avatar';
 
 interface Props {
   account: Account;

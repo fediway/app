@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
-import Avatar from '../primitives/Avatar.vue';
-import RichText from '../primitives/RichText.vue';
+import { Avatar } from '../ui/avatar';
+import { RichText } from '../ui/rich-text';
 import AccountDisplayName from './AccountDisplayName.vue';
 import AccountHandle from './AccountHandle.vue';
 
