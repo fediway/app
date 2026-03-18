@@ -12,4 +12,5 @@ export { Headline } from './headline';
 export type { HeadlineVariants } from './headline';
 export { RelativeTime } from './relative-time';
 export { RichText } from './rich-text';
+export { SearchInput } from './search-input';
 export { Section } from './section';

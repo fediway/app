@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { useStatusStore } from '@repo/api';
 import {
   AccountActions,
   AccountBio,
@@ -22,6 +23,7 @@ const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useI
 const { toggleFollow, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
+const statusStore = useStatusStore();
 
 const acct = computed(() => {
   const param = route.params.acct;
@@ -120,6 +122,7 @@ function goBack() {
         :loading="false"
         :has-more="false"
         :get-profile-url="(acct) => getProfileUrl(acct)"
+        :get-status="statusStore.get"
         @reblog="handleReblog"
         @favourite="handleFavourite"
         @bookmark="handleBookmark"

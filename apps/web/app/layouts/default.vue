@@ -124,7 +124,6 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     />
 
     <!-- Mobile Navigation -->
-    <MobileHeader class="hidden max-lg:block" />
     <MobileFooter class="hidden max-lg:block" />
     <MobileSidebar />
 
@@ -149,7 +148,7 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     </div>
 
     <!-- Mobile Main Content -->
-    <main class="block lg:hidden pt-14 pb-14 bg-white dark:bg-gray-900">
+    <main class="block lg:hidden pb-20 bg-white dark:bg-gray-900">
       <slot />
     </main>
   </div>

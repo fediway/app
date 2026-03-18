@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 import { cn } from '../../../lib/utils';
 import { Avatar } from '../../ui/avatar';
 import { RelativeTime } from '../../ui/relative-time';
@@ -53,6 +53,8 @@ const emit = defineEmits<{
   more: [];
 }>();
 
+const slots = useSlots();
+
 const actionBarProps = computed(() => ({
   favouritesCount: props.favouritesCount,
   repliesCount: props.repliesCount,
@@ -67,6 +69,9 @@ const actionBarProps = computed(() => ({
 
 <template>
   <article :class="cn('contain-layout-style-paint', props.class)">
+    <!-- Pre-header slot (e.g. reblog indicator) -->
+    <slot name="pre-header" />
+
     <div class="flex gap-2 px-5 py-3">
       <!-- Left: avatar + connector -->
       <div class="flex flex-col items-center shrink-0">
@@ -88,17 +93,20 @@ const actionBarProps = computed(() => ({
           <slot />
         </div>
 
-        <!-- Action bar (hidden for context posts in reply threads) -->
-        <ActionBar
-          v-if="!hideActions"
-          class="mt-2 mb-1"
-          v-bind="actionBarProps"
-          @favourite="emit('favourite')"
-          @reply="emit('reply')"
-          @reblog="emit('reblog')"
-          @bookmark="emit('bookmark')"
-          @more="emit('more')"
-        />
+        <!-- Actions: custom slot or default ActionBar -->
+        <template v-if="!hideActions">
+          <slot v-if="slots.actions" name="actions" />
+          <ActionBar
+            v-else
+            class="mt-2 mb-1"
+            v-bind="actionBarProps"
+            @favourite="emit('favourite')"
+            @reply="emit('reply')"
+            @reblog="emit('reblog')"
+            @bookmark="emit('bookmark')"
+            @more="emit('more')"
+          />
+        </template>
       </div>
     </div>
 

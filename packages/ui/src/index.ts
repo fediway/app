@@ -44,7 +44,7 @@ export {
 export { Timeline } from './components/timeline';
 
 // UI primitives
-export { Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonSK, ButtonText, Divider, Headline, RelativeTime, RichText, Section } from './components/ui';
+export { Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonSK, ButtonText, Divider, Headline, RelativeTime, RichText, SearchInput, Section } from './components/ui';
 
 export type { AvatarStackItem } from './components/ui';
 

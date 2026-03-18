@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useTimeline } from '@repo/api';
+import { useStatusStore, useTimeline } from '@repo/api';
 import { Status as StatusComponent } from '@repo/ui';
 import Button from '@ui/components/ui/button/Button.vue';
 import { useData } from '~/composables/useData';
@@ -19,6 +19,14 @@ const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
 const timeline = useTimeline({ type: 'home' });
+const statusStore = useStatusStore();
+
+function getReplyParent(status: Status): Status | null {
+  const displayStatus = status.reblog ?? status;
+  if (!displayStatus.inReplyToId)
+    return null;
+  return statusStore.get(displayStatus.inReplyToId) ?? null;
+}
 
 if (import.meta.client) {
   timeline.fetch();
@@ -103,6 +111,7 @@ onDeactivated(() => {
       :key="status.id"
       :status="status"
       :profile-url="getProfileUrl(status.reblog?.account.acct ?? status.account.acct)"
+      :reply-parent="getReplyParent(status)"
       @reply="handleReply"
       @reblog="handleReblog"
       @favourite="handleFavourite"
@@ -123,6 +132,7 @@ onDeactivated(() => {
       :key="status.id"
       :status="status"
       :profile-url="getProfileUrl(status.reblog?.account.acct ?? status.account.acct)"
+      :reply-parent="getReplyParent(status)"
       @reply="handleReply"
       @reblog="handleReblog"
       @favourite="handleFavourite"
