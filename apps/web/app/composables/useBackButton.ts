@@ -36,7 +36,8 @@ export function useBackButton() {
   async function initCapacitorBackButton() {
     try {
       // Dynamic import — only resolves in Capacitor (apps/mobile), fails gracefully on web
-      const { App } = await import(/* @vite-ignore */ '@capacitor/app' as string);
+      const capacitorApp = '@capacitor/app';
+      const { App } = await import(/* @vite-ignore */ capacitorApp);
       App.addListener('backButton', () => {
         if (!handleBackButton()) {
           App.minimizeApp();
