@@ -2,17 +2,24 @@
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { useDarkMode } from '@repo/api';
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppInit } from './composables/useAppInit';
 import { useTransition } from './composables/useTransition';
 import AppLayout from './layouts/AppLayout.vue';
 import AuthLayout from './layouts/AuthLayout.vue';
+import { useNavigationStore } from './stores/navigation';
 
 const route = useRoute();
 const { isDark } = useDarkMode();
 const { init } = useAppInit();
 const { transitionName } = useTransition();
+const navigation = useNavigationStore();
+
+const routeAnnouncement = ref('');
+watch(() => navigation.pageTitle, (title) => {
+  routeAnnouncement.value = title;
+});
 
 const layout = computed(() => {
   return route.meta.layout === 'auth' ? AuthLayout : AppLayout;
@@ -38,6 +45,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <div aria-live="polite" class="sr-only">
+    {{ routeAnnouncement }}
+  </div>
   <component :is="layout">
     <router-view v-slot="{ Component }">
       <Transition :name="transitionName" mode="out-in">
@@ -50,41 +60,43 @@ onMounted(() => {
 </template>
 
 <style>
-/* Tab switch: fade */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+@media (prefers-reduced-motion: no-preference) {
+  /* Tab switch: fade */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.15s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 
-/* Stack push: slide left */
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.slide-left-enter-from {
-  transform: translateX(30%);
-  opacity: 0;
-}
-.slide-left-leave-to {
-  transform: translateX(-15%);
-  opacity: 0;
-}
+  /* Stack push: slide left */
+  .slide-left-enter-active,
+  .slide-left-leave-active {
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .slide-left-enter-from {
+    transform: translateX(30%);
+    opacity: 0;
+  }
+  .slide-left-leave-to {
+    transform: translateX(-15%);
+    opacity: 0;
+  }
 
-/* Stack pop: slide right */
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.slide-right-enter-from {
-  transform: translateX(-15%);
-  opacity: 0;
-}
-.slide-right-leave-to {
-  transform: translateX(30%);
-  opacity: 0;
+  /* Stack pop: slide right */
+  .slide-right-enter-active,
+  .slide-right-leave-active {
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .slide-right-enter-from {
+    transform: translateX(-15%);
+    opacity: 0;
+  }
+  .slide-right-leave-to {
+    transform: translateX(30%);
+    opacity: 0;
+  }
 }
 </style>

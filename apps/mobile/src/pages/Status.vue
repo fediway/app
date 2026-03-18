@@ -1,23 +1,32 @@
 <script setup lang="ts">
 import type { Tag } from '@repo/types';
 import { PhArrowLeft, PhChatCircle, PhHeart, PhRepeat } from '@phosphor-icons/vue';
+import { useStatus, useStatusActions } from '@repo/api';
 import { AccountDisplayName, AccountHandle, Avatar, Button, RelativeTime, RichText, StatusActions, StatusMedia, StatusTags } from '@repo/ui';
-import { computed } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useData } from '../composables/useData';
-import { useInteractions } from '../composables/useInteractions';
+import { useHaptics } from '../composables/useHaptics';
 import { usePostComposer } from '../composables/usePostComposer';
+import { getProfileUrl } from '../composables/useStatusBridge';
 
 const route = useRoute();
 const router = useRouter();
-const { getStatusById, getStatusContext, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverrides } = useInteractions();
+const { impact, notification } = useHaptics();
 const { open: openComposer } = usePostComposer();
 
+const statusData = useStatus();
+const actions = useStatusActions({
+  onError: () => notification('error'),
+});
+
 const statusId = computed(() => route.params.id as string);
-const rawStatus = computed(() => getStatusById(statusId.value));
-const status = computed(() => rawStatus.value ? withOverrides(rawStatus.value) : undefined);
-const context = computed(() => getStatusContext(statusId.value));
+
+async function load() {
+  await statusData.fetch(statusId.value);
+}
+
+onMounted(load);
+watch(statusId, load);
 
 function goBack() {
   if (window.history.length > 1) {
@@ -32,19 +41,22 @@ function navigateToStatus(id: string) {
   router.push(`/status/${id}`);
 }
 
-function handleReblog(id: string) {
-  if (rawStatus.value)
-    toggleReblog(id, [rawStatus.value]);
+async function handleFavourite(id: string) {
+  impact('light');
+  await actions.toggleFavourite(id);
+  load();
 }
 
-function handleFavourite(id: string) {
-  if (rawStatus.value)
-    toggleFavourite(id, [rawStatus.value]);
+async function handleReblog(id: string) {
+  impact('medium');
+  await actions.toggleReblog(id);
+  load();
 }
 
-function handleBookmark(id: string) {
-  if (rawStatus.value)
-    toggleBookmark(id, [rawStatus.value]);
+async function handleBookmark(id: string) {
+  impact('light');
+  await actions.toggleBookmark(id);
+  load();
 }
 
 function handleTagClick(tag: Tag) {
@@ -69,7 +81,7 @@ function formatFullTimestamp(dateString: string): string {
     <!-- Header -->
     <header class="sticky top-[calc(3.5rem+var(--safe-area-inset-top))] z-10 border-b border-gray-200 bg-white/80 px-4 py-3 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
       <div class="flex items-center gap-4">
-        <Button variant="muted" size="icon" class="-ml-2 size-9" @click="goBack">
+        <Button variant="muted" size="icon" class="-ml-2 size-9" aria-label="Go back" @click="goBack">
           <PhArrowLeft :size="20" />
         </Button>
         <h1 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -78,8 +90,25 @@ function formatFullTimestamp(dateString: string): string {
       </div>
     </header>
 
+    <!-- Loading -->
+    <div v-if="statusData.isLoading.value && !statusData.status.value" class="flex items-center justify-center py-20">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Loading...
+      </p>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="statusData.error.value && !statusData.status.value" class="p-8 text-center">
+      <p class="text-gray-500">
+        Couldn't load this post
+      </p>
+      <button class="mt-4 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium dark:bg-gray-800" @click="load">
+        Try again
+      </button>
+    </div>
+
     <!-- Not found -->
-    <div v-if="!status" class="p-8 text-center text-gray-500">
+    <div v-else-if="!statusData.status.value" class="p-8 text-center text-gray-500">
       <p>Post not found</p>
       <Button variant="secondary" size="sm" class="mt-4" @click="router.push('/')">
         Go to Home
@@ -88,15 +117,15 @@ function formatFullTimestamp(dateString: string): string {
 
     <template v-else>
       <!-- Ancestors -->
-      <div v-if="context.ancestors.length > 0">
+      <div v-if="statusData.context.value?.ancestors?.length">
         <div
-          v-for="(ancestor, index) in context.ancestors"
+          v-for="(ancestor, index) in statusData.context.value.ancestors"
           :key="ancestor.id"
           class="relative transition-colors active:bg-gray-50 dark:active:bg-gray-800"
           @click="navigateToStatus(ancestor.id)"
         >
           <div
-            v-if="index < context.ancestors.length - 1 || status"
+            v-if="index < statusData.context.value.ancestors.length - 1 || statusData.status.value"
             class="absolute bottom-0 left-8 top-14 w-0.5 bg-gray-300 dark:bg-gray-600"
           />
           <article class="px-4 py-3">
@@ -131,66 +160,66 @@ function formatFullTimestamp(dateString: string): string {
       <!-- Main status -->
       <article class="border-b border-gray-200 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
         <div class="mb-4 px-4 pt-4">
-          <router-link :to="getProfileUrl(status.account.acct)" class="flex items-center gap-3 no-underline">
-            <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="md" />
+          <router-link :to="getProfileUrl(statusData.status.value.account.acct)" class="flex items-center gap-3 no-underline">
+            <Avatar :src="statusData.status.value.account.avatar" :alt="statusData.status.value.account.displayName" size="md" />
             <div>
-              <AccountDisplayName :name="status.account.displayName || status.account.username" :emojis="status.account.emojis" />
-              <AccountHandle :acct="status.account.acct" class="block text-sm" />
+              <AccountDisplayName :name="statusData.status.value.account.displayName || statusData.status.value.account.username" :emojis="statusData.status.value.account.emojis" />
+              <AccountHandle :acct="statusData.status.value.account.acct" class="block text-sm" />
             </div>
           </router-link>
         </div>
 
         <StatusMedia
-          v-if="status.mediaAttachments.length > 0"
-          :attachments="status.mediaAttachments"
-          :sensitive="status.sensitive"
+          v-if="statusData.status.value.mediaAttachments.length > 0"
+          :attachments="statusData.status.value.mediaAttachments"
+          :sensitive="statusData.status.value.sensitive"
           class="mb-4"
         />
 
         <div class="px-4">
-          <RichText :content="status.content" :emojis="status.emojis" class="mb-4 text-lg leading-relaxed text-gray-900 dark:text-gray-100" />
+          <RichText :content="statusData.status.value.content" :emojis="statusData.status.value.emojis" class="mb-4 text-lg leading-relaxed text-gray-900 dark:text-gray-100" />
 
-          <div v-if="status.tags.length > 0" class="mb-4">
-            <StatusTags :tags="status.tags" @tag-click="handleTagClick" />
+          <div v-if="statusData.status.value.tags.length > 0" class="mb-4">
+            <StatusTags :tags="statusData.status.value.tags" @tag-click="handleTagClick" />
           </div>
 
           <div class="border-t border-gray-200 py-3 text-sm text-gray-500 dark:border-gray-700">
-            {{ formatFullTimestamp(status.createdAt) }}
+            {{ formatFullTimestamp(statusData.status.value.createdAt) }}
           </div>
 
           <div class="flex gap-6 border-t border-gray-200 py-3 text-sm dark:border-gray-700">
-            <div v-if="status.reblogsCount > 0">
-              <span class="font-semibold text-gray-900 dark:text-gray-100">{{ status.reblogsCount }}</span>
+            <div v-if="statusData.status.value.reblogsCount > 0">
+              <span class="font-semibold text-gray-900 dark:text-gray-100">{{ statusData.status.value.reblogsCount }}</span>
               <span class="ml-1 text-gray-500">Reblogs</span>
             </div>
-            <div v-if="status.favouritesCount > 0">
-              <span class="font-semibold text-gray-900 dark:text-gray-100">{{ status.favouritesCount }}</span>
+            <div v-if="statusData.status.value.favouritesCount > 0">
+              <span class="font-semibold text-gray-900 dark:text-gray-100">{{ statusData.status.value.favouritesCount }}</span>
               <span class="ml-1 text-gray-500">Likes</span>
             </div>
           </div>
 
           <div class="border-t border-gray-200 py-2 dark:border-gray-700">
             <StatusActions
-              :replies-count="status.repliesCount"
-              :reblogs-count="status.reblogsCount"
-              :favourites-count="status.favouritesCount"
-              :favourited="status.favourited ?? false"
-              :reblogged="status.reblogged ?? false"
-              :bookmarked="status.bookmarked ?? false"
-              :visibility="status.visibility"
-              @reply="openComposer(status)"
-              @reblog="handleReblog(status.id)"
-              @favourite="handleFavourite(status.id)"
-              @bookmark="handleBookmark(status.id)"
+              :replies-count="statusData.status.value.repliesCount"
+              :reblogs-count="statusData.status.value.reblogsCount"
+              :favourites-count="statusData.status.value.favouritesCount"
+              :favourited="statusData.status.value.favourited ?? false"
+              :reblogged="statusData.status.value.reblogged ?? false"
+              :bookmarked="statusData.status.value.bookmarked ?? false"
+              :visibility="statusData.status.value.visibility"
+              @reply="openComposer(statusData.status.value)"
+              @reblog="handleReblog(statusData.status.value!.id)"
+              @favourite="handleFavourite(statusData.status.value!.id)"
+              @bookmark="handleBookmark(statusData.status.value!.id)"
             />
           </div>
         </div>
       </article>
 
       <!-- Descendants -->
-      <div v-if="context.descendants.length > 0">
+      <div v-if="statusData.context.value?.descendants?.length">
         <div
-          v-for="reply in context.descendants"
+          v-for="reply in statusData.context.value.descendants"
           :key="reply.id"
           class="border-b border-gray-100 last:border-b-0 transition-colors active:bg-gray-50 dark:border-gray-800 dark:active:bg-gray-800"
           @click="navigateToStatus(reply.id)"

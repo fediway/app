@@ -27,6 +27,7 @@ const showBackButton = computed(() => {
         v-if="showBackButton"
         variant="muted"
         size="icon"
+        aria-label="Go back"
         @click="router.back()"
       >
         <PhArrowLeft :size="24" />
@@ -35,6 +36,7 @@ const showBackButton = computed(() => {
         v-else
         variant="muted"
         size="icon"
+        aria-label="Open menu"
         @click="navigation.openDrawer()"
       >
         <PhList :size="24" />
@@ -49,6 +51,7 @@ const showBackButton = computed(() => {
       <Button
         variant="muted"
         size="icon"
+        aria-label="Explore"
         @click="router.push('/explore')"
       >
         <PhMagnifyingGlass :size="24" />
