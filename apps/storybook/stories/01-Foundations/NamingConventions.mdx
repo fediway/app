@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="01-Foundations/Naming Conventions" />
+
+# Naming Conventions
+
+## Prefixes
+
+- **`Profile*`** — Full page-level view of a person. Profile pages only.
+- **`Account*`** — Compact reference to a person. Inside statuses, lists, search.
+- **`Status*`** — Mastodon status (post) rendering.
+- **`Item*`** / **`Take`** — Fediway-specific. Media ratings, not standard Mastodon.
+
+## Patterns
+
+- **`*ListItem`** — Single row in a list. (`AccountListItem`, `TagListItem`)
+- **`*List`** — Rendered list with loading/empty/error states. (`AccountList`, `TagList`)
+- **`*Carousel`** — Horizontal scrollable list. (`AccountCarousel`)
+- **`*Actions`** — Action button group for an entity. (`StatusActions`, `ProfileActions`)
+- **`*Display`** — Read-only rendering. (`PollDisplay`)
+- **`*Editor`** — Interactive input. (`PollEditor`)
+
+## Terminology
+
+- **`Status`** not "Post" — Mastodon API term.
+- **`Timeline`** not "Feed" — Mastodon API term.
+- **`Favourite`** not "Like" — Mastodon API term.
+- **`Reblog`** not "Boost" or "Repost" — Mastodon API term.

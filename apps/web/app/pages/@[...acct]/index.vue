@@ -2,10 +2,9 @@
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { useStatusStore } from '@repo/api';
 import {
-  AccountActions,
-  AccountBio,
-  AccountStats,
+  ProfileActions,
   ProfileHeader,
+  ProfileInformation,
   Timeline,
 } from '@repo/ui';
 import { useData } from '~/composables/useData';
@@ -96,24 +95,17 @@ function goBack() {
 
       <!-- Actions row (positioned to align with avatar row) -->
       <div class="px-4 -mt-12 flex justify-end">
-        <AccountActions
-          :relationship="relationship"
+        <ProfileActions
+          :following="relationship?.following ?? false"
+          :requested="relationship?.requested ?? false"
           @follow="handleFollowToggle"
           @unfollow="handleFollowToggle"
         />
       </div>
 
       <!-- Profile Info Section -->
-      <div class="px-4 pt-2 pb-4 border-b border-gray-200">
-        <!-- Bio (includes name, handle, description) -->
-        <AccountBio :account="account" class="mb-3" />
-
-        <!-- Stats -->
-        <AccountStats
-          :statuses-count="account.statusesCount"
-          :followers-count="account.followersCount"
-          :following-count="account.followingCount"
-        />
+      <div class="pt-2 pb-4 border-b border-gray-200">
+        <ProfileInformation :account="account" />
       </div>
 
       <!-- User's Statuses -->

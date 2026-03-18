@@ -1,17 +1,15 @@
-// Account components
+// Account* — compact inline representations
+// Profile* — full page-level representations
 export {
-  AccountActions,
-  AccountBio,
   AccountCard,
   AccountCarousel,
   AccountDisplayName,
   AccountHandle,
-  AccountHeader,
   AccountList,
   AccountListItem,
-  AccountStats,
   CurrentUserCard,
   FollowButton,
+  ProfileActions,
   ProfileHeader,
   ProfileInformation,
   UserSuggestions,

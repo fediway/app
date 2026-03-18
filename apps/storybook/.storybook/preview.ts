@@ -12,6 +12,9 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    sidebar: {
+      collapsedRoots: ['02-primitives', '03-form', '04-layout', '05-navigation', '06-account', '07-status', '08-compose', '09-timeline', '10-notification', '11-conversation', '12-media', '13-item', '14-brand'],
+    },
   },
   decorators: [
     withThemeByClassName({

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import ProfileActions from '@/components/account/AccountActions.vue';
+import ProfileActions from '@/components/account/ProfileActions.vue';
 
 const meta = {
   title: '06-Account/ProfileActions',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FediwayStatus, Tag } from '@repo/types';
 import { useAccount, useStatusActions, useStatusStore } from '@repo/api';
-import { AccountBio, AccountStats, ProfileHeader, Status } from '@repo/ui';
+import { ProfileHeader, ProfileInformation, Status } from '@repo/ui';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useHaptics } from '../composables/useHaptics';
@@ -118,15 +118,7 @@ function handleBack() {
       </div>
 
       <div class="mt-3">
-        <AccountBio :account="accountData.account.value" />
-      </div>
-
-      <div class="mt-3">
-        <AccountStats
-          :statuses-count="accountData.account.value.statusesCount"
-          :followers-count="accountData.account.value.followersCount"
-          :following-count="accountData.account.value.followingCount"
-        />
+        <ProfileInformation :account="accountData.account.value" />
       </div>
     </div>
 
