@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountDisplayName, AccountHandle } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Avatar, Button } from '@repo/ui';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { useData } from '~/composables/useData';
 import { formatCount } from '~/utils/format';
@@ -38,11 +37,7 @@ const suggestions = computed(() => getSuggestedAccounts());
           class="block bg-white rounded-xl border border-gray-200 p-3 hover:border-gray-300 transition-colors no-underline h-full"
         >
           <div class="flex flex-col items-center text-center">
-            <img
-              :src="account.avatar"
-              :alt="account.displayName"
-              class="w-14 h-14 rounded-full mb-2"
-            >
+            <Avatar :src="account.avatar" :alt="account.displayName" size="lg" class="mb-2" />
             <AccountDisplayName
               :name="account.displayName || account.username"
               :emojis="account.emojis"

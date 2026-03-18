@@ -33,7 +33,6 @@
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.1",
     "@capacitor/text-zoom": "^8.0.1",
-    "@headlessui/vue": "^1.7.19",
     "@phosphor-icons/vue": "^2.2.1",
     "@repo/api": "*",
     "@repo/types": "*",

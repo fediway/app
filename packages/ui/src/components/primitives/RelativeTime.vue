@@ -14,6 +14,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime()))
+    return '';
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);
@@ -43,6 +45,8 @@ function formatRelativeTime(dateString: string): string {
 
 function formatFullDate(dateString: string): string {
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime()))
+    return '';
   return date.toLocaleString(undefined, {
     weekday: 'long',
     year: 'numeric',

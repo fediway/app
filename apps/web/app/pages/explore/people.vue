@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountDisplayName, AccountHandle, RichText } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Avatar, Button, RichText } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useFollows } from '~/composables/useFollows';
@@ -27,11 +26,7 @@ function handleFollow(accountId: string) {
       >
         <div class="flex items-start gap-3">
           <NuxtLink :to="getProfileUrl(account.acct)" class="shrink-0">
-            <img
-              :src="account.avatar"
-              :alt="account.displayName"
-              class="w-12 h-12 rounded-full"
-            >
+            <Avatar :src="account.avatar" :alt="account.displayName" size="lg" />
           </NuxtLink>
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between gap-3">

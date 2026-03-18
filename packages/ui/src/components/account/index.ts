@@ -4,4 +4,8 @@ export { default as AccountCard } from './AccountCard.vue';
 export { default as AccountDisplayName } from './AccountDisplayName.vue';
 export { default as AccountHandle } from './AccountHandle.vue';
 export { default as AccountHeader } from './AccountHeader.vue';
+export { default as AccountList } from './AccountList.vue';
+export { default as AccountListItem } from './AccountListItem.vue';
 export { default as AccountStats } from './AccountStats.vue';
+export { default as CurrentUserCard } from './CurrentUserCard.vue';
+export { default as FollowButton } from './FollowButton.vue';

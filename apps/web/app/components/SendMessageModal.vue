@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
 import { PhX } from '@phosphor-icons/vue';
-import { Input } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
-import Textarea from '@ui/components/ui/textarea/Textarea.vue';
+import { Button, Input, Textarea } from '@repo/ui';
 import { computed, ref, watch } from 'vue';
 import { useData } from '~/composables/useData';
 

@@ -1,0 +1,58 @@
+<script setup lang="ts">
+import type { Status } from '@repo/types';
+import AccountDisplayName from '../account/AccountDisplayName.vue';
+import AccountHandle from '../account/AccountHandle.vue';
+import Avatar from '../primitives/Avatar.vue';
+import RelativeTime from '../primitives/RelativeTime.vue';
+import RichText from '../primitives/RichText.vue';
+import ThreadConnector from './ThreadConnector.vue';
+
+defineProps<{
+  status: Status;
+  /** Show vertical connector line below this status */
+  showConnector?: boolean;
+}>();
+
+defineEmits<{
+  click: [statusId: string];
+  profileClick: [acct: string];
+}>();
+</script>
+
+<template>
+  <div
+    class="relative cursor-pointer transition-colors hover:bg-gray-50 active:bg-gray-50 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+    @click="$emit('click', status.id)"
+  >
+    <ThreadConnector
+      v-if="showConnector"
+      class="top-14 bottom-0"
+    />
+
+    <article class="px-4 py-3">
+      <div class="flex gap-3">
+        <a class="shrink-0" @click.stop="$emit('profileClick', status.account.acct)">
+          <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="sm" />
+        </a>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-1 text-sm">
+            <AccountDisplayName
+              :name="status.account.displayName || status.account.username"
+              :emojis="status.account.emojis"
+              class="truncate text-sm"
+              @click.stop="$emit('profileClick', status.account.acct)"
+            />
+            <AccountHandle :acct="status.account.acct" class="truncate text-sm" />
+            <span class="text-gray-400">·</span>
+            <RelativeTime :datetime="status.createdAt" class="text-sm text-gray-500" />
+          </div>
+          <RichText
+            :content="status.content"
+            :emojis="status.emojis"
+            class="mt-1 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+      </div>
+    </article>
+  </div>
+</template>

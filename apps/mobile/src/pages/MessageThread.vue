@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhArrowLeft, PhChatCircle } from '@phosphor-icons/vue';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button } from '@repo/ui';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();

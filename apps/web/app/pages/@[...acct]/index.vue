@@ -3,8 +3,8 @@ import type { MediaAttachment, Status, Tag } from '@repo/types';
 import {
   AccountActions,
   AccountBio,
+  AccountHeader,
   AccountStats,
-  ProfileHeader,
   Timeline,
 } from '@repo/ui';
 import { useData } from '~/composables/useData';
@@ -84,10 +84,8 @@ function goBack() {
   <div class="w-full">
     <div v-if="account" class="w-full">
       <!-- Profile Header (banner + avatar + back) -->
-      <ProfileHeader
-        :header-image="account.header"
-        :avatar-src="account.avatar"
-        :avatar-alt="`${account.displayName}'s avatar`"
+      <AccountHeader
+        :account="account"
         :follows-you="relationship?.followedBy ?? false"
         @back="goBack"
       />

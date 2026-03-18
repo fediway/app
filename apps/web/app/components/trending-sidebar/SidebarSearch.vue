@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
+import { InputGroup, InputGroupAddon, InputGroupInput, NavIcon } from '@repo/ui';
 import { ref } from 'vue';
 
 const searchQuery = ref('');

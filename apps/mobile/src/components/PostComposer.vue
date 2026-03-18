@@ -10,7 +10,7 @@ import {
   PhX,
 } from '@phosphor-icons/vue';
 import { useClient } from '@repo/api';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button } from '@repo/ui';
 import { computed, nextTick, ref, watch } from 'vue';
 import { useBackButton } from '../composables/useBackButton';
 import { useHaptics } from '../composables/useHaptics';

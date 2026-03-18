@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountCard, Status } from '@repo/ui';
-import Input from '@ui/components/ui/input/Input.vue';
+import { AccountCard, Input, Status } from '@repo/ui';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useData } from '../composables/useData';

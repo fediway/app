@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
 import { computed, ref } from 'vue';
 import { clearLiveCache } from '~/composables/useData';
 import { useDataMode } from '~/composables/useDataMode';

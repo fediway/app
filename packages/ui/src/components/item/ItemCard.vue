@@ -3,7 +3,7 @@ import type { Item, ItemType } from '@repo/types';
 import type { Component } from 'vue';
 import { PhBook, PhFilmSlate, PhLink, PhMusicNote } from '@phosphor-icons/vue';
 import { computed } from 'vue';
-import { TagItem } from '@/components/ui/tag-item';
+import { Badge } from '@/components/ui/badge';
 
 const props = defineProps<{
   item: Item;
@@ -79,12 +79,12 @@ const label = computed(() => {
         {{ item.title }}
       </p>
       <div class="flex items-center gap-1.5">
-        <TagItem :variant="config.variant">
+        <Badge :variant="config.variant">
           <template #icon>
             <component :is="iconMap[item.type]" :size="16" />
           </template>
           {{ config.label }}
-        </TagItem>
+        </Badge>
         <span v-if="label" class="text-sm text-[#232B37]/80">
           {{ label }}
         </span>

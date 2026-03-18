@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { PhMagnifyingGlass, PhX } from '@phosphor-icons/vue';
-import { AccountDisplayName, AccountHandle, Timeline } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Avatar, Button, Timeline } from '@repo/ui';
 import { computed, ref, watch } from 'vue';
 import { useData } from '~/composables/useData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -192,11 +191,7 @@ const tabs = computed(() => [
             class="block px-4 py-3 hover:bg-gray-50 transition-colors no-underline"
           >
             <div class="flex items-center gap-3">
-              <img
-                :src="account.avatar"
-                :alt="account.displayName"
-                class="w-12 h-12 rounded-full"
-              >
+              <Avatar :src="account.avatar" :alt="account.displayName" size="md" class="shrink-0" />
               <div class="flex-1 min-w-0">
                 <AccountDisplayName
                   :name="account.displayName || account.username"

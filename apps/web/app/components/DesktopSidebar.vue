@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhPlus } from '@phosphor-icons/vue';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Avatar, Button, NavIcon } from '@repo/ui';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useNavigationStore } from '~/stores/navigation';
 
@@ -15,11 +15,7 @@ const { open: openComposer } = usePostComposer();
       :to="`/@${navigation.currentUser.acct}`"
       class="flex items-center gap-3 py-4 px-4 mb-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors no-underline"
     >
-      <img
-        :src="navigation.currentUser.avatar"
-        :alt="navigation.currentUser.name"
-        class="w-10 h-10 rounded-full shrink-0"
-      >
+      <Avatar :src="navigation.currentUser.avatar" :alt="navigation.currentUser.name" size="md" />
       <div class="min-w-0">
         <div class="text-sm font-semibold truncate text-gray-900 dark:text-white">
           {{ navigation.currentUser.name }}

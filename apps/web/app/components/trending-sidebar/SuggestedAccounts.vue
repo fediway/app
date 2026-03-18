@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountDisplayName, AccountHandle, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Avatar, Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 
 const suggestedAccounts = [
   {
@@ -44,11 +43,7 @@ function handleFollow(accountId: string) {
       <ul class="list-none m-0 p-0 space-y-3">
         <li v-for="account in suggestedAccounts" :key="account.id">
           <div class="flex items-start gap-3">
-            <img
-              :src="account.avatar"
-              :alt="account.displayName"
-              class="w-10 h-10 rounded-full shrink-0"
-            >
+            <Avatar :src="account.avatar" :alt="account.displayName" size="md" class="shrink-0" />
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">

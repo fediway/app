@@ -172,6 +172,8 @@ function handleTouchMove(event: TouchEvent) {
       touch0.clientX - touch1.clientX,
       touch0.clientY - touch1.clientY,
     );
+    if (touchStartDistance < 1)
+      return;
     const newScale = initialScale * (distance / touchStartDistance);
     scale.value = Math.min(Math.max(newScale, 1), 4);
     if (scale.value === 1) {

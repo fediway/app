@@ -6,9 +6,13 @@ import RichText from '../primitives/RichText.vue';
 
 interface Props {
   status: Status;
+  /** Recursion depth guard — stops rendering at depth >= 2 */
+  depth?: number;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  depth: 0,
+});
 
 const emit = defineEmits<{
   click: [statusId: string];

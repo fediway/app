@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AccountBio, AccountStats, ProfileHeader, Status } from '@repo/ui';
+import { AccountBio, AccountHeader, AccountStats, Status } from '@repo/ui';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useData } from '../composables/useData';
@@ -53,10 +53,8 @@ function handleBack() {
 
 <template>
   <div v-if="account" class="min-h-screen">
-    <ProfileHeader
-      :header-image="account.header"
-      :avatar-src="account.avatar"
-      :avatar-alt="account.displayName"
+    <AccountHeader
+      :account="account"
       @back="handleBack"
     />
 

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
 import { PhChartBar, PhChatCircle, PhClock, PhEnvelope, PhGlobe, PhImage, PhLock, PhLockOpen, PhPlus, PhWarning, PhX } from '@phosphor-icons/vue';
-import { Input } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, Input } from '@repo/ui';
 import { computed, ref, watch } from 'vue';
 import { useSettings } from '~/composables/useSettings';
 
