@@ -29,6 +29,12 @@
     "test:mobile": "turbo run test --filter=@repo/mobile",
     "check-size": "node scripts/check-bundle-size.mjs"
   },
+  "dependencies": {
+    "@oxc-minify/binding-linux-x64-gnu": "^0.120.0",
+    "@oxc-parser/binding-linux-x64-gnu": "^0.120.0",
+    "@oxc-resolver/binding-linux-x64-gnu": "^11.19.1",
+    "@oxc-transform/binding-linux-x64-gnu": "^0.120.0"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^7.4.3",
     "@vue/test-utils": "^2.4.6",

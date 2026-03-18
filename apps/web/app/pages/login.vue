@@ -119,13 +119,13 @@ function handleKeydown(event: KeyboardEvent) {
       </div>
 
       <!-- Sign In Card -->
-      <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6">
-        <h1 class="text-xl font-semibold text-gray-900 text-center mb-6">
+      <div class="rounded-2xl border border-border bg-card p-6 shadow-xl">
+        <h1 class="mb-6 text-center text-xl font-semibold text-foreground">
           Sign in
         </h1>
 
         <!-- Error -->
-        <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+        <div v-if="errorMessage" class="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
           {{ errorMessage }}
         </div>
 
@@ -171,10 +171,10 @@ function handleKeydown(event: KeyboardEvent) {
         </div>
 
         <!-- Developer Login Toggle -->
-        <div class="mt-4 pt-4 border-t border-gray-100">
+        <div class="mt-4 border-t border-border pt-4">
           <button
             type="button"
-            class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            class="text-xs text-foreground/40 transition-colors hover:text-foreground/60"
             @click="showDevLogin = !showDevLogin"
           >
             {{ showDevLogin ? 'Hide' : 'Developer login' }}
@@ -194,7 +194,7 @@ function handleKeydown(event: KeyboardEvent) {
                 @keydown="handleKeydown"
               />
             </InputGroup>
-            <p class="text-xs text-gray-400">
+            <p class="text-xs text-foreground/40">
               Generate a token in your instance's Settings &gt; Development &gt; New Application
             </p>
             <Button

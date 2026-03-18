@@ -40,15 +40,15 @@ function formatTime(dateString: string): string {
         class="rounded-2xl px-4 py-2"
         :class="[
           isOwn
-            ? 'bg-blue-500 text-white rounded-br-md'
-            : 'bg-gray-100 text-gray-900 rounded-bl-md dark:bg-gray-800 dark:text-gray-100',
+            ? 'bg-primary text-primary-foreground rounded-br-md'
+            : 'bg-muted text-foreground rounded-bl-md',
         ]"
       >
         <!-- Shared status preview -->
         <div
           v-if="sharedStatus"
           class="mb-2 cursor-pointer overflow-hidden rounded-lg border"
-          :class="[isOwn ? 'border-blue-400 bg-blue-400/20' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900']"
+          :class="[isOwn ? 'border-primary-foreground/20 bg-primary-foreground/10' : 'border-border bg-background']"
           @click="$emit('statusClick')"
         >
           <img
@@ -64,17 +64,18 @@ function formatTime(dateString: string): string {
                 :src="sharedStatus.authorAvatar"
                 :alt="sharedStatus.authorName"
                 class="size-5 rounded-full"
+                loading="lazy"
               >
               <span
                 class="truncate text-xs font-medium"
-                :class="[isOwn ? 'text-white' : 'text-gray-900 dark:text-gray-100']"
+                :class="[isOwn ? 'text-primary-foreground' : 'text-foreground']"
               >
                 {{ sharedStatus.authorName }}
               </span>
             </div>
             <p
               class="line-clamp-2 text-xs"
-              :class="[isOwn ? 'text-blue-100' : 'text-gray-600 dark:text-gray-400']"
+              :class="[isOwn ? 'text-primary-foreground/70' : 'text-foreground/60']"
             >
               {{ sharedStatus.content }}
             </p>
@@ -92,10 +93,10 @@ function formatTime(dateString: string): string {
         class="mt-1 flex items-center gap-1 px-1"
         :class="[isOwn ? 'justify-end' : 'justify-start']"
       >
-        <span v-if="favourited && isOwn" class="text-red-500">
+        <span v-if="favourited && isOwn" class="text-red">
           <PhHeart :size="12" weight="fill" />
         </span>
-        <span class="text-[11px] text-gray-400">
+        <span class="text-[11px] text-foreground/40">
           {{ formatTime(sentAt) }}
         </span>
       </div>

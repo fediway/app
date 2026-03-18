@@ -1,5 +1,5 @@
 import { useAuth } from '@repo/api';
-import { computed, reactive, ref } from 'vue';
+import { computed, onScopeDispose, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export interface MenuItem {
@@ -54,6 +54,7 @@ const TAB_ITEMS: Omit<MenuItem, 'to'>[] = [
 ];
 
 const isDrawerOpen = ref(false);
+const pageTitleOverride = ref<{ title: string; avatar?: string } | null>(null);
 
 export function useNavigationStore() {
   const route = useRoute();
@@ -110,9 +111,31 @@ export function useNavigationStore() {
   });
 
   const pageTitle = computed(() => {
+    if (pageTitleOverride.value)
+      return pageTitleOverride.value.title;
     const item = DRAWER_ITEMS.find(i => i.id === activeItemId.value);
     return item?.label ?? 'Fediway';
   });
+
+  const pageTitleAvatar = computed(() => pageTitleOverride.value?.avatar ?? null);
+
+  function setPageTitle(title: string | null, avatar?: string) {
+    pageTitleOverride.value = title ? { title, avatar } : null;
+  }
+
+  /**
+   * Set a custom page title (with optional avatar) that auto-resets when the calling component unmounts.
+   */
+  function usePageTitle(titleInfo: () => { title: string; avatar?: string } | null) {
+    const stop = watch(titleInfo, (val) => {
+      pageTitleOverride.value = val;
+    }, { immediate: true });
+
+    onScopeDispose(() => {
+      stop();
+      pageTitleOverride.value = null;
+    });
+  }
 
   function openDrawer() {
     isDrawerOpen.value = true;
@@ -129,8 +152,11 @@ export function useNavigationStore() {
     activeItemId,
     activeTab,
     pageTitle,
+    pageTitleAvatar,
     isDrawerOpen,
     openDrawer,
     closeDrawer,
+    setPageTitle,
+    usePageTitle,
   });
 }

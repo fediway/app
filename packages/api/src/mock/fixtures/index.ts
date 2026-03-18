@@ -9,6 +9,8 @@ export {
   suggestedAccounts,
 } from './accounts';
 
+export { mockConversations, mockMessages } from './conversations';
+
 export { mockItemAggregations } from './items';
 
 export { mockNotifications } from './notifications';

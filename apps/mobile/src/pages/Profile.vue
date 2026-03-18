@@ -92,10 +92,6 @@ async function handleUnfollow() {
   impact('light');
   await accountData.unfollow();
 }
-
-function handleBack() {
-  router.back();
-}
 </script>
 
 <template>
@@ -127,18 +123,11 @@ function handleBack() {
       :header-image="accountData.account.value.header"
       :avatar-src="accountData.account.value.avatar"
       :avatar-alt="accountData.account.value.displayName"
-      @back="handleBack"
+      @back="router.back()"
     />
 
-    <div class="px-4 pb-4">
-      <div class="mt-3">
-        <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
-          {{ accountData.account.value.displayName }}
-        </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          @{{ accountData.account.value.acct }}
-        </p>
-      </div>
+    <div class="pb-4">
+      <ProfileInformation :account="accountData.account.value" class="mt-3" />
 
       <div class="mt-3">
         <ProfileActions
@@ -149,10 +138,6 @@ function handleBack() {
           @unfollow="handleUnfollow"
           @message="router.push('/messages')"
         />
-      </div>
-
-      <div class="mt-3">
-        <ProfileInformation :account="accountData.account.value" />
       </div>
     </div>
 
