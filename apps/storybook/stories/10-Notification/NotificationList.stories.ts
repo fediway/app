@@ -30,3 +30,7 @@ export const Loading: Story = {
 export const Empty: Story = {
   args: { notifications: [] },
 };
+
+export const Error: Story = {
+  args: { notifications: [], error: 'Failed to load notifications' },
+};

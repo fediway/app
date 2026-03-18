@@ -1,3 +1,4 @@
+export { default as PollDisplay } from './PollDisplay.vue';
 export { default as Status } from './Status.vue';
 export { default as StatusActions } from './StatusActions.vue';
 export { default as StatusAncestor } from './StatusAncestor.vue';

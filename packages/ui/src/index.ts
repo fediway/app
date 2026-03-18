@@ -3,6 +3,7 @@ export {
   AccountActions,
   AccountBio,
   AccountCard,
+  AccountCarousel,
   AccountDisplayName,
   AccountHandle,
   AccountHeader,
@@ -50,6 +51,7 @@ export { Avatar, FullTimestamp, RelativeTime, RichText } from './components/prim
 
 // Status components
 export {
+  PollDisplay,
   Status,
   StatusActions,
   StatusAncestor,
