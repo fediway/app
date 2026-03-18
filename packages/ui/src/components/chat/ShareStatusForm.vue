@@ -72,13 +72,17 @@ function stripHtml(html: string): string {
   return html.replace(HTML_TAG_RE, '').trim();
 }
 
-watch(() => props.status.id, () => {
+function reset() {
   searchQuery.value = '';
   selectedRecipients.value = [];
   message.value = '';
   showMessage.value = false;
   isSubmitting.value = false;
-});
+}
+
+watch(() => props.status.id, reset);
+
+defineExpose({ reset });
 </script>
 
 <template>

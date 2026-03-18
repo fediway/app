@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserSuggestion } from '@repo/ui';
+import type { AccountListUser } from '@repo/ui';
 import { AccountList, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
@@ -7,7 +7,7 @@ import { useData } from '~/composables/useData';
 const { getSuggestedAccounts } = useData();
 const { toggleFollow } = useFollows();
 
-const suggestions = computed<UserSuggestion[]>(() =>
+const suggestions = computed<AccountListUser[]>(() =>
   getSuggestedAccounts().slice(0, 3).map(account => ({
     displayName: account.displayName || account.username,
     handle: `@${account.acct}`,

@@ -26,7 +26,7 @@ const pageTitleInfo = computed(() => {
     return null;
   return { title: account.displayName, avatar: account.avatar };
 });
-navigation.usePageTitle(pageTitleInfo);
+navigation.usePageTitle(() => pageTitleInfo.value);
 
 async function load() {
   loading.value = true;

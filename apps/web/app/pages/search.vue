@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import type { UserSuggestion } from '@repo/ui';
+import type { AccountListUser } from '@repo/ui';
 import {
   AccountList,
   Avatar,
@@ -73,7 +73,7 @@ const filteredAccounts = computed(() => {
 });
 
 // Suggested accounts for discover state
-const suggestions = computed<UserSuggestion[]>(() =>
+const suggestions = computed<AccountListUser[]>(() =>
   getSuggestedAccounts().slice(0, 3).map(account => ({
     displayName: account.displayName || account.username,
     handle: `@${account.acct}`,

@@ -94,7 +94,7 @@ function hasReplyBelow(index: number): boolean {
     return false;
   const current = descendants[index];
   const next = descendants[index + 1];
-  return next.inReplyToId === current.id;
+  return !!next && !!current && next.inReplyToId === current.id;
 }
 
 // Find the reply parent for a descendant (for thread context)

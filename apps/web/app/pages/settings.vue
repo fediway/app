@@ -149,7 +149,7 @@ function handleLogout() {
           <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Default post visibility</label>
           <VisibilitySelector
             :model-value="settings.privacy.defaultVisibility"
-            @update:model-value="setDefaultVisibility($event)"
+            @update:model-value="setDefaultVisibility($event as 'public' | 'unlisted' | 'private')"
           />
         </div>
 

@@ -20,7 +20,7 @@ function createConversation(
       sensitive: false,
       spoilerText: '',
       uri: `https://social.network/statuses/dm-${id}`,
-      url: `https://social.network/@${accounts[0].username}/dm-${id}`,
+      url: `https://social.network/@${accounts[0]?.username}/dm-${id}`,
       repliesCount: 0,
       reblogsCount: 0,
       favouritesCount: 0,
