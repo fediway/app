@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PhArrowLeft } from '@phosphor-icons/vue';
-import { Timeline } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, Timeline } from '@repo/ui';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useData } from '../composables/useData';

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Tag } from '@repo/types';
 import { PhArrowLeft, PhChatCircle, PhHeart, PhRepeat } from '@phosphor-icons/vue';
-import { AccountDisplayName, AccountHandle, Avatar, RelativeTime, RichText, StatusActions, StatusMedia, StatusTags } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Avatar, Button, RelativeTime, RichText, StatusActions, StatusMedia, StatusTags } from '@repo/ui';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useData } from '../composables/useData';

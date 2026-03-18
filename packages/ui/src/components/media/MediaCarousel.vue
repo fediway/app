@@ -61,7 +61,7 @@ function updateNavState(swiper: SwiperType) {
 </script>
 
 <template>
-  <div class="relative group">
+  <div v-if="attachments.length > 0" class="relative group">
     <!-- Sensitive content overlay -->
     <div
       v-if="sensitive && !revealed"

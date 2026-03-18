@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountDisplayName, AccountHandle } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Button } from '@repo/ui';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { useData } from '~/composables/useData';
 import { formatCount } from '~/utils/format';

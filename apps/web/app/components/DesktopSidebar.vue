@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhPlus } from '@phosphor-icons/vue';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, NavIcon } from '@repo/ui';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useNavigationStore } from '~/stores/navigation';
 

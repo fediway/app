@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { useStatusStore, useTimeline } from '@repo/api';
-import { Status as StatusComponent } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, Status as StatusComponent } from '@repo/ui';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';

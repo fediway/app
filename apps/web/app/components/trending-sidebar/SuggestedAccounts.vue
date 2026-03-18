@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountDisplayName, AccountHandle, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 
 const suggestedAccounts = [
   {

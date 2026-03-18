@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NavItem } from '@ui/components/navigation';
+import type { NavItem } from '@repo/ui';
 import {
   PhBell,
   PhHouse,
@@ -7,7 +7,7 @@ import {
   PhPlusSquare,
   PhUser,
 } from '@phosphor-icons/vue';
-import MainNavigation from '@ui/components/navigation/MainNavigation.vue';
+import { MainNavigation } from '@repo/ui';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNavigationStore } from '../stores/navigation';

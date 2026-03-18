@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'vue';
 import { PhStar } from '@phosphor-icons/vue';
 import { cn } from '../../../lib/utils';
-import { ActionBar } from '../../feed/action-bar';
+import { StatusActions } from '../../status';
 import { Avatar } from '../../ui/avatar';
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   rating: number;
   timeAgo: string;
   content?: string;
-  // ActionBar state (pass-through)
+  // StatusActions state (pass-through)
   favouritesCount?: number;
   repliesCount?: number;
   reblogsCount?: number;
@@ -84,14 +84,13 @@ const emit = defineEmits<{
           {{ content }}
         </p>
 
-        <!-- Action bar -->
-        <ActionBar
+        <!-- Actions -->
+        <StatusActions
           class="mt-2 mb-1"
           :favourites-count="favouritesCount"
           :replies-count="repliesCount"
           :reblogs-count="reblogsCount"
           :favourited="favourited"
-          :replied="replied"
           :reblogged="reblogged"
           :bookmarked="bookmarked"
           :visibility="visibility"
@@ -99,7 +98,6 @@ const emit = defineEmits<{
           @reply="emit('reply')"
           @reblog="emit('reblog')"
           @bookmark="emit('bookmark')"
-          @more="emit('more')"
         />
       </div>
     </div>

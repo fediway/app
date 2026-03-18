@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, NavIcon } from '@repo/ui';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();

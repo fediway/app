@@ -1,7 +1,16 @@
 export { default as AccountActions } from './AccountActions.vue';
 export { default as AccountBio } from './AccountBio.vue';
 export { default as AccountCard } from './AccountCard.vue';
+export { default as AccountCarousel } from './AccountCarousel.vue';
 export { default as AccountDisplayName } from './AccountDisplayName.vue';
 export { default as AccountHandle } from './AccountHandle.vue';
 export { default as AccountHeader } from './AccountHeader.vue';
+export { default as AccountList } from './AccountList.vue';
+export { default as AccountListItem } from './AccountListItem.vue';
 export { default as AccountStats } from './AccountStats.vue';
+export { default as CurrentUserCard } from './CurrentUserCard.vue';
+export { default as FollowButton } from './FollowButton.vue';
+export { default as ProfileHeader } from './ProfileHeader.vue';
+export { default as ProfileInformation } from './ProfileInformation.vue';
+export { default as UserSuggestions } from './UserSuggestions.vue';
+export type { UserSuggestion } from './UserSuggestions.vue';

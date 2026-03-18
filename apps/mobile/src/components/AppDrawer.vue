@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Avatar } from '@repo/ui';
+import { Avatar, NavIcon } from '@repo/ui';
 import { useRouter } from 'vue-router';
 import { useNavigationStore } from '../stores/navigation';
-import NavIcon from './NavIcon.vue';
 
 const router = useRouter();
 const navigation = useNavigationStore();

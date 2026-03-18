@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhArrowLeft, PhList, PhMagnifyingGlass } from '@phosphor-icons/vue';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button } from '@repo/ui';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNavigationStore } from '../stores/navigation';

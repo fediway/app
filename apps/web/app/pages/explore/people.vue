@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { AccountDisplayName, AccountHandle, RichText } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { AccountDisplayName, AccountHandle, Button, RichText } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useFollows } from '~/composables/useFollows';

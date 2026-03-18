@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { PhArrowLeft } from '@phosphor-icons/vue';
-import { Timeline } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, Timeline } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';

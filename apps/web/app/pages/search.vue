@@ -2,13 +2,13 @@
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import type { UserSuggestion } from '@repo/ui';
 import {
+  Button,
   SearchInput,
   Section,
   TabBar,
   Timeline,
   UserSuggestions,
 } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
 import { computed, ref, watch } from 'vue';
 import { useData } from '~/composables/useData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
