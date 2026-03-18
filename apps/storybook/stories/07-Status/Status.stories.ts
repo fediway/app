@@ -75,3 +75,44 @@ export const ZeroCounts: Story = {
     }),
   },
 };
+
+export const ReplyThread: Story = {
+  render: () => ({
+    components: { Status },
+    setup() {
+      const parent = createMockStatus({
+        account: createMockAccount({ displayName: 'Sarah Chen', username: 'sarah' }),
+        content: '<p>What do you think about the new Vue 3.5 features?</p>',
+      });
+      const reply = createMockStatus({
+        content: '<p>The reactivity improvements are incredible. Especially the new watch behavior.</p>',
+        replyParent: parent,
+      });
+      return { reply, parent };
+    },
+    template: `
+      <div style="max-width: 600px">
+        <Status :status="reply" :reply-parent="parent" />
+      </div>
+    `,
+  }),
+};
+
+export const WithReplyBelow: Story = {
+  args: {
+    status: createMockStatus({
+      content: '<p>Starting a new thread about component architecture...</p>',
+    }),
+    hasReplyBelow: true,
+    showSeparator: false,
+  },
+};
+
+export const HideActions: Story = {
+  args: {
+    status: createMockStatus({
+      content: '<p>This status has its action bar hidden (used for ancestor posts in threads).</p>',
+    }),
+    hideActions: true,
+  },
+};

@@ -18,11 +18,14 @@ const options = [
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2">
+  <div role="radiogroup" aria-label="Post visibility" class="flex flex-wrap gap-2">
     <button
       v-for="option in options"
       :key="option.value"
       type="button"
+      role="radio"
+      :aria-checked="props.modelValue === option.value"
+      :aria-label="option.label"
       class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors"
       :class="[
         props.modelValue === option.value

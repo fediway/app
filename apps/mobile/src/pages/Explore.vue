@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account, Tag } from '@repo/types';
-import { AccountCard } from '@repo/ui';
+import { PhWarningCircle } from '@phosphor-icons/vue';
+import { AccountCard, EmptyState, ListHeader, Skeleton, TagListItem } from '@repo/ui';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getProfileUrl, getSafeClient } from '../composables/useStatusBridge';
@@ -34,8 +35,8 @@ async function load() {
   }
 }
 
-function handleTagClick(tag: string) {
-  router.push(`/tags/${encodeURIComponent(tag)}`);
+function handleTagClick(name: string) {
+  router.push(`/tags/${encodeURIComponent(name)}`);
 }
 
 function handleProfileClick(acct: string) {
@@ -46,55 +47,43 @@ onMounted(load);
 </script>
 
 <template>
-  <div v-if="error && trendingTags.length === 0 && suggestedAccounts.length === 0" class="flex flex-col items-center justify-center gap-3 py-20">
-    <p class="text-sm text-gray-500 dark:text-gray-400">
-      Couldn't load explore data
-    </p>
-    <button class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium dark:bg-gray-800" @click="load()">
-      Try again
-    </button>
+  <EmptyState
+    v-if="error && trendingTags.length === 0 && suggestedAccounts.length === 0"
+    :icon="PhWarningCircle"
+    title="Couldn't load explore data"
+    action-label="Try again"
+    @action="load"
+  />
+
+  <div v-else-if="loading && trendingTags.length === 0 && suggestedAccounts.length === 0" class="space-y-4 p-4">
+    <Skeleton class="h-6 w-32" />
+    <Skeleton v-for="i in 5" :key="i" class="h-10 w-full" />
+    <Skeleton class="mt-4 h-6 w-40" />
+    <Skeleton v-for="i in 3" :key="`a${i}`" class="h-16 w-full" />
   </div>
 
   <div v-else class="flex flex-col">
-    <div v-if="loading && trendingTags.length === 0 && suggestedAccounts.length === 0" class="flex items-center justify-center py-20">
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Loading…
-      </p>
-    </div>
+    <section class="px-4 py-4">
+      <ListHeader title="Trending Tags" class="mb-3" />
+      <div class="space-y-1">
+        <TagListItem
+          v-for="tag in trendingTags"
+          :key="tag.name"
+          :name="tag.name"
+          @click="handleTagClick(tag.name)"
+        />
+      </div>
+      <EmptyState v-if="trendingTags.length === 0" title="No trending tags" />
+    </section>
 
-    <template v-else>
-      <section class="px-4 py-4">
-        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Trending Tags
-        </h2>
-        <div class="space-y-2">
-          <button
-            v-for="tag in trendingTags"
-            :key="tag.name"
-            class="block w-full rounded-lg px-3 py-2.5 text-left transition-colors active:bg-gray-100 dark:active:bg-gray-800"
-            @click="handleTagClick(tag.name)"
-          >
-            <span class="font-medium text-gray-900 dark:text-gray-100">#{{ tag.name }}</span>
-          </button>
-          <p v-if="trendingTags.length === 0" class="py-4 text-center text-sm text-gray-500">
-            No trending tags
-          </p>
+    <section class="border-t border-gray-200 px-4 py-4 dark:border-gray-800">
+      <ListHeader title="Suggested Accounts" class="mb-3" />
+      <div class="space-y-3">
+        <div v-for="account in suggestedAccounts" :key="account.id" @click="handleProfileClick(account.acct)">
+          <AccountCard :account="account" :profile-url="getProfileUrl(account.acct)" show-bio size="sm" />
         </div>
-      </section>
-
-      <section class="border-t border-gray-200 px-4 py-4 dark:border-gray-800">
-        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Suggested Accounts
-        </h2>
-        <div class="space-y-3">
-          <div v-for="account in suggestedAccounts" :key="account.id" @click="handleProfileClick(account.acct)">
-            <AccountCard :account="account" :profile-url="getProfileUrl(account.acct)" show-bio size="sm" />
-          </div>
-          <p v-if="suggestedAccounts.length === 0" class="py-4 text-center text-sm text-gray-500">
-            No suggestions
-          </p>
-        </div>
-      </section>
-    </template>
+      </div>
+      <EmptyState v-if="suggestedAccounts.length === 0" title="No suggestions" />
+    </section>
   </div>
 </template>

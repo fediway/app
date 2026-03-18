@@ -1,6 +1,7 @@
 import type { Account, Relationship, Status } from '@repo/types';
 import { ref, shallowRef } from 'vue';
 import { useAuth } from './useAuth';
+import { useClient } from './useClient';
 
 export interface UseAccountReturn {
   account: ReturnType<typeof shallowRef<Account | null>>;
@@ -22,7 +23,7 @@ export interface UseAccountReturn {
  * Composable for fetching and managing account data
  */
 export function useAccount(): UseAccountReturn {
-  const { getClient, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const account = shallowRef<Account | null>(null);
   const relationship = shallowRef<Relationship | null>(null);
@@ -34,10 +35,7 @@ export function useAccount(): UseAccountReturn {
    * Fetch account by ID
    */
   async function fetch(accountId: string) {
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     isLoading.value = true;
     error.value = null;
@@ -72,10 +70,7 @@ export function useAccount(): UseAccountReturn {
    * Fetch account by acct (username@instance or username for local)
    */
   async function fetchByAcct(acct: string) {
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     isLoading.value = true;
     error.value = null;
@@ -98,10 +93,7 @@ export function useAccount(): UseAccountReturn {
     if (!account.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       relationship.value = await client.rest.v1.accounts.$select(account.value.id).follow();
@@ -118,10 +110,7 @@ export function useAccount(): UseAccountReturn {
     if (!account.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       relationship.value = await client.rest.v1.accounts.$select(account.value.id).unfollow();
@@ -138,10 +127,7 @@ export function useAccount(): UseAccountReturn {
     if (!account.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       relationship.value = await client.rest.v1.accounts.$select(account.value.id).block();
@@ -158,10 +144,7 @@ export function useAccount(): UseAccountReturn {
     if (!account.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       relationship.value = await client.rest.v1.accounts.$select(account.value.id).unblock();
@@ -178,10 +161,7 @@ export function useAccount(): UseAccountReturn {
     if (!account.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       relationship.value = await client.rest.v1.accounts.$select(account.value.id).mute();
@@ -198,10 +178,7 @@ export function useAccount(): UseAccountReturn {
     if (!account.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       relationship.value = await client.rest.v1.accounts.$select(account.value.id).unmute();

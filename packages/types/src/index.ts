@@ -66,13 +66,17 @@ export interface Item {
   title: string;
   description?: string;
   image?: string;
-  // Flat metadata — no nested type-specific objects for MVP
+  // Flat metadata — type-specific fields picked by ItemCard based on `type`
   author?: string;
   director?: string;
   artist?: string;
   album?: string;
   year?: number;
   genre?: string;
+  // Link-specific (from PreviewCard data)
+  provider?: string;
+  blurhash?: string;
+  language?: string;
 }
 
 export interface Rating {

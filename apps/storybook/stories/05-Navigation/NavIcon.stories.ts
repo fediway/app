@@ -8,7 +8,7 @@ const meta = {
   argTypes: {
     name: {
       control: 'select',
-      options: ['home', 'search', 'explore', 'new-post', 'notifications', 'profile', 'chat', 'favourites', 'saved', 'settings', 'menu', 'close', 'back'],
+      options: ['home', 'search', 'explore', 'new-post', 'notifications', 'profile', 'chat', 'messages', 'favourites', 'saved', 'bookmarks', 'settings', 'menu', 'close', 'back', 'more', 'compose', 'share', 'filter'],
     },
   },
 } satisfies Meta<typeof NavIcon>;
@@ -20,7 +20,7 @@ export const Default: Story = {
   args: { name: 'home', size: 24 },
 };
 
-const allIcons = ['home', 'search', 'explore', 'new-post', 'notifications', 'profile', 'chat', 'favourites', 'saved', 'settings', 'menu', 'close', 'back'];
+const allIcons = ['home', 'search', 'explore', 'new-post', 'notifications', 'profile', 'chat', 'messages', 'favourites', 'saved', 'bookmarks', 'settings', 'menu', 'close', 'back', 'more', 'compose', 'share', 'filter'];
 
 export const AllIcons: Story = {
   render: () => ({

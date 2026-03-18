@@ -1,0 +1,37 @@
+<script setup lang="ts">
+defineProps<{
+  avatar?: string;
+  name: string;
+  handle: string;
+}>();
+
+defineEmits<{ click: [] }>();
+</script>
+
+<template>
+  <div
+    role="button"
+    tabindex="0"
+    class="flex w-full items-center gap-3 rounded-lg px-4 py-4 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+    :aria-label="`${name}, ${handle}`"
+    @click="$emit('click')"
+    @keydown.enter="$emit('click')"
+    @keydown.space.prevent="$emit('click')"
+  >
+    <img
+      v-if="avatar"
+      :src="avatar"
+      :alt="name"
+      class="h-10 w-10 shrink-0 rounded-full"
+    >
+    <div v-else class="h-10 w-10 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700" />
+    <div class="min-w-0">
+      <div class="truncate text-sm font-semibold text-gray-900 dark:text-white">
+        {{ name }}
+      </div>
+      <div class="truncate text-xs text-gray-500 dark:text-gray-400">
+        {{ handle }}
+      </div>
+    </div>
+  </div>
+</template>

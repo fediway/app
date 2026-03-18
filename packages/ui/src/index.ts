@@ -6,16 +6,24 @@ export {
   AccountDisplayName,
   AccountHandle,
   AccountList,
-  AccountListItem,
   CurrentUserCard,
   FollowButton,
   ProfileActions,
   ProfileHeader,
   ProfileInformation,
-  UserSuggestions,
 } from './components/account';
 
-export type { UserSuggestion } from './components/account';
+export type { AccountListUser } from './components/account';
+
+// Chat components
+export {
+  ChatHeader,
+  ChatList,
+  ChatListItem,
+  MessageBubble,
+  MessageInput,
+  ShareStatusForm,
+} from './components/chat';
 
 // Compose components
 export {
@@ -27,15 +35,6 @@ export {
   VisibilitySelector,
 } from './components/compose';
 
-// Conversation components
-export {
-  ChatHeader,
-  ConversationList,
-  ConversationListItem,
-  MessageBubble,
-  MessageInput,
-} from './components/conversation';
-
 // Item components
 export { ItemCard, ItemHeader, Take } from './components/item';
 
@@ -43,9 +42,32 @@ export { ItemCard, ItemHeader, Take } from './components/item';
 export { MediaCarousel, MediaGallery, MediaLightbox } from './components/media';
 
 // Navigation components
-export { MainNavigation, MainNavigationItem, NavIcon, TabBar } from './components/navigation';
+export {
+  AppBar,
+  BottomNav,
+  BottomNavItem,
+  // Backwards-compat aliases (remove after app migration)
+  MainNavigation,
+  MainNavigationItem,
+  NavDrawer,
+  NavDrawerItem,
+  NavDrawerProfile,
+  NavIcon,
+  SideNav,
+  SideNavItem,
+  SideNavProfile,
+  TabBar,
+} from './components/navigation';
 
-export type { NavItem, TabItem } from './components/navigation';
+export type {
+  BottomNavItemType,
+  NavIconName,
+  // Backwards-compat alias
+  NavItem,
+  NavMenuItem,
+  NavUser,
+  TabItem,
+} from './components/navigation';
 
 // Notification components
 export { NotificationItem, NotificationList } from './components/notification';
@@ -88,6 +110,26 @@ export {
   CardTitle,
 } from './components/ui/card';
 
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './components/ui/dialog';
+
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './components/ui/dropdown-menu';
+
 export { EmptyState } from './components/ui/empty-state';
 export { FullTimestamp } from './components/ui/full-timestamp';
 
@@ -101,9 +143,14 @@ export {
   InputGroupTextarea,
 } from './components/ui/input-group';
 export { ListHeader } from './components/ui/list-header';
+export { PageHeader } from './components/ui/page-header';
+export { RatingInput, RatingStars } from './components/ui/rating';
+export { SegmentedControl } from './components/ui/segmented-control';
 export { Skeleton } from './components/ui/skeleton';
 export { TagItem } from './components/ui/tag-item';
 export { Textarea } from './components/ui/textarea';
+export { Toast, ToastContainer, useToast } from './components/ui/toast';
+export type { ToastType } from './components/ui/toast';
 export { Toggle } from './components/ui/toggle';
 
 // Utilities

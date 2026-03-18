@@ -29,9 +29,14 @@ const bookItem: Item = {
 };
 
 const linkItem: Item = {
-  url: 'https://example.com/articles/some-article',
+  url: 'https://www.nytimes.com/2025/03/15/technology/fediverse-growth.html',
   type: 'link',
-  title: 'Some Article',
+  title: 'The Fediverse Is Growing Fast. Here\'s What You Need to Know.',
+  description: 'As more people leave centralized platforms, decentralized social networks are seeing unprecedented growth.',
+  provider: 'The New York Times',
+  author: 'Sarah Chen',
+  image: 'https://picsum.photos/seed/nyt-article/400/200',
+  language: 'en',
 };
 
 const noImageItem: Item = {
@@ -72,6 +77,17 @@ export const Book: Story = {
 
 export const Link: Story = {
   args: { item: linkItem },
+};
+
+export const LinkMinimal: Story = {
+  args: {
+    item: {
+      url: 'https://example.com/post',
+      type: 'link',
+      title: 'A Simple Link Without Much Info',
+      provider: 'example.com',
+    } satisfies Item,
+  },
 };
 
 export const NoImage: Story = {

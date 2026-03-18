@@ -29,3 +29,11 @@ export const MediumSize: Story = {
 export const MediumFollowing: Story = {
   args: { isFollowing: true, size: 'md' },
 };
+
+export const Requested: Story = {
+  args: { isFollowing: false, requested: true },
+};
+
+export const RequestedMedium: Story = {
+  args: { isFollowing: false, requested: true, size: 'md' },
+};

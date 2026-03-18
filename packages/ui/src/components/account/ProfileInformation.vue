@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { computed } from 'vue';
+import { Badge } from '../ui/badge';
 import { RichText } from '../ui/rich-text';
 
 const props = defineProps<{
@@ -74,25 +75,28 @@ function extractText(html: string): string {
     </div>
 
     <!-- Profile fields + Join date -->
-    <div v-if="account.fields.length > 0 || accountAge" class="flex flex-wrap items-center gap-2 text-sm text-foreground/60">
-      <div v-if="accountAge" class="inline-flex items-center gap-1.5">
-        <span>Joined {{ accountAge }} ago</span>
-      </div>
+    <div v-if="account.fields.length > 0 || accountAge" class="flex flex-wrap items-center gap-2">
+      <Badge v-if="accountAge" variant="muted">
+        Joined {{ accountAge }} ago
+      </Badge>
       <template v-for="field in account.fields" :key="field.name">
         <a
           v-if="extractHref(field.value)"
           :href="extractHref(field.value) ?? undefined"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1 transition-colors hover:text-foreground"
-          :class="{ 'text-green': field.verifiedAt }"
+          class="no-underline"
         >
-          <span>{{ extractText(field.value) }}</span>
-          <svg v-if="field.verifiedAt" class="size-4 text-green" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-          </svg>
+          <Badge :variant="field.verifiedAt ? 'default' : 'muted'" class="gap-1 transition-colors hover:opacity-80">
+            {{ extractText(field.value) }}
+            <svg v-if="field.verifiedAt" class="size-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </Badge>
         </a>
-        <span v-else>{{ extractText(field.value) }}</span>
+        <Badge v-else variant="muted">
+          {{ extractText(field.value) }}
+        </Badge>
       </template>
     </div>
   </div>

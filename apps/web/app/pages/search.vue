@@ -2,12 +2,14 @@
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import type { UserSuggestion } from '@repo/ui';
 import {
-  Button,
+  AccountList,
+  Avatar,
+  EmptyState,
+  FollowButton,
   SearchInput,
   Section,
   TabBar,
   Timeline,
-  UserSuggestions,
 } from '@repo/ui';
 import { computed, ref, watch } from 'vue';
 import { useData } from '~/composables/useData';
@@ -25,7 +27,7 @@ const {
   getProfileUrl,
   getSuggestedAccounts,
 } = useData();
-const { toggleFollow, isFollowing } = useFollows();
+const { toggleFollow, isFollowing, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 
@@ -128,7 +130,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
 <template>
   <div class="w-full">
     <!-- Search Input -->
-    <div class="px-5 pt-[45px] pb-3">
+    <div class="px-5 pb-3 pt-[45px]">
       <SearchInput
         v-model="searchQuery"
         placeholder="Search"
@@ -151,7 +153,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
         action-label="View all"
         class="mt-3"
       >
-        <UserSuggestions :users="suggestions" />
+        <AccountList :users="suggestions" />
       </Section>
 
       <!-- Popular Films -->
@@ -163,15 +165,15 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
       >
         <ul class="flex flex-col">
           <li v-for="film in popularFilms" :key="film.title" class="flex items-center gap-3 px-5 py-2">
-            <div class="shrink-0 w-12 h-[71px] rounded-sm border border-border overflow-hidden bg-muted">
-              <img :src="film.image" :alt="film.title" class="w-full h-full object-cover">
+            <div class="h-[71px] w-12 shrink-0 overflow-hidden rounded-sm border border-border bg-muted">
+              <img :src="film.image" :alt="film.title" class="size-full object-cover">
             </div>
-            <div class="min-w-0 flex-1 flex flex-col gap-1.5">
-              <p class="font-bold text-base text-foreground truncate">
+            <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+              <p class="truncate text-base font-bold text-foreground">
                 {{ film.title }}
               </p>
               <div class="flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-0.5 rounded px-1 text-xs font-medium bg-blue-100 text-foreground h-5">Film</span>
+                <span class="inline-flex h-5 items-center gap-0.5 rounded bg-blue-100 px-1 text-xs font-medium text-foreground dark:bg-blue-900/30">Film</span>
                 <span class="text-sm text-foreground/80">{{ film.meta }}</span>
               </div>
             </div>
@@ -188,15 +190,15 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
       >
         <ul class="flex flex-col">
           <li v-for="album in popularAlbums" :key="album.title" class="flex items-center gap-3 px-5 py-2">
-            <div class="shrink-0 w-12 h-12 rounded-sm border border-border overflow-hidden bg-muted">
-              <img :src="album.image" :alt="album.title" class="w-full h-full object-cover">
+            <div class="size-12 shrink-0 overflow-hidden rounded-sm border border-border bg-muted">
+              <img :src="album.image" :alt="album.title" class="size-full object-cover">
             </div>
-            <div class="min-w-0 flex-1 flex flex-col gap-1.5">
-              <p class="font-bold text-base text-foreground truncate">
+            <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+              <p class="truncate text-base font-bold text-foreground">
                 {{ album.title }}
               </p>
               <div class="flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-0.5 rounded px-1 text-xs font-medium bg-green-100 text-foreground h-5">Album</span>
+                <span class="inline-flex h-5 items-center gap-0.5 rounded bg-green-100 px-1 text-xs font-medium text-foreground dark:bg-green-900/30">Album</span>
                 <span class="text-sm text-foreground/80">{{ album.meta }}</span>
               </div>
             </div>
@@ -206,14 +208,12 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
     </template>
 
     <!-- No Results -->
-    <div v-else-if="!hasResults" class="text-center py-16 px-4">
-      <h3 class="text-lg font-medium text-foreground mb-2">
-        No results found
-      </h3>
-      <p class="text-foreground/60">
-        Try searching for something else
-      </p>
-    </div>
+    <EmptyState
+      v-else-if="!hasResults"
+      title="No results found"
+      description="Try searching for something else"
+      class="py-16"
+    />
 
     <!-- Search Results -->
     <div v-else>
@@ -225,29 +225,24 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
               v-for="account in filteredAccounts"
               :key="account.id"
               :to="getProfileUrl(account.acct)"
-              class="flex items-center gap-3 px-5 py-3 hover:bg-muted/50 transition-colors no-underline"
+              class="flex items-center gap-3 px-5 py-3 no-underline transition-colors hover:bg-muted/50"
             >
-              <img
-                :src="account.avatar"
-                :alt="account.displayName"
-                class="w-11 h-11 rounded-full border border-border shrink-0"
-              >
-              <div class="flex-1 min-w-0">
-                <p class="font-bold text-base text-foreground truncate">
+              <Avatar :src="account.avatar" :alt="account.displayName" size="md" />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-base font-bold text-foreground">
                   {{ account.displayName || account.username }}
                 </p>
-                <p class="text-sm text-foreground/80 truncate">
+                <p class="truncate text-sm text-foreground/80">
                   @{{ account.acct }}
                 </p>
               </div>
-              <Button
-                variant="secondary"
+              <FollowButton
+                :is-following="isFollowing(account.id)"
+                :requested="getRelationship(account.id).requested"
                 size="sm"
-                class="shrink-0"
-                @click.prevent.stop="toggleFollow(account.id)"
-              >
-                {{ isFollowing(account.id) ? 'Following' : 'Follow' }}
-              </Button>
+                @follow.prevent.stop="toggleFollow(account.id)"
+                @unfollow.prevent.stop="toggleFollow(account.id)"
+              />
             </NuxtLink>
           </div>
         </Section>

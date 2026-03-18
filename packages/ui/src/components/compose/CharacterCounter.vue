@@ -11,6 +11,8 @@ const remaining = computed(() => props.limit - props.current);
 
 <template>
   <span
+    aria-live="polite"
+    :aria-label="`${remaining} characters remaining`"
     class="text-sm"
     :class="[
       remaining < 0 ? 'font-medium text-red-500'

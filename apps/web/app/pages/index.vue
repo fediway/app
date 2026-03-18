@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { useStatusStore, useTimeline } from '@repo/api';
-import { Button, Status as StatusComponent } from '@repo/ui';
+import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -93,6 +93,29 @@ onDeactivated(() => {
 
 <template>
   <section class="w-full py-2">
+    <!-- Loading skeleton -->
+    <div v-if="timeline.isLoading.value && allStatuses.length === 0" class="space-y-4 p-4">
+      <div v-for="i in 3" :key="i" class="space-y-3">
+        <div class="flex items-center gap-3">
+          <Skeleton class="size-10 rounded-full" />
+          <div class="space-y-1.5">
+            <Skeleton class="h-4 w-32" />
+            <Skeleton class="h-3 w-20" />
+          </div>
+        </div>
+        <Skeleton class="h-16 w-full" />
+        <Skeleton class="h-8 w-48" />
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <EmptyState
+      v-else-if="!timeline.isLoading.value && allStatuses.length === 0"
+      title="Your timeline is empty"
+      description="Follow some people to see their posts here"
+      class="py-12"
+    />
+
     <!-- New posts banner -->
     <div v-if="timeline.newStatusCount.value > 0" class="flex justify-center py-2">
       <Button

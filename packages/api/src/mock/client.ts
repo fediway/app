@@ -414,6 +414,13 @@ export function createMockClient(): MastoClient {
         },
         $select(id: string) {
           return {
+            async fetch() {
+              await delay();
+              const account = findAccountById(id);
+              if (!account)
+                throw new Error(`Account ${id} not found`);
+              return account;
+            },
             statuses: {
               async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
                 await delay();

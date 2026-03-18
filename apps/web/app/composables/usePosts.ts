@@ -1,5 +1,6 @@
 import type { Account, Status } from '@repo/types';
 import { useAuth, useClient } from '@repo/api';
+import { useToast } from '@repo/ui';
 import { reactive } from 'vue';
 import { clearLiveCache } from './useData';
 
@@ -36,6 +37,8 @@ const currentUserAccount: Account = {
   followersCount: 1847,
   followingCount: 412,
 } as unknown as Account;
+
+const { toast } = useToast();
 
 export function usePosts() {
   function addPost(opts: {
@@ -115,9 +118,11 @@ export function usePosts() {
           }
           // Clear the home timeline cache so it re-fetches with the new post
           clearLiveCache();
+          toast.success('Post published');
         }
         catch (err) {
           console.error('[usePosts] Failed to create status:', err);
+          toast.error('Failed to post', 'Please try again.');
           // Remove placeholder on failure
           const idx = userPosts.findIndex(s => s.id === tempId);
           if (idx !== -1) {

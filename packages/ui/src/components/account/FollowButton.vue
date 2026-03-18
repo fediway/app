@@ -2,11 +2,14 @@
 import { ref } from 'vue';
 import Button from '../ui/button/Button.vue';
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   isFollowing: boolean;
+  /** Follow request is pending approval (for locked/private accounts) */
+  requested?: boolean;
   size?: 'sm' | 'md';
   loading?: boolean;
 }>(), {
+  requested: false,
   size: 'sm',
   loading: false,
 });
@@ -22,8 +25,8 @@ const isHovered = ref(false);
 <template>
   <Button
     :size="size === 'sm' ? 'sm' : 'default'"
-    :variant="isFollowing ? 'secondary' : 'default'"
-    :disabled="loading"
+    :variant="isFollowing || props.requested ? 'secondary' : 'default'"
+    :disabled="loading || props.requested"
     class="shrink-0"
     :class="[
       isFollowing && isHovered && 'border-red-300 text-red-600 hover:bg-white dark:hover:bg-transparent',
@@ -32,6 +35,6 @@ const isHovered = ref(false);
     @mouseleave="isHovered = false"
     @click="isFollowing ? $emit('unfollow') : $emit('follow')"
   >
-    {{ loading ? '...' : isFollowing ? (isHovered ? 'Unfollow' : 'Following') : 'Follow' }}
+    {{ loading ? '...' : props.requested ? 'Requested' : isFollowing ? (isHovered ? 'Unfollow' : 'Following') : 'Follow' }}
   </Button>
 </template>

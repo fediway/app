@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { PhArrowLeft, PhList, PhMagnifyingGlass } from '@phosphor-icons/vue';
-import { Button } from '@repo/ui';
+import { AppBar } from '@repo/ui';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNavigationStore } from '../stores/navigation';
@@ -17,45 +16,27 @@ const navigation = useNavigationStore();
 const showBackButton = computed(() => {
   return props.showBack || !navigation.activeTab;
 });
+
+function handleLeftClick() {
+  if (showBackButton.value) {
+    router.back();
+  }
+  else {
+    navigation.openDrawer();
+  }
+}
 </script>
 
 <template>
-  <header class="safe-area-top fixed inset-x-0 top-0 z-40 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-    <div class="flex h-14 items-center justify-between px-2">
-      <!-- Left: back or menu -->
-      <Button
-        v-if="showBackButton"
-        variant="muted"
-        size="icon"
-        aria-label="Go back"
-        @click="router.back()"
-      >
-        <PhArrowLeft :size="24" />
-      </Button>
-      <Button
-        v-else
-        variant="muted"
-        size="icon"
-        aria-label="Open menu"
-        @click="navigation.openDrawer()"
-      >
-        <PhList :size="24" />
-      </Button>
-
-      <!-- Center: title -->
-      <h1 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-        {{ navigation.pageTitle }}
-      </h1>
-
-      <!-- Right: explore -->
-      <Button
-        variant="muted"
-        size="icon"
-        aria-label="Explore"
-        @click="router.push('/explore')"
-      >
-        <PhMagnifyingGlass :size="24" />
-      </Button>
-    </div>
+  <header class="safe-area-top fixed inset-x-0 top-0 z-40">
+    <AppBar
+      :title="navigation.pageTitle"
+      :left-icon="showBackButton ? 'back' : 'menu'"
+      :left-label="showBackButton ? 'Go back' : 'Open menu'"
+      right-icon="explore"
+      right-label="Explore"
+      @left-click="handleLeftClick"
+      @right-click="router.push('/explore')"
+    />
   </header>
 </template>

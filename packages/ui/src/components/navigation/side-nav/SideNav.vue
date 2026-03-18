@@ -1,0 +1,26 @@
+<script setup lang="ts">
+</script>
+
+<template>
+  <div class="flex flex-col">
+    <!-- Profile section -->
+    <div v-if="$slots.profile" class="mb-2">
+      <slot name="profile" />
+    </div>
+
+    <!-- Primary action (e.g., "New Post" button) -->
+    <div v-if="$slots.action" class="mb-4 px-4">
+      <slot name="action" />
+    </div>
+
+    <!-- Navigation menu -->
+    <nav class="flex flex-col">
+      <slot />
+    </nav>
+
+    <!-- Footer -->
+    <div v-if="$slots.footer" class="mt-auto">
+      <slot name="footer" />
+    </div>
+  </div>
+</template>

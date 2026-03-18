@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NavItem } from '@repo/ui';
+import type { BottomNavItemType } from '@repo/ui';
 import type { Component } from 'vue';
 import {
   PhBell,
@@ -8,7 +8,7 @@ import {
   PhPlus,
   PhUser,
 } from '@phosphor-icons/vue';
-import { MainNavigation } from '@repo/ui';
+import { BottomNav } from '@repo/ui';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
@@ -26,7 +26,7 @@ const iconMap: Record<string, Component> = {
   'profile': PhUser,
 };
 
-const navItems = computed<NavItem[]>(() =>
+const navItems = computed<BottomNavItemType[]>(() =>
   navigation.mobileFooterItems.map(item => ({
     id: item.id,
     icon: iconMap[item.icon] ?? iconMap[item.id] ?? PhHouse,
@@ -36,7 +36,7 @@ const navItems = computed<NavItem[]>(() =>
   })),
 );
 
-function handleItemClick(item: NavItem) {
+function handleItemClick(item: BottomNavItemType) {
   if (item.id === 'new-post') {
     openComposer();
     return;
@@ -49,7 +49,7 @@ function handleItemClick(item: NavItem) {
 
 <template>
   <footer class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-    <MainNavigation
+    <BottomNav
       :items="navItems"
       @item-click="handleItemClick"
     />

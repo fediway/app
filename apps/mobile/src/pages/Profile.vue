@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { FediwayStatus, Tag } from '@repo/types';
-import { useAccount, useStatusActions, useStatusStore } from '@repo/api';
-import { ProfileHeader, ProfileInformation, Status } from '@repo/ui';
+import { PhUser, PhWarningCircle } from '@phosphor-icons/vue';
+import { useAccount, useAuth, useStatusActions, useStatusStore } from '@repo/api';
+import { EmptyState, ProfileActions, ProfileHeader, ProfileInformation, Skeleton, Status } from '@repo/ui';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useHaptics } from '../composables/useHaptics';
@@ -15,6 +16,7 @@ const route = useRoute();
 const router = useRouter();
 const { impact, notification } = useHaptics();
 
+const { currentUser: authUser } = useAuth();
 const accountData = useAccount();
 const store = useStatusStore();
 const actions = useStatusActions({
@@ -24,6 +26,12 @@ const actions = useStatusActions({
 const acct = computed(() => {
   const raw = route.params.acct as string;
   return raw?.replace(LEADING_AT_RE, '') ?? '';
+});
+
+const isOwnProfile = computed(() => {
+  if (!authUser.value || !accountData.account.value)
+    return false;
+  return authUser.value.acct === accountData.account.value.acct;
 });
 
 const statuses = computed(() =>
@@ -75,6 +83,16 @@ async function handleBookmark(id: string) {
   await actions.toggleBookmark(id);
 }
 
+async function handleFollow() {
+  impact('light');
+  await accountData.follow();
+}
+
+async function handleUnfollow() {
+  impact('light');
+  await accountData.unfollow();
+}
+
 function handleBack() {
   router.back();
 }
@@ -82,21 +100,26 @@ function handleBack() {
 
 <template>
   <!-- Loading -->
-  <div v-if="accountData.isLoading.value && !accountData.account.value" class="flex items-center justify-center py-20">
-    <p class="text-sm text-gray-500 dark:text-gray-400">
-      Loading profile...
-    </p>
+  <div v-if="accountData.isLoading.value && !accountData.account.value" class="space-y-4 p-4">
+    <Skeleton class="h-40 w-full rounded-lg" />
+    <div class="flex items-center gap-3">
+      <Skeleton class="size-16 rounded-full" />
+      <div class="flex-1 space-y-2">
+        <Skeleton class="h-5 w-32" />
+        <Skeleton class="h-4 w-24" />
+      </div>
+    </div>
+    <Skeleton class="h-20 w-full" />
   </div>
 
   <!-- Error -->
-  <div v-else-if="accountData.error.value && !accountData.account.value" class="flex flex-col items-center justify-center gap-4 py-20">
-    <p class="text-sm text-gray-500 dark:text-gray-400">
-      Couldn't load profile
-    </p>
-    <button class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium dark:bg-gray-800" @click="load">
-      Try again
-    </button>
-  </div>
+  <EmptyState
+    v-else-if="accountData.error.value && !accountData.account.value"
+    :icon="PhWarningCircle"
+    title="Couldn't load profile"
+    action-label="Try again"
+    @action="load"
+  />
 
   <!-- Profile -->
   <div v-else-if="accountData.account.value" class="min-h-screen">
@@ -115,6 +138,17 @@ function handleBack() {
         <p class="text-sm text-gray-500 dark:text-gray-400">
           @{{ accountData.account.value.acct }}
         </p>
+      </div>
+
+      <div class="mt-3">
+        <ProfileActions
+          :following="accountData.relationship.value?.following"
+          :requested="accountData.relationship.value?.requested"
+          :is-own-profile="isOwnProfile"
+          @follow="handleFollow"
+          @unfollow="handleUnfollow"
+          @message="router.push('/messages')"
+        />
       </div>
 
       <div class="mt-3">
@@ -139,8 +173,10 @@ function handleBack() {
     </div>
 
     <!-- Empty statuses -->
-    <div v-if="!accountData.isLoading.value && statuses.length === 0" class="py-12 text-center text-gray-500">
-      <p>No posts yet</p>
-    </div>
+    <EmptyState
+      v-if="!accountData.isLoading.value && statuses.length === 0"
+      :icon="PhUser"
+      title="No posts yet"
+    />
   </div>
 </template>

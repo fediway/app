@@ -1,5 +1,6 @@
 import type { Status } from '@repo/types';
 import { useClient } from '@repo/api';
+import { useToast } from '@repo/ui';
 import { reactive } from 'vue';
 
 // Module-level state — persists across page navigations
@@ -11,9 +12,12 @@ const overrides = reactive(new Map<string, {
   reblogsCount?: number;
 }>());
 
+const { toast } = useToast();
+
 function callApi(fn: () => Promise<unknown>) {
   fn().catch((err) => {
     console.error('[useInteractions] API call failed:', err);
+    toast.error('Action failed', 'Please try again.');
   });
 }
 
@@ -89,6 +93,7 @@ export function useInteractions() {
       ...current,
       bookmarked: !isBookmarked,
     });
+    toast.success(isBookmarked ? 'Bookmark removed' : 'Post bookmarked');
 
     const client = getClient();
     if (client) {

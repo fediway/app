@@ -12,9 +12,16 @@ import {
   PhProhibit,
   PhSpeakerSlash,
 } from '@phosphor-icons/vue';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed } from 'vue';
 import { cn } from '../../lib/utils';
 import { ButtonAction } from '../ui/button-action';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 interface Props {
   repliesCount?: number;
@@ -52,36 +59,9 @@ const emit = defineEmits<{
   blockDomain: [];
 }>();
 
-const showMoreMenu = ref(false);
-const menuRef = ref<HTMLElement | null>(null);
-
 const canReblog = computed(() =>
   props.visibility !== 'direct' && props.visibility !== 'private',
 );
-
-function toggleMoreMenu(event: Event) {
-  event.stopPropagation();
-  showMoreMenu.value = !showMoreMenu.value;
-}
-
-function emitAndClose(event: 'copyLink' | 'sendMessage' | 'mute' | 'block' | 'blockDomain' | 'report') {
-  emit(event);
-  showMoreMenu.value = false;
-}
-
-function handleClickOutside(event: MouseEvent) {
-  if (menuRef.value && !menuRef.value.contains(event.target as Node)) {
-    showMoreMenu.value = false;
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
 </script>
 
 <template>
@@ -129,77 +109,46 @@ onUnmounted(() => {
       </ButtonAction>
 
       <!-- More menu -->
-      <div ref="menuRef" class="relative">
-        <ButtonAction @click="toggleMoreMenu">
-          <PhDotsThree :size="20" />
-        </ButtonAction>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <ButtonAction>
+            <PhDotsThree :size="20" />
+          </ButtonAction>
+        </DropdownMenuTrigger>
 
-        <!-- Dropdown -->
-        <Transition
-          enter-active-class="transition ease-out duration-100"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-75"
-          leave-from-class="opacity-100 scale-100"
-          leave-to-class="opacity-0 scale-95"
-        >
-          <div
-            v-if="showMoreMenu"
-            class="absolute right-0 bottom-full z-50 mb-2 w-48 rounded-xl border border-border bg-card py-1 shadow-lg"
-          >
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted"
-              @click="emitAndClose('copyLink')"
-            >
-              <PhLink :size="16" class="text-foreground/60" />
-              Copy link
-            </button>
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted"
-              @click="emitAndClose('sendMessage')"
-            >
-              <PhPaperPlaneRight :size="16" class="text-foreground/60" />
-              Send as message
-            </button>
-            <div class="my-1 border-t border-border" />
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted"
-              @click="emitAndClose('mute')"
-            >
-              <PhSpeakerSlash :size="16" class="text-foreground/60" />
-              Mute user
-            </button>
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted"
-              @click="emitAndClose('block')"
-            >
-              <PhProhibit :size="16" class="text-foreground/60" />
-              Block user
-            </button>
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted"
-              @click="emitAndClose('blockDomain')"
-            >
-              <PhProhibit :size="16" class="text-foreground/60" />
-              Block domain
-            </button>
-            <div class="my-1 border-t border-border" />
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red hover:bg-red-background"
-              @click="emitAndClose('report')"
-            >
-              <PhFlag :size="16" />
-              Report
-            </button>
-          </div>
-        </Transition>
-      </div>
+        <DropdownMenuContent side="top" align="end" :side-offset="8">
+          <DropdownMenuItem @select="emit('copyLink')">
+            <PhLink :size="16" class="text-foreground/60" />
+            Copy link
+          </DropdownMenuItem>
+          <DropdownMenuItem @select="emit('sendMessage')">
+            <PhPaperPlaneRight :size="16" class="text-foreground/60" />
+            Send as message
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem @select="emit('mute')">
+            <PhSpeakerSlash :size="16" class="text-foreground/60" />
+            Mute user
+          </DropdownMenuItem>
+          <DropdownMenuItem @select="emit('block')">
+            <PhProhibit :size="16" class="text-foreground/60" />
+            Block user
+          </DropdownMenuItem>
+          <DropdownMenuItem @select="emit('blockDomain')">
+            <PhProhibit :size="16" class="text-foreground/60" />
+            Block domain
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem destructive @select="emit('report')">
+            <PhFlag :size="16" />
+            Report
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </div>
 </template>

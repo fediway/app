@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { PhArrowLeft } from '@phosphor-icons/vue';
-import { Button, Timeline } from '@repo/ui';
+import { EmptyState, FollowButton, PageHeader, Timeline } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
@@ -66,68 +65,43 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
 
 <template>
   <div class="w-full">
-    <!-- Header -->
-    <div class="px-4 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-      <div class="flex items-center gap-3">
-        <Button
-          variant="muted"
-          size="icon"
-          class="size-9 -ml-2"
-          @click="$router.back()"
-        >
-          <PhArrowLeft :size="20" class="text-gray-700" />
-        </Button>
-        <div>
-          <h1 class="text-xl font-bold text-gray-900">
-            #{{ tagName }}
-          </h1>
-          <p class="text-sm text-gray-500">
-            {{ statuses.length }} posts
-          </p>
-        </div>
-      </div>
-    </div>
+    <PageHeader
+      :title="`#${tagName}`"
+      :subtitle="`${statuses.length} posts`"
+      show-back
+      @back="$router.back()"
+    />
 
     <!-- Tag Stats Banner -->
-    <div class="px-4 py-4 bg-gray-50 border-b border-gray-200">
+    <div class="border-b border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-800 dark:bg-gray-800/30">
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center">
-          <span class="text-2xl text-gray-500">#</span>
+        <div class="flex size-14 items-center justify-center rounded-xl bg-gray-200 dark:bg-gray-700">
+          <span class="text-2xl text-gray-500 dark:text-gray-400">#</span>
         </div>
         <div class="flex-1">
-          <h2 class="text-lg font-semibold text-gray-900">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             #{{ tagName }}
           </h2>
           <p class="text-sm text-gray-500">
             {{ statuses.length }} posts from the community
           </p>
         </div>
-        <Button
+        <FollowButton
+          :is-following="isFollowingTag"
           size="sm"
-          :class="[
-            isFollowingTag
-              ? 'bg-white text-gray-700 border border-gray-300 hover:border-red-300 hover:text-red-600 hover:bg-white'
-              : '',
-          ]"
-          @click="toggleFollowTag"
-        >
-          {{ isFollowingTag ? 'Following' : 'Follow' }}
-        </Button>
+          @follow="toggleFollowTag"
+          @unfollow="toggleFollowTag"
+        />
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="statuses.length === 0" class="text-center py-16 px-4">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-        <span class="text-3xl text-gray-400">#</span>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">
-        No posts yet
-      </h3>
-      <p class="text-gray-500">
-        Be the first to post with #{{ tagName }}
-      </p>
-    </div>
+    <EmptyState
+      v-if="statuses.length === 0"
+      title="No posts yet"
+      :description="`Be the first to post with #${tagName}`"
+      class="py-16"
+    />
 
     <!-- Timeline -->
     <Timeline

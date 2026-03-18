@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { Timeline } from '@repo/ui';
+import { EmptyState, PageHeader, Timeline } from '@repo/ui';
 import { useData } from '~/composables/useData';
 import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -46,15 +46,18 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
 
 <template>
   <div class="w-full">
-    <!-- Header -->
-    <div class="px-4 py-3 border-b border-gray-200 sticky top-0 bg-white z-10">
-      <h1 class="text-xl font-bold">
-        Favourites
-      </h1>
-    </div>
+    <PageHeader title="Favourites" />
+
+    <!-- Empty State -->
+    <EmptyState
+      v-if="statuses.length === 0"
+      title="No favourites yet"
+      description="Posts you like will appear here"
+      class="py-12"
+    />
 
     <!-- Timeline -->
-    <section class="w-full">
+    <section v-else class="w-full">
       <Timeline
         :statuses="statuses"
         :loading="false"
@@ -69,13 +72,5 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
         @media-click="handleMediaClick"
       />
     </section>
-
-    <!-- Empty State -->
-    <div v-if="statuses.length === 0" class="text-center py-12 text-gray-500">
-      <p>No favourites yet</p>
-      <p class="text-sm mt-1">
-        Posts you like will appear here
-      </p>
-    </div>
   </div>
 </template>

@@ -11,6 +11,10 @@ defineProps<Props>();
 const searchQuery = ref('');
 
 function handleSearchKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    searchQuery.value = '';
+    return;
+  }
   if (event.key === 'Enter' && searchQuery.value.trim()) {
     navigateTo({ path: '/search', query: { q: searchQuery.value } });
   }
@@ -29,25 +33,25 @@ const tabs = [
 </script>
 
 <template>
-  <div class="px-4 py-3 border-b border-gray-200 sticky top-0 bg-white z-10">
-    <h1 class="text-xl font-bold mb-3">
+  <div class="sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur">
+    <h1 class="mb-3 text-xl font-bold text-foreground">
       {{ title || 'Explore' }}
     </h1>
 
     <!-- Search Input -->
     <div class="relative">
-      <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" />
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search..."
-        class="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full text-[15px] outline-hidden focus:ring-2 focus:ring-gray-300 focus:bg-white transition-colors"
+        class="w-full rounded-full bg-muted py-2 pl-10 pr-4 text-[15px] text-foreground outline-hidden transition-colors placeholder:text-foreground/40 focus:bg-card focus:ring-2 focus:ring-ring"
         @keydown="handleSearchKeydown"
       >
       <button
         v-if="searchQuery"
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground/80"
         @click="clearSearch"
       >
         <PhX :size="20" />
@@ -55,15 +59,15 @@ const tabs = [
     </div>
 
     <!-- Navigation Tabs -->
-    <nav class="flex gap-1 mt-3">
+    <nav class="mt-3 flex gap-1">
       <NuxtLink
         v-for="tab in tabs"
         :key="tab.to"
         :to="tab.to"
-        class="px-4 py-2 rounded-full text-sm font-medium transition-colors no-underline" :class="[
+        class="rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors" :class="[
           $route.path === tab.to
-            ? 'bg-gray-900 text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+            ? 'bg-foreground text-background'
+            : 'bg-muted text-foreground/80 hover:bg-muted/80',
         ]"
       >
         {{ tab.label }}

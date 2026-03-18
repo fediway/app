@@ -1,14 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import { AccountList, FollowButton } from '@/components/account';
-import { createMockAccount } from '../../mocks';
-
-const fiveAccounts = [
-  createMockAccount({ displayName: 'Alice Chen', username: 'alice' }),
-  createMockAccount({ displayName: 'Sarah Chen', username: 'sarah' }),
-  createMockAccount({ displayName: 'Alex Rivera', username: 'alex' }),
-  createMockAccount({ displayName: 'Jordan Kim', username: 'jordan' }),
-  createMockAccount({ displayName: 'Morgan Lee', username: 'morgan' }),
-];
+import AccountList from '@/components/account/AccountList.vue';
 
 const meta = {
   title: '06-Account/AccountList',
@@ -21,37 +12,37 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { accounts: fiveAccounts, showBio: true },
+  args: {
+    users: [
+      { displayName: 'Alice Chen', handle: '@alice@mastodon.social', avatarSrc: 'https://picsum.photos/seed/alice/200/200' },
+      { displayName: 'Sarah Chen', handle: '@sarah@mastodon.social', avatarSrc: 'https://picsum.photos/seed/sarah/200/200' },
+      { displayName: 'Alex Rivera', handle: '@alex@fosstodon.org', avatarSrc: 'https://picsum.photos/seed/alex/200/200' },
+    ],
+  },
 };
 
-export const WithFollowButtons: Story = {
-  render: () => ({
-    components: { AccountList, FollowButton },
-    setup() {
-      return { accounts: fiveAccounts };
-    },
-    template: `
-      <AccountList :accounts="accounts" show-bio>
-        <template #item-action="{ account }">
-          <FollowButton :is-following="false" />
-        </template>
-      </AccountList>
-    `,
-  }),
+export const SingleUser: Story = {
+  args: {
+    users: [
+      { displayName: 'Alice Chen', handle: '@alice@mastodon.social', avatarSrc: 'https://picsum.photos/seed/alice/200/200' },
+    ],
+  },
 };
 
-export const CompactWithLimit: Story = {
-  args: { accounts: fiveAccounts, limit: 3, showSeeMore: true },
+export const NoAvatars: Story = {
+  args: {
+    users: [
+      { displayName: 'Alice Chen', handle: '@alice@mastodon.social' },
+      { displayName: 'Bob Smith', handle: '@bob@mastodon.social' },
+    ],
+  },
 };
 
-export const Loading: Story = {
-  args: { accounts: [], loading: true },
-};
-
-export const Empty: Story = {
-  args: { accounts: [] },
-};
-
-export const Error: Story = {
-  args: { accounts: [], error: 'Failed to load accounts' },
+export const LongHandles: Story = {
+  args: {
+    users: [
+      { displayName: 'Alice', handle: '@alice@a-very-long-instance-domain.social', avatarSrc: 'https://picsum.photos/seed/alice/200/200' },
+      { displayName: 'Verylongdisplaynamethatoverflows', handle: '@longname@mastodon.social', avatarSrc: 'https://picsum.photos/seed/long/200/200' },
+    ],
+  },
 };

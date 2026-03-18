@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import UserSuggestions from '@/components/search-discover/user-suggestions/UserSuggestions.vue';
+import AccountList from '@/components/account/AccountList.vue';
 import Section from '@/components/ui/section/Section.vue';
 
 const meta = {
@@ -122,16 +122,16 @@ const mockUsers = [
   { displayName: 'Alice Chen', handle: '@alice.chen@mastodon.social', avatarSrc: 'https://picsum.photos/seed/alice3/200/200' },
 ];
 
-export const UserSuggestionsSection: Story = {
+export const AccountListSection: Story = {
   render: args => ({
-    components: { Section, UserSuggestions },
+    components: { Section, AccountList },
     setup() {
       return { args, users: mockUsers };
     },
     template: `
       <div style="max-width: 390px">
         <Section v-bind="args">
-          <UserSuggestions :users="users" />
+          <AccountList :users="users" />
         </Section>
       </div>
     `,

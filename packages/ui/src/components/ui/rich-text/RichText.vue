@@ -24,7 +24,7 @@ const processedContent = computed(() => {
     const pattern = new RegExp(`:${escapeRegExp(emoji.shortcode)}:`, 'g');
     html = html.replace(
       pattern,
-      `<img src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-5 w-5 align-text-bottom" draggable="false" />`,
+      `<img loading="lazy" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-5 w-5 align-text-bottom" draggable="false" />`,
     );
   }
 

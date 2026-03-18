@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NavItem } from '@repo/ui';
+import type { BottomNavItemType } from '@repo/ui';
 import {
   PhBell,
   PhHouse,
@@ -7,7 +7,7 @@ import {
   PhPlusSquare,
   PhUser,
 } from '@phosphor-icons/vue';
-import { MainNavigation } from '@repo/ui';
+import { BottomNav } from '@repo/ui';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNavigationStore } from '../stores/navigation';
@@ -27,8 +27,9 @@ const TAB_ICONS: Record<string, any> = {
   'profile': PhUser,
 };
 
-const navItems = computed<NavItem[]>(() =>
+const navItems = computed<BottomNavItemType[]>(() =>
   navigation.tabItems.map(item => ({
+    id: item.id,
     icon: TAB_ICONS[item.id],
     label: item.id === 'new-post' ? undefined : item.label,
     main: item.id === 'new-post',
@@ -36,35 +37,24 @@ const navItems = computed<NavItem[]>(() =>
   })),
 );
 
-function handleClick(e: Event) {
-  const target = (e.target as HTMLElement).closest('button, a');
-  if (!target)
-    return;
-
-  const nav = target.closest('nav');
-  if (!nav)
-    return;
-
-  const buttons = [...nav.querySelectorAll(':scope > button, :scope > a')];
-  const index = buttons.indexOf(target as Element);
-  if (index === -1)
-    return;
-
-  const item = navigation.tabItems[index];
-  if (!item)
-    return;
-
+function handleItemClick(item: BottomNavItemType) {
   if (item.id === 'new-post') {
     emit('compose');
     return;
   }
 
-  router.push(item.to);
+  const navItem = navigation.tabItems.find(t => t.id === item.id);
+  if (navItem) {
+    router.push(navItem.to);
+  }
 }
 </script>
 
 <template>
-  <div class="safe-area-bottom fixed inset-x-0 bottom-0 z-40 px-4 pb-4" @click="handleClick">
-    <MainNavigation :items="navItems" />
+  <div class="safe-area-bottom fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+    <BottomNav
+      :items="navItems"
+      @item-click="handleItemClick"
+    />
   </div>
 </template>

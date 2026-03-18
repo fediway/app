@@ -50,7 +50,27 @@ const creator = computed(() => {
   return field ? props.item[field] : undefined;
 });
 
-const label = computed(() => {
+function getDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  }
+  catch {
+    return '';
+  }
+}
+
+const sublabel = computed(() => {
+  // Links show domain and/or author
+  if (props.item.type === 'link') {
+    const parts: string[] = [];
+    const domain = getDomain(props.item.url);
+    if (domain)
+      parts.push(domain);
+    if (props.item.author)
+      parts.push(props.item.author);
+    return parts.join(' · ');
+  }
+  // Other types show creator and year
   const parts: (string | number)[] = [];
   if (creator.value)
     parts.push(creator.value);
@@ -85,8 +105,8 @@ const label = computed(() => {
           </template>
           {{ config.label }}
         </TagItem>
-        <span v-if="label" class="text-sm text-[#232B37]/80">
-          {{ label }}
+        <span v-if="sublabel" class="text-sm text-[#232B37]/80">
+          {{ sublabel }}
         </span>
       </div>
     </div>
