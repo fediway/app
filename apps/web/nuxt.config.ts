@@ -69,6 +69,7 @@ export default defineNuxtConfig({
         'swiper/vue',
         'swiper/modules',
         'reka-ui',
+        'reka-ui/namespaced',
         'clsx',
         'tailwind-merge',
         'class-variance-authority',

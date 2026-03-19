@@ -6,9 +6,13 @@ import { RichText } from '../ui/rich-text';
 
 interface Props {
   status: Status;
+  /** Recursion depth guard */
+  depth?: number;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  depth: 0,
+});
 
 const emit = defineEmits<{
   click: [statusId: string];

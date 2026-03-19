@@ -1,14 +1,18 @@
 import type { Relationship } from '@repo/types';
 import { useClient } from '@repo/api';
+import { useToast } from '@repo/ui';
 import { reactive } from 'vue';
 
 // Module-level state — persists across page navigations
 const followState = reactive(new Map<string, boolean>());
 const relationshipCache = reactive(new Map<string, Relationship>());
 
+const { toast } = useToast();
+
 function callApi(fn: () => Promise<unknown>) {
   fn().catch((err) => {
     console.error('[useFollows] API call failed:', err);
+    toast.error('Action failed', 'Please try again.');
   });
 }
 
@@ -25,6 +29,7 @@ export function useFollows() {
   function toggleFollow(accountId: string) {
     const current = followState.get(accountId) ?? false;
     followState.set(accountId, !current);
+    toast.success(current ? 'Unfollowed' : 'Followed');
 
     const client = getClient();
     if (client) {

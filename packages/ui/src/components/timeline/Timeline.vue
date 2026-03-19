@@ -12,12 +12,15 @@ interface Props {
   hasMore?: boolean;
   /** Function to generate profile URL from account */
   getProfileUrl?: (acct: string) => string;
+  /** Function to resolve a status by ID (for reply parent context) */
+  getStatus?: (id: string) => StatusType | undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   hasMore: true,
   getProfileUrl: undefined,
+  getStatus: undefined,
 });
 
 const emit = defineEmits<{
@@ -50,6 +53,14 @@ function getProfileUrlForStatus(status: StatusType): string | undefined {
   }
   return undefined;
 }
+
+function getReplyParent(status: StatusType): StatusType | null {
+  const displayStatus = status.reblog ?? status;
+  if (!displayStatus.inReplyToId || !props.getStatus) {
+    return null;
+  }
+  return props.getStatus(displayStatus.inReplyToId) ?? null;
+}
 </script>
 
 <template>
@@ -80,6 +91,7 @@ function getProfileUrlForStatus(status: StatusType): string | undefined {
         <Status
           :status="statuses[item.index]!"
           :profile-url="getProfileUrlForStatus(statuses[item.index]!)"
+          :reply-parent="getReplyParent(statuses[item.index]!)"
           @reply="emit('reply', $event)"
           @reblog="emit('reblog', $event)"
           @favourite="emit('favourite', $event)"

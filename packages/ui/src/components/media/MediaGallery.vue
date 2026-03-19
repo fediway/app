@@ -119,7 +119,6 @@ function handleCarouselClick(attachment: MediaAttachment, index: number) {
           :src="attachment.previewUrl || attachment.url || ''"
           :alt="attachment.description || 'Image'"
           class="w-full h-full object-cover"
-          loading="lazy"
         >
 
         <!-- Video -->

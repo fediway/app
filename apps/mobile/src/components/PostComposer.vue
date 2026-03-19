@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import {
   PhCamera,
-  PhChatCircle,
-  PhEnvelope,
-  PhGlobe,
-  PhLock,
-  PhLockOpen,
-  PhWarning,
   PhX,
 } from '@phosphor-icons/vue';
 import { useClient } from '@repo/api';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, CharacterCounter, ContentWarningToggle, ReplyContext, VisibilitySelector } from '@repo/ui';
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -21,6 +15,7 @@ import {
   AlertDialogRoot,
   AlertDialogTitle,
   DialogContent,
+  DialogDescription,
   DialogPortal,
   DialogRoot,
   DialogTitle,
@@ -49,24 +44,13 @@ const showDiscardDialog = ref(false);
 
 const CHARACTER_LIMIT = 500;
 
-const characterCount = computed(() => content.value.length);
-const charactersRemaining = computed(() => CHARACTER_LIMIT - characterCount.value);
-const isOverLimit = computed(() => charactersRemaining.value < 0);
-
 const canPost = computed(() => {
-  return content.value.trim().length > 0 && !isOverLimit.value && !isSubmitting.value;
+  return content.value.trim().length > 0 && content.value.length <= CHARACTER_LIMIT && !isSubmitting.value;
 });
 
 const dialogTitle = computed(() => {
   return replyingTo.value ? `Reply to @${replyingTo.value.account.acct}` : 'New post';
 });
-
-const visibilityOptions = [
-  { value: 'public' as const, label: 'Public', icon: PhGlobe },
-  { value: 'unlisted' as const, label: 'Unlisted', icon: PhLockOpen },
-  { value: 'private' as const, label: 'Followers', icon: PhLock },
-  { value: 'direct' as const, label: 'Direct', icon: PhEnvelope },
-];
 
 let unregisterBack: (() => void) | null = null;
 
@@ -203,6 +187,7 @@ function removeImage() {
         >
           <VisuallyHidden>
             <DialogTitle>{{ dialogTitle }}</DialogTitle>
+            <DialogDescription>Compose a new post</DialogDescription>
           </VisuallyHidden>
 
           <!-- Header -->
@@ -219,10 +204,7 @@ function removeImage() {
           </header>
 
           <!-- Reply context -->
-          <div v-if="replyingTo" class="flex items-center gap-2 border-b border-gray-100 px-4 py-2 text-sm text-gray-500 dark:border-gray-800">
-            <PhChatCircle :size="16" />
-            <span>Replying to <strong class="text-gray-700 dark:text-gray-300">@{{ replyingTo.account.acct }}</strong></span>
-          </div>
+          <ReplyContext v-if="replyingTo" :acct="replyingTo.account.acct" class="border-b border-gray-100 px-4 py-2 dark:border-gray-800" />
 
           <!-- Composer body -->
           <div class="flex-1 overflow-y-auto p-4">
@@ -263,59 +245,24 @@ function removeImage() {
 
             <!-- Character Count -->
             <div id="char-count" class="mt-2 flex justify-end" aria-live="polite">
-              <span
-                class="text-sm"
-                :class="[
-                  isOverLimit ? 'font-medium text-red-500' : charactersRemaining <= 50 ? 'text-orange-500' : 'text-gray-400',
-                ]"
-              >
-                {{ charactersRemaining }}
-              </span>
+              <CharacterCounter :current="content.length" :limit="CHARACTER_LIMIT" />
             </div>
           </div>
 
           <!-- Bottom Toolbar -->
           <div class="border-t border-gray-200 px-4 py-3 dark:border-gray-800">
             <!-- Visibility Selector -->
-            <div class="mb-3 flex flex-wrap gap-2">
-              <button
-                v-for="option in visibilityOptions"
-                :key="option.value"
-                type="button"
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors"
-                :class="[
-                  visibility === option.value
-                    ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-                ]"
-                :aria-pressed="visibility === option.value"
-                @click="visibility = option.value"
-              >
-                <component :is="option.icon" :size="16" />
-                <span>{{ option.label }}</span>
-              </button>
+            <div class="mb-3">
+              <VisibilitySelector v-model="visibility" />
             </div>
 
             <!-- Options Row -->
             <div class="flex items-center gap-3">
-              <button
-                type="button"
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors"
-                :class="[
-                  showContentWarning
-                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-                ]"
-                :aria-pressed="showContentWarning"
-                @click="showContentWarning = !showContentWarning"
-              >
-                <PhWarning :size="16" />
-                <span>CW</span>
-              </button>
+              <ContentWarningToggle v-model="showContentWarning" />
 
               <button
                 type="button"
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm bg-gray-100 text-gray-600 transition-colors dark:bg-gray-800 dark:text-gray-400"
+                class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-600 transition-colors dark:bg-gray-800 dark:text-gray-400"
                 @click="handleCamera"
               >
                 <PhCamera :size="16" />

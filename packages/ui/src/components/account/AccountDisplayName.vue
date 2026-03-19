@@ -3,6 +3,14 @@ import type { CustomEmoji } from '@repo/types';
 import { computed } from 'vue';
 import { escapeRegExp, sanitizeHtml } from '../../utils/sanitize';
 
+const props = withDefaults(defineProps<Props>(), {
+  emojis: () => [],
+  asLink: false,
+  href: undefined,
+});
+
+const QUOTE_RE = /"/g;
+
 interface Props {
   /** Display name */
   name: string;
@@ -14,12 +22,6 @@ interface Props {
   href?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  emojis: () => [],
-  asLink: false,
-  href: undefined,
-});
-
 // Process display name to replace custom emoji shortcodes
 const processedName = computed(() => {
   let html = sanitizeHtml(props.name);
@@ -28,7 +30,7 @@ const processedName = computed(() => {
     const pattern = new RegExp(`:${escapeRegExp(emoji.shortcode)}:`, 'g');
     html = html.replace(
       pattern,
-      `<img src="${encodeURI(emoji.url)}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-4 w-4 align-text-bottom" draggable="false" />`,
+      `<img loading="lazy" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-4 w-4 align-text-bottom" draggable="false" />`,
     );
   }
 

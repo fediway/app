@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
-import { MediaLightbox } from '@repo/ui';
+import { MediaLightbox, ToastContainer, useToast } from '@repo/ui';
 import { useBackButton } from '~/composables/useBackButton';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useMessages } from '~/composables/useMessages';
@@ -91,8 +91,11 @@ function handlePost(data: { content: string; spoilerText: string; visibility: st
   });
 }
 
+const { toast } = useToast();
+
 function handleSendMessage(data: { recipients: Account[]; message: string; status: Status }) {
   const conversationId = shareStatus(data.recipients, data.message, data.status);
+  toast.success('Message sent');
   router.push(`/messages/${conversationId}`);
 }
 </script>
@@ -124,7 +127,6 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     />
 
     <!-- Mobile Navigation -->
-    <MobileHeader class="hidden max-lg:block" />
     <MobileFooter class="hidden max-lg:block" />
     <MobileSidebar />
 
@@ -149,8 +151,11 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     </div>
 
     <!-- Mobile Main Content -->
-    <main class="block lg:hidden pt-14 pb-14 bg-white dark:bg-gray-900">
+    <main class="block lg:hidden pb-20 bg-white dark:bg-gray-900">
       <slot />
     </main>
+
+    <!-- Toast notifications -->
+    <ToastContainer />
   </div>
 </template>

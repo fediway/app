@@ -1,4 +1,4 @@
-import type { Account, Context, FediwayStatus, Notification, Relationship, Status } from '@repo/types';
+import type { Account, Context, Conversation, FediwayStatus, Notification, Relationship, Status } from '@repo/types';
 import type { mastodon } from 'masto';
 import type { MastoClient, MastoClientConfig } from '../client';
 import type { CreateStatusParams, FediwayAPI } from '../fediway-api';
@@ -10,6 +10,7 @@ import {
   mockAccounts,
   mockAccountStatuses,
   mockContexts,
+  mockConversations,
   mockItemAggregations,
   mockNotifications,
   mockStatuses,
@@ -414,6 +415,13 @@ export function createMockClient(): MastoClient {
         },
         $select(id: string) {
           return {
+            async fetch() {
+              await delay();
+              const account = findAccountById(id);
+              if (!account)
+                throw new Error(`Account ${id} not found`);
+              return account;
+            },
             statuses: {
               async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
                 await delay();
@@ -460,6 +468,23 @@ export function createMockClient(): MastoClient {
         async list() {
           await delay();
           return mockNotifications as Notification[];
+        },
+      },
+      conversations: {
+        async list() {
+          await delay();
+          return mockConversations as Conversation[];
+        },
+        $select(id: string) {
+          return {
+            async read() {
+              await delay();
+              const conv = mockConversations.find(c => c.id === id);
+              if (!conv)
+                throw new Error(`Conversation ${id} not found`);
+              return { ...conv, unread: false };
+            },
+          };
         },
       },
       favourites: {

@@ -1,31 +1,35 @@
 <script setup lang="ts">
+import { TagList } from '@repo/ui';
 import { computed } from 'vue';
 import { useData } from '~/composables/useData';
 
+const router = useRouter();
 const { getTrendingTags } = useData();
 
-const trendingTags = computed(() => getTrendingTags().slice(0, 10));
+const trendingTags = computed(() =>
+  getTrendingTags().slice(0, 10).map(tag => ({
+    name: tag.name,
+    postCount: tag.history?.reduce((sum: number, h: { uses: string }) => sum + Number(h.uses), 0) ?? undefined,
+  })),
+);
+
+function handleTagClick(name: string) {
+  router.push(`/tags/${name}`);
+}
 </script>
 
 <template>
   <div class="w-full">
     <ExploreHeader />
 
-    <!-- Trending Tags -->
     <div class="p-4">
-      <h2 class="text-sm font-medium text-gray-500 mb-3">
+      <h2 class="mb-3 text-sm font-medium text-gray-500">
         Trending now
       </h2>
-      <div class="flex flex-wrap gap-2">
-        <NuxtLink
-          v-for="tag in trendingTags"
-          :key="tag.id"
-          :to="`/tags/${tag.name}`"
-          class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium text-gray-700 transition-colors no-underline"
-        >
-          #{{ tag.name }}
-        </NuxtLink>
-      </div>
+      <TagList
+        :tags="trendingTags"
+        @tag-click="handleTagClick"
+      />
     </div>
   </div>
 </template>

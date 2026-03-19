@@ -3,16 +3,18 @@ import type { CustomEmoji } from '@repo/types';
 import { computed } from 'vue';
 import { escapeRegExp, sanitizeHtml } from '../../../utils/sanitize';
 
+const props = withDefaults(defineProps<Props>(), {
+  emojis: () => [],
+});
+
+const QUOTE_RE = /"/g;
+
 interface Props {
   /** HTML content to render */
   content: string;
   /** Custom emoji map for replacement */
   emojis?: CustomEmoji[];
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  emojis: () => [],
-});
 
 // Process content to replace custom emoji shortcodes with images
 const processedContent = computed(() => {
@@ -22,7 +24,7 @@ const processedContent = computed(() => {
     const pattern = new RegExp(`:${escapeRegExp(emoji.shortcode)}:`, 'g');
     html = html.replace(
       pattern,
-      `<img src="${encodeURI(emoji.url)}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-5 w-5 align-text-bottom" draggable="false" />`,
+      `<img loading="lazy" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-5 w-5 align-text-bottom" draggable="false" />`,
     );
   }
 

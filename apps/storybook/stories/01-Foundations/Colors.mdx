@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="01-Foundations/Colors" />
+
+# Colors
+
+CSS custom properties in `globals.css`. Use semantic names, not raw hex.
+
+## Core
+
+- `--primary` · `#232B37` — Text, buttons
+- `--primary-foreground` · `#fff` — Text on primary
+- `--secondary` · `#DBDDFF` — Secondary buttons
+- `--muted` · `#F6F3EB` — Muted backgrounds
+- `--accent` · `#EDE6D6` — Accent backgrounds
+- `--border` · `#EDE6D6` — Borders, dividers
+- `--destructive` · `hsl(0 84.2% 60.2%)` — Error, danger
+
+## Semantic
+
+- `--red` · `#C23737` — Favourite / heart
+- `--blue` · `#70A6E0` — Reply
+- `--green` · `#4A9073` — Reblog / verified
+- `--yellow` · `#DBA800` — Bookmark / stars
+- `--camel` · `#C8A148` — Accent warm
+- `--gray` · `#232B37CC` — Muted text
+
+## Usage in Tailwind
+
+```html
+<span class="text-foreground">Primary text</span>
+<span class="text-foreground/80">Secondary text</span>
+<div class="bg-muted">Muted background</div>
+<div class="border-border">Border</div>
+<span class="text-red">Favourite</span>
+<span class="text-green">Reblog</span>
+```
+
+Dark mode is automatic via CSS variables.

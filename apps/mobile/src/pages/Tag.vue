@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Status, Tag } from '@repo/types';
 import { PhArrowLeft } from '@phosphor-icons/vue';
-import { Timeline } from '@repo/ui';
-import Button from '@ui/components/ui/button/Button.vue';
+import { Button, Timeline } from '@repo/ui';
 import { computed, onMounted, ref, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getProfileUrl, getSafeClient, useStatusBridge } from '../composables/useStatusBridge';

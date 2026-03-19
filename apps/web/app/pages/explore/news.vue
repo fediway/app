@@ -64,30 +64,30 @@ function getLinkPageUrl(url: string): string {
   <div class="w-full">
     <ExploreHeader title="Explore" />
 
-    <div class="divide-y divide-gray-100">
+    <div class="divide-y divide-border">
       <NuxtLink
         v-for="link in trendingLinks"
         :key="link.url"
         :to="getLinkPageUrl(link.url)"
-        class="block px-4 py-4 hover:bg-gray-50 transition-colors no-underline"
+        class="block px-4 py-4 no-underline transition-colors hover:bg-muted/50"
       >
         <div class="flex items-start gap-3">
-          <div class="shrink-0 w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+          <div class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
             <img
               :src="link.favicon"
               :alt="link.source"
-              class="w-5 h-5"
+              class="size-5"
               @error="handleFaviconError"
             >
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="text-[15px] font-medium text-gray-900 leading-snug mb-1">
+          <div class="min-w-0 flex-1">
+            <div class="mb-1 text-[15px] font-medium leading-snug text-foreground">
               {{ link.title }}
             </div>
-            <p class="text-[14px] text-gray-600 line-clamp-2 mb-2">
+            <p class="mb-2 line-clamp-2 text-[14px] text-foreground/60">
               {{ link.description }}
             </p>
-            <div class="flex items-center gap-3 text-[13px] text-gray-500">
+            <div class="flex items-center gap-3 text-[13px] text-foreground/40">
               <span>{{ link.source }}</span>
               <span>{{ link.posts }} posts</span>
             </div>

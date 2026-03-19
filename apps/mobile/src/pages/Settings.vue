@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { Card, CardContent, Skeleton } from '@repo/ui';
 import { ref } from 'vue';
 
 const appInfo = ref<{ name: string; version: string; build: string } | null>(null);
@@ -16,7 +17,7 @@ async function loadAppInfo() {
   }
   else {
     appInfo.value = {
-      name: 'Monorepo App',
+      name: 'Fediway',
       version: '0.0.0',
       build: 'web',
     };
@@ -24,59 +25,49 @@ async function loadAppInfo() {
 }
 
 loadAppInfo();
+
+const infoRows = [
+  ['Name', () => appInfo.value?.name],
+  ['Version', () => appInfo.value?.version],
+  ['Build', () => appInfo.value?.build],
+  ['Platform', () => Capacitor.getPlatform()],
+] as const;
 </script>
 
 <template>
-  <div class="px-4 py-6 space-y-6">
-    <header class="flex items-center gap-4">
-      <router-link to="/">
-        <button
-          type="button"
-          class="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Back
-        </button>
-      </router-link>
-      <h1 class="text-2xl font-bold text-gray-900">
-        Settings
-      </h1>
-    </header>
-
-    <div class="bg-white rounded-lg border border-gray-200 p-4">
-      <h2 class="text-lg font-semibold mb-3">
+  <div class="space-y-4 px-4 py-6">
+    <section>
+      <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
         App Information
       </h2>
-      <div v-if="appInfo" class="space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-gray-500">Name</span>
-          <span class="font-medium">{{ appInfo.name }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Version</span>
-          <span class="font-medium">{{ appInfo.version }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Build</span>
-          <span class="font-medium">{{ appInfo.build }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Platform</span>
-          <span class="font-medium">{{ Capacitor.getPlatform() }}</span>
-        </div>
-      </div>
-      <div v-else class="text-gray-500">
-        Loading...
-      </div>
-    </div>
+      <Card>
+        <CardContent class="space-y-3 p-4">
+          <template v-if="appInfo">
+            <div
+              v-for="[label, getValue] in infoRows"
+              :key="label"
+              class="flex justify-between text-sm"
+            >
+              <span class="text-gray-500 dark:text-gray-400">{{ label }}</span>
+              <span class="font-medium text-gray-900 dark:text-gray-100">{{ getValue() }}</span>
+            </div>
+          </template>
+          <Skeleton v-else class="h-24 w-full" />
+        </CardContent>
+      </Card>
+    </section>
 
-    <div class="bg-white rounded-lg border border-gray-200 p-4">
-      <h2 class="text-lg font-semibold mb-2">
+    <section>
+      <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
         About
       </h2>
-      <p class="text-gray-600 text-sm">
-        A demonstration of a Turborepo monorepo with shared Vue components
-        used across web and mobile applications.
-      </p>
-    </div>
+      <Card>
+        <CardContent class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Fediway — A Mastodon client built with Vue, Nuxt, and Capacitor.
+          </p>
+        </CardContent>
+      </Card>
+    </section>
   </div>
 </template>

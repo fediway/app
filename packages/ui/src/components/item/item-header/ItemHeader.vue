@@ -113,7 +113,7 @@ function formatCount(n: number): string {
     <!-- Poster + Synopsis -->
     <div v-if="posterSrc || synopsis" class="flex gap-4 px-5 mt-4">
       <div v-if="posterSrc" class="shrink-0 w-[132px] h-[195px] rounded-sm border border-foreground/10 overflow-hidden">
-        <img :src="posterSrc" :alt="posterAlt" class="size-full object-cover">
+        <img loading="lazy" :src="posterSrc" :alt="posterAlt" class="size-full object-cover">
       </div>
       <p v-if="synopsis" class="flex-1 text-sm text-foreground leading-normal overflow-hidden">
         {{ synopsis }}

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
+import { useStatusStore } from '@repo/api';
 import {
-  AccountActions,
-  AccountBio,
-  AccountStats,
+  Badge,
+  EmptyState,
+  ProfileActions,
   ProfileHeader,
+  ProfileInformation,
   Timeline,
 } from '@repo/ui';
 import { useData } from '~/composables/useData';
@@ -22,6 +24,7 @@ const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useI
 const { toggleFollow, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
+const statusStore = useStatusStore();
 
 const acct = computed(() => {
   const param = route.params.acct;
@@ -88,29 +91,26 @@ function goBack() {
         :header-image="account.header"
         :avatar-src="account.avatar"
         :avatar-alt="`${account.displayName}'s avatar`"
-        :follows-you="relationship?.followedBy ?? false"
         @back="goBack"
       />
 
-      <!-- Actions row (positioned to align with avatar row) -->
-      <div class="px-4 -mt-12 flex justify-end">
-        <AccountActions
-          :relationship="relationship"
-          @follow="handleFollowToggle"
-          @unfollow="handleFollowToggle"
-        />
+      <!-- Follows you badge (right-aligned below header) -->
+      <div v-if="relationship?.followedBy" class="flex justify-end px-4 -mb-2">
+        <Badge variant="muted">
+          Follows you
+        </Badge>
       </div>
 
       <!-- Profile Info Section -->
-      <div class="px-4 pt-2 pb-4 border-b border-gray-200">
-        <!-- Bio (includes name, handle, description) -->
-        <AccountBio :account="account" class="mb-3" />
+      <ProfileInformation :account="account" />
 
-        <!-- Stats -->
-        <AccountStats
-          :statuses-count="account.statusesCount"
-          :followers-count="account.followersCount"
-          :following-count="account.followingCount"
+      <!-- Actions row -->
+      <div class="border-b border-gray-200 px-4 pb-4 dark:border-gray-800">
+        <ProfileActions
+          :following="relationship?.following ?? false"
+          :requested="relationship?.requested ?? false"
+          @follow="handleFollowToggle"
+          @unfollow="handleFollowToggle"
         />
       </div>
 
@@ -120,6 +120,7 @@ function goBack() {
         :loading="false"
         :has-more="false"
         :get-profile-url="(acct) => getProfileUrl(acct)"
+        :get-status="statusStore.get"
         @reblog="handleReblog"
         @favourite="handleFavourite"
         @bookmark="handleBookmark"
@@ -129,10 +130,13 @@ function goBack() {
         @media-click="handleMediaClick"
       />
     </div>
-    <div v-else class="p-8 text-center">
-      <p class="text-gray-500">
-        User not found
-      </p>
-    </div>
+    <EmptyState
+      v-else
+      title="User not found"
+      description="This account may have been deleted or moved."
+      action-label="Go home"
+      class="py-12"
+      @action="router.push('/')"
+    />
   </div>
 </template>

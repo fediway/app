@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { Account, Status, Tag } from '@repo/types';
 import { useClient } from '@repo/api';
-import { AccountCard, Status as StatusComponent } from '@repo/ui';
-import Input from '@ui/components/ui/input/Input.vue';
-import { TabsList, TabsRoot, TabsTrigger } from 'reka-ui';
+import { AccountCard, EmptyState, ListHeader, SearchInput, Status as StatusComponent, TabBar, TagListItem } from '@repo/ui';
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getProfileUrl, useStatusBridge } from '../composables/useStatusBridge';
@@ -88,6 +86,13 @@ async function loadTrending() {
 
 loadTrending();
 
+const searchTabs = [
+  { label: 'All', value: 'all' },
+  { label: 'People', value: 'people' },
+  { label: 'Posts', value: 'posts' },
+  { label: 'Tags', value: 'tags' },
+];
+
 const showPeople = computed(() => activeTab.value === 'all' || activeTab.value === 'people');
 const showPosts = computed(() => activeTab.value === 'all' || activeTab.value === 'posts');
 const showTags = computed(() => activeTab.value === 'all' || activeTab.value === 'tags');
@@ -104,8 +109,9 @@ function handleProfileClick(acct: string) {
   router.push(getProfileUrl(acct));
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${encodeURIComponent(tag.name)}`);
+function handleTagClick(tagOrName: Tag | string) {
+  const name = typeof tagOrName === 'string' ? tagOrName : tagOrName.name;
+  router.push(`/tags/${encodeURIComponent(name)}`);
 }
 </script>
 
@@ -113,9 +119,8 @@ function handleTagClick(tag: Tag) {
   <div class="flex flex-col">
     <!-- Search input -->
     <div class="sticky top-[calc(3.5rem+var(--safe-area-inset-top))] z-10 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
-      <Input
+      <SearchInput
         v-model="query"
-        type="search"
         placeholder="Search..."
         class="w-full"
       />
@@ -124,25 +129,12 @@ function handleTagClick(tag: Tag) {
     <!-- Results -->
     <template v-if="debouncedQuery">
       <!-- Tabs -->
-      <TabsRoot v-model="activeTab">
-        <TabsList class="flex border-b border-gray-200 dark:border-gray-800">
-          <TabsTrigger
-            v-for="tab in (['all', 'people', 'posts', 'tags'] as const)"
-            :key="tab"
-            :value="tab"
-            class="flex-1 py-3 text-center text-sm font-medium transition-colors data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-gray-400"
-          >
-            {{ tab === 'all' ? 'All' : tab === 'people' ? 'People' : tab === 'posts' ? 'Posts' : 'Tags' }}
-          </TabsTrigger>
-        </TabsList>
-      </TabsRoot>
+      <TabBar v-model="activeTab" :tabs="searchTabs" />
 
       <div class="divide-y divide-gray-200 dark:divide-gray-800">
         <!-- People -->
         <div v-if="showPeople && searchedAccounts.length > 0" class="px-4 py-3">
-          <h3 v-if="activeTab === 'all'" class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            People
-          </h3>
+          <ListHeader v-if="activeTab === 'all'" title="People" class="mb-3" />
           <div class="space-y-3">
             <div v-for="account in searchedAccounts" :key="account.id" @click="handleProfileClick(account.acct)">
               <AccountCard :account="account" :profile-url="getProfileUrl(account.acct)" show-bio size="sm" />
@@ -152,9 +144,7 @@ function handleTagClick(tag: Tag) {
 
         <!-- Posts -->
         <div v-if="showPosts && displayStatuses.length > 0">
-          <h3 v-if="activeTab === 'all'" class="px-4 pb-2 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Posts
-          </h3>
+          <ListHeader v-if="activeTab === 'all'" title="Posts" class="px-4 pt-3" />
           <div v-for="status in displayStatuses" :key="status.id">
             <StatusComponent
               :status="status"
@@ -171,18 +161,14 @@ function handleTagClick(tag: Tag) {
 
         <!-- Tags -->
         <div v-if="showTags && searchedTags.length > 0" class="px-4 py-3">
-          <h3 v-if="activeTab === 'all'" class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Tags
-          </h3>
-          <div class="space-y-2">
-            <button
+          <ListHeader v-if="activeTab === 'all'" title="Tags" class="mb-3" />
+          <div class="space-y-1">
+            <TagListItem
               v-for="tag in searchedTags"
               :key="tag.name"
-              class="block w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-              @click="handleTagClick(tag)"
-            >
-              <span class="font-medium text-gray-900 dark:text-gray-100">#{{ tag.name }}</span>
-            </button>
+              :name="tag.name"
+              @click="handleTagClick(tag.name)"
+            />
           </div>
         </div>
       </div>
@@ -195,27 +181,23 @@ function handleTagClick(tag: Tag) {
       </div>
 
       <!-- Empty -->
-      <div v-else-if="!hasResults" class="flex items-center justify-center py-20">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          No results found
-        </p>
-      </div>
+      <EmptyState
+        v-else-if="!hasResults"
+        title="No results found"
+        description="Try a different search term"
+      />
     </template>
 
     <!-- Trending tags (no query) -->
     <div v-else class="px-4 py-3">
-      <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-        Trending
-      </h3>
-      <div class="space-y-2">
-        <button
+      <ListHeader title="Trending" class="mb-3" />
+      <div class="space-y-1">
+        <TagListItem
           v-for="tag in trendingTags"
           :key="tag.name"
-          class="block w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-          @click="handleTagClick(tag)"
-        >
-          <span class="font-medium text-gray-900 dark:text-gray-100">#{{ tag.name }}</span>
-        </button>
+          :name="tag.name"
+          @click="handleTagClick(tag.name)"
+        />
       </div>
     </div>
   </div>

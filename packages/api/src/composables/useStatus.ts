@@ -1,6 +1,6 @@
 import type { Context, Status } from '@repo/types';
 import { ref, shallowRef } from 'vue';
-import { useAuth } from './useAuth';
+import { useClient } from './useClient';
 
 export interface UseStatusReturn {
   status: ReturnType<typeof shallowRef<Status | null>>;
@@ -21,8 +21,6 @@ export interface UseStatusReturn {
  * Composable for fetching and interacting with a single status
  */
 export function useStatus(): UseStatusReturn {
-  const { getClient } = useAuth();
-
   const status = shallowRef<Status | null>(null);
   const context = shallowRef<Context | null>(null);
   const isLoading = ref(false);
@@ -32,10 +30,7 @@ export function useStatus(): UseStatusReturn {
    * Fetch status and its context (replies)
    */
   async function fetch(statusId: string) {
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     isLoading.value = true;
     error.value = null;
@@ -64,10 +59,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       status.value = await client.rest.v1.statuses.$select(status.value.id).favourite();
@@ -84,10 +76,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       status.value = await client.rest.v1.statuses.$select(status.value.id).unfavourite();
@@ -104,10 +93,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       status.value = await client.rest.v1.statuses.$select(status.value.id).reblog();
@@ -124,10 +110,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       status.value = await client.rest.v1.statuses.$select(status.value.id).unreblog();
@@ -144,10 +127,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       status.value = await client.rest.v1.statuses.$select(status.value.id).bookmark();
@@ -164,10 +144,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       status.value = await client.rest.v1.statuses.$select(status.value.id).unbookmark();
@@ -184,10 +161,7 @@ export function useStatus(): UseStatusReturn {
     if (!status.value)
       return;
 
-    const client = getClient();
-    if (!client) {
-      throw new Error('Client not initialized');
-    }
+    const client = useClient();
 
     try {
       await client.rest.v1.statuses.$select(status.value.id).remove();

@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import Button from '@ui/components/ui/button/Button.vue';
+import type { BottomNavItemType } from '@repo/ui';
+import type { Component } from 'vue';
+import {
+  PhBell,
+  PhHouse,
+  PhMagnifyingGlass,
+  PhPlus,
+  PhUser,
+} from '@phosphor-icons/vue';
+import { BottomNav } from '@repo/ui';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
@@ -9,40 +18,40 @@ const navigation = useNavigationStore();
 const { open: openComposer } = usePostComposer();
 const { activeTab, switchTab } = useTabNavigation();
 
-function handleTabTap(itemId: string) {
-  if (itemId === 'new-post') {
+const iconMap: Record<string, Component> = {
+  'home': PhHouse,
+  'search': PhMagnifyingGlass,
+  'new-post': PhPlus,
+  'notifications': PhBell,
+  'profile': PhUser,
+};
+
+const navItems = computed<BottomNavItemType[]>(() =>
+  navigation.mobileFooterItems.map(item => ({
+    id: item.id,
+    icon: iconMap[item.icon] ?? iconMap[item.id] ?? PhHouse,
+    label: item.id === 'new-post' ? undefined : item.label,
+    main: item.id === 'new-post',
+    active: activeTab.value === item.id,
+  })),
+);
+
+function handleItemClick(item: BottomNavItemType) {
+  if (item.id === 'new-post') {
     openComposer();
     return;
   }
-  switchTab(itemId as any, path => router.push(path));
+  if (item.id) {
+    switchTab(item.id as any, path => router.push(path));
+  }
 }
 </script>
 
 <template>
-  <footer class="fixed bottom-0 left-0 right-0 h-14 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-[100]">
-    <nav class="flex items-center justify-around h-full">
-      <template v-for="item in navigation.mobileFooterItems" :key="item.id">
-        <!-- New Post Button (opens modal) -->
-        <Button
-          v-if="item.id === 'new-post'"
-          size="icon"
-          class="size-12"
-          @click="handleTabTap(item.id)"
-        >
-          <NavIcon :name="item.icon" :size="24" />
-        </Button>
-        <!-- Tab buttons -->
-        <button
-          v-else
-          type="button"
-          class="flex items-center justify-center rounded-full transition-colors no-underline w-11 h-11 hover:bg-gray-100 border-none bg-transparent cursor-pointer" :class="[
-            activeTab === item.id ? 'text-gray-900' : 'text-gray-500',
-          ]"
-          @click="handleTabTap(item.id)"
-        >
-          <NavIcon :name="item.icon" :size="22" />
-        </button>
-      </template>
-    </nav>
+  <footer class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <BottomNav
+      :items="navItems"
+      @item-click="handleItemClick"
+    />
   </footer>
 </template>

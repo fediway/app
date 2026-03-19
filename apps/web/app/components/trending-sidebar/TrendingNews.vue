@@ -48,31 +48,31 @@ function handleFaviconError(event: Event) {
 </script>
 
 <template>
-  <Card class="rounded-xl border-gray-200 shadow-none">
+  <Card class="rounded-xl border-border shadow-none">
     <CardHeader class="p-4 pb-0">
-      <CardTitle class="text-[13px] font-medium text-gray-500">
+      <CardTitle class="text-[13px] font-medium text-foreground/40">
         Trending News
       </CardTitle>
     </CardHeader>
     <CardContent class="p-4 pt-3">
-      <ul class="list-none m-0 p-0 space-y-1">
+      <ul class="m-0 list-none space-y-1 p-0">
         <li v-for="link in trendingLinks" :key="link.url">
           <NuxtLink
             :to="getLinkPageUrl(link.url)"
-            class="block hover:bg-gray-50 -mx-2 px-2 py-1.5 rounded-lg transition-colors no-underline"
+            class="-mx-2 block rounded-lg px-2 py-1.5 no-underline transition-colors hover:bg-muted/50"
           >
             <div class="flex items-start gap-2">
               <img
                 :src="link.favicon"
                 :alt="getDomain(link.url)"
-                class="w-4 h-4 rounded mt-0.5 shrink-0"
+                class="mt-0.5 size-4 shrink-0 rounded"
                 @error="handleFaviconError"
               >
-              <div class="flex-1 min-w-0">
-                <div class="text-[13px] text-gray-900 leading-snug line-clamp-2">
+              <div class="min-w-0 flex-1">
+                <div class="line-clamp-2 text-[13px] leading-snug text-foreground">
                   {{ link.title }}
                 </div>
-                <div class="text-[12px] text-gray-500 mt-0.5">
+                <div class="mt-0.5 text-[12px] text-foreground/40">
                   {{ link.posts }} posts
                 </div>
               </div>
@@ -84,7 +84,7 @@ function handleFaviconError(event: Event) {
     <CardFooter class="px-4 pb-4">
       <NuxtLink
         to="/explore/news"
-        class="text-[13px] text-gray-500 hover:text-gray-700 transition-colors"
+        class="text-[13px] text-foreground/40 transition-colors hover:text-foreground/60"
       >
         See more
       </NuxtLink>

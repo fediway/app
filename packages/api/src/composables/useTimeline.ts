@@ -3,6 +3,7 @@ import type { ComputedRef } from 'vue';
 import { computed, ref, shallowRef } from 'vue';
 import { useTimelineCache } from '../cache/timeline-cache';
 import { useClient } from './useClient';
+import { useStatusStore } from './useStatusStore';
 
 export type TimelineType = 'home' | 'public' | 'local' | 'hashtag' | 'list' | 'account';
 
@@ -71,6 +72,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
   const hasGap = ref(false);
 
   const newStatusCount = computed(() => pendingStatuses.value.length);
+  const statusStore = useStatusStore();
 
   // Cache setup
   const cacheEnabled = options.cache === true;
@@ -209,6 +211,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
       trackIds(result);
 
       statuses.value = result;
+      statusStore.setMany(result as FediwayStatus[]);
       hasMore.value = result.length >= DEFAULT_LIMIT;
 
       if (result.length > 0) {
@@ -243,6 +246,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
       const result = await fetchTimeline({ olderThan: maxId });
       const fresh = dedup(result);
       statuses.value = [...statuses.value, ...fresh];
+      statusStore.setMany(fresh as FediwayStatus[]);
       hasMore.value = result.length >= DEFAULT_LIMIT;
 
       if (result.length > 0) {

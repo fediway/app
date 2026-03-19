@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { AccountBio, AccountHeader, AccountStats, Status } from '@repo/ui';
+import { ProfileHeader, ProfileInformation, Status } from '@repo/ui';
 import { onMounted, onUnmounted } from 'vue';
 import { allStatuses, janeAccount } from '../mock';
 
@@ -47,16 +47,15 @@ onUnmounted(async () => {
           Back
         </button>
       </router-link>
-      <AccountHeader :account="janeAccount" />
+      <ProfileHeader
+        :header-image="janeAccount.header"
+        :avatar-src="janeAccount.avatar"
+        :avatar-alt="janeAccount.displayName"
+      />
     </div>
 
-    <div class="px-4 py-4 space-y-4">
-      <AccountBio :account="janeAccount" />
-      <AccountStats
-        :statuses-count="janeAccount.statusesCount"
-        :followers-count="janeAccount.followersCount"
-        :following-count="janeAccount.followingCount"
-      />
+    <div class="py-4">
+      <ProfileInformation :account="janeAccount" />
     </div>
 
     <div class="border-t border-gray-200 dark:border-gray-700">
