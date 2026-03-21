@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusActions, useStatusStore, useTimeline } from '@repo/api';
-import { Button, EmptyState, Skeleton, Status as StatusComponent, useToast } from '@repo/ui';
+import { useTimeline } from '@repo/api';
+import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -10,11 +10,7 @@ definePageMeta({ keepalive: true });
 
 const router = useRouter();
 const { getProfileUrl } = useAccountData();
-const store = useStatusStore();
-const { toast } = useToast();
-const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
-  onError: () => toast.error('Action failed', 'Please try again.'),
-});
+const { toggleFavourite, toggleReblog, handleBookmark, withStoreState, store } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
@@ -33,17 +29,7 @@ if (import.meta.client) {
 }
 
 const rawStatuses = computed(() => timeline.statuses.value ?? []);
-const allStatuses = computed(() =>
-  rawStatuses.value.map((s) => {
-    const id = s.reblog?.id ?? s.id;
-    const stored = store.get(id);
-    if (!stored)
-      return s;
-    if (s.reblog)
-      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
-    return { ...s, ...stored } as Status;
-  }),
-);
+const allStatuses = withStoreState(rawStatuses);
 
 // Split statuses for inserting follow suggestions after second post
 const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
@@ -65,10 +51,6 @@ function handleReblog(statusId: string) {
 
 function handleFavourite(statusId: string) {
   toggleFavourite(statusId);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId);
 }
 
 function handleShare(statusId: string) {

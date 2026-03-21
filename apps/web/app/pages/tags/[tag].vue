@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusActions, useStatusStore } from '@repo/api';
-import { EmptyState, FollowButton, PageHeader, Timeline, useToast } from '@repo/ui';
+import { EmptyState, FollowButton, PageHeader, Timeline } from '@repo/ui';
 import { computed } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -9,11 +8,7 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 const route = useRoute();
 const { getStatusesByTag, getTagInfo } = useExploreData();
 const { getProfileUrl } = useAccountData();
-const store = useStatusStore();
-const { toast } = useToast();
-const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
-  onError: () => toast.error('Action failed', 'Please try again.'),
-});
+const { toggleFavourite, toggleReblog, handleBookmark, withStoreState } = useWebActions();
 const { toggleFollow, isFollowing } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -25,17 +20,7 @@ const tagName = computed(() => {
 
 const _tagInfo = computed(() => getTagInfo(tagName.value || ''));
 const { data: rawStatuses } = getStatusesByTag(tagName.value || '');
-const statuses = computed(() =>
-  rawStatuses.value.map((s) => {
-    const id = s.reblog?.id ?? s.id;
-    const stored = store.get(id);
-    if (!stored)
-      return s;
-    if (s.reblog)
-      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
-    return { ...s, ...stored } as Status;
-  }),
-);
+const statuses = withStoreState(rawStatuses);
 
 // Tag follow uses the tag name prefixed with "tag:" to avoid ID collisions with accounts
 const tagFollowId = computed(() => `tag:${tagName.value}`);
@@ -50,10 +35,6 @@ function handleReblog(statusId: string) {
 
 function handleFavourite(statusId: string) {
   toggleFavourite(statusId);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId);
 }
 
 function handleStatusClick(statusId: string) {

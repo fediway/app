@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusActions, useStatusStore } from '@repo/api';
 import {
   Badge,
   EmptyState,
@@ -8,7 +7,6 @@ import {
   ProfileHeader,
   ProfileInformation,
   Timeline,
-  useToast,
 } from '@repo/ui';
 import { useFollows } from '~/composables/useFollows';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -19,11 +17,7 @@ definePageMeta({ keepalive: true });
 const route = useRoute();
 const router = useRouter();
 const { getAccountByAcct, getAccountStatuses, getProfileUrl } = useAccountData();
-const store = useStatusStore();
-const { toast } = useToast();
-const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
-  onError: () => toast.error('Action failed', 'Please try again.'),
-});
+const { toggleFavourite, toggleReblog, handleBookmark, withStoreState, store } = useWebActions();
 const { toggleFollow, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -38,17 +32,7 @@ const acct = computed(() => {
 
 const { data: account } = getAccountByAcct(acct.value);
 const { data: rawStatuses } = getAccountStatuses(acct.value);
-const statuses = computed(() =>
-  rawStatuses.value.map((s) => {
-    const id = s.reblog?.id ?? s.id;
-    const stored = store.get(id);
-    if (!stored)
-      return s;
-    if (s.reblog)
-      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
-    return { ...s, ...stored } as Status;
-  }),
-);
+const statuses = withStoreState(rawStatuses);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
 
 function handleFollowToggle() {
@@ -67,10 +51,6 @@ function handleReblog(statusId: string) {
 
 function handleFavourite(statusId: string) {
   toggleFavourite(statusId);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId);
 }
 
 function handleTagClick(tag: Tag) {

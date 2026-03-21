@@ -11,8 +11,13 @@ const { toast } = useToast();
 
 function callApi(fn: () => Promise<unknown>) {
   fn().catch((err) => {
-    console.error('[useFollows] API call failed:', err);
-    toast.error('Action failed', 'Please try again.');
+    if (import.meta.dev) {
+      console.error('[useFollows] API call failed:', err);
+      toast.error('Action failed', err instanceof Error ? err.message : 'Please try again.');
+    }
+    else {
+      toast.error('Action failed', 'Please try again.');
+    }
   });
 }
 

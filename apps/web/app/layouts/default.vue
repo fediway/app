@@ -4,6 +4,7 @@ import { MediaLightbox, ToastContainer, useToast } from '@repo/ui';
 import { useBackButton } from '~/composables/useBackButton';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useMessages } from '~/composables/useMessages';
+import { useNetworkStatus } from '~/composables/useNetworkStatus';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { usePosts } from '~/composables/usePosts';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -11,6 +12,7 @@ import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
+useNetworkStatus();
 const navigation = useNavigationStore();
 const { isOpen, replyingTo, close } = usePostComposer();
 const { addPost } = usePosts();

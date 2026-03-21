@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusActions, useStatusStore } from '@repo/api';
-import { EmptyState, PageHeader, StatusAncestor, Status as StatusComponent, StatusDetailMain, useToast } from '@repo/ui';
+import { EmptyState, PageHeader, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
 import { computed } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -12,11 +11,7 @@ const router = useRouter();
 
 const { getStatusById, getStatusContext } = useStatusData();
 const { getProfileUrl } = useAccountData();
-const store = useStatusStore();
-const { toast } = useToast();
-const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
-  onError: () => toast.error('Action failed', 'Please try again.'),
-});
+const { toggleFavourite, toggleReblog, handleBookmark, getStoreStatus } = useWebActions();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 const { open: openSendMessage } = useSendMessageModal();
@@ -24,12 +19,7 @@ const { open: openSendMessage } = useSendMessageModal();
 const statusId = computed(() => route.params.id as string);
 
 const { data: rawStatus } = getStatusById(statusId.value);
-const status = computed(() => {
-  const raw = rawStatus.value;
-  if (!raw)
-    return undefined;
-  return (store.get(raw.id) as Status) ?? raw;
-});
+const status = computed(() => getStoreStatus(rawStatus.value));
 const { data: context } = getStatusContext(statusId.value);
 
 // Navigation
@@ -57,10 +47,6 @@ function handleReblog(id: string) {
 
 function handleFavourite(id: string) {
   toggleFavourite(id);
-}
-
-function handleBookmark(id: string) {
-  toggleBookmark(id);
 }
 
 function handleShare(id: string) {

@@ -1,33 +1,18 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusActions, useStatusStore } from '@repo/api';
-import { EmptyState, PageHeader, Timeline, useToast } from '@repo/ui';
+import { EmptyState, PageHeader, Timeline } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const router = useRouter();
 const { getBookmarkedStatuses } = useTimelineData();
 const { getProfileUrl } = useAccountData();
-const store = useStatusStore();
-const { toast } = useToast();
-const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
-  onError: () => toast.error('Action failed', 'Please try again.'),
-});
+const { toggleFavourite, toggleReblog, handleBookmark, withStoreState } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 
 const { data: rawStatuses } = getBookmarkedStatuses();
-const statuses = computed(() =>
-  rawStatuses.value.map((s) => {
-    const id = s.reblog?.id ?? s.id;
-    const stored = store.get(id);
-    if (!stored)
-      return s;
-    if (s.reblog)
-      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
-    return { ...s, ...stored } as Status;
-  }),
-);
+const statuses = withStoreState(rawStatuses);
 
 function handleStatusClick(statusId: string) {
   router.push(`/status/${statusId}`);
@@ -39,10 +24,6 @@ function handleReblog(statusId: string) {
 
 function handleFavourite(statusId: string) {
   toggleFavourite(statusId);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId);
 }
 
 function handleTagClick(tag: Tag) {
