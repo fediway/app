@@ -149,7 +149,7 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
           <DesktopSidebar />
         </nav>
 
-        <!-- Center Column: Main Feed -->
+        <!-- Center Column: Main Feed (desktop) -->
         <main id="main-content" class="min-w-0 bg-white dark:bg-gray-900 border-x border-gray-200 dark:border-gray-800 min-h-screen">
           <slot />
         </main>
@@ -162,9 +162,9 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     </div>
 
     <!-- Mobile Main Content -->
-    <main class="block lg:hidden pb-20 bg-white dark:bg-gray-900">
+    <div class="block lg:hidden pb-20 bg-white dark:bg-gray-900">
       <slot />
-    </main>
+    </div>
 
     <!-- Toast notifications -->
     <ToastContainer />
