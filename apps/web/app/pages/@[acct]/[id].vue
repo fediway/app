@@ -22,6 +22,17 @@ const { data: rawStatus } = getStatusById(statusId.value);
 const status = computed(() => getStoreStatus(rawStatus.value));
 const { data: context } = getStatusContext(statusId.value);
 
+// SEO meta tags for link previews
+useSeoMeta({
+  title: () => status.value
+    ? `${status.value.account.displayName || status.value.account.username}: "${status.value.content.replace(/<[^>]*>/g, '').slice(0, 80)}"`
+    : 'Post',
+  ogTitle: () => status.value?.account.displayName || 'Post',
+  ogDescription: () => status.value?.content.replace(/<[^>]*>/g, '').slice(0, 200) || '',
+  ogImage: () => status.value?.mediaAttachments?.[0]?.previewUrl || status.value?.account.avatar || '',
+  twitterCard: () => status.value?.mediaAttachments?.length ? 'summary_large_image' : 'summary',
+});
+
 // Navigation
 function goBack() {
   if (window.history.length > 1) {

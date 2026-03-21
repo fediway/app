@@ -22,6 +22,17 @@ const isStatusDetail = computed(() => !!route.params.id);
 const { data: account } = getAccountByAcct(acct.value);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
 
+// SEO meta tags for link previews (Twitter/Slack/Discord)
+useSeoMeta({
+  title: () => account.value
+    ? `${account.value.displayName || account.value.username} (@${account.value.acct})`
+    : `@${acct.value}`,
+  ogTitle: () => account.value?.displayName || `@${acct.value}`,
+  ogDescription: () => account.value?.note?.replace(/<[^>]*>/g, '').slice(0, 200) || '',
+  ogImage: () => account.value?.avatar || '',
+  twitterCard: 'summary',
+});
+
 // Tab bar
 const tabs = [
   { label: 'Posts', value: 'posts' },
