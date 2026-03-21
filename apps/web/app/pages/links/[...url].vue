@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { PhArrowSquareOut, PhLink } from '@phosphor-icons/vue';
-import { EmptyState, PageHeader, Timeline } from '@repo/ui';
+import { PageHeader } from '@repo/ui';
 import { computed } from 'vue';
-import { useMediaLightbox } from '~/composables/useMediaLightbox';
-import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const route = useRoute();
 const { getStatusesByLink, getLinkInfo } = useExploreData();
-const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, withStoreState } = useWebActions();
-const { open: openSendMessage } = useSendMessageModal();
-const { open: openLightbox } = useMediaLightbox();
 
 const linkUrl = computed(() => {
   const url = route.params.url;
@@ -19,36 +12,8 @@ const linkUrl = computed(() => {
 });
 
 const linkInfo = computed(() => getLinkInfo(linkUrl.value || ''));
-const { data: rawStatuses } = getStatusesByLink(linkUrl.value || '');
-const statuses = withStoreState(rawStatuses);
-
-function handleReblog(statusId: string) {
-  toggleReblog(statusId);
-}
-
-function handleFavourite(statusId: string) {
-  toggleFavourite(statusId);
-}
-
-function handleStatusClick(statusId: string) {
-  navigateTo(getStatusPath(statusId));
-}
-
-function handleProfileClick(acct: string) {
-  navigateTo(getProfilePath(acct));
-}
-
-function handleTagClick(tag: Tag) {
-  navigateTo(`/tags/${tag.name}`);
-}
-
-function handleSendMessage(status: Status) {
-  openSendMessage(status);
-}
-
-function handleMediaClick(attachments: MediaAttachment[], index: number) {
-  openLightbox(attachments, index);
-}
+const { data: rawStatuses, isLoading } = getStatusesByLink(linkUrl.value || '');
+const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 
 <template>
@@ -85,27 +50,11 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
       </a>
     </div>
 
-    <!-- Empty State -->
-    <EmptyState
-      v-if="statuses.length === 0"
-      title="No posts yet"
-      description="No one has shared this link yet"
-      class="py-16"
-    />
-
-    <!-- Timeline -->
-    <Timeline
-      v-else
+    <StatusTimeline
       :statuses="statuses"
-      :get-profile-url="getProfilePath"
-      @status-click="handleStatusClick"
-      @profile-click="handleProfileClick"
-      @tag-click="handleTagClick"
-      @reblog="handleReblog"
-      @favourite="handleFavourite"
-      @bookmark="handleBookmark"
-      @send-message="handleSendMessage"
-      @media-click="handleMediaClick"
+      :is-loading="isLoading"
+      empty-title="No posts yet"
+      empty-description="No one has shared this link yet"
     />
   </div>
 </template>

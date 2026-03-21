@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const route = useRoute();
 const acct = computed(() => route.params.acct as string);
-const { getAccountStatuses } = useAccountData();
-const { data: rawStatuses, isLoading } = getAccountStatuses(acct.value);
+const { getAccountMediaStatuses } = useAccountData();
+const { data: rawStatuses, isLoading } = getAccountMediaStatuses(acct.value);
 const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 
@@ -10,7 +10,7 @@ const statuses = useWebActions().withStoreState(rawStatuses);
   <StatusTimeline
     :statuses="statuses"
     :is-loading="isLoading"
-    empty-title="No posts yet"
-    empty-description="This user hasn't posted anything yet."
+    empty-title="No media"
+    empty-description="Posts with images, video, or audio will appear here."
   />
 </template>

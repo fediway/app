@@ -423,13 +423,29 @@ export function createMockClient(): MastoClient {
               return account;
             },
             statuses: {
-              async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
+              async list(params?: { limit?: number; maxId?: string; sinceId?: string; onlyMedia?: boolean }) {
                 await delay();
                 const account = findAccountById(id);
                 if (account) {
-                  return paginateArray(mockAccountStatuses[account.acct] || [], params);
+                  let statuses = mockAccountStatuses[account.acct] || [];
+                  if (params?.onlyMedia) {
+                    statuses = statuses.filter(s => s.mediaAttachments && s.mediaAttachments.length > 0);
+                  }
+                  return paginateArray(statuses, params);
                 }
                 return [];
+              },
+            },
+            followers: {
+              async list(_params?: { limit?: number }) {
+                await delay();
+                return allAccounts().filter(a => a.id !== id).slice(0, _params?.limit ?? 40);
+              },
+            },
+            following: {
+              async list(_params?: { limit?: number }) {
+                await delay();
+                return allAccounts().filter(a => a.id !== id).slice(0, Math.min(_params?.limit ?? 40, 5));
               },
             },
             async follow() {

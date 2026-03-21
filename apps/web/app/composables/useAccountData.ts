@@ -27,6 +27,43 @@ export function useAccountData() {
     });
   }
 
+  function getAccountStatusesWithReplies(acct: string): DataResult<Status[]> {
+    return createDataResult(`accountReplies:${acct}`, [] as Status[], async () => {
+      const account = await client.rest.v1.accounts.lookup({ acct });
+      const statuses = await client.rest.v1.accounts.$select(account.id).statuses.list({
+        limit: 20,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
+  function getAccountMediaStatuses(acct: string): DataResult<Status[]> {
+    return createDataResult(`accountMedia:${acct}`, [] as Status[], async () => {
+      const account = await client.rest.v1.accounts.lookup({ acct });
+      const statuses = await client.rest.v1.accounts.$select(account.id).statuses.list({
+        limit: 20,
+        onlyMedia: true,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
+  function getAccountFollowers(acct: string): DataResult<Account[]> {
+    return createDataResult(`accountFollowers:${acct}`, [] as Account[], async () => {
+      const account = await client.rest.v1.accounts.lookup({ acct });
+      return await client.rest.v1.accounts.$select(account.id).followers.list({ limit: 40 });
+    });
+  }
+
+  function getAccountFollowing(acct: string): DataResult<Account[]> {
+    return createDataResult(`accountFollowing:${acct}`, [] as Account[], async () => {
+      const account = await client.rest.v1.accounts.lookup({ acct });
+      return await client.rest.v1.accounts.$select(account.id).following.list({ limit: 40 });
+    });
+  }
+
   function getSuggestedAccounts(): DataResult<Account[]> {
     return createDataResult('suggestions', [] as Account[], async () => {
       const result = await client.rest.v2.suggestions.list({ limit: 10 });
@@ -57,5 +94,16 @@ export function useAccountData() {
     return `/@unknown/${statusId}`;
   }
 
-  return { getAccountByAcct, getAccountStatuses, getSuggestedAccounts, getAllAccounts, getProfilePath, getStatusPath };
+  return {
+    getAccountByAcct,
+    getAccountStatuses,
+    getAccountStatusesWithReplies,
+    getAccountMediaStatuses,
+    getAccountFollowers,
+    getAccountFollowing,
+    getSuggestedAccounts,
+    getAllAccounts,
+    getProfilePath,
+    getStatusPath,
+  };
 }
