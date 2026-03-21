@@ -6,21 +6,21 @@ definePageMeta({ keepalive: true });
 
 const router = useRouter();
 const { getNotifications } = useNotificationData();
-const { getProfileUrl } = useAccountData();
+const { getProfilePath, getStatusPath } = useAccountData();
 
 const { data: notifications, isLoading } = getNotifications();
 
 function handleNotificationClick(notification: Notification) {
   if (notification.status) {
-    router.push(`/status/${notification.status.id}`);
+    router.push(getStatusPath(notification.status.id, notification.status.account.acct));
   }
   else if (notification.type === 'follow') {
-    router.push(getProfileUrl(notification.account.acct));
+    router.push(getProfilePath(notification.account.acct));
   }
 }
 
 function navigateToProfile(acct: string) {
-  router.push(getProfileUrl(acct));
+  router.push(getProfilePath(acct));
 }
 </script>
 

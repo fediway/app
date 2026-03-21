@@ -16,19 +16,13 @@ definePageMeta({ keepalive: true });
 
 const route = useRoute();
 const router = useRouter();
-const { getAccountByAcct, getAccountStatuses, getProfileUrl } = useAccountData();
+const { getAccountByAcct, getAccountStatuses, getProfilePath, getStatusPath } = useAccountData();
 const { toggleFavourite, toggleReblog, handleBookmark, withStoreState, store } = useWebActions();
 const { toggleFollow, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 
-const acct = computed(() => {
-  const param = route.params.acct;
-  if (Array.isArray(param)) {
-    return param.join('/');
-  }
-  return param ?? '';
-});
+const acct = computed(() => route.params.acct as string);
 
 const { data: account } = getAccountByAcct(acct.value);
 const { data: rawStatuses } = getAccountStatuses(acct.value);
@@ -42,7 +36,7 @@ function handleFollowToggle() {
 }
 
 function handleStatusClick(statusId: string) {
-  router.push(`/status/${statusId}`);
+  router.push(getStatusPath(statusId));
 }
 
 function handleReblog(statusId: string) {
@@ -111,7 +105,7 @@ function goBack() {
         :statuses="statuses"
         :loading="false"
         :has-more="false"
-        :get-profile-url="(acct) => getProfileUrl(acct)"
+        :get-profile-url="(acct) => getProfilePath(acct)"
         :get-status="store.get"
         @reblog="handleReblog"
         @favourite="handleFavourite"

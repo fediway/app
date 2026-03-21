@@ -8,7 +8,7 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const route = useRoute();
 const { getStatusesByLink, getLinkInfo } = useExploreData();
-const { getProfileUrl } = useAccountData();
+const { getProfilePath, getStatusPath } = useAccountData();
 const { toggleFavourite, toggleReblog, handleBookmark, withStoreState } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -31,11 +31,11 @@ function handleFavourite(statusId: string) {
 }
 
 function handleStatusClick(statusId: string) {
-  navigateTo(`/status/${statusId}`);
+  navigateTo(getStatusPath(statusId));
 }
 
 function handleProfileClick(acct: string) {
-  navigateTo(getProfileUrl(acct));
+  navigateTo(getProfilePath(acct));
 }
 
 function handleTagClick(tag: Tag) {
@@ -97,7 +97,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
     <Timeline
       v-else
       :statuses="statuses"
-      :get-profile-url="getProfileUrl"
+      :get-profile-url="getProfilePath"
       @status-click="handleStatusClick"
       @profile-click="handleProfileClick"
       @tag-click="handleTagClick"

@@ -18,7 +18,7 @@ function getAnnouncement(): string {
   const path = route.path;
 
   // Detail pages — derive from route params
-  if (path.startsWith('/status/'))
+  if (path.startsWith('/@') && route.params.id)
     return 'Post detail';
   if (path.startsWith('/@'))
     return 'Profile';

@@ -10,7 +10,7 @@ const route = useRoute();
 const router = useRouter();
 
 const { getStatusById, getStatusContext } = useStatusData();
-const { getProfileUrl } = useAccountData();
+const { getProfilePath, getStatusPath } = useAccountData();
 const { toggleFavourite, toggleReblog, handleBookmark, getStoreStatus } = useWebActions();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
@@ -33,11 +33,11 @@ function goBack() {
 }
 
 function navigateToStatus(id: string) {
-  router.push(`/status/${id}`);
+  router.push(getStatusPath(id));
 }
 
 function navigateToProfile(acct: string) {
-  router.push(getProfileUrl(acct));
+  router.push(getProfilePath(acct));
 }
 
 // Event handlers
@@ -50,8 +50,9 @@ function handleFavourite(id: string) {
 }
 
 function handleShare(id: string) {
+  const statusUrl = getStatusPath(id);
   if (navigator.share) {
-    navigator.share({ url: `${window.location.origin}/status/${id}` });
+    navigator.share({ url: `${window.location.origin}${statusUrl}` });
   }
 }
 
@@ -71,8 +72,8 @@ function handleMediaClick(_attachments: MediaAttachment[], index: number) {
   }
 }
 
-function handleStatusClick(statusId: string) {
-  navigateToStatus(statusId);
+function handleStatusClick(id: string) {
+  navigateToStatus(id);
 }
 
 function handleSendMessage(s: Status) {
@@ -93,10 +94,8 @@ function hasReplyBelow(index: number): boolean {
 function getReplyParent(reply: Status): Status | null {
   if (!reply.inReplyToId)
     return null;
-  // Check if parent is the main status
   if (reply.inReplyToId === status.value?.id)
-    return null; // don't show reply parent for direct replies to main
-  // Check ancestors and descendants
+    return null;
   const all = [...context.value.ancestors, ...(rawStatus.value ? [rawStatus.value] : []), ...context.value.descendants];
   return all.find(s => s.id === reply.inReplyToId) ?? null;
 }
@@ -153,7 +152,7 @@ function getReplyParent(reply: Status): Status | null {
         v-for="(reply, index) in context.descendants"
         :key="reply.id"
         :status="reply"
-        :profile-url="getProfileUrl(reply.account.acct)"
+        :profile-url="getProfilePath(reply.account.acct)"
         :has-reply-below="hasReplyBelow(index)"
         :reply-parent="getReplyParent(reply)"
         @reply="handleReply"

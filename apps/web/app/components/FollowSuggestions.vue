@@ -5,7 +5,7 @@ import { formatCount } from '~/utils/format';
 
 import 'swiper/css';
 
-const { getSuggestedAccounts, getProfileUrl } = useAccountData();
+const { getSuggestedAccounts, getProfilePath } = useAccountData();
 const { toggleFollow, isFollowing } = useFollows();
 const { data: suggestions } = getSuggestedAccounts();
 </script>
@@ -32,7 +32,7 @@ const { data: suggestions } = getSuggestedAccounts();
         :key="account.id"
       >
         <NuxtLink
-          :to="getProfileUrl(account.acct)"
+          :to="getProfilePath(account.acct)"
           class="block h-full rounded-xl border border-gray-200 bg-white p-3 no-underline transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
         >
           <div class="flex flex-col items-center text-center">

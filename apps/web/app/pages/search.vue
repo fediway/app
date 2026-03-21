@@ -20,7 +20,7 @@ definePageMeta({ keepalive: true });
 const route = useRoute();
 const router = useRouter();
 const { searchStatuses, searchAccounts, searchTags } = useSearchData();
-const { getProfileUrl, getSuggestedAccounts } = useAccountData();
+const { getProfilePath, getStatusPath, getSuggestedAccounts } = useAccountData();
 const { toggleFollow, isFollowing, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -102,11 +102,11 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 function handleStatusClick(statusId: string) {
-  navigateTo(`/status/${statusId}`);
+  navigateTo(getStatusPath(statusId));
 }
 
 function handleProfileClick(acct: string) {
-  navigateTo(getProfileUrl(acct));
+  navigateTo(getProfilePath(acct));
 }
 
 function handleTagClick(tag: Tag) {
@@ -219,7 +219,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
             <NuxtLink
               v-for="account in filteredAccounts"
               :key="account.id"
-              :to="getProfileUrl(account.acct)"
+              :to="getProfilePath(account.acct)"
               class="flex items-center gap-3 px-5 py-3 no-underline transition-colors hover:bg-muted/50"
             >
               <Avatar :src="account.avatar" :alt="account.displayName" size="md" />
@@ -252,7 +252,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
         </div>
         <Timeline
           :statuses="filteredPosts"
-          :get-profile-url="getProfileUrl"
+          :get-profile-url="getProfilePath"
           @status-click="handleStatusClick"
           @profile-click="handleProfileClick"
           @tag-click="handleTagClick"

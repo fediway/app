@@ -6,7 +6,7 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const router = useRouter();
 const { getFavouritedStatuses } = useTimelineData();
-const { getProfileUrl } = useAccountData();
+const { getProfilePath, getStatusPath } = useAccountData();
 const { toggleFavourite, toggleReblog, handleBookmark, withStoreState } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -15,7 +15,7 @@ const { data: rawStatuses } = getFavouritedStatuses();
 const statuses = withStoreState(rawStatuses);
 
 function handleStatusClick(statusId: string) {
-  router.push(`/status/${statusId}`);
+  router.push(getStatusPath(statusId));
 }
 
 function handleReblog(statusId: string) {
@@ -57,7 +57,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
         :statuses="statuses"
         :loading="false"
         :has-more="false"
-        :get-profile-url="(acct) => getProfileUrl(acct)"
+        :get-profile-url="(acct) => getProfilePath(acct)"
         @reblog="handleReblog"
         @favourite="handleFavourite"
         @bookmark="handleBookmark"

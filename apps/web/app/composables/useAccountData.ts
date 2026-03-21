@@ -40,10 +40,22 @@ export function useAccountData() {
     });
   }
 
-  function getProfileUrl(acct: string): string {
+  function getProfilePath(acct: string): string {
     const cleanAcct = acct.replace(LEADING_AT_RE, '');
     return `/@${cleanAcct}`;
   }
 
-  return { getAccountByAcct, getAccountStatuses, getSuggestedAccounts, getAllAccounts, getProfileUrl };
+  /** Build status path: /@acct/statusId (Mastodon convention) */
+  function getStatusPath(statusId: string, acct?: string): string {
+    if (acct) {
+      return `${getProfilePath(acct)}/${statusId}`;
+    }
+    const status = store.get(statusId);
+    if (status?.account?.acct) {
+      return `${getProfilePath(status.account.acct)}/${statusId}`;
+    }
+    return `/@unknown/${statusId}`;
+  }
+
+  return { getAccountByAcct, getAccountStatuses, getSuggestedAccounts, getAllAccounts, getProfilePath, getStatusPath };
 }

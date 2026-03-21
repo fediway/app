@@ -9,7 +9,7 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 definePageMeta({ keepalive: true });
 
 const router = useRouter();
-const { getProfileUrl } = useAccountData();
+const { getProfilePath, getStatusPath } = useAccountData();
 const { toggleFavourite, toggleReblog, handleBookmark, withStoreState, store } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -36,7 +36,7 @@ const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
 const remainingStatuses = computed(() => allStatuses.value.slice(2));
 
 function handleStatusClick(statusId: string) {
-  router.push(`/status/${statusId}`);
+  router.push(getStatusPath(statusId));
 }
 
 function handleReply(statusId: string) {
@@ -55,7 +55,7 @@ function handleFavourite(statusId: string) {
 
 function handleShare(statusId: string) {
   if (navigator.share) {
-    navigator.share({ url: `${window.location.origin}/status/${statusId}` });
+    navigator.share({ url: `${window.location.origin}${getStatusPath(statusId)}` });
   }
 }
 
@@ -137,7 +137,7 @@ onDeactivated(() => {
           v-for="status in firstStatuses"
           :key="status.id"
           :status="status"
-          :profile-url="getProfileUrl(status.reblog?.account.acct ?? status.account.acct)"
+          :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
           @reply="handleReply"
           @reblog="handleReblog"
@@ -158,7 +158,7 @@ onDeactivated(() => {
           v-for="status in remainingStatuses"
           :key="status.id"
           :status="status"
-          :profile-url="getProfileUrl(status.reblog?.account.acct ?? status.account.acct)"
+          :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
           @reply="handleReply"
           @reblog="handleReblog"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { AccountDisplayName, AccountHandle, Avatar, FollowButton, RichText } from '@repo/ui';
 
-const { getAllAccounts, getProfileUrl } = useAccountData();
+const { getAllAccounts, getProfilePath } = useAccountData();
 const { toggleFollow, isFollowing, getRelationship } = useFollows();
 
 const { data: suggestedAccounts } = getAllAccounts();
@@ -22,12 +22,12 @@ function handleFollow(accountId: string) {
         class="px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
       >
         <div class="flex items-start gap-3">
-          <NuxtLink :to="getProfileUrl(account.acct)" class="shrink-0">
+          <NuxtLink :to="getProfilePath(account.acct)" class="shrink-0">
             <Avatar :src="account.avatar" :alt="account.displayName" size="md" />
           </NuxtLink>
           <div class="min-w-0 flex-1">
             <div class="flex items-start justify-between gap-3">
-              <NuxtLink :to="getProfileUrl(account.acct)" class="min-w-0 no-underline">
+              <NuxtLink :to="getProfilePath(account.acct)" class="min-w-0 no-underline">
                 <AccountDisplayName
                   :name="account.displayName || account.username"
                   :emojis="account.emojis"
