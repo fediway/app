@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuth } from '@repo/api';
 import { Avatar, Button, PageHeader, SegmentedControl, Toggle, VisibilitySelector } from '@repo/ui';
-import { clearLiveCache } from '~/composables/useData';
+import { clearAllCaches } from '~/composables/useDataHelpers';
 import { useDataMode } from '~/composables/useDataMode';
 import { useSettings } from '~/composables/useSettings';
 import { useNavigationStore } from '~/stores/navigation';
@@ -24,7 +24,7 @@ const notificationLabels: Record<string, { label: string; description: string }>
 
 function handleDisconnect() {
   apiLogout();
-  clearLiveCache();
+  clearAllCaches();
   setMode('mock');
 }
 

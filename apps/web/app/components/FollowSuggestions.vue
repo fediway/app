@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { AccountDisplayName, AccountHandle, Avatar, FollowButton } from '@repo/ui';
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import { useData } from '~/composables/useData';
 import { formatCount } from '~/utils/format';
 
 import 'swiper/css';
 
-const { getSuggestedAccounts, getProfileUrl } = useData();
+const { getSuggestedAccounts, getProfileUrl } = useAccountData();
 const { toggleFollow, isFollowing } = useFollows();
-const suggestions = computed(() => getSuggestedAccounts());
+const { data: suggestions } = getSuggestedAccounts();
 </script>
 
 <template>

@@ -1,23 +1,14 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
 import { NotificationList, PageHeader } from '@repo/ui';
-import { computed, onMounted, ref } from 'vue';
-import { useData } from '~/composables/useData';
 
 definePageMeta({ keepalive: true });
 
 const router = useRouter();
-const { getNotifications, getProfileUrl } = useData();
+const { getNotifications } = useNotificationData();
+const { getProfileUrl } = useAccountData();
 
-const loading = ref(true);
-const notifications = computed(() => getNotifications());
-
-onMounted(() => {
-  // getNotifications fires-and-forgets internally; mark loading done on next tick
-  setTimeout(() => {
-    loading.value = false;
-  }, 100);
-});
+const { data: notifications, isLoading } = getNotifications();
 
 function handleNotificationClick(notification: Notification) {
   if (notification.status) {
@@ -39,7 +30,7 @@ function navigateToProfile(acct: string) {
 
     <NotificationList
       :notifications="notifications"
-      :loading="loading && notifications.length === 0"
+      :loading="isLoading && notifications.length === 0"
       @click="handleNotificationClick"
       @profile-click="navigateToProfile"
     />

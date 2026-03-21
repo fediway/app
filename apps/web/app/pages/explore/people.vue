@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { AccountDisplayName, AccountHandle, Avatar, FollowButton, RichText } from '@repo/ui';
-import { computed } from 'vue';
-import { useData } from '~/composables/useData';
-import { useFollows } from '~/composables/useFollows';
 
-const { getAllAccounts, getProfileUrl } = useData();
+const { getAllAccounts, getProfileUrl } = useAccountData();
 const { toggleFollow, isFollowing, getRelationship } = useFollows();
 
-const suggestedAccounts = computed(() => getAllAccounts());
+const { data: suggestedAccounts } = getAllAccounts();
 
 function handleFollow(accountId: string) {
   toggleFollow(accountId);

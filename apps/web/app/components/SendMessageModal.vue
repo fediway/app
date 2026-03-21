@@ -2,7 +2,6 @@
 import type { Account, Status } from '@repo/types';
 import { Dialog, DialogContent, ShareStatusForm } from '@repo/ui';
 import { ref, watch } from 'vue';
-import { useData } from '~/composables/useData';
 
 interface Props {
   isOpen: boolean;
@@ -16,7 +15,8 @@ const emit = defineEmits<{
   send: [data: { recipients: Account[]; message: string; status: Status }];
 }>();
 
-const { getAllAccounts } = useData();
+const { getAllAccounts } = useAccountData();
+const { data: allAccounts } = getAllAccounts();
 const formRef = ref<InstanceType<typeof ShareStatusForm>>();
 
 // Reset form when modal opens
@@ -46,7 +46,7 @@ function handleOpenChange(open: boolean) {
         v-if="status"
         ref="formRef"
         :status="status"
-        :accounts="getAllAccounts()"
+        :accounts="allAccounts"
         @send="handleSend"
         @cancel="emit('close')"
       />

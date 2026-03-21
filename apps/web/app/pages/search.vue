@@ -12,7 +12,6 @@ import {
   Timeline,
 } from '@repo/ui';
 import { computed, ref, watch } from 'vue';
-import { useData } from '~/composables/useData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
@@ -20,13 +19,8 @@ definePageMeta({ keepalive: true });
 
 const route = useRoute();
 const router = useRouter();
-const {
-  searchStatuses,
-  searchAccounts,
-  searchTags,
-  getProfileUrl,
-  getSuggestedAccounts,
-} = useData();
+const { searchStatuses, searchAccounts, searchTags } = useSearchData();
+const { getProfileUrl, getSuggestedAccounts } = useAccountData();
 const { toggleFollow, isFollowing, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
@@ -47,10 +41,10 @@ watch(() => route.query.q, (newQuery) => {
   searchQuery.value = (newQuery as string) || '';
 });
 
-// Search results
-const postResults = computed(() => searchStatuses(searchQuery.value));
-const accountResults = computed(() => searchAccounts(searchQuery.value));
-const tagResults = computed(() => searchTags(searchQuery.value));
+// Search results — DataResult is keyed by query, so same query returns cached refs
+const postResults = computed(() => searchStatuses(searchQuery.value).data.value);
+const accountResults = computed(() => searchAccounts(searchQuery.value).data.value);
+const tagResults = computed(() => searchTags(searchQuery.value).data.value);
 
 const isSearching = computed(() => searchQuery.value.trim().length > 0);
 const hasResults = computed(() =>
@@ -73,8 +67,9 @@ const filteredAccounts = computed(() => {
 });
 
 // Suggested accounts for discover state
+const { data: suggestedAccountsData } = getSuggestedAccounts();
 const suggestions = computed<AccountListUser[]>(() =>
-  getSuggestedAccounts().slice(0, 3).map(account => ({
+  suggestedAccountsData.value.slice(0, 3).map(account => ({
     displayName: account.displayName || account.username,
     handle: `@${account.acct}`,
     avatarSrc: account.avatar,

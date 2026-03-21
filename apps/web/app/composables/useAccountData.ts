@@ -1,0 +1,49 @@
+import type { Account, FediwayStatus, Status } from '@repo/types';
+import type { DataResult } from './useDataHelpers';
+import { useClient, useStatusStore } from '@repo/api';
+import { createDataResult } from './useDataHelpers';
+
+const LEADING_AT_RE = /^@/;
+
+export function useAccountData() {
+  const client = useClient();
+  const store = useStatusStore();
+
+  function getAccountByAcct(acct: string): DataResult<Account | undefined> {
+    return createDataResult(`account:${acct}`, undefined as Account | undefined, async () => {
+      return await client.rest.v1.accounts.lookup({ acct });
+    });
+  }
+
+  function getAccountStatuses(acct: string): DataResult<Status[]> {
+    return createDataResult(`accountStatuses:${acct}`, [] as Status[], async () => {
+      const account = await client.rest.v1.accounts.lookup({ acct });
+      const statuses = await client.rest.v1.accounts.$select(account.id).statuses.list({
+        limit: 20,
+        excludeReplies: true,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
+  function getSuggestedAccounts(): DataResult<Account[]> {
+    return createDataResult('suggestions', [] as Account[], async () => {
+      const result = await client.rest.v2.suggestions.list({ limit: 10 });
+      return result.map(s => s.account);
+    });
+  }
+
+  function getAllAccounts(): DataResult<Account[]> {
+    return createDataResult('allAccounts', [] as Account[], async () => {
+      return await client.rest.v1.directory.list({ limit: 40, order: 'active' });
+    });
+  }
+
+  function getProfileUrl(acct: string): string {
+    const cleanAcct = acct.replace(LEADING_AT_RE, '');
+    return `/@${cleanAcct}`;
+  }
+
+  return { getAccountByAcct, getAccountStatuses, getSuggestedAccounts, getAllAccounts, getProfileUrl };
+}

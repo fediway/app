@@ -2,7 +2,7 @@ import type { Account, Status } from '@repo/types';
 import { useAuth, useClient } from '@repo/api';
 import { useToast } from '@repo/ui';
 import { reactive } from 'vue';
-import { clearLiveCache } from './useData';
+import { clearAllCaches } from './useDataHelpers';
 
 const AMPERSAND_RE = /&/g;
 const LESS_THAN_RE = /</g;
@@ -117,7 +117,7 @@ export function usePosts() {
             userPosts.splice(idx, 1, created);
           }
           // Clear the home timeline cache so it re-fetches with the new post
-          clearLiveCache();
+          clearAllCaches();
           toast.success('Post published');
         }
         catch (err) {

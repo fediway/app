@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { PhArrowSquareOut, PhLink } from '@phosphor-icons/vue';
-import { EmptyState, PageHeader, Timeline } from '@repo/ui';
+import { useStatusActions, useStatusStore } from '@repo/api';
+import { EmptyState, PageHeader, Timeline, useToast } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const route = useRoute();
-const { getStatusesByLink, getLinkInfo, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+const { getStatusesByLink, getLinkInfo } = useExploreData();
+const { getProfileUrl } = useAccountData();
+const store = useStatusStore();
+const { toast } = useToast();
+const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
+  onError: () => toast.error('Action failed', 'Please try again.'),
+});
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 
@@ -20,19 +24,29 @@ const linkUrl = computed(() => {
 });
 
 const linkInfo = computed(() => getLinkInfo(linkUrl.value || ''));
-const rawStatuses = computed(() => getStatusesByLink(linkUrl.value || ''));
-const statuses = computed(() => withOverridesAll(rawStatuses.value));
+const { data: rawStatuses } = getStatusesByLink(linkUrl.value || '');
+const statuses = computed(() =>
+  rawStatuses.value.map((s) => {
+    const id = s.reblog?.id ?? s.id;
+    const stored = store.get(id);
+    if (!stored)
+      return s;
+    if (s.reblog)
+      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
+    return { ...s, ...stored } as Status;
+  }),
+);
 
 function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
+  toggleReblog(statusId);
 }
 
 function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
+  toggleFavourite(statusId);
 }
 
 function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
+  toggleBookmark(statusId);
 }
 
 function handleStatusClick(statusId: string) {

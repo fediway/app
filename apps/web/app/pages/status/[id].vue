@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { EmptyState, PageHeader, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
+import { useStatusActions, useStatusStore } from '@repo/api';
+import { EmptyState, PageHeader, StatusAncestor, Status as StatusComponent, StatusDetailMain, useToast } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -11,17 +10,27 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 const route = useRoute();
 const router = useRouter();
 
-const { getStatusById, getStatusContext, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverrides } = useInteractions();
+const { getStatusById, getStatusContext } = useStatusData();
+const { getProfileUrl } = useAccountData();
+const store = useStatusStore();
+const { toast } = useToast();
+const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
+  onError: () => toast.error('Action failed', 'Please try again.'),
+});
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 const { open: openSendMessage } = useSendMessageModal();
 
 const statusId = computed(() => route.params.id as string);
 
-const rawStatus = computed(() => getStatusById(statusId.value));
-const status = computed(() => rawStatus.value ? withOverrides(rawStatus.value) : undefined);
-const context = computed(() => getStatusContext(statusId.value));
+const { data: rawStatus } = getStatusById(statusId.value);
+const status = computed(() => {
+  const raw = rawStatus.value;
+  if (!raw)
+    return undefined;
+  return (store.get(raw.id) as Status) ?? raw;
+});
+const { data: context } = getStatusContext(statusId.value);
 
 // Navigation
 function goBack() {
@@ -43,18 +52,15 @@ function navigateToProfile(acct: string) {
 
 // Event handlers
 function handleReblog(id: string) {
-  if (rawStatus.value)
-    toggleReblog(id, [rawStatus.value]);
+  toggleReblog(id);
 }
 
 function handleFavourite(id: string) {
-  if (rawStatus.value)
-    toggleFavourite(id, [rawStatus.value]);
+  toggleFavourite(id);
 }
 
 function handleBookmark(id: string) {
-  if (rawStatus.value)
-    toggleBookmark(id, [rawStatus.value]);
+  toggleBookmark(id);
 }
 
 function handleShare(id: string) {

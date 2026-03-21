@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusStore, useTimeline } from '@repo/api';
-import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
+import { useStatusActions, useStatusStore, useTimeline } from '@repo/api';
+import { Button, EmptyState, Skeleton, Status as StatusComponent, useToast } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -11,20 +9,23 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 definePageMeta({ keepalive: true });
 
 const router = useRouter();
-const { getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+const { getProfileUrl } = useAccountData();
+const store = useStatusStore();
+const { toast } = useToast();
+const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
+  onError: () => toast.error('Action failed', 'Please try again.'),
+});
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
 const timeline = useTimeline({ type: 'home' });
-const statusStore = useStatusStore();
 
 function getReplyParent(status: Status): Status | null {
   const displayStatus = status.reblog ?? status;
   if (!displayStatus.inReplyToId)
     return null;
-  return statusStore.get(displayStatus.inReplyToId) ?? null;
+  return store.get(displayStatus.inReplyToId) ?? null;
 }
 
 if (import.meta.client) {
@@ -32,7 +33,17 @@ if (import.meta.client) {
 }
 
 const rawStatuses = computed(() => timeline.statuses.value ?? []);
-const allStatuses = computed(() => withOverridesAll(rawStatuses.value));
+const allStatuses = computed(() =>
+  rawStatuses.value.map((s) => {
+    const id = s.reblog?.id ?? s.id;
+    const stored = store.get(id);
+    if (!stored)
+      return s;
+    if (s.reblog)
+      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
+    return { ...s, ...stored } as Status;
+  }),
+);
 
 // Split statuses for inserting follow suggestions after second post
 const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
@@ -49,15 +60,15 @@ function handleReply(statusId: string) {
 }
 
 function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
+  toggleReblog(statusId);
 }
 
 function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
+  toggleFavourite(statusId);
 }
 
 function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
+  toggleBookmark(statusId);
 }
 
 function handleShare(statusId: string) {

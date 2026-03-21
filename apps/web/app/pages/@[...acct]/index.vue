@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusStore } from '@repo/api';
+import { useStatusActions, useStatusStore } from '@repo/api';
 import {
   Badge,
   EmptyState,
@@ -8,10 +8,9 @@ import {
   ProfileHeader,
   ProfileInformation,
   Timeline,
+  useToast,
 } from '@repo/ui';
-import { useData } from '~/composables/useData';
 import { useFollows } from '~/composables/useFollows';
-import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
@@ -19,12 +18,15 @@ definePageMeta({ keepalive: true });
 
 const route = useRoute();
 const router = useRouter();
-const { getAccountByAcct, getAccountStatuses, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+const { getAccountByAcct, getAccountStatuses, getProfileUrl } = useAccountData();
+const store = useStatusStore();
+const { toast } = useToast();
+const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
+  onError: () => toast.error('Action failed', 'Please try again.'),
+});
 const { toggleFollow, getRelationship } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
-const statusStore = useStatusStore();
 
 const acct = computed(() => {
   const param = route.params.acct;
@@ -34,9 +36,19 @@ const acct = computed(() => {
   return param ?? '';
 });
 
-const account = computed(() => acct.value ? getAccountByAcct(acct.value) : undefined);
-const rawStatuses = computed(() => acct.value ? getAccountStatuses(acct.value) : []);
-const statuses = computed(() => withOverridesAll(rawStatuses.value));
+const { data: account } = getAccountByAcct(acct.value);
+const { data: rawStatuses } = getAccountStatuses(acct.value);
+const statuses = computed(() =>
+  rawStatuses.value.map((s) => {
+    const id = s.reblog?.id ?? s.id;
+    const stored = store.get(id);
+    if (!stored)
+      return s;
+    if (s.reblog)
+      return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
+    return { ...s, ...stored } as Status;
+  }),
+);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
 
 function handleFollowToggle() {
@@ -50,15 +62,15 @@ function handleStatusClick(statusId: string) {
 }
 
 function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
+  toggleReblog(statusId);
 }
 
 function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
+  toggleFavourite(statusId);
 }
 
 function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
+  toggleBookmark(statusId);
 }
 
 function handleTagClick(tag: Tag) {
@@ -120,7 +132,7 @@ function goBack() {
         :loading="false"
         :has-more="false"
         :get-profile-url="(acct) => getProfileUrl(acct)"
-        :get-status="statusStore.get"
+        :get-status="store.get"
         @reblog="handleReblog"
         @favourite="handleFavourite"
         @bookmark="handleBookmark"
