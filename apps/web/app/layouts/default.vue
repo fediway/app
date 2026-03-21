@@ -102,6 +102,17 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
 
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <!-- Skip to content -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-ring dark:focus:bg-gray-900"
+    >
+      Skip to content
+    </a>
+
+    <!-- Route announcer for screen readers -->
+    <AriaAnnouncer />
+
     <!-- Post Composer Modal -->
     <PostComposerModal
       :is-open="isOpen"
@@ -134,17 +145,17 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     <div class="hidden lg:flex justify-center min-h-screen">
       <div class="w-full max-w-[1200px] grid grid-cols-[240px_minmax(0,650px)_280px] gap-8 px-4">
         <!-- Left Column: Menu Sidebar -->
-        <aside class="h-fit sticky top-4">
+        <nav aria-label="Main navigation" class="h-fit sticky top-4">
           <DesktopSidebar />
-        </aside>
+        </nav>
 
         <!-- Center Column: Main Feed -->
-        <main class="min-w-0 bg-white dark:bg-gray-900 border-x border-gray-200 dark:border-gray-800 min-h-screen">
+        <main id="main-content" class="min-w-0 bg-white dark:bg-gray-900 border-x border-gray-200 dark:border-gray-800 min-h-screen">
           <slot />
         </main>
 
         <!-- Right Column: Trending Sidebar -->
-        <aside class="h-fit sticky top-4">
+        <aside aria-label="Trending" class="h-fit sticky top-4">
           <TrendingSidebar />
         </aside>
       </div>
