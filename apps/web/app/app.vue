@@ -11,6 +11,7 @@ const pageTransition = computed(() => {
 </script>
 
 <template>
+  <NuxtLoadingIndicator color="#3b82f6" />
   <NuxtLayout>
     <NuxtPage
       :keepalive-props="{ max: 10 }"
