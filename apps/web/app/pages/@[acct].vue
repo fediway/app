@@ -67,6 +67,11 @@ function handleFollowToggle() {
   }
 }
 
+function handleMessage() {
+  // TODO: Pre-select this account as DM recipient when navigating to messages
+  router.push('/messages');
+}
+
 function goBack() {
   if (window.history.length > 1) {
     router.back();
@@ -112,6 +117,7 @@ function goBack() {
             :requested="relationship?.requested ?? false"
             @follow="handleFollowToggle"
             @unfollow="handleFollowToggle"
+            @message="handleMessage"
           />
         </div>
 

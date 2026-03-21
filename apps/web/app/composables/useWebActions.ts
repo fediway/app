@@ -43,6 +43,26 @@ export function useWebActions() {
     bookmarkToastId = toast.success(wasBookmarked ? 'Removed from bookmarks' : 'Saved');
   }
 
+  /** Copy status URL to clipboard + toast */
+  async function handleCopyLink(statusId: string) {
+    const { getStatusPath } = useAccountData();
+    const path = getStatusPath(statusId);
+    const url = `${window.location.origin}${path}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Copied');
+    }
+    catch {
+      toast.error('Failed to copy');
+    }
+  }
+
+  /** Delete status with confirmation callback */
+  async function handleDelete(statusId: string) {
+    await deleteStatus(statusId);
+    toast.success('Post deleted');
+  }
+
   /**
    * Map statuses through the store for display.
    * Returns a computed that reflects optimistic updates from useStatusActions.
@@ -75,7 +95,8 @@ export function useWebActions() {
     toggleFavourite,
     toggleReblog,
     handleBookmark,
-    deleteStatus,
+    handleCopyLink,
+    handleDelete,
     withStoreState,
     getStoreStatus,
     store,

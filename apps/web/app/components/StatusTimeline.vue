@@ -4,6 +4,7 @@ import { EmptyState, Timeline } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
+// TODO: Accept hasMore + onLoadMore props for pagination
 defineProps<{
   statuses: Status[];
   isLoading: boolean;

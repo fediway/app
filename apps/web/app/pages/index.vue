@@ -10,7 +10,7 @@ definePageMeta({ keepalive: true });
 
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, withStoreState, store } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, withStoreState, store } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
@@ -144,6 +144,7 @@ onDeactivated(() => {
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
+          @copy-link="handleCopyLink"
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
@@ -165,6 +166,7 @@ onDeactivated(() => {
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
+          @copy-link="handleCopyLink"
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"

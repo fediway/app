@@ -11,7 +11,7 @@ const router = useRouter();
 
 const { getStatusById, getStatusContext } = useStatusData();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, getStoreStatus } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, getStoreStatus } = useWebActions();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 const { open: openSendMessage } = useSendMessageModal();
@@ -154,6 +154,7 @@ function getReplyParent(reply: Status): Status | null {
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
+          @copy-link="handleCopyLink"
           @tag-click="handleTagClick"
           @profile-click="navigateToProfile"
           @media-click="handleMediaClick"
@@ -172,6 +173,7 @@ function getReplyParent(reply: Status): Status | null {
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
+          @copy-link="handleCopyLink"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
           @profile-click="navigateToProfile"

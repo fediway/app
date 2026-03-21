@@ -25,17 +25,28 @@ export default defineNuxtPlugin(async () => {
     resolvedCookie.value = dark ? 'dark' : 'light';
   });
 
+  const envMode = import.meta.env.VITE_API_MODE as string | undefined;
+
   if (mode.value === 'live') {
     try {
       await restoreSession();
       if (!isAuthenticated.value) {
-        // Session restore failed in live mode — fall back to mock
-        setMode('mock');
+        if (envMode === 'live') {
+          // Env forced live mode — redirect to login, never fall back to mock
+          navigateTo('/login');
+        }
+        else {
+          setMode('mock');
+        }
       }
     }
     catch {
-      // Session restore failed — fall back to mock
-      setMode('mock');
+      if (envMode === 'live') {
+        navigateTo('/login');
+      }
+      else {
+        setMode('mock');
+      }
     }
   }
   else {

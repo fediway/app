@@ -249,7 +249,7 @@ function confirmDiscard() {
             :show-poll="showPoll"
             @update:show-content-warning="showContentWarning = $event"
             @toggle-poll="showPoll = !showPoll"
-            @add-media="() => {}"
+            @add-media="() => {} /* TODO: Wire media upload */"
           />
           <CharacterCounter :current="content.length" :limit="CHARACTER_LIMIT" />
         </div>
