@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
-import { Dialog, DialogContent, ShareStatusForm } from '@repo/ui';
+import { Dialog, DialogContent, DialogDescription, DialogTitle, ShareStatusForm } from '@repo/ui';
+import { VisuallyHidden } from 'reka-ui';
 import { ref, watch } from 'vue';
 
 interface Props {
@@ -42,6 +43,11 @@ function handleOpenChange(open: boolean) {
 <template>
   <Dialog :open="isOpen && !!status" @update:open="handleOpenChange">
     <DialogContent size="md" :show-close="false">
+      <VisuallyHidden>
+        <DialogTitle>Send message</DialogTitle>
+        <DialogDescription>Share this post with someone</DialogDescription>
+      </VisuallyHidden>
+
       <ShareStatusForm
         v-if="status"
         ref="formRef"

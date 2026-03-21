@@ -105,67 +105,69 @@ function getReplyParent(reply: Status): Status | null {
   <div class="w-full">
     <PageHeader title="Post" show-back @back="goBack" />
 
-    <!-- Not found state -->
-    <EmptyState
-      v-if="!status"
-      title="Post not found"
-      description="This post may have been deleted or is not available."
-      action-label="Go to Home"
-      class="py-12"
-      @action="router.push('/')"
-    />
-
-    <template v-else>
-      <!-- Ancestors (parent chain) -->
-      <StatusAncestor
-        v-for="(ancestor, index) in context.ancestors"
-        :key="ancestor.id"
-        :status="ancestor"
-        :show-connector="index < context.ancestors.length - 1 || !!status"
-        @click="navigateToStatus"
-        @profile-click="navigateToProfile"
+    <ClientOnly>
+      <!-- Not found state -->
+      <EmptyState
+        v-if="!status"
+        title="Post not found"
+        description="This post may have been deleted or is not available."
+        action-label="Go to Home"
+        class="py-12"
+        @action="router.push('/')"
       />
 
-      <!-- Connector from last ancestor to main -->
-      <div
-        v-if="context.ancestors.length"
-        class="relative h-3"
-      >
-        <div class="absolute left-8 bottom-0 top-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
-      </div>
+      <template v-else>
+        <!-- Ancestors (parent chain) -->
+        <StatusAncestor
+          v-for="(ancestor, index) in context.ancestors"
+          :key="ancestor.id"
+          :status="ancestor"
+          :show-connector="index < context.ancestors.length - 1 || !!status"
+          @click="navigateToStatus"
+          @profile-click="navigateToProfile"
+        />
 
-      <!-- Main (focused) status -->
-      <StatusDetailMain
-        :status="status"
-        @reply="handleReply"
-        @reblog="handleReblog"
-        @favourite="handleFavourite"
-        @bookmark="handleBookmark"
-        @share="handleShare"
-        @tag-click="handleTagClick"
-        @profile-click="navigateToProfile"
-        @media-click="handleMediaClick"
-      />
+        <!-- Connector from last ancestor to main -->
+        <div
+          v-if="context.ancestors.length"
+          class="relative h-3"
+        >
+          <div class="absolute left-8 bottom-0 top-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+        </div>
 
-      <!-- Descendants (replies) -->
-      <StatusComponent
-        v-for="(reply, index) in context.descendants"
-        :key="reply.id"
-        :status="reply"
-        :profile-url="getProfilePath(reply.account.acct)"
-        :has-reply-below="hasReplyBelow(index)"
-        :reply-parent="getReplyParent(reply)"
-        @reply="handleReply"
-        @reblog="handleReblog"
-        @favourite="handleFavourite"
-        @bookmark="handleBookmark"
-        @share="handleShare"
-        @tag-click="handleTagClick"
-        @status-click="handleStatusClick"
-        @profile-click="navigateToProfile"
-        @media-click="handleMediaClick"
-        @send-message="handleSendMessage"
-      />
-    </template>
+        <!-- Main (focused) status -->
+        <StatusDetailMain
+          :status="status"
+          @reply="handleReply"
+          @reblog="handleReblog"
+          @favourite="handleFavourite"
+          @bookmark="handleBookmark"
+          @share="handleShare"
+          @tag-click="handleTagClick"
+          @profile-click="navigateToProfile"
+          @media-click="handleMediaClick"
+        />
+
+        <!-- Descendants (replies) -->
+        <StatusComponent
+          v-for="(reply, index) in context.descendants"
+          :key="reply.id"
+          :status="reply"
+          :profile-url="getProfilePath(reply.account.acct)"
+          :has-reply-below="hasReplyBelow(index)"
+          :reply-parent="getReplyParent(reply)"
+          @reply="handleReply"
+          @reblog="handleReblog"
+          @favourite="handleFavourite"
+          @bookmark="handleBookmark"
+          @share="handleShare"
+          @tag-click="handleTagClick"
+          @status-click="handleStatusClick"
+          @profile-click="navigateToProfile"
+          @media-click="handleMediaClick"
+          @send-message="handleSendMessage"
+        />
+      </template>
+    </ClientOnly>
   </div>
 </template>

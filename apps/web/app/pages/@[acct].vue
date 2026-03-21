@@ -73,55 +73,57 @@ function goBack() {
       <NuxtPage />
     </template>
 
-    <!-- Profile tabs: show full profile chrome -->
-    <template v-else-if="account">
-      <!-- Profile Header (banner + avatar + back) -->
-      <ProfileHeader
-        :header-image="account.header"
-        :avatar-src="account.avatar"
-        :avatar-alt="`${account.displayName}'s avatar`"
-        @back="goBack"
-      />
-
-      <!-- Follows you badge -->
-      <div v-if="relationship?.followedBy" class="flex justify-end px-4 -mb-2">
-        <Badge variant="muted">
-          Follows you
-        </Badge>
-      </div>
-
-      <!-- Profile Info Section -->
-      <ProfileInformation :account="account" />
-
-      <!-- Actions row -->
-      <div class="border-b border-gray-200 px-4 pb-4 dark:border-gray-800">
-        <ProfileActions
-          :following="relationship?.following ?? false"
-          :requested="relationship?.requested ?? false"
-          @follow="handleFollowToggle"
-          @unfollow="handleFollowToggle"
+    <!-- Profile: data-dependent, client-only to avoid hydration mismatch -->
+    <ClientOnly v-else>
+      <template v-if="account">
+        <!-- Profile Header (banner + avatar + back) -->
+        <ProfileHeader
+          :header-image="account.header"
+          :avatar-src="account.avatar"
+          :avatar-alt="`${account.displayName}'s avatar`"
+          @back="goBack"
         />
-      </div>
 
-      <!-- Tab bar -->
-      <TabBar
-        :model-value="activeTab"
-        :tabs="tabs"
-        @update:model-value="handleTabChange"
+        <!-- Follows you badge -->
+        <div v-if="relationship?.followedBy" class="flex justify-end px-4 -mb-2">
+          <Badge variant="muted">
+            Follows you
+          </Badge>
+        </div>
+
+        <!-- Profile Info Section -->
+        <ProfileInformation :account="account" />
+
+        <!-- Actions row -->
+        <div class="border-b border-gray-200 px-4 pb-4 dark:border-gray-800">
+          <ProfileActions
+            :following="relationship?.following ?? false"
+            :requested="relationship?.requested ?? false"
+            @follow="handleFollowToggle"
+            @unfollow="handleFollowToggle"
+          />
+        </div>
+
+        <!-- Tab bar -->
+        <TabBar
+          :model-value="activeTab"
+          :tabs="tabs"
+          @update:model-value="handleTabChange"
+        />
+
+        <!-- Child route (posts / replies / media / followers / following) -->
+        <NuxtPage />
+      </template>
+
+      <!-- Account not found -->
+      <EmptyState
+        v-else
+        title="User not found"
+        description="This account may have been deleted or moved."
+        action-label="Go home"
+        class="py-12"
+        @action="router.push('/')"
       />
-
-      <!-- Child route (posts / replies / media / followers / following) -->
-      <NuxtPage />
-    </template>
-
-    <!-- Account not found -->
-    <EmptyState
-      v-else
-      title="User not found"
-      description="This account may have been deleted or moved."
-      action-label="Go home"
-      class="py-12"
-      @action="router.push('/')"
-    />
+    </ClientOnly>
   </div>
 </template>
