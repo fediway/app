@@ -1,26 +1,32 @@
 <script setup lang="ts">
-import type { Notification } from '@repo/types';
-import { NotificationList, PageHeader } from '@repo/ui';
+import { PageHeader, TabBar } from '@repo/ui';
+import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
 definePageMeta({ keepalive: true });
 
+const route = useRoute();
 const router = useRouter();
-const { getNotifications } = useNotificationData();
-const { getProfilePath, getStatusPath } = useAccountData();
 
-const { data: notifications, isLoading } = getNotifications();
+const tabs = [
+  { label: 'All', value: 'all' },
+  ...Object.entries(NOTIFICATION_FILTERS).map(([key, { label }]) => ({
+    label,
+    value: key,
+  })),
+];
 
-function handleNotificationClick(notification: Notification) {
-  if (notification.status) {
-    router.push(getStatusPath(notification.status.id, notification.status.account.acct));
+const activeTab = computed(() => {
+  const filter = route.params.filter as string | undefined;
+  return filter ?? 'all';
+});
+
+function handleTabChange(tab: string) {
+  if (tab === 'all') {
+    router.push('/notifications');
   }
-  else if (notification.type === 'follow') {
-    router.push(getProfilePath(notification.account.acct));
+  else {
+    router.push(`/notifications/${tab}`);
   }
-}
-
-function navigateToProfile(acct: string) {
-  router.push(getProfilePath(acct));
 }
 </script>
 
@@ -28,11 +34,12 @@ function navigateToProfile(acct: string) {
   <div class="w-full">
     <PageHeader title="Notifications" />
 
-    <NotificationList
-      :notifications="notifications"
-      :loading="isLoading && notifications.length === 0"
-      @click="handleNotificationClick"
-      @profile-click="navigateToProfile"
+    <TabBar
+      :model-value="activeTab"
+      :tabs="tabs"
+      @update:model-value="handleTabChange"
     />
+
+    <NuxtPage :key="route.path" />
   </div>
 </template>

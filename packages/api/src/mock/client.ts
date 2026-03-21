@@ -481,9 +481,13 @@ export function createMockClient(): MastoClient {
         },
       },
       notifications: {
-        async list() {
+        async list(params?: { limit?: number; types?: string[] }) {
           await delay();
-          return mockNotifications as Notification[];
+          let result = mockNotifications as Notification[];
+          if (params?.types?.length) {
+            result = result.filter(n => params.types!.includes(n.type));
+          }
+          return result.slice(0, params?.limit ?? 30);
         },
       },
       conversations: {

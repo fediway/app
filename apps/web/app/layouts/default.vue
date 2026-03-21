@@ -143,29 +143,24 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     <MobileFooter class="hidden max-lg:block" />
     <MobileSidebar />
 
-    <!-- Desktop Layout: 3 Column Grid -->
-    <div class="hidden lg:flex justify-center min-h-screen">
-      <div class="w-full max-w-[1200px] grid grid-cols-[240px_minmax(0,650px)_280px] gap-8 px-4">
-        <!-- Left Column: Menu Sidebar -->
-        <nav aria-label="Main navigation" class="h-fit sticky top-4">
+    <!-- Responsive Layout: single slot, sidebars show/hide via CSS -->
+    <div class="flex justify-center min-h-screen">
+      <div class="w-full max-w-[1200px] lg:grid lg:grid-cols-[240px_minmax(0,650px)_280px] lg:gap-8 lg:px-4">
+        <!-- Left Column: Menu Sidebar (desktop only) -->
+        <nav aria-label="Main navigation" class="hidden lg:block h-fit sticky top-4">
           <DesktopSidebar />
         </nav>
 
-        <!-- Center Column: Main Feed (desktop) -->
-        <main id="main-content" class="min-w-0 bg-white dark:bg-gray-900 border-x border-gray-200 dark:border-gray-800 min-h-screen">
+        <!-- Center Column: Main Feed -->
+        <main id="main-content" class="min-w-0 bg-white dark:bg-gray-900 lg:border-x lg:border-gray-200 dark:lg:border-gray-800 min-h-screen pb-20 lg:pb-0">
           <slot />
         </main>
 
-        <!-- Right Column: Trending Sidebar -->
-        <aside aria-label="Trending" class="h-fit sticky top-4">
+        <!-- Right Column: Trending Sidebar (desktop only) -->
+        <aside aria-label="Trending" class="hidden lg:block h-fit sticky top-4">
           <TrendingSidebar />
         </aside>
       </div>
-    </div>
-
-    <!-- Mobile Main Content -->
-    <div class="block lg:hidden pb-20 bg-white dark:bg-gray-900">
-      <slot />
     </div>
 
     <!-- Toast notifications -->
