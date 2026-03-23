@@ -2,7 +2,7 @@
 import { PageHeader, TabBar } from '@repo/ui';
 import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
-definePageMeta({ keepalive: true });
+definePageMeta({});
 
 const route = useRoute();
 const router = useRouter();

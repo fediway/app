@@ -120,6 +120,7 @@ export interface StoredAccount {
   instanceDomain: string;
   accountId: string;
   username: string;
+  acct?: string;
   displayName?: string;
   avatarUrl?: string;
   appRegistration?: AppRegistration;

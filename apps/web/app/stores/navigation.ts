@@ -14,13 +14,6 @@ export interface CurrentUser {
   avatar: string;
 }
 
-const mockUser: CurrentUser = {
-  name: 'Jane Doe',
-  username: 'jane',
-  acct: 'jane@social.network',
-  avatar: 'https://i.pravatar.cc/150?u=jane',
-};
-
 const MENU_ITEMS: Omit<MenuItem, 'to'>[] = [
   { id: 'home', label: 'Home', icon: 'home' },
   { id: 'explore', label: 'Explore', icon: 'explore' },
@@ -55,7 +48,7 @@ export function useNavigationStore() {
   const { currentUser: authUser } = useAuth();
   const isSidebarOpen = useState('nav:sidebar', () => false);
 
-  const currentUser = computed<CurrentUser>(() => {
+  const currentUser = computed<CurrentUser | null>(() => {
     if (authUser.value) {
       return {
         name: authUser.value.displayName || authUser.value.username,
@@ -64,10 +57,10 @@ export function useNavigationStore() {
         avatar: authUser.value.avatar,
       };
     }
-    return mockUser;
+    return null;
   });
 
-  const profileUrl = computed(() => `/@${currentUser.value.acct}`);
+  const profileUrl = computed(() => currentUser.value ? `/@${currentUser.value.acct}` : '/');
 
   function getRoute(id: string) {
     return id === 'profile' ? profileUrl.value : (MENU_ROUTES[id] ?? '/');

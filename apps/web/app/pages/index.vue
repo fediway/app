@@ -6,7 +6,7 @@ import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-definePageMeta({ keepalive: true });
+definePageMeta({});
 
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
@@ -75,11 +75,11 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
   openLightbox(attachments, index);
 }
 
-onActivated(() => {
+onMounted(() => {
   timeline.startPolling(30_000);
 });
 
-onDeactivated(() => {
+onUnmounted(() => {
   timeline.stopPolling();
 });
 </script>

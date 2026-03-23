@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { AccountCard, EmptyState, FollowButton } from '@repo/ui';
+import { watch } from 'vue';
 import { useFollows } from '~/composables/useFollows';
 
-defineProps<{
+const props = defineProps<{
   accounts: Account[];
   isLoading: boolean;
   emptyTitle: string;
@@ -11,7 +12,14 @@ defineProps<{
 }>();
 
 const { getProfilePath } = useAccountData();
-const { toggleFollow, isFollowing, getRelationship } = useFollows();
+const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
+
+// Batch-fetch relationships when accounts change
+watch(() => props.accounts, (accts) => {
+  if (accts.length > 0) {
+    fetchRelationships(accts.map(a => a.id));
+  }
+}, { immediate: true });
 </script>
 
 <template>
@@ -35,6 +43,7 @@ const { toggleFollow, isFollowing, getRelationship } = useFollows();
           class="min-w-0 flex-1"
         />
         <FollowButton
+          v-if="hasRelationship(account.id)"
           :is-following="isFollowing(account.id)"
           :requested="getRelationship(account.id).requested"
           size="sm"

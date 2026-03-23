@@ -43,7 +43,7 @@ function handleLogout() {
       <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
         Account
       </h2>
-      <div class="flex items-center gap-4">
+      <div v-if="navigation.currentUser" class="flex items-center gap-4">
         <Avatar :src="navigation.currentUser.avatar" :alt="navigation.currentUser.name" size="lg" />
         <div>
           <div class="font-semibold text-gray-900 dark:text-white">

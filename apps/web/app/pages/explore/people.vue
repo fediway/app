@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { AccountCard, FollowButton } from '@repo/ui';
+import { watch } from 'vue';
 
 const { getAllAccounts, getProfilePath } = useAccountData();
-const { toggleFollow, isFollowing, getRelationship } = useFollows();
+const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
 
 const { data: accounts } = getAllAccounts();
+
+// Batch-fetch relationships when accounts load (one API call instead of N)
+watch(accounts, (accts) => {
+  if (accts.length > 0) {
+    fetchRelationships(accts.map(a => a.id));
+  }
+}, { immediate: true });
 </script>
 
 <template>
@@ -25,6 +33,7 @@ const { data: accounts } = getAllAccounts();
             class="min-w-0 flex-1"
           />
           <FollowButton
+            v-if="hasRelationship(account.id)"
             :is-following="isFollowing(account.id)"
             :requested="getRelationship(account.id).requested"
             size="sm"

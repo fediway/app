@@ -1,27 +1,19 @@
 <script setup lang="ts">
-import type { Conversation as MastoConversation } from '@repo/types';
-import { ChatList, PageHeader } from '@repo/ui';
-import { computed } from 'vue';
-import { useMessages } from '~/composables/useMessages';
+import type { Conversation } from '@repo/types';
+import { useClient } from '@repo/api';
+import { ChatList, EmptyState, PageHeader, Skeleton } from '@repo/ui';
+import { createDataResult } from '~/composables/useDataHelpers';
 
 const router = useRouter();
-const { getConversations } = useMessages();
+const client = useClient();
 
-// Adapt local mock shape → mastodon Conversation shape for UI component
-const conversations = computed(() =>
-  getConversations().map(conv => ({
-    id: conv.id,
-    accounts: [{
-      avatar: conv.participant.avatar,
-      displayName: conv.participant.displayName,
-      acct: conv.participant.acct,
-    }],
-    lastStatus: {
-      content: conv.lastMessage,
-      createdAt: conv.lastMessageAt,
-    },
-    unread: conv.unreadCount > 0,
-  }) as unknown as MastoConversation),
+const { data: conversations, isLoading, error, refetch } = createDataResult<Conversation[]>(
+  'conversations',
+  [],
+  async () => {
+    const result = await client.rest.v1.conversations.list({ limit: 40 });
+    return result;
+  },
 );
 
 function navigateToChat(conversationId: string) {
@@ -33,9 +25,41 @@ function navigateToChat(conversationId: string) {
   <div class="w-full">
     <PageHeader title="Messages" />
 
-    <ChatList
-      :conversations="conversations"
-      @conversation-click="navigateToChat"
-    />
+    <ClientOnly>
+      <!-- Loading -->
+      <div v-if="isLoading && conversations.length === 0" class="space-y-1 p-4">
+        <div v-for="i in 4" :key="i" class="flex items-center gap-3 rounded-lg px-2 py-3">
+          <Skeleton class="size-10 rounded-full" />
+          <div class="flex-1 space-y-1.5">
+            <Skeleton class="h-4 w-32" />
+            <Skeleton class="h-3 w-48" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <EmptyState
+        v-else-if="error"
+        :title="error.message || 'Failed to load messages'"
+        action-label="Try again"
+        class="py-12"
+        @action="refetch()"
+      />
+
+      <!-- Empty -->
+      <EmptyState
+        v-else-if="conversations.length === 0"
+        title="No messages yet"
+        description="Direct messages with other users will appear here."
+        class="py-12"
+      />
+
+      <!-- Conversations list -->
+      <ChatList
+        v-else
+        :conversations="conversations"
+        @conversation-click="navigateToChat"
+      />
+    </ClientOnly>
   </div>
 </template>

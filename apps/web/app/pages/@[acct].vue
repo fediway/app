@@ -9,18 +9,25 @@ import {
 } from '@repo/ui';
 import { useFollows } from '~/composables/useFollows';
 
-definePageMeta({ keepalive: true });
+definePageMeta({});
 
 const route = useRoute();
 const router = useRouter();
 
 const { getAccountByAcct, getProfilePath } = useAccountData();
-const { toggleFollow, getRelationship } = useFollows();
+const { toggleFollow, getRelationship, fetchRelationships } = useFollows();
 
 const acct = computed(() => route.params.acct as string);
 const isStatusDetail = computed(() => !!route.params.id);
 const { data: account } = getAccountByAcct(acct.value);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
+
+// Fetch relationship when account loads
+watch(account, (acc) => {
+  if (acc) {
+    fetchRelationships([acc.id]);
+  }
+}, { immediate: true });
 
 // SEO meta tags for link previews (Twitter/Slack/Discord)
 useSeoMeta({

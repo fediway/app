@@ -46,6 +46,7 @@ export interface AddAccountOptions {
   instanceDomain: string;
   accountId: string;
   username: string;
+  acct?: string;
   displayName?: string;
   avatarUrl?: string;
   accessToken: string;
@@ -62,6 +63,7 @@ async function addAccount(opts: AddAccountOptions): Promise<void> {
     instanceDomain: opts.instanceDomain,
     accountId: opts.accountId,
     username: opts.username,
+    acct: opts.acct,
     displayName: opts.displayName,
     avatarUrl: opts.avatarUrl,
     appRegistration: opts.appRegistration,
@@ -103,14 +105,41 @@ async function switchAccount(key: string): Promise<void> {
 
     activeClient.value = createClientForAccount(account, token);
 
-    // Verify credentials and update display data
+    // Pre-populate currentUser from stored data (instant, no network)
+    // verifyCredentials() below will replace with the full object
+    currentUser.value = {
+      id: account.accountId,
+      username: account.username,
+      acct: account.acct ?? account.username,
+      displayName: account.displayName ?? account.username,
+      avatar: account.avatarUrl ?? '',
+      avatarStatic: account.avatarUrl ?? '',
+      header: '',
+      headerStatic: '',
+      note: '',
+      url: account.instanceUrl,
+      locked: false,
+      fields: [],
+      emojis: [],
+      bot: false,
+      group: false,
+      createdAt: '',
+      followersCount: 0,
+      followingCount: 0,
+      statusesCount: 0,
+      lastStatusAt: null,
+      source: { privacy: 'public', sensitive: false, language: '', fields: [], note: '' },
+    } as unknown as AccountCredentials;
+
+    // Verify credentials and update with full data
     const user = await activeClient.value.rest.v1.accounts.verifyCredentials();
     currentUser.value = user;
 
     // Update stored account with fresh display data
-    if (user.displayName !== account.displayName || user.avatar !== account.avatarUrl) {
+    if (user.displayName !== account.displayName || user.avatar !== account.avatarUrl || user.acct !== account.acct) {
       const updated: StoredAccount = {
         ...account,
+        acct: user.acct ?? account.acct,
         displayName: user.displayName ?? account.displayName,
         avatarUrl: user.avatar ?? account.avatarUrl,
       };

@@ -47,7 +47,7 @@ const navigation = useNavigationStore();
 
 // Draft persistence — keyed by account + reply context
 const draftKey = computed(() => {
-  const acct = navigation.currentUser.acct;
+  const acct = navigation.currentUser?.acct ?? 'anon';
   return props.replyTo ? `${acct}:reply:${props.replyTo.id}` : acct;
 });
 const draft = useDraft(draftKey.value);

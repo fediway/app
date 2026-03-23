@@ -14,30 +14,6 @@ const userPosts = reactive<Status[]>([]);
 
 let nextId = 1000;
 
-// The current user's account (matches mock data)
-const currentUserAccount: Account = {
-  id: '0',
-  username: 'jane',
-  acct: 'jane@social.network',
-  url: 'https://social.network/@jane',
-  displayName: 'Jane Doe',
-  note: '<p>Product designer & coffee addict. Building beautiful things on the fediverse.</p>',
-  avatar: 'https://picsum.photos/seed/jane/200/200',
-  avatarStatic: 'https://picsum.photos/seed/jane/200/200',
-  header: 'https://picsum.photos/seed/jane-header/800/300',
-  headerStatic: 'https://picsum.photos/seed/jane-header/800/300',
-  locked: false,
-  fields: [],
-  emojis: [],
-  bot: false,
-  group: false,
-  createdAt: '2023-01-15T00:00:00.000Z',
-  lastStatusAt: new Date().toISOString().split('T')[0] as string,
-  statusesCount: 234,
-  followersCount: 1847,
-  followingCount: 412,
-} as unknown as Account;
-
 const { toast } = useToast();
 
 export function usePosts() {
@@ -50,7 +26,11 @@ export function usePosts() {
   }): Status {
     const tempId = `temp-${nextId++}`;
     const { currentUser } = useAuth();
-    const account = currentUser.value ?? currentUserAccount;
+    if (!currentUser.value) {
+      toast.error('Not signed in');
+      throw new Error('Cannot create post without authenticated user');
+    }
+    const account = currentUser.value;
 
     const placeholder: Status = {
       id: tempId,
@@ -135,7 +115,7 @@ export function usePosts() {
     return placeholder;
   }
 
-  return { userPosts, addPost, currentUserAccount };
+  return { userPosts, addPost };
 }
 
 function escapeHtml(text: string): string {

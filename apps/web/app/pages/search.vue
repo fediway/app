@@ -15,13 +15,13 @@ import { computed, ref, watch } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-definePageMeta({ keepalive: true });
+definePageMeta({});
 
 const route = useRoute();
 const router = useRouter();
 const { searchStatuses, searchAccounts, searchTags } = useSearchData();
 const { getProfilePath, getStatusPath, getSuggestedAccounts } = useAccountData();
-const { toggleFollow, isFollowing, getRelationship } = useFollows();
+const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 
@@ -52,6 +52,13 @@ const hasResults = computed(() =>
   || accountResults.value.length > 0
   || tagResults.value.length > 0,
 );
+
+// Batch-fetch relationships when account results change
+watch(accountResults, (accts) => {
+  if (accts.length > 0) {
+    fetchRelationships(accts.map(a => a.id));
+  }
+});
 
 // Filtered results based on active tab
 const filteredPosts = computed(() => {
@@ -232,6 +239,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
                 </p>
               </div>
               <FollowButton
+                v-if="hasRelationship(account.id)"
                 :is-following="isFollowing(account.id)"
                 :requested="getRelationship(account.id).requested"
                 size="sm"

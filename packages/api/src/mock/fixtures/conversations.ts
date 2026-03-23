@@ -7,7 +7,9 @@ function createConversation(
   lastStatusContent: string,
   lastStatusDate: string,
   unread: boolean,
+  lastStatusAuthor?: typeof janeAccount,
 ): Conversation {
+  const author = lastStatusAuthor ?? accounts[0];
   return {
     id,
     accounts,
@@ -20,7 +22,7 @@ function createConversation(
       sensitive: false,
       spoilerText: '',
       uri: `https://social.network/statuses/dm-${id}`,
-      url: `https://social.network/@${accounts[0]?.username}/dm-${id}`,
+      url: `https://social.network/@${author?.username}/dm-${id}`,
       repliesCount: 0,
       reblogsCount: 0,
       favouritesCount: 0,
@@ -29,7 +31,7 @@ function createConversation(
       bookmarked: false,
       muted: false,
       pinned: false,
-      account: accounts[0],
+      account: author,
       mediaAttachments: [],
       mentions: [],
       tags: [],
@@ -52,9 +54,10 @@ export const mockConversations: Conversation[] = [
   createConversation(
     '2',
     [marcusAccount],
-    'Thanks for the code review feedback — I\'ll push the fixes this afternoon.',
-    '2024-03-15T12:15:00.000Z',
+    'Sounds good, let me know when it\'s ready for another look!',
+    '2024-03-15T12:30:00.000Z',
     true,
+    janeAccount,
   ),
   createConversation(
     '3',

@@ -15,10 +15,11 @@ const fetched = new Set<string>();
 /**
  * Creates a reactive data result with loading/error tracking.
  *
- * - First call: fires fetch, tracks loading/error
- * - Subsequent calls with same key: returns cached refs (no re-fetch)
- * - refetch(): clears error, re-fetches
- * - Cache-first: shows existing data while refreshing in background
+ * Stale-while-revalidate:
+ * - First call: fires fetch, shows loading spinner
+ * - Subsequent calls with same key: returns cached data instantly,
+ *   re-fetches in background (no spinner, silent update)
+ * - refetch(): forces a re-fetch
  */
 export function createDataResult<T>(
   key: string,
@@ -39,7 +40,7 @@ export function createDataResult<T>(
   const error = entry.error;
 
   function doFetch() {
-    // Only show loading spinner if no data yet
+    // Only show loading spinner if no data yet (cold load)
     const isEmpty = data.value === defaultValue
       || (Array.isArray(data.value) && data.value.length === 0)
       || data.value === undefined;
@@ -54,16 +55,19 @@ export function createDataResult<T>(
       })
       .catch((err) => {
         error.value = err instanceof Error ? err : new Error(String(err));
-        fetched.delete(key);
       })
       .finally(() => {
         isLoading.value = false;
       });
   }
 
-  // Auto-fetch on first access
   if (!fetched.has(key)) {
+    // First access — fetch with loading spinner
     fetched.add(key);
+    doFetch();
+  }
+  else {
+    // Revisit — revalidate silently in background (no spinner)
     doFetch();
   }
 
@@ -79,6 +83,12 @@ export function createDataResult<T>(
  * Clear all module-level caches. Call on logout / mode switch.
  */
 export function clearAllCaches() {
+  registry.clear();
+  fetched.clear();
+}
+
+/** Reset all state — for testing only */
+export function _resetDataHelpers() {
   registry.clear();
   fetched.clear();
 }
