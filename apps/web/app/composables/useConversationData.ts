@@ -5,6 +5,7 @@ import { createDataResult } from './useDataHelpers';
 
 const HTML_TAG_RE = /<[^>]*>/g;
 const HTML_ENTITY_RE = /&([a-z]+|#\d+|#x[\da-f]+);/gi;
+const LEADING_MENTION_RE = /^@([\w.@-]+)\s*/;
 
 const ENTITY_MAP: Record<string, string> = {
   amp: '&',
@@ -117,7 +118,6 @@ export function useConversationData() {
 
     // Strip leading @mentions that match any participant
     // Matches: @alice or @alice@example.com at the start, followed by space/newline
-    const LEADING_MENTION_RE = /^@([\w.@-]+)\s*/;
     let match = LEADING_MENTION_RE.exec(text);
     while (match) {
       const mentioned = match[1]!.toLowerCase();
