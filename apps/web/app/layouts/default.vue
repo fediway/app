@@ -158,12 +158,12 @@ onMounted(() => {
         </nav>
 
         <!-- Center Column: Sticky header (with rounded corners) + Feed content -->
-        <div class="min-w-0 min-h-screen">
+        <div class="min-w-0 lg:flex lg:min-h-screen lg:flex-col">
           <DesktopFeedHeader />
           <main
             id="main-content"
             ref="feedRef"
-            class="bg-white dark:bg-gray-900 pb-20 lg:border-x lg:border-border"
+            class="bg-white dark:bg-gray-900 pb-20 lg:flex-1 lg:border-x lg:border-border"
           >
             <slot />
           </main>
