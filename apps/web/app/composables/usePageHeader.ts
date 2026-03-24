@@ -48,3 +48,9 @@ export function usePageHeader(options: PageHeaderOptions) {
     }
   });
 }
+
+/** Reset all state — for testing only */
+export function _resetPageHeaderState() {
+  nextId = 0;
+  activeId.value = null;
+}

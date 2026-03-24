@@ -24,3 +24,10 @@ export function useMediaLightbox() {
     close,
   };
 }
+
+/** Reset all state — for testing only */
+export function _resetMediaLightboxState() {
+  isOpen.value = false;
+  attachments.value = [];
+  initialIndex.value = 0;
+}

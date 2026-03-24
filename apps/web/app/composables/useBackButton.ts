@@ -55,3 +55,8 @@ export function useBackButton() {
     initCapacitorBackButton,
   };
 }
+
+/** Reset all state — for testing only */
+export function _resetBackButtonState() {
+  handlers.value = [];
+}

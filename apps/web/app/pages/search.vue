@@ -42,7 +42,7 @@ watch(() => route.query.q, (newQuery) => {
   searchQuery.value = (newQuery as string) || '';
 });
 
-// Search results — DataResult is keyed by query, so same query returns cached refs
+// Search results — QueryResult is keyed by query, so same query returns cached refs
 const postResults = computed(() => searchStatuses(searchQuery.value).data.value);
 const accountResults = computed(() => searchAccounts(searchQuery.value).data.value);
 const tagResults = computed(() => searchTags(searchQuery.value).data.value);

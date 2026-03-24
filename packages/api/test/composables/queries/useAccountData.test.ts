@@ -1,6 +1,7 @@
 import type { Account, FediwayStatus } from '@repo/types';
+import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _resetDataHelpers } from '../useDataHelpers';
+import { _resetQueryCache } from '../../../src/composables/createQuery';
 
 // Mock store
 const mockStoreGet = vi.fn();
@@ -14,7 +15,7 @@ const mockFollowersList = vi.fn();
 const mockFollowingList = vi.fn();
 const mockSuggestionsList = vi.fn();
 
-vi.mock('@repo/api', () => ({
+vi.mock('../../../src/composables/useClient', () => ({
   useClient: () => ({
     rest: {
       v1: {
@@ -32,16 +33,15 @@ vi.mock('@repo/api', () => ({
       },
     },
   }),
+}));
+
+vi.mock('../../../src/composables/useStatusStore', () => ({
   useStatusStore: () => ({
     get: mockStoreGet,
     set: mockStoreSet,
     setMany: mockStoreSetMany,
   }),
 }));
-
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
 
 function makeAccount(overrides: Partial<Account> = {}): Account {
   return {
@@ -93,19 +93,19 @@ function makeStatus(overrides: Partial<FediwayStatus> = {}): FediwayStatus {
 }
 
 afterEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
   vi.clearAllMocks();
 });
 
 // Import after mocks are set up
 async function getComposable() {
-  const { useAccountData } = await import('../useAccountData');
+  const { useAccountData } = await import('../../../src/composables/queries/useAccountData');
   return useAccountData();
 }
 
 describe('useAccountData', () => {
   describe('getAccountByAcct', () => {
-    it('returns DataResult with account', async () => {
+    it('returns QueryResult with account', async () => {
       const account = makeAccount({ acct: 'bob' });
       mockLookup.mockResolvedValue(account);
 

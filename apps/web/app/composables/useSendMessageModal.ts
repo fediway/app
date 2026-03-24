@@ -22,3 +22,9 @@ export function useSendMessageModal() {
     close,
   };
 }
+
+/** Reset all state — for testing only */
+export function _resetSendMessageModalState() {
+  isOpen.value = false;
+  statusToShare.value = null;
+}

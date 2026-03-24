@@ -1,11 +1,12 @@
 import type { Account, Status, Tag } from '@repo/types';
+import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _resetDataHelpers } from '../useDataHelpers';
+import { _resetQueryCache } from '../../../src/composables/createQuery';
 
 const mockSetMany = vi.fn();
 const mockListSearch = vi.fn();
 
-vi.mock('@repo/api', () => ({
+vi.mock('../../../src/composables/useClient', () => ({
   useClient: () => ({
     rest: {
       v2: {
@@ -13,17 +14,16 @@ vi.mock('@repo/api', () => ({
       },
     },
   }),
+}));
+
+vi.mock('../../../src/composables/useStatusStore', () => ({
   useStatusStore: () => ({
     setMany: mockSetMany,
   }),
 }));
 
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
-
 afterEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
   mockSetMany.mockReset();
   mockListSearch.mockReset();
 });
@@ -42,7 +42,7 @@ function makeTag(name: string): Tag {
 
 describe('useSearchData', () => {
   async function getComposable() {
-    const mod = await import('../useSearchData');
+    const mod = await import('../../../src/composables/queries/useSearchData');
     return mod.useSearchData();
   }
 
