@@ -2,7 +2,6 @@
 import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { useStatusStore } from '@repo/api';
 import {
-  Badge,
   EmptyState,
   ProfileActions,
   ProfileHeader,
@@ -91,15 +90,9 @@ function goBack() {
         :header-image="account.header"
         :avatar-src="account.avatar"
         :avatar-alt="`${account.displayName}'s avatar`"
+        :follows-you="relationship?.followedBy ?? false"
         @back="goBack"
       />
-
-      <!-- Follows you badge (right-aligned below header) -->
-      <div v-if="relationship?.followedBy" class="flex justify-end px-4 -mb-2">
-        <Badge variant="muted">
-          Follows you
-        </Badge>
-      </div>
 
       <!-- Profile Info Section -->
       <ProfileInformation :account="account" />

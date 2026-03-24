@@ -1,18 +1,9 @@
 <script setup lang="ts">
-import { NavDrawer, NavDrawerItem, NavDrawerProfile } from '@repo/ui';
+import { NavDrawerItem, NavDrawerProfile } from '@repo/ui';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
-
-function handleOpenChange(open: boolean) {
-  if (open) {
-    navigation.openSidebar();
-  }
-  else {
-    navigation.closeSidebar();
-  }
-}
 
 function handleItemClick(item: { to: string }) {
   navigation.closeSidebar();
@@ -21,22 +12,26 @@ function handleItemClick(item: { to: string }) {
 </script>
 
 <template>
-  <NavDrawer :open="navigation.isSidebarOpen" @update:open="handleOpenChange">
-    <template #header>
+  <aside class="flex flex-col h-full overflow-y-auto bg-white dark:bg-gray-900">
+    <!-- Header: user profile -->
+    <div class="border-b border-gray-100 dark:border-gray-800">
       <NavDrawerProfile
         :avatar="navigation.currentUser.avatar"
         :name="navigation.currentUser.name"
         :handle="`@${navigation.currentUser.username}`"
       />
-    </template>
+    </div>
 
-    <NavDrawerItem
-      v-for="item in navigation.menuItems"
-      :key="item.id"
-      :icon="item.icon"
-      :label="item.label"
-      :active="navigation.activeItemId === item.id"
-      @click="handleItemClick(item)"
-    />
-  </NavDrawer>
+    <!-- Menu items -->
+    <nav aria-label="Main menu" class="flex flex-col p-2">
+      <NavDrawerItem
+        v-for="item in navigation.menuItems"
+        :key="item.id"
+        :icon="item.icon"
+        :label="item.label"
+        :active="navigation.activeItemId === item.id"
+        @click="handleItemClick(item)"
+      />
+    </nav>
+  </aside>
 </template>

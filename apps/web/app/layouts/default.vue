@@ -126,9 +126,32 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
       @close="closeLightbox"
     />
 
-    <!-- Mobile Navigation -->
-    <MobileFooter class="hidden max-lg:block" />
-    <MobileSidebar />
+    <!-- Mobile: push-style sidebar layout -->
+    <div class="lg:hidden relative min-h-screen" style="overflow-x: clip;">
+      <!-- Sidebar (off-screen left, revealed by push) -->
+      <MobileSidebar
+        class="fixed top-0 left-0 bottom-0 w-[280px] max-w-[80vw] transition-transform duration-250 ease-out"
+        :class="navigation.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+      />
+
+      <!-- Mobile content wrapper (pushed right when sidebar opens) -->
+      <div
+        class="flex flex-col min-h-screen transition-transform duration-250 ease-out bg-white dark:bg-gray-900"
+        :class="navigation.isSidebarOpen ? 'translate-x-[280px]' : 'translate-x-0'"
+      >
+        <!-- Overlay to close sidebar when tapping pushed content -->
+        <div
+          v-if="navigation.isSidebarOpen"
+          class="absolute inset-0 z-[200]"
+          @click="navigation.closeSidebar()"
+        />
+        <MobileHeader />
+        <main class="flex-1">
+          <slot />
+        </main>
+        <MobileFooter />
+      </div>
+    </div>
 
     <!-- Desktop Layout: 3 Column Grid -->
     <div class="hidden lg:flex justify-center min-h-screen">
@@ -149,11 +172,6 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
         </aside>
       </div>
     </div>
-
-    <!-- Mobile Main Content -->
-    <main class="block lg:hidden pb-20 bg-white dark:bg-gray-900">
-      <slot />
-    </main>
 
     <!-- Toast notifications -->
     <ToastContainer />

@@ -34,12 +34,10 @@ const ProfilePage = defineComponent({
         follows-you
       />
 
-      <div class="px-5 -mt-3 flex justify-end">
-        <ProfileActions :following="false" />
-      </div>
+      <ProfileInformation :account="account" class="mt-3" />
 
-      <div class="mt-3">
-        <ProfileInformation :account="account" />
+      <div class="border-b border-border px-4 pb-4 mt-3">
+        <ProfileActions :following="false" />
       </div>
     </div>
   `,

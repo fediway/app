@@ -123,6 +123,7 @@ async function handleUnfollow() {
       :header-image="accountData.account.value.header"
       :avatar-src="accountData.account.value.avatar"
       :avatar-alt="accountData.account.value.displayName"
+      :follows-you="accountData.relationship.value?.followedBy ?? false"
       @back="router.back()"
     />
 

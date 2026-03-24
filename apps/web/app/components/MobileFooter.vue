@@ -10,6 +10,7 @@ import {
 } from '@phosphor-icons/vue';
 import { BottomNav } from '@repo/ui';
 import { usePostComposer } from '~/composables/usePostComposer';
+import { useScrollDirection } from '~/composables/useScrollDirection';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
@@ -17,6 +18,7 @@ const router = useRouter();
 const navigation = useNavigationStore();
 const { open: openComposer } = usePostComposer();
 const { activeTab, switchTab } = useTabNavigation();
+const { hidden } = useScrollDirection();
 
 const iconMap: Record<string, Component> = {
   'home': PhHouse,
@@ -48,7 +50,10 @@ function handleItemClick(item: BottomNavItemType) {
 </script>
 
 <template>
-  <footer class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+  <footer
+    class="sticky bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out"
+    :class="hidden ? 'translate-y-full' : 'translate-y-0'"
+  >
     <BottomNav
       :items="navItems"
       @item-click="handleItemClick"
