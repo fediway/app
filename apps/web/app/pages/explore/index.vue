@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { TagList } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
 
 const router = useRouter();
-const { getTrendingTags } = useData();
+const { exploreTabs } = useDiscoveryTabs();
+const { getTrendingTags } = useExploreData();
+const { data: tags } = getTrendingTags();
 
 const trendingTags = computed(() =>
-  getTrendingTags().slice(0, 10).map(tag => ({
+  tags.value.slice(0, 10).map(tag => ({
     name: tag.name,
     postCount: tag.history?.reduce((sum: number, h: { uses: string }) => sum + Number(h.uses), 0) ?? undefined,
   })),
@@ -20,7 +21,10 @@ function handleTagClick(name: string) {
 
 <template>
   <div class="w-full">
-    <ExploreHeader />
+    <DiscoveryHeader
+      :tabs="exploreTabs"
+      @search="q => navigateTo({ path: '/search', query: { q } })"
+    />
 
     <div class="p-4">
       <h2 class="mb-3 text-sm font-medium text-gray-500">

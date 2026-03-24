@@ -1,35 +1,32 @@
 <script setup lang="ts">
-import type { Notification } from '@repo/types';
-import { NotificationList, PageHeader } from '@repo/ui';
-import { computed, onMounted, ref } from 'vue';
-import { useData } from '~/composables/useData';
+import { PageHeader, TabBar } from '@repo/ui';
+import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
-definePageMeta({ keepalive: true });
+definePageMeta({});
 
+const route = useRoute();
 const router = useRouter();
-const { getNotifications, getProfileUrl } = useData();
 
-const loading = ref(true);
-const notifications = computed(() => getNotifications());
+const tabs = [
+  { label: 'All', value: 'all' },
+  ...Object.entries(NOTIFICATION_FILTERS).map(([key, { label }]) => ({
+    label,
+    value: key,
+  })),
+];
 
-onMounted(() => {
-  // getNotifications fires-and-forgets internally; mark loading done on next tick
-  setTimeout(() => {
-    loading.value = false;
-  }, 100);
+const activeTab = computed(() => {
+  const filter = route.params.filter as string | undefined;
+  return filter ?? 'all';
 });
 
-function handleNotificationClick(notification: Notification) {
-  if (notification.status) {
-    router.push(`/status/${notification.status.id}`);
+function handleTabChange(tab: string) {
+  if (tab === 'all') {
+    router.push('/notifications');
   }
-  else if (notification.type === 'follow') {
-    router.push(getProfileUrl(notification.account.acct));
+  else {
+    router.push(`/notifications/${tab}`);
   }
-}
-
-function navigateToProfile(acct: string) {
-  router.push(getProfileUrl(acct));
 }
 </script>
 
@@ -37,11 +34,12 @@ function navigateToProfile(acct: string) {
   <div class="w-full">
     <PageHeader title="Notifications" />
 
-    <NotificationList
-      :notifications="notifications"
-      :loading="loading && notifications.length === 0"
-      @click="handleNotificationClick"
-      @profile-click="navigateToProfile"
+    <TabBar
+      :model-value="activeTab"
+      :tabs="tabs"
+      @update:model-value="handleTabChange"
     />
+
+    <NuxtPage :key="route.path" />
   </div>
 </template>

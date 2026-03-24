@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
 import { PhX } from '@phosphor-icons/vue';
+import { useDraft } from '@repo/api';
 import {
   Button,
   CharacterCounter,
@@ -16,8 +17,10 @@ import {
   Textarea,
   VisibilitySelector,
 } from '@repo/ui';
+import { VisuallyHidden } from 'reka-ui';
 import { computed, ref, watch } from 'vue';
 import { useSettings } from '~/composables/useSettings';
+import { useNavigationStore } from '~/stores/navigation';
 
 interface Props {
   isOpen: boolean;
@@ -40,6 +43,14 @@ const emit = defineEmits<{
 }>();
 
 const { settings: appSettings } = useSettings();
+const navigation = useNavigationStore();
+
+// Draft persistence — keyed by account + reply context
+const draftKey = computed(() => {
+  const acct = navigation.currentUser?.acct ?? 'anon';
+  return props.replyTo ? `${acct}:reply:${props.replyTo.id}` : acct;
+});
+const draft = useDraft(draftKey.value);
 
 // Post content
 const content = ref('');
@@ -47,6 +58,7 @@ const spoilerText = ref('');
 const showContentWarning = ref(false);
 const visibility = ref<'public' | 'unlisted' | 'private' | 'direct'>('public');
 const isSubmitting = ref(false);
+const draftStatus = ref<'idle' | 'saving' | 'saved'>('idle');
 
 // Poll state
 const showPoll = ref(false);
@@ -66,10 +78,28 @@ const canPost = computed(() => {
   return hasContent && underLimit && !isSubmitting.value && pollValid;
 });
 
-// Reset form when modal opens
-watch(() => props.isOpen, (isOpen) => {
+const hasUnsavedContent = computed(() => content.value.trim().length > 0);
+
+// Draft autosave — debounced via useDraft (1s)
+watch([content, spoilerText, visibility], () => {
+  if (!props.isOpen || !hasUnsavedContent.value)
+    return;
+  draftStatus.value = 'saving';
+  draft.save({
+    content: content.value,
+    spoilerText: spoilerText.value,
+    visibility: visibility.value,
+    inReplyToId: props.replyTo?.id,
+  });
+  setTimeout(() => {
+    if (draftStatus.value === 'saving')
+      draftStatus.value = 'saved';
+  }, 1200);
+});
+
+// Restore draft or reset form when modal opens
+watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
-    content.value = props.replyTo ? `@${props.replyTo.account.acct} ` : '';
     spoilerText.value = '';
     showContentWarning.value = false;
     visibility.value = appSettings.privacy.defaultVisibility;
@@ -79,6 +109,20 @@ watch(() => props.isOpen, (isOpen) => {
     pollMultiple.value = false;
     pollDuration.value = 86400;
     showDiscardConfirm.value = false;
+    draftStatus.value = 'idle';
+
+    // Try to restore draft
+    const saved = await draft.load();
+    if (saved && saved.content.trim()) {
+      content.value = saved.content;
+      spoilerText.value = saved.spoilerText;
+      showContentWarning.value = saved.spoilerText.length > 0;
+      visibility.value = saved.visibility;
+      draftStatus.value = 'saved';
+    }
+    else {
+      content.value = props.replyTo ? `@${props.replyTo.account.acct} ` : '';
+    }
   }
 });
 
@@ -103,13 +147,14 @@ function handlePost() {
     };
   }
 
+  draft.discard();
   emit('post', postData);
   isSubmitting.value = false;
   emit('close');
 }
 
 function handleClose() {
-  if (content.value.trim()) {
+  if (hasUnsavedContent.value) {
     showDiscardConfirm.value = true;
     return;
   }
@@ -123,6 +168,7 @@ function handleOpenChange(open: boolean) {
 }
 
 function confirmDiscard() {
+  draft.discard();
   showDiscardConfirm.value = false;
   emit('close');
 }
@@ -132,14 +178,22 @@ function confirmDiscard() {
   <!-- Compose Dialog -->
   <Dialog :open="isOpen" @update:open="handleOpenChange">
     <DialogContent size="lg" :show-close="false">
+      <VisuallyHidden>
+        <DialogTitle>{{ replyTo ? 'Write a reply' : 'New post' }}</DialogTitle>
+        <DialogDescription>Compose and publish a post</DialogDescription>
+      </VisuallyHidden>
+
       <!-- Header -->
       <header class="flex items-center justify-between border-b border-border px-4 py-3">
         <Button variant="muted" size="sm" @click="handleClose">
           Cancel
         </Button>
-        <Button size="sm" :disabled="!canPost" @click="handlePost">
-          {{ isSubmitting ? 'Posting...' : 'Post' }}
-        </Button>
+        <div class="flex items-center gap-3">
+          <span v-if="draftStatus === 'saved'" class="text-xs text-foreground/40">Draft saved</span>
+          <Button size="sm" :disabled="!canPost" @click="handlePost">
+            {{ isSubmitting ? 'Posting...' : 'Post' }}
+          </Button>
+        </div>
       </header>
 
       <!-- Reply context -->
@@ -195,7 +249,7 @@ function confirmDiscard() {
             :show-poll="showPoll"
             @update:show-content-warning="showContentWarning = $event"
             @toggle-poll="showPoll = !showPoll"
-            @add-media="() => {}"
+            @add-media="() => {} /* TODO: Wire media upload */"
           />
           <CharacterCounter :current="content.length" :limit="CHARACTER_LIMIT" />
         </div>

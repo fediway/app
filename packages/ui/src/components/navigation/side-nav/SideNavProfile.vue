@@ -12,7 +12,7 @@ defineEmits<{ click: [] }>();
   <div
     role="button"
     tabindex="0"
-    class="flex w-full items-center gap-3 rounded-lg px-4 py-4 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+    class="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
     :aria-label="`${name}, ${handle}`"
     @click="$emit('click')"
     @keydown.enter="$emit('click')"
@@ -22,14 +22,14 @@ defineEmits<{ click: [] }>();
       v-if="avatar"
       :src="avatar"
       :alt="name"
-      class="h-10 w-10 shrink-0 rounded-full"
+      class="size-8 shrink-0 rounded-full"
     >
-    <div v-else class="h-10 w-10 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700" />
+    <div v-else class="size-8 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700" />
     <div class="min-w-0">
-      <div class="truncate text-sm font-semibold text-gray-900 dark:text-white">
+      <div class="truncate text-[13px] font-semibold leading-tight text-gray-900 dark:text-white">
         {{ name }}
       </div>
-      <div class="truncate text-xs text-gray-500 dark:text-gray-400">
+      <div class="truncate text-xs leading-tight text-gray-500 dark:text-gray-400">
         {{ handle }}
       </div>
     </div>

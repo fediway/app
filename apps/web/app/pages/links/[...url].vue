@@ -1,18 +1,10 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
 import { PhArrowSquareOut, PhLink } from '@phosphor-icons/vue';
-import { EmptyState, PageHeader, Timeline } from '@repo/ui';
+import { PageHeader } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
-import { useMediaLightbox } from '~/composables/useMediaLightbox';
-import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const route = useRoute();
-const { getStatusesByLink, getLinkInfo, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
-const { open: openSendMessage } = useSendMessageModal();
-const { open: openLightbox } = useMediaLightbox();
+const { getStatusesByLink, getLinkInfo } = useExploreData();
 
 const linkUrl = computed(() => {
   const url = route.params.url;
@@ -20,40 +12,14 @@ const linkUrl = computed(() => {
 });
 
 const linkInfo = computed(() => getLinkInfo(linkUrl.value || ''));
-const rawStatuses = computed(() => getStatusesByLink(linkUrl.value || ''));
-const statuses = computed(() => withOverridesAll(rawStatuses.value));
+const { data: rawStatuses, isLoading } = getStatusesByLink(linkUrl.value || '');
 
-function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
-}
-
-function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
-}
-
-function handleStatusClick(statusId: string) {
-  navigateTo(`/status/${statusId}`);
-}
-
-function handleProfileClick(acct: string) {
-  navigateTo(getProfileUrl(acct));
-}
-
-function handleTagClick(tag: Tag) {
-  navigateTo(`/tags/${tag.name}`);
-}
-
-function handleSendMessage(status: Status) {
-  openSendMessage(status);
-}
-
-function handleMediaClick(attachments: MediaAttachment[], index: number) {
-  openLightbox(attachments, index);
-}
+usePageHeader({
+  title: computed(() => linkInfo.value?.title || 'Link'),
+  subtitle: computed(() => linkInfo.value?.source),
+  icon: 'PhLink',
+});
+const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 
 <template>
@@ -90,27 +56,11 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
       </a>
     </div>
 
-    <!-- Empty State -->
-    <EmptyState
-      v-if="statuses.length === 0"
-      title="No posts yet"
-      description="No one has shared this link yet"
-      class="py-16"
-    />
-
-    <!-- Timeline -->
-    <Timeline
-      v-else
+    <StatusTimeline
       :statuses="statuses"
-      :get-profile-url="getProfileUrl"
-      @status-click="handleStatusClick"
-      @profile-click="handleProfileClick"
-      @tag-click="handleTagClick"
-      @reblog="handleReblog"
-      @favourite="handleFavourite"
-      @bookmark="handleBookmark"
-      @send-message="handleSendMessage"
-      @media-click="handleMediaClick"
+      :is-loading="isLoading"
+      empty-title="No posts yet"
+      empty-description="No one has shared this link yet"
     />
   </div>
 </template>

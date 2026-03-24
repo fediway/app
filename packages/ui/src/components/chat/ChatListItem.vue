@@ -17,10 +17,20 @@ function getParticipant(conversation: Conversation) {
   return conversation.accounts[0];
 }
 
+function isOwnMessage(conversation: Conversation): boolean {
+  if (!conversation.lastStatus)
+    return false;
+  const participant = getParticipant(conversation);
+  if (!participant)
+    return false;
+  return conversation.lastStatus.account.acct !== participant.acct;
+}
+
 function getPreviewText(conversation: Conversation): string {
   if (!conversation.lastStatus)
     return '';
-  return conversation.lastStatus.content.replace(HTML_STRIP_RE, '').slice(0, 100);
+  const text = conversation.lastStatus.content.replace(HTML_STRIP_RE, '').slice(0, 100);
+  return isOwnMessage(conversation) ? `You: ${text}` : text;
 }
 </script>
 

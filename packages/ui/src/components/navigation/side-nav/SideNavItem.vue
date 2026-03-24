@@ -14,7 +14,7 @@ defineEmits<{ click: [] }>();
 <template>
   <button
     type="button"
-    class="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    class="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     :class="[
       active
         ? 'bg-gray-50 font-semibold text-gray-900 dark:bg-gray-800 dark:text-white'

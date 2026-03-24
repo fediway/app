@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, TagListItem } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
 
 const router = useRouter();
-const { getTrendingTags, getStatusesByTag } = useData();
+const { getTrendingTags } = useExploreData();
+const { data: tags } = getTrendingTags();
 
 const trendingTags = computed(() =>
-  getTrendingTags().slice(0, 7).map(tag => ({
+  tags.value.slice(0, 7).map(tag => ({
     name: tag.name,
-    postCount: getStatusesByTag(tag.name).length || undefined,
+    postCount: tag.history?.[0]?.uses ? `${tag.history[0].uses} posts` : undefined,
   })),
 );
 

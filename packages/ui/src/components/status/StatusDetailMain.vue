@@ -23,6 +23,8 @@ defineEmits<{
   tagClick: [tag: Tag];
   profileClick: [acct: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
+  viewReblogs: [statusId: string];
+  viewFavourites: [statusId: string];
 }>();
 </script>
 
@@ -77,6 +79,8 @@ defineEmits<{
         <StatusStats
           :reblogs-count="status.reblogsCount"
           :favourites-count="status.favouritesCount"
+          @reblogs="$emit('viewReblogs', status.id)"
+          @favourites="$emit('viewFavourites', status.id)"
         />
       </div>
 

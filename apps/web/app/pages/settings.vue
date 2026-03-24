@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuth } from '@repo/api';
 import { Avatar, Button, PageHeader, SegmentedControl, Toggle, VisibilitySelector } from '@repo/ui';
-import { clearLiveCache } from '~/composables/useData';
+import { clearAllCaches } from '~/composables/useDataHelpers';
 import { useDataMode } from '~/composables/useDataMode';
 import { useSettings } from '~/composables/useSettings';
 import { useNavigationStore } from '~/stores/navigation';
@@ -24,7 +24,7 @@ const notificationLabels: Record<string, { label: string; description: string }>
 
 function handleDisconnect() {
   apiLogout();
-  clearLiveCache();
+  clearAllCaches();
   setMode('mock');
 }
 
@@ -43,7 +43,7 @@ function handleLogout() {
       <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
         Account
       </h2>
-      <div class="flex items-center gap-4">
+      <div v-if="navigation.currentUser" class="flex items-center gap-4">
         <Avatar :src="navigation.currentUser.avatar" :alt="navigation.currentUser.name" size="lg" />
         <div>
           <div class="font-semibold text-gray-900 dark:text-white">

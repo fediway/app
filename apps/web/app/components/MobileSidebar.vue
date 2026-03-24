@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NavDrawer, NavDrawerItem, NavDrawerProfile } from '@repo/ui';
+import { NavDrawer, NavDrawerItem, NavDrawerProfile, Skeleton } from '@repo/ui';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
@@ -23,11 +23,23 @@ function handleItemClick(item: { to: string }) {
 <template>
   <NavDrawer :open="navigation.isSidebarOpen" @update:open="handleOpenChange">
     <template #header>
-      <NavDrawerProfile
-        :avatar="navigation.currentUser.avatar"
-        :name="navigation.currentUser.name"
-        :handle="`@${navigation.currentUser.username}`"
-      />
+      <ClientOnly>
+        <NavDrawerProfile
+          v-if="navigation.currentUser"
+          :avatar="navigation.currentUser.avatar"
+          :name="navigation.currentUser.name"
+          :handle="`@${navigation.currentUser.username}`"
+        />
+        <template #fallback>
+          <div class="flex items-center gap-3 px-4 py-3">
+            <Skeleton class="size-10 rounded-full" />
+            <div class="space-y-1.5">
+              <Skeleton class="h-4 w-24" />
+              <Skeleton class="h-3 w-16" />
+            </div>
+          </div>
+        </template>
+      </ClientOnly>
     </template>
 
     <NavDrawerItem

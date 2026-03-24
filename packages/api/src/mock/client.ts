@@ -16,6 +16,7 @@ import {
   mockStatuses,
   suggestedAccounts,
   taggedStatuses,
+  trendingLinks,
   trendingTags,
 } from './fixtures';
 
@@ -423,13 +424,29 @@ export function createMockClient(): MastoClient {
               return account;
             },
             statuses: {
-              async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
+              async list(params?: { limit?: number; maxId?: string; sinceId?: string; onlyMedia?: boolean }) {
                 await delay();
                 const account = findAccountById(id);
                 if (account) {
-                  return paginateArray(mockAccountStatuses[account.acct] || [], params);
+                  let statuses = mockAccountStatuses[account.acct] || [];
+                  if (params?.onlyMedia) {
+                    statuses = statuses.filter(s => s.mediaAttachments && s.mediaAttachments.length > 0);
+                  }
+                  return paginateArray(statuses, params);
                 }
                 return [];
+              },
+            },
+            followers: {
+              async list(_params?: { limit?: number }) {
+                await delay();
+                return allAccounts().filter(a => a.id !== id).slice(0, _params?.limit ?? 40);
+              },
+            },
+            following: {
+              async list(_params?: { limit?: number }) {
+                await delay();
+                return allAccounts().filter(a => a.id !== id).slice(0, Math.min(_params?.limit ?? 40, 5));
               },
             },
             async follow() {
@@ -465,9 +482,13 @@ export function createMockClient(): MastoClient {
         },
       },
       notifications: {
-        async list() {
+        async list(params?: { limit?: number; types?: string[] }) {
           await delay();
-          return mockNotifications as Notification[];
+          let result = mockNotifications as Notification[];
+          if (params?.types?.length) {
+            result = result.filter(n => params.types!.includes(n.type));
+          }
+          return result.slice(0, params?.limit ?? 30);
         },
       },
       conversations: {
@@ -504,6 +525,12 @@ export function createMockClient(): MastoClient {
           async list() {
             await delay();
             return trendingTags;
+          },
+        },
+        links: {
+          async list() {
+            await delay();
+            return trendingLinks;
           },
         },
       },

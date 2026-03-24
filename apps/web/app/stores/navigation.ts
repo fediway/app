@@ -14,13 +14,6 @@ export interface CurrentUser {
   avatar: string;
 }
 
-const mockUser: CurrentUser = {
-  name: 'Jane Doe',
-  username: 'jane',
-  acct: 'jane@social.network',
-  avatar: 'https://i.pravatar.cc/150?u=jane',
-};
-
 const MENU_ITEMS: Omit<MenuItem, 'to'>[] = [
   { id: 'home', label: 'Home', icon: 'home' },
   { id: 'explore', label: 'Explore', icon: 'explore' },
@@ -55,7 +48,7 @@ export function useNavigationStore() {
   const { currentUser: authUser } = useAuth();
   const isSidebarOpen = useState('nav:sidebar', () => false);
 
-  const currentUser = computed<CurrentUser>(() => {
+  const currentUser = computed<CurrentUser | null>(() => {
     if (authUser.value) {
       return {
         name: authUser.value.displayName || authUser.value.username,
@@ -64,10 +57,10 @@ export function useNavigationStore() {
         avatar: authUser.value.avatar,
       };
     }
-    return mockUser;
+    return null;
   });
 
-  const profileUrl = computed(() => `/@${currentUser.value.acct}`);
+  const profileUrl = computed(() => currentUser.value ? `/@${currentUser.value.acct}` : '/');
 
   function getRoute(id: string) {
     return id === 'profile' ? profileUrl.value : (MENU_ROUTES[id] ?? '/');
@@ -96,10 +89,39 @@ export function useNavigationStore() {
     return 'home';
   });
 
+  // Page header state — set by pages via usePageHeader composable
+  const pageHeaderOverride = useState<{
+    title: string;
+    subtitle?: string;
+    image?: string;
+    icon?: string;
+  } | null>('nav:pageHeaderOverride', () => null);
+
+  // Auto-detect whether current route is a top-level menu destination
+  const isMenuPage = computed(() => {
+    const path = route.path;
+    for (const item of MENU_ITEMS) {
+      const to = getRoute(item.id);
+      if (to === '/' && path === '/')
+        return true;
+      if (to !== '/' && (path === to || path.startsWith(`${to}/`)))
+        return true;
+    }
+    return false;
+  });
+
+  const showBack = computed(() => !isMenuPage.value);
+
   const pageTitle = computed(() => {
+    if (pageHeaderOverride.value)
+      return pageHeaderOverride.value.title;
     const item = MENU_ITEMS.find(i => i.id === activeItemId.value);
     return item?.label ?? 'Home';
   });
+
+  const pageSubtitle = computed(() => pageHeaderOverride.value?.subtitle ?? null);
+  const pageImage = computed(() => pageHeaderOverride.value?.image ?? null);
+  const pageIcon = computed(() => pageHeaderOverride.value?.icon ?? null);
 
   function openSidebar() {
     isSidebarOpen.value = true;
@@ -117,6 +139,11 @@ export function useNavigationStore() {
     isSidebarOpen,
     activeItemId,
     pageTitle,
+    pageSubtitle,
+    pageImage,
+    pageIcon,
+    pageHeaderOverride,
+    showBack,
     menuItems,
     mobileFooterItems,
     currentUser,

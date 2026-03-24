@@ -1,76 +1,30 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { EmptyState, PageHeader, Timeline } from '@repo/ui';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
-import { useMediaLightbox } from '~/composables/useMediaLightbox';
-import { useSendMessageModal } from '~/composables/useSendMessageModal';
+import { PageHeader, Skeleton } from '@repo/ui';
 
-const router = useRouter();
-const { getFavouritedStatuses, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
-const { open: openSendMessage } = useSendMessageModal();
-const { open: openLightbox } = useMediaLightbox();
-
-const rawStatuses = computed(() => getFavouritedStatuses());
-const statuses = computed(() => withOverridesAll(rawStatuses.value));
-
-function handleStatusClick(statusId: string) {
-  router.push(`/status/${statusId}`);
-}
-
-function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
-}
-
-function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
-}
-
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${tag.name}`);
-}
-
-function handleSendMessage(status: Status) {
-  openSendMessage(status);
-}
-
-function handleMediaClick(attachments: MediaAttachment[], index: number) {
-  openLightbox(attachments, index);
-}
+const { getFavouritedStatuses } = useTimelineData();
+const { data: rawStatuses, isLoading, error, refetch } = getFavouritedStatuses();
+const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 
 <template>
   <div class="w-full">
     <PageHeader title="Favourites" />
 
-    <!-- Empty State -->
-    <EmptyState
-      v-if="statuses.length === 0"
-      title="No favourites yet"
-      description="Posts you like will appear here"
-      class="py-12"
-    />
-
-    <!-- Timeline -->
-    <section v-else class="w-full">
-      <Timeline
+    <ClientOnly>
+      <StatusTimeline
         :statuses="statuses"
-        :loading="false"
-        :has-more="false"
-        :get-profile-url="(acct) => getProfileUrl(acct)"
-        @reblog="handleReblog"
-        @favourite="handleFavourite"
-        @bookmark="handleBookmark"
-        @send-message="handleSendMessage"
-        @tag-click="handleTagClick"
-        @status-click="handleStatusClick"
-        @media-click="handleMediaClick"
+        :is-loading="isLoading"
+        :error="error"
+        empty-title="No favourites yet"
+        empty-description="Posts you like will appear here"
+        @retry="refetch()"
       />
-    </section>
+
+      <template #fallback>
+        <div class="space-y-4 p-4">
+          <Skeleton v-for="i in 3" :key="i" class="h-32 w-full" />
+        </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>

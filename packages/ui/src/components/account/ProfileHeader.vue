@@ -50,7 +50,7 @@ defineEmits<{ back: [] }>();
 
     <!-- Back Button -->
     <button
-      class="absolute top-[45px] left-5 flex items-center justify-center w-[44px] h-[44px] rounded-full bg-muted cursor-pointer hover:bg-muted/80 transition-colors"
+      class="absolute top-[45px] left-5 flex items-center justify-center w-[44px] h-[44px] rounded-full bg-muted cursor-pointer hover:bg-muted/80 transition-colors lg:hidden"
       aria-label="Go back"
       @click="$emit('back')"
     >
