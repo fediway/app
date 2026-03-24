@@ -75,8 +75,8 @@ describe('usePosts', () => {
       addPost({ content: 'Second' });
 
       expect(userPosts).toHaveLength(2);
-      expect(userPosts[0].content).toBe('<p>Second</p>');
-      expect(userPosts[1].content).toBe('<p>First</p>');
+      expect(userPosts[0]!.content).toBe('<p>Second</p>');
+      expect(userPosts[1]!.content).toBe('<p>First</p>');
     });
 
     it('uses provided visibility', () => {
@@ -138,11 +138,11 @@ describe('usePosts', () => {
       const { addPost, userPosts } = usePosts();
       const placeholder = addPost({ content: 'Hello world' });
 
-      expect(userPosts[0].id).toBe(placeholder.id);
+      expect(userPosts[0]!.id).toBe(placeholder.id);
 
       await flushPromises();
 
-      expect(userPosts[0].id).toBe('real-123');
+      expect(userPosts[0]!.id).toBe('real-123');
       expect(mockToastSuccess).toHaveBeenCalledWith('Post published');
     });
 

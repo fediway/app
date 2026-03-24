@@ -95,7 +95,7 @@ describe('useConversationData', () => {
       await flushPromises();
 
       expect(data.value).toHaveLength(2);
-      expect(data.value[0].id).toBe('1');
+      expect(data.value[0]!.id).toBe('1');
       expect(isLoading.value).toBe(false);
     });
 
@@ -138,9 +138,9 @@ describe('useConversationData', () => {
       expect(data.value.conversation?.id).toBe('1');
       expect(data.value.messages).toHaveLength(3);
       // Order: ancestors → lastStatus → descendants
-      expect(data.value.messages[0].id).toBe('a1');
-      expect(data.value.messages[1].id).toBe('status-1');
-      expect(data.value.messages[2].id).toBe('d1');
+      expect(data.value.messages[0]!.id).toBe('a1');
+      expect(data.value.messages[1]!.id).toBe('status-1');
+      expect(data.value.messages[2]!.id).toBe('d1');
     });
 
     it('returns empty messages when conversation has no lastStatus', async () => {
@@ -193,7 +193,7 @@ describe('useConversationData', () => {
       await flushPromises();
 
       expect(data.value.messages).toHaveLength(1);
-      expect(data.value.messages[0].id).toBe('status-1');
+      expect(data.value.messages[0]!.id).toBe('status-1');
     });
   });
 
@@ -231,7 +231,7 @@ describe('useConversationData', () => {
       const { shareStatus } = useConversationData();
       await shareStatus('alice@example.com', 'Check this out', sharedStatus);
 
-      const call = mockStatusCreate.mock.calls[0][0];
+      const call = mockStatusCreate.mock.calls[0]![0];
       expect(call.status).toContain('@alice@example.com');
       expect(call.status).toContain('Check this out');
       expect(call.status).toContain('https://example.com/statuses/shared-1');
@@ -245,7 +245,7 @@ describe('useConversationData', () => {
       const { shareStatus } = useConversationData();
       await shareStatus('alice@example.com', '', sharedStatus);
 
-      const call = mockStatusCreate.mock.calls[0][0];
+      const call = mockStatusCreate.mock.calls[0]![0];
       expect(call.status).toContain('Great post about testing');
       expect(call.status).toContain('https://example.com/statuses/shared-1');
       // Should NOT contain empty message at start
@@ -264,7 +264,7 @@ describe('useConversationData', () => {
       const { shareStatus } = useConversationData();
       await shareStatus('alice@example.com', 'Look at this', sharedStatus);
 
-      const call = mockStatusCreate.mock.calls[0][0];
+      const call = mockStatusCreate.mock.calls[0]![0];
       expect(call.status).toContain('Look at this');
       // Should not contain "undefined" or "null"
       expect(call.status).not.toContain('undefined');

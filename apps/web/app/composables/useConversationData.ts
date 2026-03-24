@@ -120,7 +120,7 @@ export function useConversationData() {
     const LEADING_MENTION_RE = /^@([\w.@-]+)\s*/;
     let match = LEADING_MENTION_RE.exec(text);
     while (match) {
-      const mentioned = match[1].toLowerCase();
+      const mentioned = match[1]!.toLowerCase();
       if (!acctSet.has(mentioned))
         break;
       text = text.slice(match[0].length);

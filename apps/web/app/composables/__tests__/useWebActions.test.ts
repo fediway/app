@@ -93,8 +93,8 @@ describe('useWebActions', () => {
       const result = withStoreState(source);
 
       expect(result.value).toHaveLength(2);
-      expect(result.value[0].id).toBe('1');
-      expect(result.value[1].id).toBe('2');
+      expect(result.value[0]!.id).toBe('1');
+      expect(result.value[1]!.id).toBe('2');
     });
 
     it('merges store state into matching statuses', () => {
@@ -104,8 +104,8 @@ describe('useWebActions', () => {
       const source = ref([makeStatus('1', { favourited: false, favouritesCount: 0 })]);
       const result = withStoreState(source);
 
-      expect(result.value[0].favourited).toBe(true);
-      expect(result.value[0].favouritesCount).toBe(5);
+      expect(result.value[0]!.favourited).toBe(true);
+      expect(result.value[0]!.favouritesCount).toBe(5);
     });
 
     it('merges store state into reblog inner status', () => {
@@ -117,9 +117,9 @@ describe('useWebActions', () => {
       const source = ref([reblog]);
       const result = withStoreState(source);
 
-      expect(result.value[0].reblog!.favourited).toBe(true);
+      expect(result.value[0]!.reblog!.favourited).toBe(true);
       // Outer status is unchanged
-      expect(result.value[0].id).toBe('outer-1');
+      expect(result.value[0]!.id).toBe('outer-1');
     });
 
     it('uses reblog id for store lookup, not outer id', () => {
@@ -131,7 +131,7 @@ describe('useWebActions', () => {
       const source = ref([outer]);
       const result = withStoreState(source);
 
-      expect(result.value[0].reblog!.bookmarked).toBe(true);
+      expect(result.value[0]!.reblog!.bookmarked).toBe(true);
     });
   });
 
