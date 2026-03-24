@@ -13,6 +13,7 @@ const registry = new Map<string, { data: Ref<any>; isLoading: Ref<boolean>; erro
 const fetched = new Set<string>();
 const inFlight = new Set<string>();
 const fetchSeq = new Map<string, number>();
+const latestFetcher = new Map<string, () => Promise<any>>();
 
 /**
  * Creates a reactive data result with loading/error tracking.
@@ -41,7 +42,12 @@ export function createDataResult<T>(
   const isLoading = entry.isLoading;
   const error = entry.error;
 
+  // Always store the latest fetcher so in-flight completions can detect changes
+  latestFetcher.set(key, fetcher);
+
   function doFetch() {
+    const currentFetcher = latestFetcher.get(key)!;
+
     // Only show loading spinner if no data yet (cold load)
     const isEmpty = data.value === defaultValue
       || (Array.isArray(data.value) && data.value.length === 0)
@@ -55,7 +61,7 @@ export function createDataResult<T>(
     const seq = (fetchSeq.get(key) ?? 0) + 1;
     fetchSeq.set(key, seq);
 
-    fetcher()
+    currentFetcher()
       .then((result) => {
         if (fetchSeq.get(key) === seq) {
           data.value = result;
@@ -70,6 +76,12 @@ export function createDataResult<T>(
         if (fetchSeq.get(key) === seq) {
           isLoading.value = false;
           inFlight.delete(key);
+
+          // If the fetcher changed while we were in-flight, re-fetch
+          if (latestFetcher.get(key) !== currentFetcher) {
+            inFlight.add(key);
+            doFetch();
+          }
         }
       });
   }
@@ -85,6 +97,8 @@ export function createDataResult<T>(
     inFlight.add(key);
     doFetch();
   }
+  // else: in-flight with same or different fetcher — doFetch will
+  // detect the fetcher change on completion and re-fetch automatically
 
   function refetch() {
     fetched.add(key);
@@ -102,6 +116,7 @@ export function clearAllCaches() {
   fetched.clear();
   inFlight.clear();
   fetchSeq.clear();
+  latestFetcher.clear();
 }
 
 /** Reset all state — for testing only */
@@ -110,4 +125,5 @@ export function _resetDataHelpers() {
   fetched.clear();
   inFlight.clear();
   fetchSeq.clear();
+  latestFetcher.clear();
 }

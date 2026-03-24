@@ -207,3 +207,13 @@ export function useMessages() {
     markAsRead,
   };
 }
+
+/** Reset all state — for testing only */
+export function _resetMessagesState() {
+  conversations.splice(0, conversations.length);
+  for (const key of Object.keys(messagesByConversation)) {
+    delete messagesByConversation[key];
+  }
+  nextConversationId = 100;
+  nextMessageId = 1000;
+}

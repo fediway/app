@@ -14,9 +14,8 @@ const userPosts = reactive<Status[]>([]);
 
 let nextId = 1000;
 
-const { toast } = useToast();
-
 export function usePosts() {
+  const { toast } = useToast();
   function addPost(opts: {
     content: string;
     spoilerText?: string;
@@ -124,4 +123,10 @@ function escapeHtml(text: string): string {
     .replace(LESS_THAN_RE, '&lt;')
     .replace(GREATER_THAN_RE, '&gt;')
     .replace(NEWLINE_RE, '<br>');
+}
+
+/** Reset all state — for testing only */
+export function _resetPostsState() {
+  userPosts.splice(0, userPosts.length);
+  nextId = 1000;
 }

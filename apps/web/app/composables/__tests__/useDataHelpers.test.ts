@@ -218,6 +218,29 @@ describe('createDataResult — edge cases', () => {
     expect(result1.data.value).toBe('result-1');
   });
 
+  it('in-flight fetch with stale fetcher re-fetches with new fetcher on completion', async () => {
+    let resolveFirst: (v: string) => void;
+    const fetcherA = vi.fn(() => new Promise<string>((r) => {
+      resolveFirst = r;
+    }));
+    const fetcherB = vi.fn(() => Promise.resolve('from-B'));
+
+    // First call — starts slow fetch with fetcherA
+    createDataResult('fetcher-inflight', '', fetcherA);
+    expect(fetcherA).toHaveBeenCalledOnce();
+
+    // Second call while in-flight — different fetcher, deduplicated
+    const result = createDataResult('fetcher-inflight', '', fetcherB);
+    expect(fetcherB).not.toHaveBeenCalled();
+
+    // First fetch completes — detects fetcher changed, triggers re-fetch with fetcherB
+    resolveFirst!('from-A');
+    await flushPromises();
+
+    expect(fetcherB).toHaveBeenCalledOnce();
+    expect(result.data.value).toBe('from-B');
+  });
+
   it('clearAllCaches makes next access a cold load again', async () => {
     const fetcher = vi.fn(() => Promise.resolve('data'));
 
