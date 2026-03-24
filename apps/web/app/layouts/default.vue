@@ -2,8 +2,9 @@
 import type { Account, Status } from '@repo/types';
 import { MediaLightbox, ToastContainer, useToast } from '@repo/ui';
 import { useBackButton } from '~/composables/useBackButton';
+import { useConversationData } from '~/composables/useConversationData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
-import { useMessages } from '~/composables/useMessages';
+import { useNetworkStatus } from '~/composables/useNetworkStatus';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { usePosts } from '~/composables/usePosts';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -11,10 +12,11 @@ import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
+useNetworkStatus();
 const navigation = useNavigationStore();
 const { isOpen, replyingTo, close } = usePostComposer();
 const { addPost } = usePosts();
-const { shareStatus } = useMessages();
+const { shareStatus } = useConversationData();
 const {
   isOpen: isSendMessageOpen,
   statusToShare,
@@ -77,9 +79,6 @@ registerBackHandler(50, () => {
 });
 
 // Initialize Capacitor back button listener (client-only to avoid SSR crash)
-onMounted(() => {
-  initCapacitorBackButton();
-});
 
 function handlePost(data: { content: string; spoilerText: string; visibility: string }) {
   addPost({
@@ -91,17 +90,44 @@ function handlePost(data: { content: string; spoilerText: string; visibility: st
   });
 }
 
+const { feedEl } = useFeedScroll();
+const feedRef = feedEl;
+
 const { toast } = useToast();
 
-function handleSendMessage(data: { recipients: Account[]; message: string; status: Status }) {
-  const conversationId = shareStatus(data.recipients, data.message, data.status);
-  toast.success('Message sent');
-  router.push(`/messages/${conversationId}`);
+async function handleSendMessage(data: { recipients: Account[]; message: string; status: Status }) {
+  const recipient = data.recipients[0];
+  if (!recipient)
+    return;
+
+  try {
+    await shareStatus(recipient.acct, data.message, data.status);
+    toast.success('Message sent');
+    router.push('/messages');
+  }
+  catch {
+    toast.error('Failed to send message');
+  }
 }
+
+onMounted(() => {
+  initCapacitorBackButton();
+});
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-950">
+  <div class="min-h-screen bg-gray-50 lg:bg-gray-100 dark:bg-gray-950">
+    <!-- Skip to content -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-ring dark:focus:bg-gray-900"
+    >
+      Skip to content
+    </a>
+
+    <!-- Route announcer for screen readers -->
+    <AriaAnnouncer />
+
     <!-- Post Composer Modal -->
     <PostComposerModal
       :is-open="isOpen"
@@ -153,22 +179,31 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
       </div>
     </div>
 
-    <!-- Desktop Layout: 3 Column Grid -->
-    <div class="hidden lg:flex justify-center min-h-screen">
-      <div class="w-full max-w-[1200px] grid grid-cols-[240px_minmax(0,650px)_280px] gap-8 px-4">
-        <!-- Left Column: Menu Sidebar -->
-        <aside class="h-fit sticky top-4">
-          <DesktopSidebar />
-        </aside>
+    <!-- Responsive Layout: page scrolls normally, sidebars + header stay fixed via sticky -->
+    <div class="flex justify-center min-h-screen">
+      <div class="w-full max-w-[1200px] lg:grid lg:grid-cols-[240px_minmax(0,650px)_280px] lg:gap-8 lg:px-4">
+        <!-- Left Column: Menu Sidebar (desktop only) -->
+        <nav aria-label="Main navigation" class="hidden lg:block">
+          <div class="lg:sticky lg:top-0 lg:pt-14">
+            <DesktopSidebar />
+          </div>
+        </nav>
 
-        <!-- Center Column: Main Feed -->
-        <main class="min-w-0 bg-white dark:bg-gray-900 border-x border-gray-200 dark:border-gray-800 min-h-screen">
-          <slot />
-        </main>
+        <!-- Center Column: Sticky header (with rounded corners) + Feed content -->
+        <div class="min-w-0 lg:flex lg:min-h-screen lg:flex-col">
+          <DesktopFeedHeader />
+          <main
+            id="main-content"
+            ref="feedRef"
+            class="bg-white dark:bg-gray-900 pb-20 lg:flex-1 lg:border-x lg:border-border"
+          >
+            <slot />
+          </main>
+        </div>
 
-        <!-- Right Column: Trending Sidebar -->
-        <aside class="h-fit sticky top-4">
-          <TrendingSidebar />
+        <!-- Right Column: Trending Sidebar (desktop only) -->
+        <aside aria-label="Trending" class="hidden lg:block">
+          <TrendingSidebarWrapper />
         </aside>
       </div>
     </div>
@@ -177,3 +212,15 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     <ToastContainer />
   </div>
 </template>
+
+<style scoped>
+</style>
+
+<style>
+/* Hide in-page PageHeader on desktop — the layout header handles it */
+@media (min-width: 1024px) {
+  #main-content > * > header:first-child {
+    display: none;
+  }
+}
+</style>

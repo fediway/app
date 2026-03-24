@@ -7,16 +7,18 @@ import { reactive } from 'vue';
 const followState = reactive(new Map<string, boolean>());
 const relationshipCache = reactive(new Map<string, Relationship>());
 
-const { toast } = useToast();
-
-function callApi(fn: () => Promise<unknown>) {
-  fn().catch((err) => {
-    console.error('[useFollows] API call failed:', err);
+function showError(toast: ReturnType<typeof useToast>['toast'], err: unknown) {
+  if (import.meta.dev) {
+    toast.error('Action failed', err instanceof Error ? err.message : 'Please try again.');
+  }
+  else {
     toast.error('Action failed', 'Please try again.');
-  });
+  }
 }
 
 export function useFollows() {
+  const { toast } = useToast();
+
   function getClient() {
     try {
       return useClient();
@@ -27,24 +29,28 @@ export function useFollows() {
   }
 
   function toggleFollow(accountId: string) {
-    const current = followState.get(accountId) ?? false;
-    followState.set(accountId, !current);
-    toast.success(current ? 'Unfollowed' : 'Followed');
+    const previous = followState.get(accountId) ?? false;
+    followState.set(accountId, !previous);
+    toast.success(previous ? 'Unfollowed' : 'Followed');
 
     const client = getClient();
     if (client) {
-      callApi(async () => {
-        let rel: Relationship;
-        if (current) {
-          rel = await client.rest.v1.accounts.$select(accountId).unfollow();
-        }
-        else {
-          rel = await client.rest.v1.accounts.$select(accountId).follow();
-        }
-        // Sync server state back
-        followState.set(accountId, rel.following);
-        relationshipCache.set(accountId, rel);
-      });
+      const apiCall = previous
+        ? client.rest.v1.accounts.$select(accountId).unfollow()
+        : client.rest.v1.accounts.$select(accountId).follow();
+
+      apiCall
+        .then((rel) => {
+          followState.set(accountId, rel.following);
+          relationshipCache.set(accountId, rel);
+        })
+        .catch((err) => {
+          followState.set(accountId, previous);
+          if (import.meta.dev) {
+            console.error('[useFollows] toggleFollow failed:', err);
+          }
+          showError(toast, err);
+        });
     }
   }
 
@@ -52,28 +58,17 @@ export function useFollows() {
     return followState.get(accountId) ?? false;
   }
 
+  function hasRelationship(accountId: string): boolean {
+    return relationshipCache.has(accountId);
+  }
+
   function getRelationship(accountId: string): Relationship {
     const cached = relationshipCache.get(accountId);
     if (cached) {
-      // Merge local override on top of cached server data
       return {
         ...cached,
         following: followState.has(accountId) ? followState.get(accountId)! : cached.following,
       };
-    }
-
-    // Fetch from API
-    const client = getClient();
-    if (client && !relationshipCache.has(accountId)) {
-      callApi(async () => {
-        const rels = await client.rest.v1.accounts.relationships.fetch({ id: [accountId] });
-        if (rels[0]) {
-          relationshipCache.set(accountId, rels[0]);
-          if (!followState.has(accountId)) {
-            followState.set(accountId, rels[0].following);
-          }
-        }
-      });
     }
 
     return {
@@ -93,5 +88,38 @@ export function useFollows() {
     } as Relationship;
   }
 
-  return { toggleFollow, isFollowing, getRelationship, followState };
+  /** Batch-fetch relationships for multiple accounts in one API call */
+  function fetchRelationships(accountIds: string[]) {
+    const uncached = accountIds.filter(id => !relationshipCache.has(id));
+    if (uncached.length === 0)
+      return;
+
+    const client = getClient();
+    if (!client)
+      return;
+
+    client.rest.v1.accounts.relationships.fetch({ id: uncached })
+      .then((rels) => {
+        for (const rel of rels) {
+          relationshipCache.set(rel.id, rel);
+          if (!followState.has(rel.id)) {
+            followState.set(rel.id, rel.following);
+          }
+        }
+      })
+      .catch((err) => {
+        if (import.meta.dev) {
+          console.error('[useFollows] fetchRelationships failed:', err);
+        }
+        showError(toast, err);
+      });
+  }
+
+  return { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships, followState };
+}
+
+/** Reset all state — for testing only */
+export function _resetFollowsState() {
+  followState.clear();
+  relationshipCache.clear();
 }

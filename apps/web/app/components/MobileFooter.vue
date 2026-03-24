@@ -50,13 +50,14 @@ function handleItemClick(item: BottomNavItemType) {
 </script>
 
 <template>
-  <footer
-    class="sticky bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out"
+  <nav
+    aria-label="Tab navigation"
+    class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out"
     :class="hidden ? 'translate-y-full' : 'translate-y-0'"
   >
     <BottomNav
       :items="navItems"
       @item-click="handleItemClick"
     />
-  </footer>
+  </nav>
 </template>

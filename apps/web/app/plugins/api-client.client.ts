@@ -1,4 +1,4 @@
-import { useAuth, useDarkMode } from '@repo/api';
+import { useAccountStore, useAuth, useClient, useDarkMode } from '@repo/api';
 import { watch } from 'vue';
 import { useDataMode } from '~/composables/useDataMode';
 
@@ -25,17 +25,28 @@ export default defineNuxtPlugin(async () => {
     resolvedCookie.value = dark ? 'dark' : 'light';
   });
 
+  const envMode = import.meta.env.VITE_API_MODE as string | undefined;
+
   if (mode.value === 'live') {
     try {
       await restoreSession();
       if (!isAuthenticated.value) {
-        // Session restore failed in live mode — fall back to mock
-        setMode('mock');
+        if (envMode === 'live') {
+          // Env forced live mode — redirect to login, never fall back to mock
+          navigateTo('/login');
+        }
+        else {
+          setMode('mock');
+        }
       }
     }
     catch {
-      // Session restore failed — fall back to mock
-      setMode('mock');
+      if (envMode === 'live') {
+        navigateTo('/login');
+      }
+      else {
+        setMode('mock');
+      }
     }
   }
   else {
@@ -48,6 +59,20 @@ export default defineNuxtPlugin(async () => {
     }
     catch {
       // Stay in mock mode
+    }
+  }
+
+  // In mock mode without a real session, set the mock user
+  // so the sidebar/navigation shows the mock identity (not a skeleton)
+  if (mode.value === 'mock' && !isAuthenticated.value) {
+    try {
+      const client = useClient();
+      const mockUser = await client.rest.v1.accounts.verifyCredentials();
+      const store = useAccountStore();
+      store.currentUser.value = mockUser;
+    }
+    catch {
+      // Mock client not available — sidebar will show skeleton
     }
   }
 });

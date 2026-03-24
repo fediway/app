@@ -94,14 +94,14 @@ describe('useTabNavigation', () => {
 
   it('onRouteChange updates lastPath for detail pages', () => {
     // Start at home, navigate to a status detail
-    tab.onRouteChange('/status/123', '/');
+    tab.onRouteChange('/@jane/123', '/');
     expect(tab.activeTab.value).toBe('home'); // Still in home tab
 
     // Switch away and back — should restore to the detail page
     tab.switchTab('search', navigateMock);
     navigateMock.mockClear();
     tab.switchTab('home', navigateMock);
-    expect(navigateMock).toHaveBeenCalledWith('/status/123');
+    expect(navigateMock).toHaveBeenCalledWith('/@jane/123');
   });
 
   it('tab-switch-triggered navigation does not double-update', () => {
@@ -125,7 +125,7 @@ describe('useTabNavigation', () => {
     tab.switchTab('home', navigateMock);
     // restoreScroll calls window.scrollTo after nextTick
     await nextTick();
-    expect(scrollToMock).toHaveBeenCalledWith(0, 500);
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 500, behavior: undefined });
   });
 
   it('isAtTabRoot is true at tab root', () => {
@@ -133,7 +133,7 @@ describe('useTabNavigation', () => {
   });
 
   it('canGoBack is true when not at tab root', () => {
-    tab.onRouteChange('/status/123', '/');
+    tab.onRouteChange('/@jane/123', '/');
     expect(tab.canGoBack.value).toBe(true);
     expect(tab.isAtTabRoot.value).toBe(false);
   });
@@ -169,7 +169,7 @@ describe('useTabNavigation', () => {
     scrollToMock.mockClear();
     tab.switchTab('search', navigateMock);
     await nextTick();
-    expect(scrollToMock).toHaveBeenCalledWith(0, 0);
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: undefined });
   });
 
   it('isTabSwitching is cleared after onRouteChange', () => {

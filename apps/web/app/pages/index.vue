@@ -1,30 +1,27 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useStatusStore, useTimeline } from '@repo/api';
+import { useTimeline } from '@repo/api';
 import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-definePageMeta({ keepalive: true });
+definePageMeta({});
 
 const router = useRouter();
-const { getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+const { getProfilePath, getStatusPath } = useAccountData();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, withStoreState, store } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
 const timeline = useTimeline({ type: 'home' });
-const statusStore = useStatusStore();
 
 function getReplyParent(status: Status): Status | null {
   const displayStatus = status.reblog ?? status;
   if (!displayStatus.inReplyToId)
     return null;
-  return statusStore.get(displayStatus.inReplyToId) ?? null;
+  return store.get(displayStatus.inReplyToId) ?? null;
 }
 
 if (import.meta.client) {
@@ -32,14 +29,14 @@ if (import.meta.client) {
 }
 
 const rawStatuses = computed(() => timeline.statuses.value ?? []);
-const allStatuses = computed(() => withOverridesAll(rawStatuses.value));
+const allStatuses = withStoreState(rawStatuses);
 
 // Split statuses for inserting follow suggestions after second post
 const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
 const remainingStatuses = computed(() => allStatuses.value.slice(2));
 
 function handleStatusClick(statusId: string) {
-  router.push(`/status/${statusId}`);
+  router.push(getStatusPath(statusId));
 }
 
 function handleReply(statusId: string) {
@@ -49,20 +46,16 @@ function handleReply(statusId: string) {
 }
 
 function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
+  toggleReblog(statusId);
 }
 
 function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
+  toggleFavourite(statusId);
 }
 
 function handleShare(statusId: string) {
   if (navigator.share) {
-    navigator.share({ url: `${window.location.origin}/status/${statusId}` });
+    navigator.share({ url: `${window.location.origin}${getStatusPath(statusId)}` });
   }
 }
 
@@ -82,11 +75,11 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
   openLightbox(attachments, index);
 }
 
-onActivated(() => {
+onMounted(() => {
   timeline.startPolling(30_000);
 });
 
-onDeactivated(() => {
+onUnmounted(() => {
   timeline.stopPolling();
 });
 </script>
@@ -144,13 +137,14 @@ onDeactivated(() => {
           v-for="status in firstStatuses"
           :key="status.id"
           :status="status"
-          :profile-url="getProfileUrl(status.reblog?.account.acct ?? status.account.acct)"
+          :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
+          @copy-link="handleCopyLink"
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
@@ -165,13 +159,14 @@ onDeactivated(() => {
           v-for="status in remainingStatuses"
           :key="status.id"
           :status="status"
-          :profile-url="getProfileUrl(status.reblog?.account.acct ?? status.account.acct)"
+          :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
+          @copy-link="handleCopyLink"
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"

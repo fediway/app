@@ -45,3 +45,9 @@ export function useDataMode() {
     setMode,
   };
 }
+
+/** Reset all state — for testing only */
+export function _resetDataModeState() {
+  mode.value = 'mock';
+  initialized = false;
+}

@@ -2,13 +2,13 @@
 import type { AccountListUser } from '@repo/ui';
 import { AccountList, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
 
-const { getSuggestedAccounts } = useData();
+const { getSuggestedAccounts } = useAccountData();
 const { toggleFollow } = useFollows();
 
+const { data: suggestedAccounts } = getSuggestedAccounts();
 const suggestions = computed<AccountListUser[]>(() =>
-  getSuggestedAccounts().slice(0, 3).map(account => ({
+  suggestedAccounts.value.slice(0, 3).map(account => ({
     displayName: account.displayName || account.username,
     handle: `@${account.acct}`,
     avatarSrc: account.avatar,
@@ -18,7 +18,7 @@ const suggestions = computed<AccountListUser[]>(() =>
 );
 
 function handleFollow(handle: string) {
-  const account = getSuggestedAccounts().find(a => `@${a.acct}` === handle);
+  const account = suggestedAccounts.value.find(a => `@${a.acct}` === handle);
   if (account) {
     toggleFollow(account.id);
   }

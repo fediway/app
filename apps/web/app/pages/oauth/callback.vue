@@ -2,7 +2,7 @@
 import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
 import { onMounted, ref } from 'vue';
-import { clearLiveCache } from '~/composables/useData';
+import { clearAllCaches } from '~/composables/useDataHelpers';
 import { useDataMode } from '~/composables/useDataMode';
 
 definePageMeta({
@@ -34,7 +34,7 @@ onMounted(async () => {
 
   try {
     await handleOAuthCallback(code);
-    clearLiveCache();
+    clearAllCaches();
     setMode('live');
     navigateTo('/');
   }

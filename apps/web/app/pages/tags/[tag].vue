@@ -1,65 +1,28 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { EmptyState, FollowButton, PageHeader, Timeline } from '@repo/ui';
+import { FollowButton, PageHeader } from '@repo/ui';
 import { computed } from 'vue';
-import { useData } from '~/composables/useData';
-import { useInteractions } from '~/composables/useInteractions';
-import { useMediaLightbox } from '~/composables/useMediaLightbox';
-import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 const route = useRoute();
-const { getStatusesByTag, getTagInfo, getProfileUrl } = useData();
-const { toggleFavourite, toggleReblog, toggleBookmark, withOverridesAll } = useInteractions();
+const { getStatusesByTag } = useExploreData();
 const { toggleFollow, isFollowing } = useFollows();
-const { open: openSendMessage } = useSendMessageModal();
-const { open: openLightbox } = useMediaLightbox();
 
 const tagName = computed(() => {
   const tag = route.params.tag;
   return Array.isArray(tag) ? tag[0] : tag;
 });
 
-const _tagInfo = computed(() => getTagInfo(tagName.value || ''));
-const rawStatuses = computed(() => getStatusesByTag(tagName.value || ''));
-const statuses = computed(() => withOverridesAll(rawStatuses.value));
+const { data: rawStatuses, isLoading } = getStatusesByTag(tagName.value || '');
+const statuses = useWebActions().withStoreState(rawStatuses);
 
-// Tag follow uses the tag name prefixed with "tag:" to avoid ID collisions with accounts
+usePageHeader({
+  title: computed(() => `#${tagName.value}`),
+  subtitle: computed(() => `${statuses.value.length} posts`),
+});
+
 const tagFollowId = computed(() => `tag:${tagName.value}`);
 const isFollowingTag = computed(() => isFollowing(tagFollowId.value));
 function toggleFollowTag() {
   toggleFollow(tagFollowId.value);
-}
-
-function handleReblog(statusId: string) {
-  toggleReblog(statusId, rawStatuses.value);
-}
-
-function handleFavourite(statusId: string) {
-  toggleFavourite(statusId, rawStatuses.value);
-}
-
-function handleBookmark(statusId: string) {
-  toggleBookmark(statusId, rawStatuses.value);
-}
-
-function handleStatusClick(statusId: string) {
-  navigateTo(`/status/${statusId}`);
-}
-
-function handleProfileClick(acct: string) {
-  navigateTo(getProfileUrl(acct));
-}
-
-function handleTagClick(tag: Tag) {
-  navigateTo(`/tags/${tag.name}`);
-}
-
-function handleSendMessage(status: Status) {
-  openSendMessage(status);
-}
-
-function handleMediaClick(attachments: MediaAttachment[], index: number) {
-  openLightbox(attachments, index);
 }
 </script>
 
@@ -95,27 +58,11 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
       </div>
     </div>
 
-    <!-- Empty State -->
-    <EmptyState
-      v-if="statuses.length === 0"
-      title="No posts yet"
-      :description="`Be the first to post with #${tagName}`"
-      class="py-16"
-    />
-
-    <!-- Timeline -->
-    <Timeline
-      v-else
+    <StatusTimeline
       :statuses="statuses"
-      :get-profile-url="getProfileUrl"
-      @status-click="handleStatusClick"
-      @profile-click="handleProfileClick"
-      @tag-click="handleTagClick"
-      @reblog="handleReblog"
-      @favourite="handleFavourite"
-      @bookmark="handleBookmark"
-      @send-message="handleSendMessage"
-      @media-click="handleMediaClick"
+      :is-loading="isLoading"
+      empty-title="No posts yet"
+      :empty-description="`Be the first to post with #${tagName}`"
     />
   </div>
 </template>
