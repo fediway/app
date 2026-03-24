@@ -8,8 +8,10 @@ export function useScrollDirection(threshold = 56) {
     lastScrollY = y;
   }
 
-  onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }));
-  onUnmounted(() => window.removeEventListener('scroll', onScroll));
+  if (typeof window !== 'undefined') {
+    onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }));
+    onUnmounted(() => window.removeEventListener('scroll', onScroll));
+  }
 
   return { hidden };
 }

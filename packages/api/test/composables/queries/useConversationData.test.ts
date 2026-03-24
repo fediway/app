@@ -1,7 +1,7 @@
 import type { Conversation, Status } from '@repo/types';
+import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useConversationData } from '../useConversationData';
-import { _resetDataHelpers } from '../useDataHelpers';
+import { _resetQueryCache } from '../../../src/composables/createQuery';
 
 // Mock API client
 const mockConversationsList = vi.fn();
@@ -9,7 +9,7 @@ const mockConversationRead = vi.fn();
 const mockContextFetch = vi.fn();
 const mockStatusCreate = vi.fn();
 
-vi.mock('@repo/api', () => ({
+vi.mock('../../../src/composables/useClient', () => ({
   useClient: () => ({
     rest: {
       v1: {
@@ -28,14 +28,13 @@ vi.mock('@repo/api', () => ({
       },
     },
   }),
+}));
+
+vi.mock('../../../src/composables/useAuth', () => ({
   useAuth: () => ({
     currentUser: { value: { acct: 'me@example.com', username: 'me' } },
   }),
 }));
-
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
 
 function makeConversation(id: string, acct: string): Conversation {
   return {
@@ -71,7 +70,7 @@ function makeStatus(id: string, acct: string, content: string, url?: string): St
 }
 
 beforeEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
   mockConversationsList.mockReset();
   mockConversationRead.mockReset();
   mockContextFetch.mockReset();
@@ -79,16 +78,21 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
 });
 
 describe('useConversationData', () => {
+  async function getComposable() {
+    const { useConversationData } = await import('../../../src/composables/queries/useConversationData');
+    return useConversationData();
+  }
+
   describe('getConversations', () => {
     it('fetches and returns conversations', async () => {
       const convs = [makeConversation('1', 'alice@example.com'), makeConversation('2', 'bob@example.com')];
       mockConversationsList.mockResolvedValue(convs);
 
-      const { getConversations } = useConversationData();
+      const { getConversations } = await getComposable();
       const { data, isLoading } = getConversations();
 
       expect(isLoading.value).toBe(true);
@@ -102,7 +106,7 @@ describe('useConversationData', () => {
     it('sets error on API failure', async () => {
       mockConversationsList.mockRejectedValue(new Error('Network error'));
 
-      const { getConversations } = useConversationData();
+      const { getConversations } = await getComposable();
       const { error } = getConversations();
 
       await flushPromises();
@@ -111,10 +115,10 @@ describe('useConversationData', () => {
       expect(error.value!.message).toBe('Network error');
     });
 
-    it('returns empty array as default', () => {
+    it('returns empty array as default', async () => {
       mockConversationsList.mockImplementation(() => new Promise(() => {}));
 
-      const { getConversations } = useConversationData();
+      const { getConversations } = await getComposable();
       const { data } = getConversations();
 
       expect(data.value).toEqual([]);
@@ -130,14 +134,14 @@ describe('useConversationData', () => {
         descendants: [makeStatus('d1', 'me@example.com', 'Reply')],
       });
 
-      const { getConversationDetail } = useConversationData();
+      const { getConversationDetail } = await getComposable();
       const { data } = getConversationDetail('1');
 
       await flushPromises();
 
       expect(data.value.conversation?.id).toBe('1');
       expect(data.value.messages).toHaveLength(3);
-      // Order: ancestors → lastStatus → descendants
+      // Order: ancestors -> lastStatus -> descendants
       expect(data.value.messages[0]!.id).toBe('a1');
       expect(data.value.messages[1]!.id).toBe('status-1');
       expect(data.value.messages[2]!.id).toBe('d1');
@@ -147,7 +151,7 @@ describe('useConversationData', () => {
       const conv = { id: '1', accounts: [], lastStatus: null, unread: false } as unknown as Conversation;
       mockConversationRead.mockResolvedValue(conv);
 
-      const { getConversationDetail } = useConversationData();
+      const { getConversationDetail } = await getComposable();
       const { data } = getConversationDetail('1');
 
       await flushPromises();
@@ -160,7 +164,7 @@ describe('useConversationData', () => {
     it('sets error when conversation not found', async () => {
       mockConversationRead.mockRejectedValue(new Error('Conversation not found'));
 
-      const { getConversationDetail } = useConversationData();
+      const { getConversationDetail } = await getComposable();
       const { error } = getConversationDetail('999');
 
       await flushPromises();
@@ -173,7 +177,7 @@ describe('useConversationData', () => {
       mockConversationRead.mockResolvedValue(conv);
       mockContextFetch.mockRejectedValue(new Error('Context unavailable'));
 
-      const { getConversationDetail } = useConversationData();
+      const { getConversationDetail } = await getComposable();
       const { error } = getConversationDetail('1');
 
       await flushPromises();
@@ -187,7 +191,7 @@ describe('useConversationData', () => {
       mockConversationRead.mockResolvedValue(conv);
       mockContextFetch.mockResolvedValue({ ancestors: [], descendants: [] });
 
-      const { getConversationDetail } = useConversationData();
+      const { getConversationDetail } = await getComposable();
       const { data } = getConversationDetail('1');
 
       await flushPromises();
@@ -202,7 +206,7 @@ describe('useConversationData', () => {
       const created = makeStatus('new-1', 'me@example.com', '@alice Hello');
       mockStatusCreate.mockResolvedValue(created);
 
-      const { sendDirectMessage } = useConversationData();
+      const { sendDirectMessage } = await getComposable();
       const result = await sendDirectMessage('alice@example.com', 'Hello');
 
       expect(mockStatusCreate).toHaveBeenCalledWith({
@@ -215,7 +219,7 @@ describe('useConversationData', () => {
     it('propagates API errors to caller', async () => {
       mockStatusCreate.mockRejectedValue(new Error('Forbidden'));
 
-      const { sendDirectMessage } = useConversationData();
+      const { sendDirectMessage } = await getComposable();
 
       await expect(sendDirectMessage('alice@example.com', 'Hello'))
         .rejects
@@ -228,7 +232,7 @@ describe('useConversationData', () => {
       mockStatusCreate.mockResolvedValue(makeStatus('new-1', 'me', 'msg'));
 
       const sharedStatus = makeStatus('shared-1', 'bob@example.com', 'Cool post');
-      const { shareStatus } = useConversationData();
+      const { shareStatus } = await getComposable();
       await shareStatus('alice@example.com', 'Check this out', sharedStatus);
 
       const call = mockStatusCreate.mock.calls[0]![0];
@@ -242,7 +246,7 @@ describe('useConversationData', () => {
       mockStatusCreate.mockResolvedValue(makeStatus('new-1', 'me', 'msg'));
 
       const sharedStatus = makeStatus('shared-1', 'bob@example.com', 'Great post about testing');
-      const { shareStatus } = useConversationData();
+      const { shareStatus } = await getComposable();
       await shareStatus('alice@example.com', '', sharedStatus);
 
       const call = mockStatusCreate.mock.calls[0]![0];
@@ -261,7 +265,7 @@ describe('useConversationData', () => {
         uri: '',
       } as unknown as Status;
 
-      const { shareStatus } = useConversationData();
+      const { shareStatus } = await getComposable();
       await shareStatus('alice@example.com', 'Look at this', sharedStatus);
 
       const call = mockStatusCreate.mock.calls[0]![0];
@@ -273,130 +277,25 @@ describe('useConversationData', () => {
   });
 
   describe('isOwnMessage', () => {
-    it('returns true when status is from current user', () => {
+    it('returns true when status is from current user', async () => {
       const status = makeStatus('1', 'me@example.com', 'My message');
-      const { isOwnMessage } = useConversationData();
+      const { isOwnMessage } = await getComposable();
       expect(isOwnMessage(status)).toBe(true);
     });
 
-    it('returns false when status is from another user', () => {
+    it('returns false when status is from another user', async () => {
       const status = makeStatus('1', 'alice@example.com', 'Their message');
-      const { isOwnMessage } = useConversationData();
+      const { isOwnMessage } = await getComposable();
       expect(isOwnMessage(status)).toBe(false);
     });
 
-    it('returns false when status is from a third party in group DM', () => {
+    it('returns false when status is from a third party in group DM', async () => {
       const status = makeStatus('1', 'bob@example.com', 'Third party message');
-      const { isOwnMessage } = useConversationData();
+      const { isOwnMessage } = await getComposable();
       expect(isOwnMessage(status)).toBe(false);
     });
   });
 
-  describe('formatMessageContent', () => {
-    it('strips leading participant mention from DM', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@alice@example.com Sure, let\'s chat.</p>',
-        ['alice@example.com'],
-      )).toBe('Sure, let\'s chat.');
-    });
-
-    it('strips short-form mention (local part only)', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@alice Sure, let\'s chat.</p>',
-        ['alice@example.com'],
-      )).toBe('Sure, let\'s chat.');
-    });
-
-    it('strips multiple leading participant mentions in group DM', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@alice @bob Hey both of you!</p>',
-        ['alice@example.com', 'bob@example.com'],
-      )).toBe('Hey both of you!');
-    });
-
-    it('preserves non-participant mentions at the start', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@charlie Have you seen this?</p>',
-        ['alice@example.com'],
-      )).toBe('@charlie Have you seen this?');
-    });
-
-    it('preserves participant mentions mid-message', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>I agree with @alice on this</p>',
-        ['alice@example.com'],
-      )).toBe('I agree with @alice on this');
-    });
-
-    it('handles message that is only a mention (returns empty)', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@alice@example.com</p>',
-        ['alice@example.com'],
-      )).toBe('');
-    });
-
-    it('handles Mastodon HTML mention markup', () => {
-      const { formatMessageContent } = useConversationData();
-      // Real Mastodon mention HTML
-      const html = '<p><span class="h-card"><a href="https://example.com/@alice" class="u-url mention">@<span>alice</span></a></span> Sure, let\'s chat.</p>';
-      expect(formatMessageContent(html, ['alice@example.com'])).toBe('Sure, let\'s chat.');
-    });
-
-    it('decodes entities after stripping mentions', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@alice Tom &amp; Jerry</p>',
-        ['alice@example.com'],
-      )).toBe('Tom & Jerry');
-    });
-
-    it('works with empty participant list (no stripping)', () => {
-      const { formatMessageContent } = useConversationData();
-      expect(formatMessageContent(
-        '<p>@alice Hello</p>',
-        [],
-      )).toBe('@alice Hello');
-    });
-  });
-
-  describe('stripHtml', () => {
-    it('removes HTML tags', () => {
-      const { stripHtml } = useConversationData();
-      expect(stripHtml('<p>Hello <strong>world</strong></p>')).toBe('Hello world');
-    });
-
-    it('decodes named HTML entities', () => {
-      const { stripHtml } = useConversationData();
-      expect(stripHtml('Tom &amp; Jerry')).toBe('Tom & Jerry');
-      expect(stripHtml('&lt;script&gt;')).toBe('<script>');
-      expect(stripHtml('She said &quot;hello&quot;')).toBe('She said "hello"');
-    });
-
-    it('decodes numeric HTML entities', () => {
-      const { stripHtml } = useConversationData();
-      expect(stripHtml('&#39;quotes&#39;')).toBe('\'quotes\'');
-      expect(stripHtml('&#x27;hex&#x27;')).toBe('\'hex\'');
-    });
-
-    it('handles tags + entities together', () => {
-      const { stripHtml } = useConversationData();
-      expect(stripHtml('<p>Tom &amp; Jerry &lt;3</p>')).toBe('Tom & Jerry <3');
-    });
-
-    it('handles empty string', () => {
-      const { stripHtml } = useConversationData();
-      expect(stripHtml('')).toBe('');
-    });
-
-    it('returns plain text unchanged', () => {
-      const { stripHtml } = useConversationData();
-      expect(stripHtml('No HTML here')).toBe('No HTML here');
-    });
-  });
+  // Note: formatMessageContent and stripHtml are tested in packages/api/test/utils/html.test.ts
+  // The composable re-exports them from @repo/api -- no need to duplicate tests here.
 });

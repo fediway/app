@@ -1,12 +1,13 @@
 import type { Status } from '@repo/types';
+import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _resetDataHelpers } from '../useDataHelpers';
+import { _resetQueryCache } from '../../../src/composables/createQuery';
 
 const mockSetMany = vi.fn();
 const mockListFavourites = vi.fn();
 const mockListBookmarks = vi.fn();
 
-vi.mock('@repo/api', () => ({
+vi.mock('../../../src/composables/useClient', () => ({
   useClient: () => ({
     rest: {
       v1: {
@@ -15,17 +16,16 @@ vi.mock('@repo/api', () => ({
       },
     },
   }),
+}));
+
+vi.mock('../../../src/composables/useStatusStore', () => ({
   useStatusStore: () => ({
     setMany: mockSetMany,
   }),
 }));
 
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
-
 afterEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
   mockSetMany.mockReset();
   mockListFavourites.mockReset();
   mockListBookmarks.mockReset();
@@ -38,7 +38,7 @@ function makeStatus(id: string): Status {
 describe('useTimelineData', () => {
   // Dynamic import so mocks are applied
   async function getComposable() {
-    const mod = await import('../useTimelineData');
+    const mod = await import('../../../src/composables/queries/useTimelineData');
     return mod.useTimelineData();
   }
 

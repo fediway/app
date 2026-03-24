@@ -1,19 +1,20 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises } from '@repo/config/vitest/helpers';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
-import { _resetDataHelpers, clearAllCaches, createDataResult } from '../useDataHelpers';
+import { _resetQueryCache, createQuery, invalidateAllQueries } from '../../src/composables/createQuery';
 
-afterEach(() => {
-  _resetDataHelpers();
+beforeEach(() => {
+  _resetQueryCache();
 });
 
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
+afterEach(() => {
+  _resetQueryCache();
+});
 
-describe('createDataResult', () => {
+describe('createQuery', () => {
   it('starts with default value and isLoading=true on first fetch', () => {
-    const fetcher = vi.fn(() => new Promise<string>(() => {})); // never resolves
-    const result = createDataResult('test', 'default', fetcher);
+    const fetcher = vi.fn(() => new Promise<string>(() => {}));
+    const result = createQuery('test', 'default', fetcher);
 
     expect(result.data.value).toBe('default');
     expect(result.isLoading.value).toBe(true);
@@ -23,7 +24,7 @@ describe('createDataResult', () => {
 
   it('populates data when fetch resolves', async () => {
     const fetcher = vi.fn(() => Promise.resolve('hello'));
-    const result = createDataResult('test', '', fetcher);
+    const result = createQuery('test', '', fetcher);
 
     await flushPromises();
 
@@ -34,7 +35,7 @@ describe('createDataResult', () => {
 
   it('sets error when fetch rejects', async () => {
     const fetcher = vi.fn(() => Promise.reject(new Error('network fail')));
-    const result = createDataResult('test', '', fetcher);
+    const result = createQuery('test', '', fetcher);
 
     await flushPromises();
 
@@ -47,7 +48,7 @@ describe('createDataResult', () => {
   it('refetch() re-fetches and updates data', async () => {
     let callCount = 0;
     const fetcher = vi.fn(() => Promise.resolve(`call-${++callCount}`));
-    const result = createDataResult('test', '', fetcher);
+    const result = createQuery('test', '', fetcher);
 
     await flushPromises();
     expect(result.data.value).toBe('call-1');
@@ -60,15 +61,13 @@ describe('createDataResult', () => {
 
   it('same key returns cached refs (shared state)', async () => {
     const fetcher = vi.fn(() => Promise.resolve('data'));
-    const result1 = createDataResult('shared', '', fetcher);
+    const result1 = createQuery('shared', '', fetcher);
 
     await flushPromises();
 
-    const result2 = createDataResult('shared', '', fetcher);
+    const result2 = createQuery('shared', '', fetcher);
 
-    // Same refs
     expect(result2.data.value).toBe('data');
-    // data ref is the same object
     expect(result1.data).toBe(result2.data);
   });
 
@@ -76,19 +75,15 @@ describe('createDataResult', () => {
     let callCount = 0;
     const fetcher = vi.fn(() => Promise.resolve(`v${++callCount}`));
 
-    // First visit
-    const result1 = createDataResult('swr', '', fetcher);
+    const result1 = createQuery('swr', '', fetcher);
     await flushPromises();
     expect(result1.data.value).toBe('v1');
 
-    // Revisit — simulates navigating back to the page
-    const result2 = createDataResult('swr', '', fetcher);
+    const result2 = createQuery('swr', '', fetcher);
 
-    // Should show cached data instantly, no loading
     expect(result2.data.value).toBe('v1');
     expect(result2.isLoading.value).toBe(false);
 
-    // Background re-fetch updates data
     await flushPromises();
     expect(result2.data.value).toBe('v2');
     expect(fetcher).toHaveBeenCalledTimes(2);
@@ -97,21 +92,19 @@ describe('createDataResult', () => {
   it('isLoading is only true on cold load (empty data)', async () => {
     const fetcher = vi.fn(() => Promise.resolve(['item1']));
 
-    // Cold load with empty array default
-    const result = createDataResult('loading-test', [] as string[], fetcher);
+    const result = createQuery('loading-test', [] as string[], fetcher);
     expect(result.isLoading.value).toBe(true);
 
     await flushPromises();
     expect(result.isLoading.value).toBe(false);
 
-    // Revisit — data exists, no loading spinner
-    const result2 = createDataResult('loading-test', [] as string[], fetcher);
+    const result2 = createQuery('loading-test', [] as string[], fetcher);
     expect(result2.isLoading.value).toBe(false);
   });
 
   it('different keys have independent state', async () => {
-    const result1 = createDataResult('a', '', () => Promise.resolve('alpha'));
-    const result2 = createDataResult('b', '', () => Promise.resolve('beta'));
+    const result1 = createQuery('a', '', () => Promise.resolve('alpha'));
+    const result2 = createQuery('b', '', () => Promise.resolve('beta'));
 
     await flushPromises();
 
@@ -125,13 +118,12 @@ describe('createDataResult', () => {
       shouldFail ? Promise.reject(new Error('fail')) : Promise.resolve('ok'),
     );
 
-    const result = createDataResult('err-test', '', fetcher);
+    const result = createQuery('err-test', '', fetcher);
     await flushPromises();
     expect(result.error.value).not.toBeNull();
 
     shouldFail = false;
     result.refetch();
-    // Error cleared immediately on refetch
     await nextTick();
     expect(result.error.value).toBeNull();
 
@@ -140,7 +132,7 @@ describe('createDataResult', () => {
   });
 });
 
-describe('createDataResult — edge cases', () => {
+describe('createQuery — edge cases', () => {
   it('race condition: slow first fetch is discarded when fast revisit fetch wins', async () => {
     let resolveFirst: (v: string) => void;
     const slowFetcher = vi.fn(() => new Promise<string>((r) => {
@@ -148,19 +140,15 @@ describe('createDataResult — edge cases', () => {
     }));
     const fastFetcher = vi.fn(() => Promise.resolve('fresh'));
 
-    // First call — starts slow fetch
-    const result1 = createDataResult('race', '', slowFetcher);
+    const result1 = createQuery('race', '', slowFetcher);
     expect(result1.isLoading.value).toBe(true);
 
-    // Force revisit by manually triggering refetch with fast fetcher
-    const result2 = createDataResult('race', '', fastFetcher);
+    const result2 = createQuery('race', '', fastFetcher);
     result2.refetch();
 
-    // Fast fetch resolves first
     await flushPromises();
     expect(result2.data.value).toBe('fresh');
 
-    // Slow fetch resolves later — should be discarded (sequence counter)
     resolveFirst!('stale');
     await flushPromises();
     expect(result2.data.value).toBe('fresh');
@@ -170,50 +158,56 @@ describe('createDataResult — edge cases', () => {
     const fetcherA = vi.fn(() => Promise.resolve('from-A'));
     const fetcherB = vi.fn(() => Promise.resolve('from-B'));
 
-    // First call with fetcher A
-    createDataResult('fetcher-swap', '', fetcherA);
+    createQuery('fetcher-swap', '', fetcherA);
     await flushPromises();
     expect(fetcherA).toHaveBeenCalledOnce();
 
-    // Revisit with fetcher B (e.g., different client after auth change)
-    const result = createDataResult('fetcher-swap', '', fetcherB);
+    const result = createQuery('fetcher-swap', '', fetcherB);
     await flushPromises();
 
-    // Should use fetcher B for revalidation
     expect(fetcherB).toHaveBeenCalledOnce();
     expect(result.data.value).toBe('from-B');
   });
 
-  it('error during revalidation preserves stale data', async () => {
+  it('revalidation failure preserves stale data and does NOT set error', async () => {
     const goodFetcher = vi.fn(() => Promise.resolve('good-data'));
     const badFetcher = vi.fn(() => Promise.reject(new Error('network down')));
 
     // First fetch succeeds
-    createDataResult('err-preserve', '', goodFetcher);
+    createQuery('err-preserve', '', goodFetcher);
     await flushPromises();
 
-    // Revisit fails — stale data should survive
-    const result = createDataResult('err-preserve', '', badFetcher);
+    // Revisit fails — stale data survives, error NOT shown
+    const result = createQuery('err-preserve', '', badFetcher);
     await flushPromises();
 
     expect(result.data.value).toBe('good-data');
-    expect(result.error.value).toBeInstanceOf(Error);
+    expect(result.error.value).toBeNull(); // No error — stale data is sufficient
     expect(result.isLoading.value).toBe(false);
+  });
+
+  it('cold load failure DOES set error (no stale data to show)', async () => {
+    const badFetcher = vi.fn(() => Promise.reject(new Error('failed')));
+
+    const result = createQuery('cold-fail', '', badFetcher);
+    await flushPromises();
+
+    expect(result.data.value).toBe('');
+    expect(result.error.value).toBeInstanceOf(Error);
+    expect(result.error.value!.message).toBe('failed');
   });
 
   it('concurrent calls with same key share refs and deduplicate fetch', async () => {
     let fetchCount = 0;
     const fetcher = vi.fn(() => Promise.resolve(`result-${++fetchCount}`));
 
-    // Two components mount simultaneously, both call createDataResult with same key
-    const result1 = createDataResult('concurrent', '', fetcher);
-    const result2 = createDataResult('concurrent', '', fetcher);
+    const result1 = createQuery('concurrent', '', fetcher);
+    const result2 = createQuery('concurrent', '', fetcher);
 
-    expect(result1.data).toBe(result2.data); // Same ref
+    expect(result1.data).toBe(result2.data);
 
     await flushPromises();
 
-    // Second call is deduplicated — only 1 fetch
     expect(fetchCount).toBe(1);
     expect(result1.data.value).toBe('result-1');
   });
@@ -225,15 +219,12 @@ describe('createDataResult — edge cases', () => {
     }));
     const fetcherB = vi.fn(() => Promise.resolve('from-B'));
 
-    // First call — starts slow fetch with fetcherA
-    createDataResult('fetcher-inflight', '', fetcherA);
+    createQuery('fetcher-inflight', '', fetcherA);
     expect(fetcherA).toHaveBeenCalledOnce();
 
-    // Second call while in-flight — different fetcher, deduplicated
-    const result = createDataResult('fetcher-inflight', '', fetcherB);
+    const result = createQuery('fetcher-inflight', '', fetcherB);
     expect(fetcherB).not.toHaveBeenCalled();
 
-    // First fetch completes — detects fetcher changed, triggers re-fetch with fetcherB
     resolveFirst!('from-A');
     await flushPromises();
 
@@ -241,16 +232,15 @@ describe('createDataResult — edge cases', () => {
     expect(result.data.value).toBe('from-B');
   });
 
-  it('clearAllCaches makes next access a cold load again', async () => {
+  it('invalidateAllQueries makes next access a cold load again', async () => {
     const fetcher = vi.fn(() => Promise.resolve('data'));
 
-    createDataResult('clear-test', '', fetcher);
+    createQuery('clear-test', '', fetcher);
     await flushPromises();
 
-    clearAllCaches();
+    invalidateAllQueries();
 
-    // After clear, should be a cold load with loading spinner
-    const result = createDataResult('clear-test', '', fetcher);
+    const result = createQuery('clear-test', '', fetcher);
     expect(result.isLoading.value).toBe(true);
     expect(result.data.value).toBe('');
 
@@ -262,31 +252,17 @@ describe('createDataResult — edge cases', () => {
     // eslint-disable-next-line prefer-promise-reject-errors
     const fetcher = vi.fn(() => Promise.reject('string error'));
 
-    const result = createDataResult('non-error', '', fetcher);
+    const result = createQuery('non-error', '', fetcher);
     await flushPromises();
 
     expect(result.error.value).toBeInstanceOf(Error);
     expect(result.error.value!.message).toBe('string error');
   });
 
-  it('refetch after error recovery shows loading only if data is empty', async () => {
-    // First fetch fails — no data yet, so loading should show
-    const failFetcher = vi.fn(() => Promise.reject(new Error('fail')));
-    const result = createDataResult('refetch-loading', [] as string[], failFetcher);
-    await flushPromises();
-    expect(result.error.value).not.toBeNull();
-    expect(result.data.value).toEqual([]);
-
-    // Refetch — data is still empty array, so loading should show
-    result.refetch();
-    // Note: refetch uses the original fetcher closure
-    // This documents that refetch() reuses the fetcher from its createDataResult call
-  });
-
   it('handles fetcher that returns undefined', async () => {
     const fetcher = vi.fn(() => Promise.resolve(undefined as unknown as string));
 
-    const result = createDataResult('undef', 'default', fetcher);
+    const result = createQuery('undef', 'default', fetcher);
     await flushPromises();
 
     expect(result.data.value).toBeUndefined();
@@ -296,13 +272,68 @@ describe('createDataResult — edge cases', () => {
   it('isEmpty check treats populated array as non-empty (no loading on revalidate)', async () => {
     const fetcher = vi.fn(() => Promise.resolve(['a', 'b']));
 
-    // First load
-    const result1 = createDataResult('array-check', [] as string[], fetcher);
-    expect(result1.isLoading.value).toBe(true); // empty array = cold load
+    const result1 = createQuery('array-check', [] as string[], fetcher);
+    expect(result1.isLoading.value).toBe(true);
     await flushPromises();
 
-    // Revisit — array has items, no loading
-    const result2 = createDataResult('array-check', [] as string[], fetcher);
-    expect(result2.isLoading.value).toBe(false); // ['a','b'] is not empty
+    const result2 = createQuery('array-check', [] as string[], fetcher);
+    expect(result2.isLoading.value).toBe(false);
+  });
+});
+
+describe('createQuery — critical edge cases', () => {
+  it('fetcher that throws synchronously is caught and sets error', () => {
+    const fetcher = vi.fn((): Promise<string> => {
+      throw new Error('sync throw');
+    });
+
+    const result = createQuery('sync-throw', '', fetcher);
+
+    expect(result.error.value).toBeInstanceOf(Error);
+    expect(result.error.value!.message).toBe('sync throw');
+    expect(result.isLoading.value).toBe(false);
+  });
+
+  it('invalidateAllQueries during in-flight does not corrupt next fetch', async () => {
+    let resolveFirst: (v: string) => void;
+    const slowFetcher = vi.fn(() => new Promise<string>((r) => {
+      resolveFirst = r;
+    }));
+
+    const result1 = createQuery('cache-clear', '', slowFetcher);
+    expect(result1.isLoading.value).toBe(true);
+
+    invalidateAllQueries();
+
+    const freshFetcher = vi.fn(() => Promise.resolve('fresh'));
+    const result2 = createQuery('cache-clear', '', freshFetcher);
+    expect(result2.isLoading.value).toBe(true);
+
+    await flushPromises();
+    expect(result2.data.value).toBe('fresh');
+
+    resolveFirst!('stale');
+    await flushPromises();
+    expect(result2.data.value).toBe('fresh');
+  });
+
+  it('refetch while in-flight increments sequence and discards old result', async () => {
+    let resolveFirst: (v: string) => void;
+    const slowFetcher = vi.fn(() => new Promise<string>((r) => {
+      resolveFirst = r;
+    }));
+    const fastFetcher = vi.fn(() => Promise.resolve('fast'));
+
+    const result = createQuery('refetch-inflight', '', slowFetcher);
+
+    createQuery('refetch-inflight', '', fastFetcher);
+    result.refetch();
+
+    await flushPromises();
+    expect(result.data.value).toBe('fast');
+
+    resolveFirst!('slow');
+    await flushPromises();
+    expect(result.data.value).toBe('fast');
   });
 });

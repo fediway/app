@@ -1,4 +1,6 @@
 export { type AddAccountOptions, useAccountStore } from '../auth/account-store';
+export { _resetQueryCache, createQuery, invalidateAllQueries, type QueryResult } from './createQuery';
+export * from './queries';
 export { useAccount, type UseAccountReturn } from './useAccount';
 export { type ActionQueueError, useActionQueue, type UseActionQueueOptions, type UseActionQueueReturn } from './useActionQueue';
 export { type AppRestoredResult, type SavedAppState, useAppLifecycle, type UseAppLifecycleOptions } from './useAppLifecycle';

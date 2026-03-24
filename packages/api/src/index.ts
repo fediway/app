@@ -37,3 +37,7 @@ export {
   type PlatformAdapter,
   setPlatformAdapter,
 } from './platform';
+
+// Utils
+export { escapeHtml, formatMessageContent, stripHtml } from './utils/html';
+export { getProfilePath, getStatusPath } from './utils/paths';
