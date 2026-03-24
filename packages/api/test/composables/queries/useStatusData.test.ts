@@ -1,14 +1,15 @@
 import type { Context, Status } from '@repo/types';
+import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _resetDataHelpers } from '../useDataHelpers';
+import { _resetQueryCache } from '../../../src/composables/createQuery';
 
-// Mock @repo/api
+// Mock API methods
 const mockStatusFetch = vi.fn();
 const mockContextFetch = vi.fn();
 const mockStoreSet = vi.fn();
 const mockStoreSetMany = vi.fn();
 
-vi.mock('@repo/api', () => ({
+vi.mock('../../../src/composables/useClient', () => ({
   useClient: () => ({
     rest: {
       v1: {
@@ -21,15 +22,14 @@ vi.mock('@repo/api', () => ({
       },
     },
   }),
+}));
+
+vi.mock('../../../src/composables/useStatusStore', () => ({
   useStatusStore: () => ({
     set: mockStoreSet,
     setMany: mockStoreSetMany,
   }),
 }));
-
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
 
 function makeStatus(id: string): Status {
   return { id, content: `Status ${id}` } as unknown as Status;
@@ -43,7 +43,7 @@ function makeContext(ancestorIds: string[], descendantIds: string[]): Context {
 }
 
 afterEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
   mockStatusFetch.mockReset();
   mockContextFetch.mockReset();
   mockStoreSet.mockReset();
@@ -53,12 +53,12 @@ afterEach(() => {
 describe('useStatusData', () => {
   // Dynamic import to ensure mocks are in place
   async function getUseStatusData() {
-    const mod = await import('../useStatusData');
+    const mod = await import('../../../src/composables/queries/useStatusData');
     return mod.useStatusData;
   }
 
   describe('getStatusById', () => {
-    it('returns DataResult with correct status after fetch', async () => {
+    it('returns QueryResult with correct status after fetch', async () => {
       const status = makeStatus('123');
       mockStatusFetch.mockResolvedValue(status);
 

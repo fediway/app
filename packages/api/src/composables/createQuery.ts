@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import { ref, shallowRef } from 'vue';
 
-export interface DataResult<T> {
+export interface QueryResult<T> {
   data: Ref<T>;
   isLoading: Ref<boolean>;
   error: Ref<Error | null>;
@@ -24,11 +24,11 @@ const latestFetcher = new Map<string, () => Promise<any>>();
  *   re-fetches in background (no spinner, silent update)
  * - refetch(): forces a re-fetch
  */
-export function createDataResult<T>(
+export function createQuery<T>(
   key: string,
   defaultValue: T,
   fetcher: () => Promise<T>,
-): DataResult<T> {
+): QueryResult<T> {
   if (!registry.has(key)) {
     registry.set(key, {
       data: shallowRef(defaultValue),
@@ -54,22 +54,42 @@ export function createDataResult<T>(
       || data.value === undefined;
     if (isEmpty) {
       isLoading.value = true;
+      error.value = null; // Clear error on cold load / retry (not during revalidation)
     }
-    error.value = null;
 
     // Sequence counter — only the latest fetch writes to data
     const seq = (fetchSeq.get(key) ?? 0) + 1;
     fetchSeq.set(key, seq);
 
-    currentFetcher()
+    let fetchPromise: Promise<T>;
+    try {
+      fetchPromise = currentFetcher();
+    }
+    catch (err) {
+      error.value = err instanceof Error ? err : new Error(String(err));
+      isLoading.value = false;
+      inFlight.delete(key);
+      return;
+    }
+
+    fetchPromise
       .then((result) => {
         if (fetchSeq.get(key) === seq) {
           data.value = result;
+          error.value = null; // Clear any previous error on success
         }
       })
       .catch((err) => {
         if (fetchSeq.get(key) === seq) {
-          error.value = err instanceof Error ? err : new Error(String(err));
+          // Only set error if no data exists (cold load failure).
+          // During revalidation, keep stale data visible — don't replace
+          // a working view with an error screen because of a transient failure.
+          const hasData = data.value !== defaultValue
+            && !(Array.isArray(data.value) && data.value.length === 0)
+            && data.value !== undefined;
+          if (!hasData) {
+            error.value = err instanceof Error ? err : new Error(String(err));
+          }
         }
       })
       .finally(() => {
@@ -111,7 +131,7 @@ export function createDataResult<T>(
 /**
  * Clear all module-level caches. Call on logout / mode switch.
  */
-export function clearAllCaches() {
+export function invalidateAllQueries() {
   registry.clear();
   fetched.clear();
   inFlight.clear();
@@ -120,7 +140,7 @@ export function clearAllCaches() {
 }
 
 /** Reset all state — for testing only */
-export function _resetDataHelpers() {
+export function _resetQueryCache() {
   registry.clear();
   fetched.clear();
   inFlight.clear();

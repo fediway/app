@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
-import { useAuth } from '@repo/api';
+import { invalidateAllQueries, useAuth } from '@repo/api';
 import { Button, InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
 import { computed, ref } from 'vue';
-import { clearAllCaches } from '~/composables/useDataHelpers';
 import { useDataMode } from '~/composables/useDataMode';
 
 const PROTOCOL_RE = /^https?:\/\//;
@@ -81,7 +80,7 @@ async function handleDevLogin() {
 
   try {
     await login(normalizedUrl.value, accessToken.value.trim());
-    clearAllCaches();
+    invalidateAllQueries();
     setMode('live');
     navigateTo('/');
   }

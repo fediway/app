@@ -22,3 +22,9 @@ export function usePostComposer() {
     close,
   };
 }
+
+/** Reset all state — for testing only */
+export function _resetPostComposerState() {
+  isOpen.value = false;
+  replyingTo.value = null;
+}

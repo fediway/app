@@ -2,6 +2,7 @@ import type { Account, Context, Conversation, FediwayStatus, Notification, Relat
 import type { mastodon } from 'masto';
 import type { MastoClient, MastoClientConfig } from '../client';
 import type { CreateStatusParams, FediwayAPI } from '../fediway-api';
+import { escapeHtml } from '../utils/html';
 import {
   allAccounts,
   bookmarkedStatuses,
@@ -21,10 +22,6 @@ import {
 } from './fixtures';
 
 const HASH_PREFIX_RE = /^#/;
-const AMP_RE = /&/g;
-const LT_RE = /</g;
-const GT_RE = />/g;
-const NEWLINE_RE = /\n/g;
 
 function delay(): Promise<void> {
   const ms = 30 + Math.random() * 70;
@@ -267,7 +264,7 @@ export function createMockClient(): MastoClient {
             createdAt: new Date().toISOString(),
             editedAt: null,
             account: currentUserAccount,
-            content: `<p>${params.status.replace(AMP_RE, '&amp;').replace(LT_RE, '&lt;').replace(GT_RE, '&gt;').replace(NEWLINE_RE, '<br>')}</p>`,
+            content: `<p>${escapeHtml(params.status)}</p>`,
             visibility: (params.visibility ?? 'public') as Status['visibility'],
             sensitive: false,
             spoilerText: params.spoilerText ?? '',
@@ -738,7 +735,7 @@ export function createMockClient(): MastoClient {
         createdAt: new Date().toISOString(),
         editedAt: null,
         account: currentUserAccount,
-        content: `<p>${params.status.replace(AMP_RE, '&amp;').replace(LT_RE, '&lt;').replace(GT_RE, '&gt;').replace(NEWLINE_RE, '<br>')}</p>`,
+        content: `<p>${escapeHtml(params.status)}</p>`,
         visibility: (params.visibility ?? 'public') as FediwayStatus['visibility'],
         sensitive: false,
         spoilerText: '',

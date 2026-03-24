@@ -1,10 +1,11 @@
 import type { Notification } from '@repo/types';
+import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _resetDataHelpers } from '../useDataHelpers';
+import { _resetQueryCache } from '../../../src/composables/createQuery';
 
 const mockListNotifications = vi.fn();
 
-vi.mock('@repo/api', () => ({
+vi.mock('../../../src/composables/useClient', () => ({
   useClient: () => ({
     rest: {
       v1: {
@@ -14,12 +15,8 @@ vi.mock('@repo/api', () => ({
   }),
 }));
 
-function flushPromises() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
-
 afterEach(() => {
-  _resetDataHelpers();
+  _resetQueryCache();
   mockListNotifications.mockReset();
 });
 
@@ -29,12 +26,12 @@ function makeNotification(id: string, type: string): Notification {
 
 describe('useNotificationData', () => {
   async function getComposable() {
-    const mod = await import('../useNotificationData');
+    const mod = await import('../../../src/composables/queries/useNotificationData');
     return mod.useNotificationData();
   }
 
   async function getExports() {
-    return await import('../useNotificationData');
+    return await import('../../../src/composables/queries/useNotificationData');
   }
 
   describe('getNotifications', () => {

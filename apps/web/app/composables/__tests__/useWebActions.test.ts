@@ -1,4 +1,5 @@
 import type { Status } from '@repo/types';
+import { makeStatus } from '@repo/config/vitest/helpers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 
@@ -40,38 +41,6 @@ vi.mock('@repo/ui', () => ({
 
 // Must import after mocks are set up
 const { useWebActions } = await import('../useWebActions');
-
-function makeStatus(id: string, overrides: Partial<Status> = {}): Status {
-  return {
-    id,
-    uri: `https://example.com/statuses/${id}`,
-    createdAt: '2024-01-01T00:00:00Z',
-    editedAt: null,
-    account: { id: 'acct-1', acct: 'user@example.com', displayName: 'User', avatar: '' } as Status['account'],
-    content: '<p>Test post</p>',
-    visibility: 'public',
-    sensitive: false,
-    spoilerText: '',
-    mediaAttachments: [],
-    mentions: [],
-    tags: [],
-    emojis: [],
-    reblogsCount: 0,
-    favouritesCount: 0,
-    repliesCount: 0,
-    reblog: null,
-    poll: null,
-    card: null,
-    language: 'en',
-    text: null,
-    favourited: false,
-    reblogged: false,
-    muted: false,
-    bookmarked: false,
-    pinned: false,
-    ...overrides,
-  } as unknown as Status;
-}
 
 beforeEach(() => {
   mockStore.clear();

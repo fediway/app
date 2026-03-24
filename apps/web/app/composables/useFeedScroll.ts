@@ -2,30 +2,43 @@ import { useMediaQuery } from '@vueuse/core';
 import { ref } from 'vue';
 
 const feedEl = ref<HTMLElement | null>(null);
-const isDesktop = useMediaQuery('(min-width: 1024px)');
+let isDesktop: ReturnType<typeof useMediaQuery> | null = null;
+
+function getIsDesktop() {
+  if (!isDesktop)
+    isDesktop = useMediaQuery('(min-width: 1024px)');
+  return isDesktop;
+}
 
 export function useFeedScroll() {
   function getScrollPosition(): number {
-    if (isDesktop.value && feedEl.value) {
+    if (typeof window === 'undefined')
+      return 0;
+    if (getIsDesktop().value && feedEl.value)
       return feedEl.value.scrollTop;
-    }
     return window.scrollY;
   }
 
   function scrollTo(y: number, behavior?: ScrollBehavior) {
+    if (typeof window === 'undefined')
+      return;
     const options: ScrollToOptions = { top: y, behavior };
-    if (isDesktop.value && feedEl.value) {
+    if (getIsDesktop().value && feedEl.value)
       feedEl.value.scrollTo(options);
-    }
-    else {
+    else
       window.scrollTo(options);
-    }
   }
 
   return {
     feedEl,
-    isDesktop,
+    isDesktop: getIsDesktop(),
     getScrollPosition,
     scrollTo,
   };
+}
+
+/** Reset all state — for testing only */
+export function _resetFeedScrollState() {
+  feedEl.value = null;
+  isDesktop = null;
 }

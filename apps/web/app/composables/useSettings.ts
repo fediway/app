@@ -18,18 +18,6 @@ export interface AppSettings {
 
 const STORAGE_KEY = 'fediway-settings';
 
-function loadFromStorage(): AppSettings {
-  if (typeof window === 'undefined')
-    return getDefaults();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw)
-      return { ...getDefaults(), ...JSON.parse(raw) };
-  }
-  catch { /* ignore */ }
-  return getDefaults();
-}
-
 function getDefaults(): AppSettings {
   return {
     notifications: {
@@ -46,27 +34,42 @@ function getDefaults(): AppSettings {
   };
 }
 
-const settings = reactive<AppSettings>(loadFromStorage());
-
-// Persist to localStorage on any change
-if (typeof window !== 'undefined') {
-  watch(settings, (val) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(val));
-  }, { deep: true });
+function loadFromStorage(): AppSettings {
+  if (typeof window === 'undefined')
+    return getDefaults();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw)
+      return { ...getDefaults(), ...JSON.parse(raw) };
+  }
+  catch { /* ignore */ }
+  return getDefaults();
 }
 
+// Module-level state — deferred initialization
+const settings = reactive<AppSettings>(getDefaults());
+let initialized = false;
+
 export function useSettings() {
+  if (!initialized) {
+    Object.assign(settings, loadFromStorage());
+
+    if (typeof window !== 'undefined') {
+      watch(settings, (val) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(val));
+      }, { deep: true });
+    }
+
+    initialized = true;
+  }
+
   const { theme, isDark, setTheme: setDarkModeTheme } = useDarkMode();
-  // Preference cookie — 'system'|'dark'|'light' (for settings button SSR).
   const themeCookie = useCookie('fediway_theme', { maxAge: 60 * 60 * 24 * 365 });
-  // Resolved cookie — always 'dark'|'light' (for SSR .dark class on <html>).
   const resolvedCookie = useCookie('fediway_theme_resolved', { maxAge: 60 * 60 * 24 * 365 });
 
   function setTheme(value: ThemePreference) {
     themeCookie.value = value;
     setDarkModeTheme(value);
-    // Sync resolved cookie immediately so the next SSR has the right class.
-    // nextTick isn't needed — isDark is a computed that updates synchronously after setTheme.
     resolvedCookie.value = isDark.value ? 'dark' : 'light';
   }
 
@@ -90,4 +93,10 @@ export function useSettings() {
     toggleNotification,
     toggleSensitiveMedia,
   };
+}
+
+/** Reset all state — for testing only */
+export function _resetSettingsState() {
+  Object.assign(settings, getDefaults());
+  initialized = false;
 }
