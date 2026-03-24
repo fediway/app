@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { exploreTabs } = useDiscoveryTabs();
+
 const trendingLinks = [
   {
     title: 'Scientists discover high-temperature superconductor at room pressure',
@@ -62,7 +64,10 @@ function getLinkPageUrl(url: string): string {
 
 <template>
   <div class="w-full">
-    <ExploreHeader title="Explore" />
+    <DiscoveryHeader
+      :tabs="exploreTabs"
+      @search="q => navigateTo({ path: '/search', query: { q } })"
+    />
 
     <div class="divide-y divide-border">
       <NuxtLink

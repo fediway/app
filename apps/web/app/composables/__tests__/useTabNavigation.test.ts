@@ -125,7 +125,7 @@ describe('useTabNavigation', () => {
     tab.switchTab('home', navigateMock);
     // restoreScroll calls window.scrollTo after nextTick
     await nextTick();
-    expect(scrollToMock).toHaveBeenCalledWith(0, 500);
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 500, behavior: undefined });
   });
 
   it('isAtTabRoot is true at tab root', () => {
@@ -169,7 +169,7 @@ describe('useTabNavigation', () => {
     scrollToMock.mockClear();
     tab.switchTab('search', navigateMock);
     await nextTick();
-    expect(scrollToMock).toHaveBeenCalledWith(0, 0);
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: undefined });
   });
 
   it('isTabSwitching is cleared after onRouteChange', () => {

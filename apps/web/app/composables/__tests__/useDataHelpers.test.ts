@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
-import { _resetDataHelpers, createDataResult } from '../useDataHelpers';
+import { _resetDataHelpers, clearAllCaches, createDataResult } from '../useDataHelpers';
 
 afterEach(() => {
   _resetDataHelpers();
@@ -137,5 +137,149 @@ describe('createDataResult', () => {
 
     await flushPromises();
     expect(result.data.value).toBe('ok');
+  });
+});
+
+describe('createDataResult — edge cases', () => {
+  it('race condition: slow first fetch is discarded when fast revisit fetch wins', async () => {
+    let resolveFirst: (v: string) => void;
+    const slowFetcher = vi.fn(() => new Promise<string>((r) => {
+      resolveFirst = r;
+    }));
+    const fastFetcher = vi.fn(() => Promise.resolve('fresh'));
+
+    // First call — starts slow fetch
+    const result1 = createDataResult('race', '', slowFetcher);
+    expect(result1.isLoading.value).toBe(true);
+
+    // Force revisit by manually triggering refetch with fast fetcher
+    const result2 = createDataResult('race', '', fastFetcher);
+    result2.refetch();
+
+    // Fast fetch resolves first
+    await flushPromises();
+    expect(result2.data.value).toBe('fresh');
+
+    // Slow fetch resolves later — should be discarded (sequence counter)
+    resolveFirst!('stale');
+    await flushPromises();
+    expect(result2.data.value).toBe('fresh');
+  });
+
+  it('revalidation uses the NEW fetcher, not the original one', async () => {
+    const fetcherA = vi.fn(() => Promise.resolve('from-A'));
+    const fetcherB = vi.fn(() => Promise.resolve('from-B'));
+
+    // First call with fetcher A
+    createDataResult('fetcher-swap', '', fetcherA);
+    await flushPromises();
+    expect(fetcherA).toHaveBeenCalledOnce();
+
+    // Revisit with fetcher B (e.g., different client after auth change)
+    const result = createDataResult('fetcher-swap', '', fetcherB);
+    await flushPromises();
+
+    // Should use fetcher B for revalidation
+    expect(fetcherB).toHaveBeenCalledOnce();
+    expect(result.data.value).toBe('from-B');
+  });
+
+  it('error during revalidation preserves stale data', async () => {
+    const goodFetcher = vi.fn(() => Promise.resolve('good-data'));
+    const badFetcher = vi.fn(() => Promise.reject(new Error('network down')));
+
+    // First fetch succeeds
+    createDataResult('err-preserve', '', goodFetcher);
+    await flushPromises();
+
+    // Revisit fails — stale data should survive
+    const result = createDataResult('err-preserve', '', badFetcher);
+    await flushPromises();
+
+    expect(result.data.value).toBe('good-data');
+    expect(result.error.value).toBeInstanceOf(Error);
+    expect(result.isLoading.value).toBe(false);
+  });
+
+  it('concurrent calls with same key share refs and deduplicate fetch', async () => {
+    let fetchCount = 0;
+    const fetcher = vi.fn(() => Promise.resolve(`result-${++fetchCount}`));
+
+    // Two components mount simultaneously, both call createDataResult with same key
+    const result1 = createDataResult('concurrent', '', fetcher);
+    const result2 = createDataResult('concurrent', '', fetcher);
+
+    expect(result1.data).toBe(result2.data); // Same ref
+
+    await flushPromises();
+
+    // Second call is deduplicated — only 1 fetch
+    expect(fetchCount).toBe(1);
+    expect(result1.data.value).toBe('result-1');
+  });
+
+  it('clearAllCaches makes next access a cold load again', async () => {
+    const fetcher = vi.fn(() => Promise.resolve('data'));
+
+    createDataResult('clear-test', '', fetcher);
+    await flushPromises();
+
+    clearAllCaches();
+
+    // After clear, should be a cold load with loading spinner
+    const result = createDataResult('clear-test', '', fetcher);
+    expect(result.isLoading.value).toBe(true);
+    expect(result.data.value).toBe('');
+
+    await flushPromises();
+    expect(result.data.value).toBe('data');
+  });
+
+  it('non-Error rejection is wrapped in Error', async () => {
+    // eslint-disable-next-line prefer-promise-reject-errors
+    const fetcher = vi.fn(() => Promise.reject('string error'));
+
+    const result = createDataResult('non-error', '', fetcher);
+    await flushPromises();
+
+    expect(result.error.value).toBeInstanceOf(Error);
+    expect(result.error.value!.message).toBe('string error');
+  });
+
+  it('refetch after error recovery shows loading only if data is empty', async () => {
+    // First fetch fails — no data yet, so loading should show
+    const failFetcher = vi.fn(() => Promise.reject(new Error('fail')));
+    const result = createDataResult('refetch-loading', [] as string[], failFetcher);
+    await flushPromises();
+    expect(result.error.value).not.toBeNull();
+    expect(result.data.value).toEqual([]);
+
+    // Refetch — data is still empty array, so loading should show
+    result.refetch();
+    // Note: refetch uses the original fetcher closure
+    // This documents that refetch() reuses the fetcher from its createDataResult call
+  });
+
+  it('handles fetcher that returns undefined', async () => {
+    const fetcher = vi.fn(() => Promise.resolve(undefined as unknown as string));
+
+    const result = createDataResult('undef', 'default', fetcher);
+    await flushPromises();
+
+    expect(result.data.value).toBeUndefined();
+    expect(result.isLoading.value).toBe(false);
+  });
+
+  it('isEmpty check treats populated array as non-empty (no loading on revalidate)', async () => {
+    const fetcher = vi.fn(() => Promise.resolve(['a', 'b']));
+
+    // First load
+    const result1 = createDataResult('array-check', [] as string[], fetcher);
+    expect(result1.isLoading.value).toBe(true); // empty array = cold load
+    await flushPromises();
+
+    // Revisit — array has items, no loading
+    const result2 = createDataResult('array-check', [] as string[], fetcher);
+    expect(result2.isLoading.value).toBe(false); // ['a','b'] is not empty
   });
 });

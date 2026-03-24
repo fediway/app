@@ -79,9 +79,6 @@ registerBackHandler(50, () => {
 });
 
 // Initialize Capacitor back button listener (client-only to avoid SSR crash)
-onMounted(() => {
-  initCapacitorBackButton();
-});
 
 function handlePost(data: { content: string; spoilerText: string; visibility: string }) {
   addPost({
@@ -93,6 +90,9 @@ function handlePost(data: { content: string; spoilerText: string; visibility: st
   });
 }
 
+const { feedEl } = useFeedScroll();
+const feedRef = feedEl;
+
 const { toast } = useToast();
 
 function handleSendMessage(data: { recipients: Account[]; message: string; status: Status }) {
@@ -100,6 +100,10 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
   toast.success('Message sent');
   router.push(`/messages/${conversationId}`);
 }
+
+onMounted(() => {
+  initCapacitorBackButton();
+});
 </script>
 
 <template>
@@ -143,22 +147,31 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     <MobileFooter class="hidden max-lg:block" />
     <MobileSidebar />
 
-    <!-- Responsive Layout: single slot, sidebars show/hide via CSS -->
+    <!-- Responsive Layout: page scrolls normally, sidebars + header stay fixed via sticky -->
     <div class="flex justify-center min-h-screen">
       <div class="w-full max-w-[1200px] lg:grid lg:grid-cols-[240px_minmax(0,650px)_280px] lg:gap-8 lg:px-4">
         <!-- Left Column: Menu Sidebar (desktop only) -->
-        <nav aria-label="Main navigation" class="hidden lg:block h-fit sticky top-4">
-          <DesktopSidebar />
+        <nav aria-label="Main navigation" class="hidden lg:block">
+          <div class="lg:sticky lg:top-0 lg:pt-14">
+            <DesktopSidebar />
+          </div>
         </nav>
 
-        <!-- Center Column: Main Feed -->
-        <main id="main-content" class="min-w-0 bg-white dark:bg-gray-900 lg:border-x lg:border-gray-200 dark:lg:border-gray-800 min-h-screen pb-20 lg:pb-0">
-          <slot />
-        </main>
+        <!-- Center Column: Sticky header (with rounded corners) + Feed content -->
+        <div class="min-w-0 min-h-screen">
+          <DesktopFeedHeader />
+          <main
+            id="main-content"
+            ref="feedRef"
+            class="bg-white dark:bg-gray-900 pb-20 lg:border-x lg:border-border"
+          >
+            <slot />
+          </main>
+        </div>
 
         <!-- Right Column: Trending Sidebar (desktop only) -->
-        <aside aria-label="Trending" class="hidden lg:block h-fit sticky top-4">
-          <TrendingSidebar />
+        <aside aria-label="Trending" class="hidden lg:block">
+          <TrendingSidebarWrapper />
         </aside>
       </div>
     </div>
@@ -167,3 +180,15 @@ function handleSendMessage(data: { recipients: Account[]; message: string; statu
     <ToastContainer />
   </div>
 </template>
+
+<style scoped>
+</style>
+
+<style>
+/* Hide in-page PageHeader on desktop — the layout header handles it */
+@media (min-width: 1024px) {
+  #main-content > * > header:first-child {
+    display: none;
+  }
+}
+</style>

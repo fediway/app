@@ -1,4 +1,5 @@
 import { computed, nextTick, ref } from 'vue';
+import { useFeedScroll } from '~/composables/useFeedScroll';
 import { useNavigationStore } from '~/stores/navigation';
 
 export type TabId = 'home' | 'search' | 'new-post' | 'notifications' | 'profile';
@@ -20,6 +21,7 @@ const isTabSwitching = ref(false);
 
 export function useTabNavigation() {
   const navigation = useNavigationStore();
+  const { getScrollPosition, scrollTo: feedScrollTo } = useFeedScroll();
 
   function getTabRoot(tabId: TabId): string {
     if (tabId === 'profile') {
@@ -45,13 +47,13 @@ export function useTabNavigation() {
 
   function saveCurrentScroll() {
     const state = getTabState(activeTab.value);
-    state.scrollY = window.scrollY;
+    state.scrollY = getScrollPosition();
   }
 
   function restoreScroll(tabId: TabId) {
     const state = getTabState(tabId);
     nextTick(() => {
-      window.scrollTo(0, state.scrollY);
+      feedScrollTo(state.scrollY);
     });
   }
 
@@ -72,7 +74,7 @@ export function useTabNavigation() {
       }
       else {
         // Already at root — smooth scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        feedScrollTo(0, 'smooth');
       }
       return;
     }

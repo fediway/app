@@ -2,6 +2,7 @@
 import { AccountCard, FollowButton } from '@repo/ui';
 import { watch } from 'vue';
 
+const { exploreTabs } = useDiscoveryTabs();
 const { getAllAccounts, getProfilePath } = useAccountData();
 const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
 
@@ -17,7 +18,10 @@ watch(accounts, (accts) => {
 
 <template>
   <div class="w-full">
-    <ExploreHeader title="Explore" />
+    <DiscoveryHeader
+      :tabs="exploreTabs"
+      @search="q => navigateTo({ path: '/search', query: { q } })"
+    />
 
     <div class="divide-y divide-gray-100 dark:divide-gray-800">
       <div

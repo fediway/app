@@ -3,6 +3,7 @@ import { TagList } from '@repo/ui';
 import { computed } from 'vue';
 
 const router = useRouter();
+const { exploreTabs } = useDiscoveryTabs();
 const { getTrendingTags, getStatusesByTag } = useExploreData();
 const { data: tags } = getTrendingTags();
 
@@ -20,7 +21,10 @@ function handleTagClick(name: string) {
 
 <template>
   <div class="w-full">
-    <ExploreHeader title="Explore" />
+    <DiscoveryHeader
+      :tabs="exploreTabs"
+      @search="q => navigateTo({ path: '/search', query: { q } })"
+    />
 
     <TagList
       :tags="trendingTags"

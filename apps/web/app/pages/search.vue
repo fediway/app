@@ -6,9 +6,7 @@ import {
   Avatar,
   EmptyState,
   FollowButton,
-  SearchInput,
   Section,
-  TabBar,
   Timeline,
 } from '@repo/ui';
 import { computed, ref, watch } from 'vue';
@@ -102,12 +100,6 @@ function handleSearch() {
   }
 }
 
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Enter') {
-    handleSearch();
-  }
-}
-
 function handleStatusClick(statusId: string) {
   navigateTo(getStatusPath(statusId));
 }
@@ -131,19 +123,12 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
 
 <template>
   <div class="w-full">
-    <!-- Search Input -->
-    <div class="px-5 pb-3 pt-[45px]">
-      <SearchInput
-        v-model="searchQuery"
-        placeholder="Search"
-        @keydown="handleKeydown"
-      />
-    </div>
-
-    <!-- Tabs -->
-    <TabBar
-      v-model="activeTab"
+    <DiscoveryHeader
+      v-model:search="searchQuery"
+      v-model:tab="activeTab"
       :tabs="searchTabs"
+      search-placeholder="Search"
+      @search="handleSearch"
     />
 
     <!-- Discover State (no search query) -->

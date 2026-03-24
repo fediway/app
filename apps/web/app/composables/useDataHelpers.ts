@@ -11,6 +11,8 @@ export interface DataResult<T> {
 // Module-level state — persists across page navigations
 const registry = new Map<string, { data: Ref<any>; isLoading: Ref<boolean>; error: Ref<Error | null> }>();
 const fetched = new Set<string>();
+const inFlight = new Set<string>();
+const fetchSeq = new Map<string, number>();
 
 /**
  * Creates a reactive data result with loading/error tracking.
@@ -49,25 +51,38 @@ export function createDataResult<T>(
     }
     error.value = null;
 
+    // Sequence counter — only the latest fetch writes to data
+    const seq = (fetchSeq.get(key) ?? 0) + 1;
+    fetchSeq.set(key, seq);
+
     fetcher()
       .then((result) => {
-        data.value = result;
+        if (fetchSeq.get(key) === seq) {
+          data.value = result;
+        }
       })
       .catch((err) => {
-        error.value = err instanceof Error ? err : new Error(String(err));
+        if (fetchSeq.get(key) === seq) {
+          error.value = err instanceof Error ? err : new Error(String(err));
+        }
       })
       .finally(() => {
-        isLoading.value = false;
+        if (fetchSeq.get(key) === seq) {
+          isLoading.value = false;
+          inFlight.delete(key);
+        }
       });
   }
 
   if (!fetched.has(key)) {
     // First access — fetch with loading spinner
     fetched.add(key);
+    inFlight.add(key);
     doFetch();
   }
-  else {
+  else if (!inFlight.has(key)) {
     // Revisit — revalidate silently in background (no spinner)
+    inFlight.add(key);
     doFetch();
   }
 
@@ -85,10 +100,14 @@ export function createDataResult<T>(
 export function clearAllCaches() {
   registry.clear();
   fetched.clear();
+  inFlight.clear();
+  fetchSeq.clear();
 }
 
 /** Reset all state — for testing only */
 export function _resetDataHelpers() {
   registry.clear();
   fetched.clear();
+  inFlight.clear();
+  fetchSeq.clear();
 }
