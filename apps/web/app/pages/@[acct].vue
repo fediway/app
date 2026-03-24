@@ -9,6 +9,8 @@ import {
 } from '@repo/ui';
 import { useFollows } from '~/composables/useFollows';
 
+const HTML_TAG_RE = /<[^>]*>/g;
+
 definePageMeta({});
 
 const route = useRoute();
@@ -43,7 +45,7 @@ useSeoMeta({
     ? `${account.value.displayName || account.value.username} (@${account.value.acct})`
     : `@${acct.value}`,
   ogTitle: () => account.value?.displayName || `@${acct.value}`,
-  ogDescription: () => account.value?.note?.replace(/<[^>]*>/g, '').slice(0, 200) || '',
+  ogDescription: () => account.value?.note?.replace(HTML_TAG_RE, '').slice(0, 200) || '',
   ogImage: () => account.value?.avatar || '',
   twitterCard: 'summary',
 });

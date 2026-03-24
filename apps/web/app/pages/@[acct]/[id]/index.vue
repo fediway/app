@@ -6,6 +6,8 @@ import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
+const HTML_TAG_RE = /<[^>]*>/g;
+
 const route = useRoute();
 const router = useRouter();
 
@@ -32,10 +34,10 @@ usePageHeader({
 // SEO meta tags for link previews
 useSeoMeta({
   title: () => status.value
-    ? `${status.value.account.displayName || status.value.account.username}: "${status.value.content.replace(/<[^>]*>/g, '').slice(0, 80)}"`
+    ? `${status.value.account.displayName || status.value.account.username}: "${status.value.content.replace(HTML_TAG_RE, '').slice(0, 80)}"`
     : 'Post',
   ogTitle: () => status.value?.account.displayName || 'Post',
-  ogDescription: () => status.value?.content.replace(/<[^>]*>/g, '').slice(0, 200) || '',
+  ogDescription: () => status.value?.content.replace(HTML_TAG_RE, '').slice(0, 200) || '',
   ogImage: () => status.value?.mediaAttachments?.[0]?.previewUrl || status.value?.account.avatar || '',
   twitterCard: () => status.value?.mediaAttachments?.length ? 'summary_large_image' : 'summary',
 });
