@@ -2,8 +2,8 @@
 import type { Account, Status } from '@repo/types';
 import { MediaLightbox, ToastContainer, useToast } from '@repo/ui';
 import { useBackButton } from '~/composables/useBackButton';
+import { useConversationData } from '~/composables/useConversationData';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
-import { useMessages } from '~/composables/useMessages';
 import { useNetworkStatus } from '~/composables/useNetworkStatus';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { usePosts } from '~/composables/usePosts';
@@ -16,7 +16,7 @@ useNetworkStatus();
 const navigation = useNavigationStore();
 const { isOpen, replyingTo, close } = usePostComposer();
 const { addPost } = usePosts();
-const { shareStatus } = useMessages();
+const { shareStatus } = useConversationData();
 const {
   isOpen: isSendMessageOpen,
   statusToShare,
@@ -95,10 +95,19 @@ const feedRef = feedEl;
 
 const { toast } = useToast();
 
-function handleSendMessage(data: { recipients: Account[]; message: string; status: Status }) {
-  const conversationId = shareStatus(data.recipients, data.message, data.status);
-  toast.success('Message sent');
-  router.push(`/messages/${conversationId}`);
+async function handleSendMessage(data: { recipients: Account[]; message: string; status: Status }) {
+  const recipient = data.recipients[0];
+  if (!recipient)
+    return;
+
+  try {
+    await shareStatus(recipient.acct, data.message, data.status);
+    toast.success('Message sent');
+    router.push('/messages');
+  }
+  catch {
+    toast.error('Failed to send message');
+  }
 }
 
 onMounted(() => {

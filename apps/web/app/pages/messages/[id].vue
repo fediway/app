@@ -1,38 +1,18 @@
 <script setup lang="ts">
-import type { Conversation, Status } from '@repo/types';
-import { useClient } from '@repo/api';
+import { useAuth } from '@repo/api';
 import { ChatHeader, EmptyState, MessageBubble, MessageInput, Skeleton } from '@repo/ui';
 import { computed, nextTick, ref, watch } from 'vue';
-import { createDataResult } from '~/composables/useDataHelpers';
 
 const route = useRoute();
 const router = useRouter();
-const client = useClient();
+const { getConversationDetail, sendDirectMessage, isOwnMessage, formatMessageContent } = useConversationData();
 
 const conversationId = computed(() => {
   const rawId = route.params.id;
   return (Array.isArray(rawId) ? rawId[0] : rawId) || '';
 });
 
-// Fetch the conversation directly + its message thread in one shot
-const { data, isLoading, error } = createDataResult<{ conversation: Conversation | null; messages: Status[] }>(
-  `conversation-detail:${conversationId.value}`,
-  { conversation: null, messages: [] },
-  async () => {
-    // First, get the conversation (mark as read)
-    const conv = await client.rest.v1.conversations.$select(conversationId.value).read();
-
-    if (!conv?.lastStatus) {
-      return { conversation: conv, messages: [] };
-    }
-
-    // Then fetch the thread context
-    const context = await client.rest.v1.statuses.$select(conv.lastStatus.id).context.fetch();
-    const messages = [...context.ancestors, conv.lastStatus, ...context.descendants];
-
-    return { conversation: conv, messages };
-  },
-);
+const { data, isLoading, error, refetch } = getConversationDetail(conversationId.value);
 
 const conversation = computed(() => data.value.conversation);
 const threadStatuses = computed(() => data.value.messages);
@@ -48,36 +28,39 @@ const participant = computed(() => {
   };
 });
 
-// Determine which messages are "own" (sent by the logged-in user, not the participant)
-function isOwnMessage(status: Status): boolean {
-  const participantAcct = participant.value?.acct;
-  return status.account.acct !== participantAcct;
-}
-
-function stripHtml(html: string): string {
-  const text = html.replace(/<[^>]*>/g, '');
-  const el = document.createElement('textarea');
-  el.innerHTML = text;
-  return el.value;
-}
+// All participant accts (other accounts + current user) — used to strip routing mentions
+// Mastodon's conversation.accounts excludes the current user, so we add them explicitly
+const { currentUser } = useAuth();
+const allParticipantAccts = computed(() => {
+  const accts = conversation.value?.accounts.map(a => a.acct) ?? [];
+  if (currentUser.value?.acct)
+    accts.push(currentUser.value.acct);
+  return accts;
+});
 
 const newMessage = ref('');
 const messagesContainer = ref<HTMLElement>();
+const isSending = ref(false);
 
-function handleSend() {
-  if (!newMessage.value.trim())
+async function handleSend() {
+  const content = newMessage.value.trim();
+  if (!content || !participant.value)
     return;
 
-  const participantAccount = conversation.value?.accounts[0];
-  if (!participantAccount)
-    return;
-
-  client.rest.v1.statuses.create({
-    status: `@${participantAccount.acct} ${newMessage.value.trim()}`,
-    visibility: 'direct',
-  });
-
+  isSending.value = true;
   newMessage.value = '';
+
+  try {
+    await sendDirectMessage(participant.value.acct, content);
+    refetch();
+  }
+  catch {
+    // Restore message on failure
+    newMessage.value = content;
+  }
+  finally {
+    isSending.value = false;
+  }
 }
 
 function goBack() {
@@ -127,7 +110,7 @@ watch(() => threadStatuses.value.length, () => {
           <MessageBubble
             v-for="status in threadStatuses"
             :key="status.id"
-            :content="stripHtml(status.content)"
+            :content="formatMessageContent(status.content, allParticipantAccts)"
             :is-own="isOwnMessage(status)"
             :sent-at="status.createdAt"
           />
@@ -138,6 +121,7 @@ watch(() => threadStatuses.value.length, () => {
           <MessageInput
             v-model="newMessage"
             placeholder="Write a message..."
+            :disabled="isSending"
             @send="handleSend"
           />
         </div>

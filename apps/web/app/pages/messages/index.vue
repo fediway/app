@@ -1,20 +1,9 @@
 <script setup lang="ts">
-import type { Conversation } from '@repo/types';
-import { useClient } from '@repo/api';
 import { ChatList, EmptyState, PageHeader, Skeleton } from '@repo/ui';
-import { createDataResult } from '~/composables/useDataHelpers';
 
 const router = useRouter();
-const client = useClient();
-
-const { data: conversations, isLoading, error, refetch } = createDataResult<Conversation[]>(
-  'conversations',
-  [],
-  async () => {
-    const result = await client.rest.v1.conversations.list({ limit: 40 });
-    return result;
-  },
-);
+const { getConversations } = useConversationData();
+const { data: conversations, isLoading, error, refetch } = getConversations();
 
 function navigateToChat(conversationId: string) {
   router.push(`/messages/${conversationId}`);

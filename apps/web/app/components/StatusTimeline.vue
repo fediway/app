@@ -8,8 +8,13 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 defineProps<{
   statuses: Status[];
   isLoading: boolean;
+  error?: Error | null;
   emptyTitle: string;
   emptyDescription: string;
+}>();
+
+const emit = defineEmits<{
+  retry: [];
 }>();
 
 const router = useRouter();
@@ -21,7 +26,15 @@ const { open: openLightbox } = useMediaLightbox();
 
 <template>
   <EmptyState
-    v-if="!isLoading && statuses.length === 0"
+    v-if="error"
+    :title="error.message || 'Failed to load'"
+    action-label="Try again"
+    class="py-12"
+    @action="emit('retry')"
+  />
+
+  <EmptyState
+    v-else-if="!isLoading && statuses.length === 0"
     :title="emptyTitle"
     :description="emptyDescription"
     class="py-12"
