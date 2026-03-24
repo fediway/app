@@ -5,18 +5,14 @@ import { useNavigationStore } from '~/stores/navigation';
 const router = useRouter();
 const navigation = useNavigationStore();
 
-function handleOpenChange(open: boolean) {
-  if (open) {
-    navigation.openSidebar();
-  }
-  else {
-    navigation.closeSidebar();
-  }
-}
-
 function handleItemClick(item: { to: string }) {
   navigation.closeSidebar();
   router.push(item.to);
+}
+
+function handleOpenChange(open: boolean) {
+  if (!open)
+    navigation.closeSidebar();
 }
 </script>
 
@@ -42,13 +38,16 @@ function handleItemClick(item: { to: string }) {
       </ClientOnly>
     </template>
 
-    <NavDrawerItem
-      v-for="item in navigation.menuItems"
-      :key="item.id"
-      :icon="item.icon"
-      :label="item.label"
-      :active="navigation.activeItemId === item.id"
-      @click="handleItemClick(item)"
-    />
+    <!-- Menu items -->
+    <nav aria-label="Main menu" class="flex flex-col p-2">
+      <NavDrawerItem
+        v-for="item in navigation.menuItems"
+        :key="item.id"
+        :icon="item.icon"
+        :label="item.label"
+        :active="navigation.activeItemId === item.id"
+        @click="handleItemClick(item)"
+      />
+    </nav>
   </NavDrawer>
 </template>

@@ -25,7 +25,7 @@ defineEmits<{
 <template>
   <header
     :class="cn(
-      'sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur',
+      'sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur hidden lg:block',
       props.class,
     )"
   >

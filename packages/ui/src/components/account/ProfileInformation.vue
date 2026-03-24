@@ -9,9 +9,9 @@ const props = defineProps<{
 }>();
 
 const stats = computed(() => [
-  { count: props.account.statusesCount, label: 'Posts' },
   { count: props.account.followersCount, label: 'Followers' },
   { count: props.account.followingCount, label: 'Following' },
+  { count: props.account.statusesCount, label: 'Posts' },
 ]);
 
 const accountAge = computed(() => {
@@ -54,14 +54,6 @@ function extractText(html: string): string {
       </p>
     </div>
 
-    <!-- Bio (HTML via RichText) -->
-    <RichText
-      v-if="account.note"
-      :content="account.note"
-      :emojis="account.emojis"
-      class="text-base leading-[22px] text-foreground"
-    />
-
     <!-- Stats -->
     <div v-if="stats.length" class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
       <div
@@ -73,6 +65,14 @@ function extractText(html: string): string {
         <span class="text-sm text-foreground/80">{{ stat.label }}</span>
       </div>
     </div>
+
+    <!-- Bio (HTML via RichText) -->
+    <RichText
+      v-if="account.note"
+      :content="account.note"
+      :emojis="account.emojis"
+      class="text-base leading-[22px] text-foreground"
+    />
 
     <!-- Profile fields + Join date -->
     <div v-if="account.fields.length > 0 || accountAge" class="flex flex-wrap items-center gap-2">

@@ -152,9 +152,32 @@ onMounted(() => {
       @close="closeLightbox"
     />
 
-    <!-- Mobile Navigation -->
-    <MobileFooter class="hidden max-lg:block" />
-    <MobileSidebar />
+    <!-- Mobile: push-style sidebar layout -->
+    <div class="lg:hidden relative min-h-screen" style="overflow-x: clip;">
+      <!-- Sidebar (off-screen left, revealed by push) -->
+      <MobileSidebar
+        class="fixed top-0 left-0 bottom-0 w-[280px] max-w-[80vw] transition-transform duration-250 ease-out"
+        :class="navigation.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+      />
+
+      <!-- Mobile content wrapper (pushed right when sidebar opens) -->
+      <div
+        class="flex flex-col min-h-screen transition-transform duration-250 ease-out bg-white dark:bg-gray-900"
+        :class="navigation.isSidebarOpen ? 'translate-x-[280px]' : 'translate-x-0'"
+      >
+        <!-- Overlay to close sidebar when tapping pushed content -->
+        <div
+          v-if="navigation.isSidebarOpen"
+          class="absolute inset-0 z-[200]"
+          @click="navigation.closeSidebar()"
+        />
+        <MobileHeader />
+        <main class="flex-1">
+          <slot />
+        </main>
+        <MobileFooter />
+      </div>
+    </div>
 
     <!-- Responsive Layout: page scrolls normally, sidebars + header stay fixed via sticky -->
     <div class="flex justify-center min-h-screen">
