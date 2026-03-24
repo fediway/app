@@ -23,7 +23,7 @@ function goBack() {
 
 <template>
   <!-- Sticky at browser top, page bg masks content under rounded corners -->
-  <div class="hidden lg:sticky lg:top-0 lg:z-20 lg:block lg:bg-gray-50 dark:lg:bg-gray-950">
+  <div class="hidden lg:sticky lg:top-0 lg:z-20 lg:block lg:bg-gray-100 dark:lg:bg-gray-950">
     <!-- Header content -->
     <div class="relative flex items-center justify-center py-3">
       <!-- Back button — absolute left, doesn't affect centering -->
@@ -76,7 +76,7 @@ function goBack() {
 <style scoped>
 .corner-mask-left,
 .corner-mask-right {
-  --corner-bg: rgb(249 250 251);
+  --corner-bg: rgb(243 244 246);
 }
 
 .dark .corner-mask-left,

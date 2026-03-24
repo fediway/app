@@ -39,7 +39,7 @@ watch(showSearch, () => nextTick(updateContentTop));
 <template>
   <div class="lg:h-full">
     <!-- Search: fixed at top, hidden on explore pages (explore has its own search) -->
-    <div v-if="showSearch" ref="searchRef" class="lg:sticky lg:top-0 lg:z-10 lg:bg-gray-50 lg:pt-14 lg:pb-4 dark:lg:bg-gray-950">
+    <div v-if="showSearch" ref="searchRef" class="lg:sticky lg:top-0 lg:z-10 lg:bg-gray-100 lg:pt-14 lg:pb-4 dark:lg:bg-gray-950">
       <SidebarSearch />
     </div>
     <!-- Content: scrolls with page, stops when bottom reaches viewport bottom -->
