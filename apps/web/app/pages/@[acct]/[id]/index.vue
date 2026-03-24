@@ -22,6 +22,13 @@ const { data: rawStatus } = getStatusById(statusId.value);
 const status = computed(() => getStoreStatus(rawStatus.value));
 const { data: context } = getStatusContext(statusId.value);
 
+// Set the desktop header — show post author info
+usePageHeader({
+  title: computed(() => status.value?.account.displayName || status.value?.account.username || 'Post'),
+  subtitle: computed(() => status.value ? `@${status.value.account.acct}` : undefined),
+  image: computed(() => status.value?.account.avatar),
+});
+
 // SEO meta tags for link previews
 useSeoMeta({
   title: () => status.value
@@ -114,7 +121,7 @@ function getReplyParent(reply: Status): Status | null {
 
 <template>
   <div class="w-full">
-    <PageHeader title="Post" show-back @back="goBack" />
+    <PageHeader title="Post" show-back class="lg:hidden" @back="goBack" />
 
     <ClientOnly>
       <!-- Not found state -->
@@ -158,6 +165,8 @@ function getReplyParent(reply: Status): Status | null {
           @tag-click="handleTagClick"
           @profile-click="navigateToProfile"
           @media-click="handleMediaClick"
+          @view-reblogs="id => router.push(`${route.path}/reblogs`)"
+          @view-favourites="id => router.push(`${route.path}/favourites`)"
         />
 
         <!-- Descendants (replies) -->

@@ -16,6 +16,7 @@ import {
   mockStatuses,
   suggestedAccounts,
   taggedStatuses,
+  trendingLinks,
   trendingTags,
 } from './fixtures';
 
@@ -524,6 +525,12 @@ export function createMockClient(): MastoClient {
           async list() {
             await delay();
             return trendingTags;
+          },
+        },
+        links: {
+          async list() {
+            await delay();
+            return trendingLinks;
           },
         },
       },

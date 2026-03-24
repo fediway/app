@@ -4,13 +4,13 @@ import { computed } from 'vue';
 
 const router = useRouter();
 const { exploreTabs } = useDiscoveryTabs();
-const { getTrendingTags, getStatusesByTag } = useExploreData();
+const { getTrendingTags } = useExploreData();
 const { data: tags } = getTrendingTags();
 
 const trendingTags = computed(() =>
   tags.value.map(tag => ({
     name: tag.name,
-    postCount: getStatusesByTag(tag.name).data.value.length,
+    postCount: tag.history?.[0]?.uses ? `${tag.history[0].uses} posts` : undefined,
   })),
 );
 

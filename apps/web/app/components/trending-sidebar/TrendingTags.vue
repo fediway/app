@@ -3,13 +3,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, TagListItem } fro
 import { computed } from 'vue';
 
 const router = useRouter();
-const { getTrendingTags, getStatusesByTag } = useExploreData();
+const { getTrendingTags } = useExploreData();
 const { data: tags } = getTrendingTags();
 
 const trendingTags = computed(() =>
   tags.value.slice(0, 7).map(tag => ({
     name: tag.name,
-    postCount: getStatusesByTag(tag.name).data.value.length || undefined,
+    postCount: tag.history?.[0]?.uses ? `${tag.history[0].uses} posts` : undefined,
   })),
 );
 

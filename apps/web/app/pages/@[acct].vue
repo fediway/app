@@ -19,8 +19,16 @@ const { toggleFollow, getRelationship, fetchRelationships } = useFollows();
 
 const acct = computed(() => route.params.acct as string);
 const isStatusDetail = computed(() => !!route.params.id);
+
 const { data: account } = getAccountByAcct(acct.value);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
+
+// Set desktop header — show profile info
+usePageHeader({
+  title: computed(() => account.value?.displayName || account.value?.username || `@${acct.value}`),
+  subtitle: computed(() => account.value ? `@${account.value.acct}` : undefined),
+  image: computed(() => account.value?.avatar),
+});
 
 // Fetch relationship when account loads
 watch(account, (acc) => {

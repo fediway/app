@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PhMagnifyingGlass, PhX } from '@phosphor-icons/vue';
+import { resolveComponent } from 'vue';
 
 interface RouteTab {
   label: string;
@@ -30,6 +31,7 @@ const search = defineModel<string>('search', { default: '' });
 const tab = defineModel<string>('tab');
 
 const route = useRoute();
+const NuxtLink = resolveComponent('NuxtLink');
 
 function isRouteTab(t: Tab): t is RouteTab {
   return 'to' in t;
@@ -87,7 +89,7 @@ function clearSearch() {
     <!-- Tabs -->
     <nav v-if="tabs.length > 0" class="mt-3 flex gap-1">
       <component
-        :is="isRouteTab(t) ? 'NuxtLink' : 'button'"
+        :is="isRouteTab(t) ? NuxtLink : 'button'"
         v-for="t in tabs"
         :key="isRouteTab(t) ? t.to : t.value"
         :to="isRouteTab(t) ? t.to : undefined"

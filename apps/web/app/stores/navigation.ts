@@ -89,10 +89,39 @@ export function useNavigationStore() {
     return 'home';
   });
 
+  // Page header state — set by pages via usePageHeader composable
+  const pageHeaderOverride = useState<{
+    title: string;
+    subtitle?: string;
+    image?: string;
+    icon?: string;
+  } | null>('nav:pageHeaderOverride', () => null);
+
+  // Auto-detect whether current route is a top-level menu destination
+  const isMenuPage = computed(() => {
+    const path = route.path;
+    for (const item of MENU_ITEMS) {
+      const to = getRoute(item.id);
+      if (to === '/' && path === '/')
+        return true;
+      if (to !== '/' && (path === to || path.startsWith(`${to}/`)))
+        return true;
+    }
+    return false;
+  });
+
+  const showBack = computed(() => !isMenuPage.value);
+
   const pageTitle = computed(() => {
+    if (pageHeaderOverride.value)
+      return pageHeaderOverride.value.title;
     const item = MENU_ITEMS.find(i => i.id === activeItemId.value);
     return item?.label ?? 'Home';
   });
+
+  const pageSubtitle = computed(() => pageHeaderOverride.value?.subtitle ?? null);
+  const pageImage = computed(() => pageHeaderOverride.value?.image ?? null);
+  const pageIcon = computed(() => pageHeaderOverride.value?.icon ?? null);
 
   function openSidebar() {
     isSidebarOpen.value = true;
@@ -110,6 +139,11 @@ export function useNavigationStore() {
     isSidebarOpen,
     activeItemId,
     pageTitle,
+    pageSubtitle,
+    pageImage,
+    pageIcon,
+    pageHeaderOverride,
+    showBack,
     menuItems,
     mobileFooterItems,
     currentUser,

@@ -1,4 +1,4 @@
-import type { FediwayStatus, Status, Tag } from '@repo/types';
+import type { FediwayStatus, Status, Tag, TrendLink } from '@repo/types';
 import type { DataResult } from './useDataHelpers';
 import { useClient, useStatusStore } from '@repo/api';
 import { createDataResult } from './useDataHelpers';
@@ -12,6 +12,12 @@ export function useExploreData() {
   function getTrendingTags(): DataResult<Tag[]> {
     return createDataResult('trendingTags', [] as Tag[], async () => {
       return await client.rest.v1.trends.tags.list();
+    });
+  }
+
+  function getTrendingLinks(): DataResult<TrendLink[]> {
+    return createDataResult('trendingLinks', [] as TrendLink[], async () => {
+      return await client.rest.v1.trends.links.list();
     });
   }
 
@@ -73,5 +79,5 @@ export function useExploreData() {
     }
   }
 
-  return { getTrendingTags, getStatusesByTag, getTagInfo, getStatusesByLink, getLinkInfo };
+  return { getTrendingTags, getTrendingLinks, getStatusesByTag, getTagInfo, getStatusesByLink, getLinkInfo };
 }

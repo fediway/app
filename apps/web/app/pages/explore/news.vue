@@ -1,61 +1,21 @@
 <script setup lang="ts">
+import { EmptyState, Skeleton } from '@repo/ui';
+import { computed } from 'vue';
+
 const { exploreTabs } = useDiscoveryTabs();
+const { getTrendingLinks } = useExploreData();
+const { data: links, isLoading, error, refetch } = getTrendingLinks();
 
-const trendingLinks = [
-  {
-    title: 'Scientists discover high-temperature superconductor at room pressure',
-    description: 'A breakthrough in materials science could revolutionize energy transmission and computing technology.',
-    url: 'https://github.com/articles/superconductor-discovery',
-    favicon: 'https://github.githubassets.com/favicons/favicon.svg',
-    source: 'github.com',
-    posts: '3.2k',
-  },
-  {
-    title: 'OpenAI announces GPT-5 with improved reasoning',
-    description: 'The latest language model shows significant improvements in mathematical reasoning and code generation.',
-    url: 'https://nytimes.com/openai-gpt5',
-    favicon: 'https://www.nytimes.com/vi-assets/static-assets/favicon-4bf96cb6a1093748bf5b3c429accb9b4.ico',
-    source: 'nytimes.com',
-    posts: '2.8k',
-  },
-  {
-    title: 'EU passes new digital privacy regulations',
-    description: 'New laws will require tech companies to provide more transparency about data collection practices.',
-    url: 'https://bbc.com/eu-privacy-law',
-    favicon: 'https://static.bbci.co.uk/wwhp/1.146.0/responsive/img/apple-touch/apple-touch-180.jpg',
-    source: 'bbc.com',
-    posts: '1.9k',
-  },
-  {
-    title: 'SpaceX Starship completes orbital flight',
-    description: 'The largest rocket ever built successfully completed its first full orbital mission.',
-    url: 'https://youtube.com/starship-orbital',
-    favicon: 'https://www.youtube.com/s/desktop/c01ea7e3/img/favicon_32x32.png',
-    source: 'youtube.com',
-    posts: '1.5k',
-  },
-  {
-    title: 'New study reveals benefits of remote work on productivity',
-    description: 'Research spanning 500 companies shows hybrid work models lead to better employee satisfaction.',
-    url: 'https://techcrunch.com/remote-work-study',
-    favicon: 'https://techcrunch.com/favicon.ico',
-    source: 'techcrunch.com',
-    posts: '1.2k',
-  },
-  {
-    title: 'Climate summit reaches historic agreement on emissions',
-    description: 'World leaders commit to ambitious targets for reducing carbon emissions by 2030.',
-    url: 'https://reuters.com/climate-summit',
-    favicon: 'https://www.reuters.com/favicon.ico',
-    source: 'reuters.com',
-    posts: '980',
-  },
-];
-
-function handleFaviconError(event: Event) {
-  const img = event.target as HTMLImageElement;
-  img.style.display = 'none';
-}
+const trendingLinks = computed(() =>
+  links.value.map(link => ({
+    url: link.url,
+    title: link.title,
+    description: link.description,
+    image: link.image ?? undefined,
+    source: link.providerName || new URL(link.url).hostname.replace('www.', ''),
+    posts: link.history?.[0]?.uses ? `${Number(link.history[0].uses).toLocaleString()} posts` : undefined,
+  })),
+);
 
 function getLinkPageUrl(url: string): string {
   return `/links/${encodeURIComponent(url)}`;
@@ -69,36 +29,68 @@ function getLinkPageUrl(url: string): string {
       @search="q => navigateTo({ path: '/search', query: { q } })"
     />
 
-    <div class="divide-y divide-border">
-      <NuxtLink
-        v-for="link in trendingLinks"
-        :key="link.url"
-        :to="getLinkPageUrl(link.url)"
-        class="block px-4 py-4 no-underline transition-colors hover:bg-muted/50"
-      >
-        <div class="flex items-start gap-3">
-          <div class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
-            <img
-              :src="link.favicon"
-              :alt="link.source"
-              class="size-5"
-              @error="handleFaviconError"
+    <ClientOnly>
+      <EmptyState
+        v-if="error"
+        :title="error.message || 'Failed to load news'"
+        action-label="Try again"
+        class="py-12"
+        @action="refetch()"
+      />
+
+      <EmptyState
+        v-else-if="!isLoading && trendingLinks.length === 0"
+        title="No trending news"
+        description="Check back later for trending links."
+        class="py-12"
+      />
+
+      <div v-else-if="trendingLinks.length > 0" class="divide-y divide-border">
+        <NuxtLink
+          v-for="link in trendingLinks"
+          :key="link.url"
+          :to="getLinkPageUrl(link.url)"
+          class="block px-4 py-4 no-underline transition-colors hover:bg-muted/50"
+        >
+          <div class="flex items-start gap-3">
+            <div
+              v-if="link.image"
+              class="size-16 shrink-0 overflow-hidden rounded-lg bg-muted"
             >
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="mb-1 text-[15px] font-medium leading-snug text-foreground">
-              {{ link.title }}
+              <img
+                :src="link.image"
+                :alt="link.title"
+                class="size-full object-cover"
+              >
             </div>
-            <p class="mb-2 line-clamp-2 text-[14px] text-foreground/60">
-              {{ link.description }}
-            </p>
-            <div class="flex items-center gap-3 text-[13px] text-foreground/40">
-              <span>{{ link.source }}</span>
-              <span>{{ link.posts }} posts</span>
+            <div class="min-w-0 flex-1">
+              <div class="mb-1 text-[15px] font-medium leading-snug text-foreground">
+                {{ link.title }}
+              </div>
+              <p class="mb-2 line-clamp-2 text-[14px] text-foreground/60">
+                {{ link.description }}
+              </p>
+              <div class="flex items-center gap-3 text-[13px] text-foreground/40">
+                <span>{{ link.source }}</span>
+                <span v-if="link.posts">{{ link.posts }}</span>
+              </div>
+            </div>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <template #fallback>
+        <div class="space-y-4 p-4">
+          <div v-for="i in 5" :key="i" class="flex items-start gap-3">
+            <Skeleton class="size-16 rounded-lg" />
+            <div class="flex-1 space-y-2">
+              <Skeleton class="h-4 w-3/4" />
+              <Skeleton class="h-3 w-full" />
+              <Skeleton class="h-3 w-24" />
             </div>
           </div>
         </div>
-      </NuxtLink>
-    </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>

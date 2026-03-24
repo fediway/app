@@ -13,6 +13,12 @@ const linkUrl = computed(() => {
 
 const linkInfo = computed(() => getLinkInfo(linkUrl.value || ''));
 const { data: rawStatuses, isLoading } = getStatusesByLink(linkUrl.value || '');
+
+usePageHeader({
+  title: computed(() => linkInfo.value?.title || 'Link'),
+  subtitle: computed(() => linkInfo.value?.source),
+  icon: 'PhLink',
+});
 const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 

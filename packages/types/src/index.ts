@@ -43,6 +43,7 @@ export type Conversation = mastodon.v1.Conversation;
 export type Application = mastodon.v1.Application;
 
 export type PreviewCard = mastodon.v1.PreviewCard;
+export type TrendLink = mastodon.v1.TrendLink;
 
 export type Token = mastodon.v1.Token;
 

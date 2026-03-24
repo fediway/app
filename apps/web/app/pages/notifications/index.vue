@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
-import { EmptyState, NotificationList } from '@repo/ui';
+import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
 
 const router = useRouter();
 const { getNotifications } = useNotificationData();
 const { getProfilePath, getStatusPath } = useAccountData();
 
-const { data: notifications, isLoading } = getNotifications();
+const { data: notifications, isLoading, error, refetch } = getNotifications();
 
 function handleNotificationClick(notification: Notification) {
   if (notification.status) {
@@ -23,18 +23,34 @@ function navigateToProfile(acct: string) {
 </script>
 
 <template>
-  <EmptyState
-    v-if="!isLoading && notifications.length === 0"
-    title="No notifications yet"
-    description="When someone interacts with you, it will show up here."
-    class="py-12"
-  />
+  <ClientOnly>
+    <EmptyState
+      v-if="error"
+      :title="error.message || 'Failed to load notifications'"
+      action-label="Try again"
+      class="py-12"
+      @action="refetch()"
+    />
 
-  <NotificationList
-    v-else
-    :notifications="notifications"
-    :loading="isLoading && notifications.length === 0"
-    @click="handleNotificationClick"
-    @profile-click="navigateToProfile"
-  />
+    <EmptyState
+      v-else-if="!isLoading && notifications.length === 0"
+      title="No notifications yet"
+      description="When someone interacts with you, it will show up here."
+      class="py-12"
+    />
+
+    <NotificationList
+      v-else
+      :notifications="notifications"
+      :loading="isLoading && notifications.length === 0"
+      @click="handleNotificationClick"
+      @profile-click="navigateToProfile"
+    />
+
+    <template #fallback>
+      <div class="space-y-3 p-4">
+        <Skeleton v-for="i in 5" :key="i" class="h-16 w-full" />
+      </div>
+    </template>
+  </ClientOnly>
 </template>

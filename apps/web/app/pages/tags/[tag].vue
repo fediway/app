@@ -14,6 +14,11 @@ const tagName = computed(() => {
 const { data: rawStatuses, isLoading } = getStatusesByTag(tagName.value || '');
 const statuses = useWebActions().withStoreState(rawStatuses);
 
+usePageHeader({
+  title: computed(() => `#${tagName.value}`),
+  subtitle: computed(() => `${statuses.value.length} posts`),
+});
+
 const tagFollowId = computed(() => `tag:${tagName.value}`);
 const isFollowingTag = computed(() => isFollowing(tagFollowId.value));
 function toggleFollowTag() {

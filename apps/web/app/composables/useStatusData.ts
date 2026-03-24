@@ -1,4 +1,4 @@
-import type { Context, FediwayStatus, Status } from '@repo/types';
+import type { Account, Context, FediwayStatus, Status } from '@repo/types';
 import type { DataResult } from './useDataHelpers';
 import { useClient, useStatusStore } from '@repo/api';
 import { createDataResult } from './useDataHelpers';
@@ -24,5 +24,19 @@ export function useStatusData() {
     });
   }
 
-  return { getStatusById, getStatusContext };
+  function getRebloggedBy(id: string): DataResult<Account[]> {
+    return createDataResult(`rebloggedBy:${id}`, [] as Account[], async () => {
+      const accounts = await client.rest.v1.statuses.$select(id).rebloggedBy.list();
+      return accounts;
+    });
+  }
+
+  function getFavouritedBy(id: string): DataResult<Account[]> {
+    return createDataResult(`favouritedBy:${id}`, [] as Account[], async () => {
+      const accounts = await client.rest.v1.statuses.$select(id).favouritedBy.list();
+      return accounts;
+    });
+  }
+
+  return { getStatusById, getStatusContext, getRebloggedBy, getFavouritedBy };
 }
