@@ -2,38 +2,60 @@ import { Meta } from '@storybook/blocks';
 
 <Meta title="01-Foundations/Colors" />
 
-# Colors
+# Fediway Color System
 
-CSS custom properties in `globals.css`. Use semantic names, not raw hex.
+**Color as Meaning. Warmth as Identity. Content First.**
 
-## Core
+The brand is not a hue — it's the warmth of the surface itself. Warm cream in light mode, galaxy navy in dark mode. Chromatic color appears only when it communicates meaning.
 
-- `--primary` · `#232B37` — Text, buttons
-- `--primary-foreground` · `#fff` — Text on primary
-- `--secondary` · `#DBDDFF` — Secondary buttons
-- `--muted` · `#F6F3EB` — Muted backgrounds
-- `--accent` · `#EDE6D6` — Accent backgrounds
-- `--border` · `#EDE6D6` — Borders, dividers
-- `--destructive` · `hsl(0 84.2% 60.2%)` — Error, danger
+## 8 Roles
 
-## Semantic
+- **Rose** → Love — Hearts, favourites, notifications
+- **Emerald** → Amplify — Boosts, reposts, sharing
+- **Gold** → Judgment — Star ratings, bookmarks (gold-400)
+- **Galaxy Blue** → Discovery — @mentions, #hashtags, links, explore, info
+- **Red** → Caution — Errors, delete, destructive (red-600 for buttons)
+- **Indigo** → Interactive — Secondary buttons, UI controls (#525380)
+- **Gray** → Structure — Primary buttons (navy/cream), text, surfaces
+- **No Color** → Content — Book titles (bold, body color), body text
 
-- `--red` · `#C23737` — Favourite / heart
-- `--blue` · `#70A6E0` — Reply
-- `--green` · `#4A9073` — Reblog / verified
-- `--yellow` · `#DBA800` — Bookmark / stars
-- `--camel` · `#C8A148` — Accent warm
-- `--gray` · `#232B37CC` — Muted text
+## Architecture
 
-## Usage in Tailwind
+- **6 primitive families** × 11 steps = 66 colors (OKLCH)
+- **Surface elevation system** — separate from primitive scale, hand-tuned per mode
+- **Interactive muted tokens** — purpose-built role, not a full family
+- **Gray hue rotation** — warm gold (H 89°) → rose (H 10°) → cool indigo (H 255°)
+
+## Key Decisions
+
+- Primary button: `#232B37` (navy) in light / cream in dark
+- Page background: near-white warm `oklch(0.975 0.006 90)`
+- Post cards: white (lifts off cream)
+- Item cards inside posts: `#F7F3E9` (returns to cream ground — Apple sandwich)
+- @mentions / #hashtags: `galaxy-500` (light) / `galaxy-400` (dark)
+- Book titles: `font-semibold` in body color, no chromatic color
+- Focus ring: `#525380` family with offset gap
+- Disabled: `opacity: 0.4`
+
+## Tailwind Usage
 
 ```html
-<span class="text-foreground">Primary text</span>
-<span class="text-foreground/80">Secondary text</span>
-<div class="bg-muted">Muted background</div>
-<div class="border-border">Border</div>
+<!-- Primitive palette -->
+<div class="bg-rose-500 text-white">Rose 500</div>
+<div class="bg-galaxy-400">Galaxy 400</div>
+<div class="bg-emerald-50 text-emerald-700">Emerald tint</div>
+
+<!-- Semantic tokens (shadcn) -->
+<div class="bg-primary text-primary-foreground">Navy button</div>
+<div class="bg-secondary text-secondary-foreground">Cream button</div>
+<div class="bg-muted text-muted-foreground">Muted surface</div>
+<div class="bg-destructive text-destructive-foreground">Delete</div>
+
+<!-- Action colors -->
 <span class="text-red">Favourite</span>
 <span class="text-green">Reblog</span>
+<span class="text-yellow">Bookmark</span>
+<span class="text-blue">Link / info</span>
 ```
 
-Dark mode is automatic via CSS variables.
+See the **Philosophy**, **Palette**, **Surfaces**, **Interactive**, and **Contrast** stories for visual reference.

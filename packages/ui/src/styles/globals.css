@@ -29,6 +29,8 @@
 @theme inline {
   --font-sans: 'Asta Sans', ui-sans-serif, system-ui, sans-serif;
   --text-xl: 22px;
+
+  /* ── shadcn semantic colors ── */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -48,6 +50,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* ── Semantic action colors ── */
   --color-red: var(--red);
   --color-red-foreground: var(--red-foreground);
   --color-red-background: var(--red-background);
@@ -72,11 +76,62 @@
   --color-gray-foreground: var(--gray-foreground);
   --color-gray-background: var(--gray-background);
 
+  /* ── Primitive palette (available as Tailwind classes: bg-rose-500, text-galaxy-400, etc.) ── */
+  --color-rose-50:  var(--rose-50);
+  --color-rose-100: var(--rose-100);
+  --color-rose-200: var(--rose-200);
+  --color-rose-300: var(--rose-300);
+  --color-rose-400: var(--rose-400);
+  --color-rose-500: var(--rose-500);
+  --color-rose-600: var(--rose-600);
+  --color-rose-700: var(--rose-700);
+  --color-rose-800: var(--rose-800);
+  --color-rose-900: var(--rose-900);
+  --color-rose-950: var(--rose-950);
+
+  --color-gold-50:  var(--gold-50);
+  --color-gold-100: var(--gold-100);
+  --color-gold-200: var(--gold-200);
+  --color-gold-300: var(--gold-300);
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+  --color-gold-600: var(--gold-600);
+  --color-gold-700: var(--gold-700);
+  --color-gold-800: var(--gold-800);
+  --color-gold-900: var(--gold-900);
+  --color-gold-950: var(--gold-950);
+
+  --color-emerald-50:  var(--emerald-50);
+  --color-emerald-100: var(--emerald-100);
+  --color-emerald-200: var(--emerald-200);
+  --color-emerald-300: var(--emerald-300);
+  --color-emerald-400: var(--emerald-400);
+  --color-emerald-500: var(--emerald-500);
+  --color-emerald-600: var(--emerald-600);
+  --color-emerald-700: var(--emerald-700);
+  --color-emerald-800: var(--emerald-800);
+  --color-emerald-900: var(--emerald-900);
+  --color-emerald-950: var(--emerald-950);
+
+  --color-galaxy-50:  var(--galaxy-50);
+  --color-galaxy-100: var(--galaxy-100);
+  --color-galaxy-200: var(--galaxy-200);
+  --color-galaxy-300: var(--galaxy-300);
+  --color-galaxy-400: var(--galaxy-400);
+  --color-galaxy-500: var(--galaxy-500);
+  --color-galaxy-600: var(--galaxy-600);
+  --color-galaxy-700: var(--galaxy-700);
+  --color-galaxy-800: var(--galaxy-800);
+  --color-galaxy-900: var(--galaxy-900);
+  --color-galaxy-950: var(--galaxy-950);
+
+  /* ── Radius ── */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
+  /* ── Animations ── */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-collapsible-down: collapsible-down 0.2s ease-out;
@@ -103,79 +158,246 @@
   to { height: 0; }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   FEDIWAY COLOR SYSTEM v5
+   Philosophy: Color as Meaning · Warmth as Identity · Content First
+
+   Primitive palette: 6 families × 11 steps (OKLCH)
+   Gray hue rotation: gold(89°) → rose(10°) → indigo(255°)
+   Surface system: separate from primitive scale
+   ═══════════════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(240 10% 3.9%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
+  /* ── Primitive Palette ────────────────────────────────────────────── */
 
-  --primary: #232B37;
-  --primary-foreground: #fff;
+  /* Rose (H ~350) — Love: hearts, favourites, notifications */
+  --rose-50:  oklch(0.975 0.012 358);
+  --rose-100: oklch(0.94  0.032 356);
+  --rose-200: oklch(0.89  0.068 354);
+  --rose-300: oklch(0.82  0.112 352);
+  --rose-400: oklch(0.74  0.148 351);  /* #EC84AF */
+  --rose-500: oklch(0.64  0.178 350);
+  --rose-600: oklch(0.55  0.182 349);
+  --rose-700: oklch(0.45  0.150 348);
+  --rose-800: oklch(0.36  0.112 347);
+  --rose-900: oklch(0.28  0.072 346);
+  --rose-950: oklch(0.20  0.042 345);
 
-  --secondary: #DBDDFF;
-  --secondary-foreground: var(--primary);
+  /* Gold (H ~87) — Judgment: star ratings, bookmarks */
+  --gold-50:  oklch(0.975 0.014 93);
+  --gold-100: oklch(0.94  0.042 92);
+  --gold-200: oklch(0.89  0.078 90);
+  --gold-300: oklch(0.82  0.122 88);
+  --gold-400: oklch(0.76  0.155 87);   /* #DBA800 */
+  --gold-500: oklch(0.68  0.142 85);
+  --gold-600: oklch(0.60  0.122 83);
+  --gold-700: oklch(0.50  0.098 80);
+  --gold-800: oklch(0.40  0.070 78);
+  --gold-900: oklch(0.32  0.046 76);
+  --gold-950: oklch(0.22  0.026 74);
 
-  --muted: #F6F3EB;
-  --muted-foreground: var(--primary);
+  /* Emerald (H ~155) — Amplification: boosts, reposts */
+  --emerald-50:  oklch(0.975 0.016 160);
+  --emerald-100: oklch(0.94  0.040 158);
+  --emerald-200: oklch(0.89  0.078 157);
+  --emerald-300: oklch(0.82  0.120 156);
+  --emerald-400: oklch(0.74  0.162 155);
+  --emerald-500: oklch(0.66  0.172 154);
+  --emerald-600: oklch(0.55  0.168 153);
+  --emerald-700: oklch(0.45  0.140 152);
+  --emerald-800: oklch(0.36  0.105 151);
+  --emerald-900: oklch(0.28  0.068 150);
+  --emerald-950: oklch(0.20  0.040 149);
 
-  --accent: #EDE6D6;
-  --accent-foreground: var(--primary);
+  /* Galaxy Blue (H ~255) — Discovery: @mentions, #hashtags, links, info */
+  --galaxy-50:  oklch(0.975 0.012 258);
+  --galaxy-100: oklch(0.94  0.030 257);
+  --galaxy-200: oklch(0.89  0.060 256);
+  --galaxy-300: oklch(0.82  0.095 255);
+  --galaxy-400: oklch(0.74  0.125 255);
+  --galaxy-500: oklch(0.64  0.142 254);
+  --galaxy-600: oklch(0.55  0.145 253);
+  --galaxy-700: oklch(0.45  0.125 252);
+  --galaxy-800: oklch(0.36  0.095 251);
+  --galaxy-900: oklch(0.28  0.065 250);
+  --galaxy-950: oklch(0.20  0.038 249);
 
-  --destructive: hsl(0 84.2% 60.2%);
-  --destructive-foreground: hsl(0 0% 98%);
+  /* Red (H ~22) — Caution: errors, delete, destructive */
+  --red-50:  oklch(0.975 0.012 25);
+  --red-100: oklch(0.94  0.032 24);
+  --red-200: oklch(0.89  0.068 23);
+  --red-300: oklch(0.82  0.115 22);
+  --red-400: oklch(0.74  0.158 22);
+  --red-500: oklch(0.64  0.188 21);
+  --red-600: oklch(0.55  0.192 20);   /* #C23737 */
+  --red-700: oklch(0.45  0.160 19);
+  --red-800: oklch(0.36  0.120 18);
+  --red-900: oklch(0.28  0.078 17);
+  --red-950: oklch(0.20  0.045 16);
 
-  --border: #EDE6D6;
-  --input: hsl(240 5.9% 90%);
-  --ring: hsl(240 5.9% 10%);
+  /* Gray — The brand. Hue rotation: gold(89°) → rose(10°) → indigo(255°) */
+  --gray-50:  oklch(0.975 0.006 90);   /* warm cream */
+  --gray-100: oklch(0.95  0.012 85);   /* ≈ #F6F3EB */
+  --gray-200: oklch(0.91  0.020 75);   /* ≈ #EDE6D6 */
+  --gray-300: oklch(0.84  0.014 55);
+  --gray-400: oklch(0.74  0.010 30);
+  --gray-500: oklch(0.64  0.008 10);   /* rose at midpoint */
+  --gray-600: oklch(0.54  0.010 345);
+  --gray-700: oklch(0.44  0.014 300);
+  --gray-800: oklch(0.35  0.020 275);
+  --gray-900: oklch(0.27  0.025 260);  /* ≈ #232B37 */
+  --gray-950: oklch(0.19  0.022 255);
+
+  /* ── Surface Tokens ──────────────────────────────────────────────── */
+
+  /* Light mode surfaces */
+  --surface-base:      oklch(0.975 0.006 90);  /* page bg */
+  --surface-raised:    oklch(1.00  0     0);    /* post cards — white */
+  --surface-overlay:   oklch(1.00  0     0);    /* modals/popovers */
+  --surface-inset:     oklch(0.963 0.014 88);  /* item cards — #F7F3E9 */
+  --surface-sunken:    oklch(0.94  0.018 87);  /* inputs, code blocks */
+
+  /* Light mode borders */
+  --border-subtle:     oklch(0.91  0.016 78);
+  --border-default:    oklch(0.87  0.014 70);
+  --border-strong:     oklch(0.80  0.012 55);
+
+  /* Dark mode surfaces */
+  --surface-dark-base:      oklch(0.19  0.022 255);  /* L 19% */
+  --surface-dark-raised:    oklch(0.23  0.025 258);  /* L 23% — #232B37 */
+  --surface-dark-overlay:   oklch(0.27  0.030 262);  /* L 27% */
+  --surface-dark-elevated:  oklch(0.31  0.032 265);  /* L 31% */
+  --surface-dark-highlight: oklch(0.35  0.028 270);  /* L 35% */
+
+  /* Dark mode borders */
+  --border-dark-subtle:     oklch(0.27  0.025 260);
+  --border-dark-default:    oklch(0.33  0.028 265);
+  --border-dark-strong:     oklch(0.40  0.022 275);
+
+  /* ── Foreground Tokens ───────────────────────────────────────────── */
+  --fg-primary:        oklch(0.27  0.025 260);
+  --fg-secondary:      oklch(0.54  0.010 345);
+  --fg-tertiary:       oklch(0.64  0.008 10);
+  --fg-placeholder:    oklch(0.74  0.010 30);
+
+  --fg-dark-primary:   oklch(0.95  0.008 85);
+  --fg-dark-secondary: oklch(0.74  0.010 30);
+  --fg-dark-tertiary:  oklch(0.54  0.010 345);
+  --fg-dark-placeholder: oklch(0.44 0.014 300);
+
+  /* ── Interactive Muted — Chromatic Gray ───────────────────────────── */
+  --interactive:           oklch(0.48  0.100 278);
+  --interactive-hover:     oklch(0.50  0.070 278);
+  --interactive-active:    oklch(0.38  0.058 282);
+  --interactive-subtle:    oklch(0.30  0.050 280);
+  --interactive-text:      oklch(0.78  0.035 280);
+  --interactive-text-dark: oklch(0.90  0.025 280);
+
+  /* ── shadcn Semantic Tokens — Light Mode ─────────────────────────── */
+  --background:             oklch(0.975 0.006 90);  /* surface-base */
+  --foreground:             oklch(0.27  0.025 260);
+  --card:                   oklch(1.00  0     0);    /* white */
+  --card-foreground:        oklch(0.27  0.025 260);
+  --popover:                oklch(1.00  0     0);
+  --popover-foreground:     oklch(0.27  0.025 260);
+
+  --primary:                oklch(0.287 0.025 258);  /* #232B37 */
+  --primary-foreground:     oklch(1.00  0     0);
+
+  --secondary:              oklch(0.91  0.020 75);   /* gray-200 */
+  --secondary-foreground:   oklch(0.35  0.020 275);
+
+  --muted:                  oklch(0.963 0.014 88);   /* #F7F3E9 */
+  --muted-foreground:       oklch(0.64  0.008 10);
+
+  --accent:                 oklch(0.94  0.018 87);   /* surface-sunken */
+  --accent-foreground:      oklch(0.27  0.025 260);
+
+  --destructive:            oklch(0.55  0.192 20);   /* red-600 */
+  --destructive-foreground: oklch(1.00  0     0);
+
+  --border:                 oklch(0.87  0.014 70);
+  --input:                  oklch(0.87  0.014 70);
+  --ring:                   oklch(0.44  0.065 280);  /* interactive */
   --radius: 0.5rem;
 
-  --red: #C23737;
-  --red-foreground: #CC6633;
-  --red-background: #F7E8E0;
+  /* Semantic action colors */
+  --red:             oklch(0.64  0.188 21);   /* red-500 — action icons */
+  --red-foreground:  oklch(0.45  0.160 19);   /* red-700 */
+  --red-background:  oklch(0.975 0.012 25);   /* red-50 */
 
-  --blue: #70A6E0;
-  --blue-foreground: #2877CB;
-  --blue-background: #DFEBF7;
+  --blue:             oklch(0.55  0.145 253);  /* galaxy-600 */
+  --blue-foreground:  oklch(0.45  0.125 252);  /* galaxy-700 */
+  --blue-background:  oklch(0.975 0.012 258);  /* galaxy-50 */
 
-  --green: #4A9073;
-  --green-foreground: #228419;
-  --green-background: #DEEDDD;
+  --green:             oklch(0.66  0.172 154);  /* emerald-500 */
+  --green-foreground:  oklch(0.45  0.140 152);  /* emerald-700 */
+  --green-background:  oklch(0.975 0.016 160);  /* emerald-50 */
 
-  --yellow: #DBA800;
-  --yellow-foreground: #CB9200;
-  --yellow-background: #FFF2D2;
+  --yellow:             oklch(0.76  0.155 87);   /* gold-400 */
+  --yellow-foreground:  oklch(0.50  0.098 80);   /* gold-700 */
+  --yellow-background:  oklch(0.975 0.014 93);   /* gold-50 */
 
-  --camel: #C8A148;
-  --camel-foreground: #FFFFFF;
-  --camel-background: #FEF3C7;
+  --camel:             oklch(0.68  0.142 85);   /* gold-500 */
+  --camel-foreground:  oklch(1.00  0     0);
+  --camel-background:  oklch(0.94  0.042 92);   /* gold-100 */
 
-  --gray: #232B37CC;
-  --gray-foreground: #000000;
-  --gray-background: #E9E9E9;
+  --gray:             oklch(0.54  0.010 345);  /* gray-600 */
+  --gray-foreground:  oklch(0.27  0.025 260);
+  --gray-background:  oklch(0.94  0.018 87);   /* surface-sunken */
 }
 
 .dark {
-  --background: hsl(240 10% 3.9%);
-  --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 3.9%);
-  --card-foreground: hsl(0 0% 98%);
-  --popover: hsl(240 10% 3.9%);
-  --popover-foreground: hsl(0 0% 98%);
-  --primary: hsl(0 0% 98%);
-  --primary-foreground: hsl(240 5.9% 10%);
-  --secondary: hsl(240 3.7% 15.9%);
-  --secondary-foreground: hsl(0 0% 98%);
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  --accent: hsl(240 3.7% 15.9%);
-  --accent-foreground: hsl(0 0% 98%);
-  --destructive: hsl(0 62.8% 30.6%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(240 4.9% 83.9%);
+  --background:             oklch(0.19  0.022 255);  /* deep space */
+  --foreground:             oklch(0.95  0.008 85);
+  --card:                   oklch(0.23  0.025 258);  /* dark-raised */
+  --card-foreground:        oklch(0.95  0.008 85);
+  --popover:                oklch(0.27  0.030 262);  /* dark-overlay */
+  --popover-foreground:     oklch(0.95  0.008 85);
+
+  --primary:                oklch(0.95  0.008 85);   /* cream */
+  --primary-foreground:     oklch(0.19  0.022 255);
+
+  --secondary:              oklch(0.48  0.100 278);  /* interactive */
+  --secondary-foreground:   oklch(0.78  0.035 280);
+
+  --muted:                  oklch(0.27  0.030 262);  /* dark-overlay */
+  --muted-foreground:       oklch(0.54  0.010 345);
+
+  --accent:                 oklch(0.31  0.032 265);  /* dark-elevated */
+  --accent-foreground:      oklch(0.95  0.008 85);
+
+  --destructive:            oklch(0.55  0.192 20);   /* red-600 */
+  --destructive-foreground: oklch(1.00  0     0);
+
+  --border:                 oklch(0.33  0.028 265);
+  --input:                  oklch(0.33  0.028 265);
+  --ring:                   oklch(0.65  0.045 280);  /* interactive lighter */
+
+  /* Semantic action colors — dark mode */
+  --red:             oklch(0.74  0.158 22);
+  --red-foreground:  oklch(0.82  0.115 22);
+  --red-background:  oklch(0.20  0.045 16);
+
+  --blue:             oklch(0.74  0.125 255);  /* galaxy-400 */
+  --blue-foreground:  oklch(0.82  0.095 255);
+  --blue-background:  oklch(0.20  0.038 249);
+
+  --green:             oklch(0.74  0.162 155);  /* emerald-400 */
+  --green-foreground:  oklch(0.82  0.120 156);
+  --green-background:  oklch(0.20  0.040 149);
+
+  --yellow:             oklch(0.76  0.155 87);
+  --yellow-foreground:  oklch(0.82  0.122 88);
+  --yellow-background:  oklch(0.22  0.026 74);
+
+  --camel:             oklch(0.76  0.155 87);
+  --camel-foreground:  oklch(1.00  0     0);
+  --camel-background:  oklch(0.22  0.026 74);
+
+  --gray:             oklch(0.54  0.010 345);
+  --gray-foreground:  oklch(0.95  0.008 85);
+  --gray-background:  oklch(0.23  0.025 258);
 }
 
 @media (prefers-reduced-motion: reduce) {
