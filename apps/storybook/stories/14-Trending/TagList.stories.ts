@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 import { TagList } from '@/components/trending';
 
 const meta = {
-  title: '13-Trending/TagList',
+  title: '14-Trending/TagList',
   component: TagList,
   tags: ['autodocs'],
   decorators: [() => ({ template: '<div style="max-width: 400px"><story /></div>' })],

@@ -41,10 +41,10 @@ function toggleCollapse() {
   <div class="status-content">
     <!-- Content Warning -->
     <div v-if="hasSpoiler" class="mb-2">
-      <RichText :content="spoilerText" :emojis="emojis" class="text-gray-800" />
+      <RichText :content="spoilerText" :emojis="emojis" class="text-foreground" />
       <button
         type="button"
-        class="mt-2 px-3 py-1 text-sm font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+        class="mt-2 px-3 py-1 text-sm font-medium text-muted-foreground bg-muted rounded hover:bg-accent transition-colors"
         @click="toggleCollapse"
       >
         {{ isCollapsed ? 'Show more' : 'Show less' }}
@@ -56,7 +56,7 @@ function toggleCollapse() {
       v-show="!hasSpoiler || !isCollapsed"
       :class="{ 'mt-2': hasSpoiler }"
     >
-      <RichText :content="content" :emojis="emojis" class="text-gray-800" />
+      <RichText :content="content" :emojis="emojis" class="text-foreground" />
     </div>
   </div>
 </template>

@@ -21,7 +21,7 @@ defineEmits<{
 
 <template>
   <!-- Loading skeleton -->
-  <div v-if="loading && notifications.length === 0" class="divide-y divide-gray-200 dark:divide-gray-800">
+  <div v-if="loading && notifications.length === 0" class="divide-y divide-border">
     <div v-for="i in 4" :key="i" class="flex gap-3 px-4 py-3">
       <Skeleton class="mt-0.5 size-5 rounded" />
       <div class="flex-1 space-y-2">
@@ -43,7 +43,7 @@ defineEmits<{
   />
 
   <!-- Notification list -->
-  <div v-else-if="notifications.length > 0" class="divide-y divide-gray-200 dark:divide-gray-800">
+  <div v-else-if="notifications.length > 0" class="divide-y divide-border">
     <NotificationItem
       v-for="notification in notifications"
       :key="notification.id"

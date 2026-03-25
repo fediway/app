@@ -22,14 +22,14 @@ function getDomain(url: string): string {
     :href="card.url"
     target="_blank"
     rel="noopener noreferrer"
-    class="block border border-gray-200 rounded-xl overflow-hidden hover:bg-gray-50 transition-colors"
+    class="block border border-border rounded-xl overflow-hidden hover:bg-muted transition-colors"
     @click.stop
   >
     <!-- Card with image -->
     <template v-if="card.image">
       <!-- Large image layout (for link type with big image) -->
       <div v-if="card.type === 'link'" class="flex flex-col">
-        <div class="aspect-[1.91/1] bg-gray-100 overflow-hidden">
+        <div class="aspect-[1.91/1] bg-muted overflow-hidden">
           <img
             :src="card.image"
             :alt="card.title || ''"
@@ -38,11 +38,11 @@ function getDomain(url: string): string {
           >
         </div>
         <div class="p-3">
-          <div class="text-xs text-gray-500 mb-1">{{ getDomain(card.url) }}</div>
-          <div v-if="card.title" class="font-medium text-gray-900 line-clamp-2 mb-1">
+          <div class="text-xs text-muted-foreground mb-1">{{ getDomain(card.url) }}</div>
+          <div v-if="card.title" class="font-medium text-foreground line-clamp-2 mb-1">
             {{ card.title }}
           </div>
-          <div v-if="card.description" class="text-sm text-gray-500 line-clamp-2">
+          <div v-if="card.description" class="text-sm text-muted-foreground line-clamp-2">
             {{ card.description }}
           </div>
         </div>
@@ -50,7 +50,7 @@ function getDomain(url: string): string {
 
       <!-- Compact layout (for video/rich embeds) -->
       <div v-else class="flex">
-        <div class="w-32 h-32 shrink-0 bg-gray-100 overflow-hidden">
+        <div class="w-32 h-32 shrink-0 bg-muted overflow-hidden">
           <img
             :src="card.image"
             :alt="card.title || ''"
@@ -59,11 +59,11 @@ function getDomain(url: string): string {
           >
         </div>
         <div class="flex-1 p-3 min-w-0">
-          <div class="text-xs text-gray-500 mb-1">{{ getDomain(card.url) }}</div>
-          <div v-if="card.title" class="font-medium text-gray-900 line-clamp-2 mb-1">
+          <div class="text-xs text-muted-foreground mb-1">{{ getDomain(card.url) }}</div>
+          <div v-if="card.title" class="font-medium text-foreground line-clamp-2 mb-1">
             {{ card.title }}
           </div>
-          <div v-if="card.description" class="text-sm text-gray-500 line-clamp-2">
+          <div v-if="card.description" class="text-sm text-muted-foreground line-clamp-2">
             {{ card.description }}
           </div>
         </div>
@@ -72,11 +72,11 @@ function getDomain(url: string): string {
 
     <!-- Card without image -->
     <div v-else class="p-3">
-      <div class="text-xs text-gray-500 mb-1">{{ getDomain(card.url) }}</div>
-      <div v-if="card.title" class="font-medium text-gray-900 line-clamp-2 mb-1">
+      <div class="text-xs text-muted-foreground mb-1">{{ getDomain(card.url) }}</div>
+      <div v-if="card.title" class="font-medium text-foreground line-clamp-2 mb-1">
         {{ card.title }}
       </div>
-      <div v-if="card.description" class="text-sm text-gray-500 line-clamp-3">
+      <div v-if="card.description" class="text-sm text-muted-foreground line-clamp-3">
         {{ card.description }}
       </div>
     </div>

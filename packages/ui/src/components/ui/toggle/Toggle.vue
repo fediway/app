@@ -24,8 +24,8 @@ function toggle() {
 <template>
   <div class="flex items-center justify-between">
     <div v-if="label || description">
-      <span v-if="label" class="text-sm text-gray-700 dark:text-gray-300">{{ label }}</span>
-      <p v-if="description" class="text-xs text-gray-500 dark:text-gray-400">
+      <span v-if="label" class="text-sm text-foreground">{{ label }}</span>
+      <p v-if="description" class="text-xs text-muted-foreground">
         {{ description }}
       </p>
     </div>
@@ -35,7 +35,7 @@ function toggle() {
       :aria-checked="modelValue"
       :disabled="disabled"
       class="relative h-6 w-11 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      :class="[modelValue ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600']"
+      :class="[modelValue ? 'bg-primary' : 'bg-border']"
       @click="toggle"
     >
       <span

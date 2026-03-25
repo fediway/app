@@ -45,7 +45,7 @@ export const ActiveFavourite: Story = {
   render: args => ({
     components: { ButtonAction, PhHeart },
     setup() { return { args }; },
-    template: '<ButtonAction v-bind="args" class="text-red hover:text-red"><PhHeart :size="20" weight="fill" /></ButtonAction>',
+    template: '<ButtonAction v-bind="args" class="text-rose-500 hover:text-rose-500"><PhHeart :size="20" weight="fill" /></ButtonAction>',
   }),
 };
 
@@ -56,7 +56,7 @@ export const AllTypes: Story = {
       <div class="flex items-center gap-4">
         <ButtonAction :count="6"><PhChatCircle :size="20" /></ButtonAction>
         <ButtonAction :count="4"><PhRepeat :size="20" /></ButtonAction>
-        <ButtonAction :count="1" class="text-red hover:text-red"><PhHeart :size="20" weight="fill" /></ButtonAction>
+        <ButtonAction :count="1" class="text-rose-500 hover:text-rose-500"><PhHeart :size="20" weight="fill" /></ButtonAction>
         <ButtonAction class="text-yellow hover:text-yellow"><PhBookmarkSimple :size="20" weight="fill" /></ButtonAction>
       </div>
     `,

@@ -47,12 +47,12 @@ const timeRemaining = computed(() => {
     <div
       v-for="(option, index) in poll.options"
       :key="index"
-      class="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+      class="relative overflow-hidden rounded-lg border border-border"
     >
       <!-- Background bar -->
       <div
         class="absolute inset-0 transition-all"
-        :class="[isVoted(index) ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-50 dark:bg-gray-800/50']"
+        :class="[isVoted(index) ? 'bg-accent' : 'bg-muted/50']"
         :style="{ width: `${getPercentage(option.votesCount)}%` }"
       />
 
@@ -62,21 +62,21 @@ const timeRemaining = computed(() => {
           <PhCheck
             v-if="isVoted(index)"
             :size="16"
-            class="shrink-0 text-blue-500"
+            class="shrink-0 text-primary"
             weight="bold"
           />
-          <span class="text-sm text-gray-900 dark:text-gray-100">{{ option.title }}</span>
+          <span class="text-sm text-foreground">{{ option.title }}</span>
         </div>
-        <span class="text-sm font-medium text-gray-500">{{ getPercentage(option.votesCount) }}%</span>
+        <span class="text-sm font-medium text-muted-foreground">{{ getPercentage(option.votesCount) }}%</span>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center gap-2 text-sm text-gray-500">
+    <div class="flex items-center gap-2 text-sm text-muted-foreground">
       <span>{{ totalVotes }} vote{{ totalVotes !== 1 ? 's' : '' }}</span>
-      <span v-if="poll.multiple" class="text-gray-400">·</span>
+      <span v-if="poll.multiple" class="text-gray-400 dark:text-gray-500">·</span>
       <span v-if="poll.multiple">Multiple choices</span>
-      <span v-if="timeRemaining" class="text-gray-400">·</span>
+      <span v-if="timeRemaining" class="text-gray-400 dark:text-gray-500">·</span>
       <span v-if="timeRemaining">{{ timeRemaining }}</span>
     </div>
   </div>

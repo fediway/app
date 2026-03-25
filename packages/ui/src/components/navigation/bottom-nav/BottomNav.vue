@@ -23,7 +23,7 @@ defineEmits<{
 </script>
 
 <template>
-  <nav class="flex flex-1 items-center justify-between rounded-full bg-white px-6 py-3 shadow-lg dark:border dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
+  <nav class="flex flex-1 items-center justify-between rounded-full bg-card px-6 py-3 shadow-lg dark:border dark:border-border dark:shadow-none">
     <BottomNavItem
       v-for="(item, i) in items"
       :key="item.id ?? i"

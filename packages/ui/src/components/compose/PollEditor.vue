@@ -50,9 +50,9 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
 </script>
 
 <template>
-  <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+  <div class="rounded-xl border border-border bg-muted p-4">
     <div class="mb-3 flex items-center justify-between">
-      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Poll</span>
+      <span class="text-sm font-medium text-foreground">Poll</span>
       <slot name="close" />
     </div>
 
@@ -65,7 +65,7 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
       >
         <div class="flex size-5 shrink-0 items-center justify-center">
           <div
-            class="size-4 border-2 border-gray-300"
+            class="size-4 border-2 border-border"
             :class="[multiple ? 'rounded' : 'rounded-full']"
           />
         </div>
@@ -80,7 +80,7 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
         <button
           v-if="options.length > MIN_OPTIONS"
           type="button"
-          class="shrink-0 p-1 text-gray-400 transition-colors hover:text-red-500"
+          class="shrink-0 p-1 text-muted-foreground transition-colors hover:text-red"
           @click="removeOption(index)"
         >
           <PhX :size="16" />
@@ -93,7 +93,7 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
     <button
       v-if="options.length < MAX_OPTIONS"
       type="button"
-      class="mb-4 flex items-center gap-2 text-sm text-blue-600 transition-colors hover:text-blue-700"
+      class="mb-4 flex items-center gap-2 text-sm text-foreground transition-colors hover:text-foreground/80"
       @click="addOption"
     >
       <PhPlus :size="16" />
@@ -101,10 +101,10 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
     </button>
 
     <!-- Settings -->
-    <div class="flex flex-wrap items-center gap-4 border-t border-gray-200 pt-3 dark:border-gray-700">
+    <div class="flex flex-wrap items-center gap-4 border-t border-border pt-3">
       <select
         :value="duration"
-        class="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm outline-hidden focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+        class="rounded-lg border border-border bg-card px-2 py-1.5 text-sm text-foreground outline-hidden focus:ring-2 focus:ring-ring"
         @change="emit('update:duration', Number(($event.target as HTMLSelectElement).value))"
       >
         <option
@@ -120,15 +120,15 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
         <input
           type="checkbox"
           :checked="multiple"
-          class="size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          class="size-4 rounded border-border text-primary focus:ring-ring"
           @change="emit('update:multiple', ($event.target as HTMLInputElement).checked)"
         >
-        <span class="text-sm text-gray-600 dark:text-gray-400">Multiple choices</span>
+        <span class="text-sm text-muted-foreground">Multiple choices</span>
       </label>
     </div>
 
     <!-- Validation -->
-    <div v-if="validCount < MIN_OPTIONS" class="mt-3 text-xs text-orange-600">
+    <div v-if="validCount < MIN_OPTIONS" class="mt-3 text-xs text-red">
       Add at least {{ MIN_OPTIONS }} options to create a poll
     </div>
   </div>

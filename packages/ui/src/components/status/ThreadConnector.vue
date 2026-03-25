@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <div
-    class="absolute left-8 w-0.5 bg-gray-300 dark:bg-gray-600"
+    class="absolute left-8 w-0.5 bg-border"
     :class="$props.class"
   />
 </template>

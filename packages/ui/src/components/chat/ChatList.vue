@@ -20,7 +20,7 @@ defineEmits<{
 
 <template>
   <!-- Loading skeleton -->
-  <div v-if="loading && conversations.length === 0" class="divide-y divide-gray-100 dark:divide-gray-800">
+  <div v-if="loading && conversations.length === 0" class="divide-y divide-border">
     <div v-for="i in 4" :key="i" class="flex items-center gap-3 px-4 py-3">
       <Skeleton class="size-10 rounded-full" />
       <div class="flex-1 space-y-2">
@@ -42,7 +42,7 @@ defineEmits<{
   />
 
   <!-- Conversation list -->
-  <div v-else-if="conversations.length > 0" class="divide-y divide-gray-100 dark:divide-gray-800">
+  <div v-else-if="conversations.length > 0" class="divide-y divide-border">
     <ConversationListItem
       v-for="conversation in conversations"
       :key="conversation.id"

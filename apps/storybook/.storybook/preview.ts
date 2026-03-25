@@ -13,7 +13,7 @@ const preview: Preview = {
       },
     },
     sidebar: {
-      collapsedRoots: ['02-primitives', '03-form', '04-layout', '05-navigation', '06-account', '07-status', '08-compose', '09-timeline', '10-notification', '11-chat', '12-media', '13-item', '14-brand'],
+      collapsedRoots: ['02-primitives', '03-form', '04-layout', '05-navigation', '06-account', '07-status', '08-compose', '09-timeline', '10-notification', '11-chat', '12-media', '13-item', '14-trending', '15-recipes'],
     },
   },
   decorators: [
@@ -23,6 +23,10 @@ const preview: Preview = {
         dark: 'dark',
       },
       defaultTheme: 'light',
+    }),
+    story => ({
+      components: { story },
+      template: '<div class="bg-white dark:bg-background text-foreground p-4"><story /></div>',
     }),
   ],
 };

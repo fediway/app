@@ -26,12 +26,12 @@ const hiddenCount = computed(() => Math.max(0, props.tags.length - props.limit))
       v-for="tag in visibleTags"
       :key="tag.name"
       type="button"
-      class="inline-flex text-[13px] px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer transition-colors border-none"
+      class="inline-flex text-[13px] px-2.5 py-1 rounded-full bg-muted text-foreground hover:bg-accent cursor-pointer transition-colors border-none"
       @click="emit('tagClick', tag)"
     >
       #{{ tag.name }}
     </button>
-    <span v-if="hiddenCount > 0" class="text-[13px] text-gray-500 py-1">
+    <span v-if="hiddenCount > 0" class="text-[13px] text-muted-foreground py-1">
       +{{ hiddenCount }} more
     </span>
   </div>

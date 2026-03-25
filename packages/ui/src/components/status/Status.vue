@@ -125,7 +125,7 @@ function handleStatusClick(event: MouseEvent) {
         v-if="isReblog && showReblogIndicator && booster"
         class="flex items-center gap-2 px-5 pt-2 text-sm text-foreground/60"
       >
-        <PhArrowsClockwise :size="16" class="ml-[28px]" />
+        <PhArrowsClockwise :size="16" class="ml-[28px] text-green" />
         <span>{{ booster.displayName || booster.username }} boosted</span>
       </div>
 

@@ -41,13 +41,12 @@ const processedContent = computed(() => {
 
 <style>
 .rich-text a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: rgb(156 163 175);
+  color: var(--galaxy-500);
+  text-decoration: none;
 }
 
 .rich-text a:hover {
-  text-decoration-color: currentColor;
+  text-decoration: underline;
 }
 
 .rich-text p {
@@ -60,8 +59,9 @@ const processedContent = computed(() => {
 
 .rich-text .mention,
 .rich-text .hashtag {
+  color: var(--galaxy-500);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .rich-text .mention:hover,
@@ -75,5 +75,11 @@ const processedContent = computed(() => {
 
 .rich-text .ellipsis::after {
   content: '...';
+}
+
+:where(.dark, .dark *) .rich-text a,
+:where(.dark, .dark *) .rich-text .mention,
+:where(.dark, .dark *) .rich-text .hashtag {
+  color: var(--galaxy-400);
 }
 </style>

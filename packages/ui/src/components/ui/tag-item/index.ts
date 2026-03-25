@@ -8,11 +8,11 @@ export const tagItemVariants = cva(
   {
     variants: {
       variant: {
-        blue: 'bg-[#DFEBF7] [&_svg]:text-[#2877CB]',
-        green: 'bg-[#DEEDDD] [&_svg]:text-[#228419]',
-        red: 'bg-[#FBDCDC] [&_svg]:text-[#C23737]',
-        yellow: 'bg-[#F7EDCF] [&_svg]:text-[#B8920C]',
-        gray: 'bg-[#EBEBEB] [&_svg]:text-[#6B7280]',
+        blue: 'bg-blue-background [&_svg]:text-blue-foreground',
+        green: 'bg-green-background [&_svg]:text-green-foreground',
+        red: 'bg-red-background [&_svg]:text-red-foreground',
+        yellow: 'bg-yellow-background [&_svg]:text-yellow',
+        gray: 'bg-gray-background [&_svg]:text-gray-foreground',
       },
     },
     defaultVariants: {

@@ -86,16 +86,16 @@ const sublabel = computed(() => {
       v-if="item.image"
       :src="item.image"
       :alt="item.title"
-      class="min-h-12 w-12 shrink-0 rounded-sm border border-[#EDE6D6] bg-[#F6F3EB] object-cover" :class="[config.aspect]"
+      class="min-h-12 w-12 shrink-0 rounded-sm border border-border bg-muted object-cover" :class="[config.aspect]"
     >
     <div
       v-else
-      class="flex min-h-12 w-12 shrink-0 items-center justify-center rounded-sm border border-[#EDE6D6] bg-[#F6F3EB] text-[#EDE6D6]" :class="[config.aspect]"
+      class="flex min-h-12 w-12 shrink-0 items-center justify-center rounded-sm border border-border bg-muted text-border" :class="[config.aspect]"
     >
       <component :is="iconMap[item.type]" :size="24" />
     </div>
     <div class="min-w-0">
-      <p class="line-clamp-2 text-base font-bold text-[#232B37]">
+      <p class="line-clamp-2 text-base font-bold text-foreground">
         {{ item.title }}
       </p>
       <div class="flex items-center gap-1.5">
@@ -105,7 +105,7 @@ const sublabel = computed(() => {
           </template>
           {{ config.label }}
         </TagItem>
-        <span v-if="sublabel" class="text-sm text-[#232B37]/80">
+        <span v-if="sublabel" class="text-sm text-foreground/80">
           {{ sublabel }}
         </span>
       </div>

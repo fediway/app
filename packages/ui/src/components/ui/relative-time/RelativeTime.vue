@@ -65,7 +65,7 @@ const fullDate = computed(() => formatFullDate(props.datetime));
   <time
     :datetime="datetime"
     :title="showTooltip ? fullDate : undefined"
-    class="text-gray-500 tabular-nums"
+    class="text-gray-400 dark:text-gray-500 tabular-nums"
   >
     {{ relativeTime }}
   </time>

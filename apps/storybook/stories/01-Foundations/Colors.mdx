@@ -37,6 +37,25 @@ The brand is not a hue — it's the warmth of the surface itself. Warm cream in 
 - Focus ring: `#525380` family with offset gap
 - Disabled: `opacity: 0.4`
 
+## Text Hierarchy Rules
+
+**Semantic tokens** are the default. **Palette grays** are for fine-grained control.
+
+- `text-foreground` — Primary text: headings, display names, titles
+- `text-muted-foreground` — Secondary text: timestamps, captions, simple labels
+- `text-gray-500 dark:text-gray-400` — Fine-grained: when you need a level between foreground and muted within one component (e.g., message preview text)
+- `text-gray-400 dark:text-gray-500` — Subtle labels: sender prefixes ("You:"), secondary identifiers
+
+Use palette grays when a component has **2+ levels of text importance** in one row (e.g., ChatListItem: name > message > sender prefix). The gray steps carry warmth from the hue rotation — gray-500 has the rose undertone, gray-400 has peach.
+
+## Interactive Pill Rules
+
+Pill-shaped toggle buttons (toolbar items, tag chips):
+
+- **Inactive:** `bg-muted text-foreground hover:bg-accent`
+- **Active:** `bg-primary text-primary-foreground`
+- Text stays full contrast in all states — the surface communicates on/off, not the text
+
 ## Tailwind Usage
 
 ```html

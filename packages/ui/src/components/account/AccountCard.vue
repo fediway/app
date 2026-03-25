@@ -53,7 +53,7 @@ withDefaults(defineProps<Props>(), {
         v-if="showBio && account.note"
         :content="account.note"
         :emojis="account.emojis"
-        class="text-sm text-gray-700 mt-1 line-clamp-2"
+        class="text-sm text-foreground mt-1 line-clamp-2"
       />
     </div>
   </div>

@@ -28,8 +28,8 @@ function formatCount(n: number): string {
     data-slot="button-action"
     :class="cn(
       'inline-flex items-center gap-[6px]',
-      'cursor-pointer text-primary/60 transition-colors',
-      'hover:text-primary',
+      'cursor-pointer text-gray-500 dark:text-gray-400 transition-colors',
+      'hover:text-foreground',
       'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
       'disabled:cursor-not-allowed disabled:opacity-50',
       props.class,

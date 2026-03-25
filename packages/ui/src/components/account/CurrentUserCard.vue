@@ -15,10 +15,10 @@ defineEmits<{
 <template>
   <div class="flex flex-col items-center" @click="$emit('click')">
     <Avatar :src="avatar" :alt="name" size="lg" class="mb-3" />
-    <div class="text-base font-semibold text-gray-900 dark:text-gray-100">
+    <div class="text-base font-semibold text-foreground">
       {{ name }}
     </div>
-    <div class="text-sm text-gray-500">
+    <div class="text-sm text-muted-foreground">
       @{{ username }}
     </div>
   </div>

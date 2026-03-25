@@ -12,7 +12,7 @@ defineEmits<{ click: [] }>();
   <div
     role="button"
     tabindex="0"
-    class="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+    class="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors hover:bg-muted"
     :aria-label="`${name}, ${handle}`"
     @click="$emit('click')"
     @keydown.enter="$emit('click')"
@@ -24,12 +24,12 @@ defineEmits<{ click: [] }>();
       :alt="name"
       class="size-8 shrink-0 rounded-full"
     >
-    <div v-else class="size-8 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700" />
+    <div v-else class="size-8 shrink-0 rounded-full bg-accent" />
     <div class="min-w-0">
-      <div class="truncate text-[13px] font-semibold leading-tight text-gray-900 dark:text-white">
+      <div class="truncate text-[13px] font-semibold leading-tight text-foreground">
         {{ name }}
       </div>
-      <div class="truncate text-xs leading-tight text-gray-500 dark:text-gray-400">
+      <div class="truncate text-xs leading-tight text-muted-foreground">
         {{ handle }}
       </div>
     </div>

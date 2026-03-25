@@ -74,7 +74,7 @@ const canReblog = computed(() =>
       <ButtonAction
         :count="favouritesCount || null"
         class="w-[60px]"
-        :class="{ 'text-red hover:text-red': favourited }"
+        :class="{ 'text-rose-500 hover:text-rose-500': favourited }"
         @click="emit('favourite')"
       >
         <PhHeart :size="20" :weight="favourited ? 'fill' : 'regular'" />

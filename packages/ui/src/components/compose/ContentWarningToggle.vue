@@ -16,8 +16,8 @@ defineEmits<{
     class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors"
     :class="[
       modelValue
-        ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400',
+        ? 'bg-primary text-primary-foreground'
+        : 'bg-muted text-foreground hover:bg-accent',
     ]"
     @click="$emit('update:modelValue', !modelValue)"
   >

@@ -29,12 +29,12 @@ defineEmits<{
       <component :is="icon" :size="24" :weight="active ? 'fill' : 'regular'" class="shrink-0" />
       <span
         v-if="badge"
-        class="absolute -right-1.5 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white"
+        class="absolute -right-1.5 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-galaxy-500 px-1 text-[10px] font-bold leading-none text-white"
       >
         {{ typeof badge === 'number' && badge > 99 ? '99+' : badge }}
       </span>
     </span>
-    <span v-if="!main && label" class="text-xs text-gray-700 dark:text-gray-300">
+    <span v-if="!main && label" class="text-xs text-foreground">
       {{ label }}
     </span>
   </component>

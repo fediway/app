@@ -14,7 +14,7 @@
     </div>
 
     <!-- Navigation menu -->
-    <nav class="flex flex-col">
+    <nav class="flex flex-col gap-1 px-2">
       <slot />
     </nav>
 

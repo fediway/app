@@ -11,10 +11,10 @@ defineEmits<{
 
 <template>
   <button
-    class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+    class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted"
     @click="$emit('click', name)"
   >
-    <span class="font-medium text-gray-900 dark:text-gray-100">#{{ name }}</span>
-    <span v-if="postCount" class="text-sm text-gray-500">{{ postCount }}</span>
+    <span class="font-medium text-foreground">#{{ name }}</span>
+    <span v-if="postCount" class="text-sm text-muted-foreground">{{ postCount }}</span>
   </button>
 </template>

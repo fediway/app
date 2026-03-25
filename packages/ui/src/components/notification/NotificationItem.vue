@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
 import type { Component } from 'vue';
-import { PhAt, PhHeart, PhRepeat, PhStar, PhUserPlus } from '@phosphor-icons/vue';
+import { PhArrowsClockwise, PhAt, PhHeart, PhStar, PhUserPlus } from '@phosphor-icons/vue';
 import AccountDisplayName from '../account/AccountDisplayName.vue';
 import StatusContent from '../status/StatusContent.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
@@ -17,15 +17,15 @@ defineEmits<{
 }>();
 
 const ICON_MAP: Record<string, { icon: Component; color: string }> = {
-  favourite: { icon: PhHeart, color: 'text-red-500' },
-  reblog: { icon: PhRepeat, color: 'text-green-500' },
-  follow: { icon: PhUserPlus, color: 'text-blue-500' },
-  mention: { icon: PhAt, color: 'text-purple-500' },
-  poll: { icon: PhStar, color: 'text-yellow-500' },
+  favourite: { icon: PhHeart, color: 'text-rose-500' },
+  reblog: { icon: PhArrowsClockwise, color: 'text-green' },
+  follow: { icon: PhUserPlus, color: 'text-galaxy-500' },
+  mention: { icon: PhAt, color: 'text-galaxy-500' },
+  poll: { icon: PhStar, color: 'text-yellow' },
 };
 
 function getIcon(type: string) {
-  return ICON_MAP[type] ?? { icon: PhStar, color: 'text-gray-500' };
+  return ICON_MAP[type] ?? { icon: PhStar, color: 'text-muted-foreground' };
 }
 
 function getText(type: string): string {
@@ -42,7 +42,7 @@ function getText(type: string): string {
 
 <template>
   <button
-    class="flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+    class="flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
     @click="$emit('click', notification)"
   >
     <!-- Type icon -->
@@ -67,14 +67,14 @@ function getText(type: string): string {
               :name="notification.account.displayName || notification.account.username"
               :emojis="notification.account.emojis"
             />
-            <span class="text-gray-500 dark:text-gray-400"> {{ getText(notification.type) }}</span>
+            <span class="ml-1 text-muted-foreground">{{ getText(notification.type) }}</span>
           </p>
-          <RelativeTime :datetime="notification.createdAt" class="text-xs text-gray-400 dark:text-gray-500" />
+          <RelativeTime :datetime="notification.createdAt" class="text-xs" />
         </div>
       </div>
 
       <!-- Status preview -->
-      <div v-if="notification.status" class="mt-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+      <div v-if="notification.status" class="mt-2 rounded-lg bg-muted p-3">
         <StatusContent
           :content="notification.status.content"
           :spoiler-text="notification.status.spoilerText"

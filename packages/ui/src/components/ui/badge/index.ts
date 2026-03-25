@@ -8,8 +8,8 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-[#ede6d6] text-[#232b37]',
-        primary: 'bg-primary text-white',
+        default: 'bg-accent text-accent-foreground',
+        primary: 'bg-primary text-primary-foreground',
         secondary: 'bg-secondary text-primary',
         muted: 'bg-muted text-primary',
       },

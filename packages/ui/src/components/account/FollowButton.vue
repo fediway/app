@@ -29,7 +29,7 @@ const isHovered = ref(false);
     :disabled="loading || props.requested"
     class="shrink-0"
     :class="[
-      isFollowing && isHovered && 'border-red-300 text-red-600 hover:bg-white dark:hover:bg-transparent',
+      isFollowing && isHovered && 'border-red text-red hover:bg-red-background',
     ]"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"

@@ -30,7 +30,7 @@ defineEmits<{
         class="!h-auto"
       >
         <div
-          class="block h-full cursor-pointer rounded-xl border border-gray-200 bg-white p-3 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+          class="block h-full cursor-pointer rounded-xl border border-border bg-card p-3 transition-colors hover:border-border"
           @click="$emit('accountClick', account.acct)"
         >
           <div class="flex flex-col items-center text-center">
@@ -45,7 +45,7 @@ defineEmits<{
               :show-instance="false"
               class="block w-full truncate text-xs"
             />
-            <div class="mb-3 mt-1 text-xs text-gray-400">
+            <div class="mb-3 mt-1 text-xs text-muted-foreground/60">
               {{ account.followersCount?.toLocaleString() }} followers
             </div>
             <!-- Action slot for follow button -->

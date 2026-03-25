@@ -22,7 +22,7 @@ defineEmits<{
 
 <template>
   <div
-    class="cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 active:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+    class="cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted active:bg-muted"
     @click="$emit('click', status.id)"
   >
     <article class="px-4 py-3">
@@ -39,20 +39,20 @@ defineEmits<{
               @click.stop="$emit('profileClick', status.account.acct)"
             />
             <AccountHandle :acct="status.account.acct" class="truncate text-sm" />
-            <span class="text-gray-400">·</span>
-            <RelativeTime :datetime="status.createdAt" class="text-gray-500" />
+            <span class="text-gray-400 dark:text-gray-500">·</span>
+            <RelativeTime :datetime="status.createdAt" />
           </div>
           <RichText
             :content="status.content"
             :emojis="status.emojis"
-            class="mt-1 text-gray-900 dark:text-gray-100"
+            class="mt-1 text-foreground"
           />
 
           <!-- Compact reply actions -->
-          <div class="mt-2 flex gap-4 text-sm text-gray-500">
+          <div class="mt-2 flex gap-4 text-sm text-primary/60">
             <button
               type="button"
-              class="flex items-center gap-1 hover:text-blue-500 active:text-blue-500"
+              class="flex items-center gap-1 hover:text-foreground active:text-foreground"
               @click.stop="$emit('reply', status.id)"
             >
               <PhChatCircle :size="16" />
@@ -60,7 +60,7 @@ defineEmits<{
             </button>
             <button
               type="button"
-              class="flex items-center gap-1 hover:text-green-500 active:text-green-500"
+              class="flex items-center gap-1 hover:text-foreground active:text-foreground"
               @click.stop="$emit('reblog', status.id)"
             >
               <PhRepeat :size="16" />
@@ -68,7 +68,7 @@ defineEmits<{
             </button>
             <button
               type="button"
-              class="flex items-center gap-1 hover:text-red-500 active:text-red-500"
+              class="flex items-center gap-1 hover:text-foreground active:text-foreground"
               @click.stop="$emit('favourite', status.id)"
             >
               <PhHeart :size="16" />

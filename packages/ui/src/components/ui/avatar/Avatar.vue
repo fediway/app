@@ -22,7 +22,7 @@ const sizeClasses = {
 
 <template>
   <div
-    class="rounded-full border border-gray-200 bg-gray-100 overflow-hidden shrink-0" :class="[
+    class="rounded-full border border-border bg-muted overflow-hidden shrink-0" :class="[
       sizeClasses[size],
     ]"
     role="img"

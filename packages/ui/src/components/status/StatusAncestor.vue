@@ -21,7 +21,7 @@ defineEmits<{
 
 <template>
   <div
-    class="relative cursor-pointer transition-colors hover:bg-gray-50 active:bg-gray-50 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+    class="relative cursor-pointer transition-colors hover:bg-muted active:bg-muted"
     @click="$emit('click', status.id)"
   >
     <ThreadConnector
@@ -43,13 +43,13 @@ defineEmits<{
               @click.stop="$emit('profileClick', status.account.acct)"
             />
             <AccountHandle :acct="status.account.acct" class="truncate text-sm" />
-            <span class="text-gray-400">·</span>
-            <RelativeTime :datetime="status.createdAt" class="text-sm text-gray-500" />
+            <span class="text-gray-400 dark:text-gray-500">·</span>
+            <RelativeTime :datetime="status.createdAt" class="text-sm" />
           </div>
           <RichText
             :content="status.content"
             :emojis="status.emojis"
-            class="mt-1 text-gray-900 dark:text-gray-100"
+            class="mt-1 text-foreground"
           />
         </div>
       </div>

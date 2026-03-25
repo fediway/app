@@ -28,8 +28,8 @@ defineEmits<{
   <div
     data-slot="app-bar"
     :class="cn(
-      'flex h-14 items-center justify-between px-2 bg-white dark:bg-gray-900',
-      bordered && 'border-b border-gray-200 dark:border-gray-800',
+      'flex h-14 items-center justify-between px-2 bg-card',
+      bordered && 'border-b border-border',
       props.class,
     )"
   >
@@ -51,7 +51,7 @@ defineEmits<{
     <!-- Title -->
     <div class="min-w-0 flex-1 text-center">
       <slot name="title">
-        <h1 v-if="title" class="m-0 truncate text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h1 v-if="title" class="m-0 truncate text-lg font-semibold text-foreground">
           {{ title }}
         </h1>
       </slot>

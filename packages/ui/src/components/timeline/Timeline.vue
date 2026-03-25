@@ -66,7 +66,7 @@ function getReplyParent(status: StatusType): StatusType | null {
 <template>
   <div class="timeline">
     <!-- Empty state -->
-    <div v-if="!loading && statuses.length === 0" class="text-center py-12 text-gray-500">
+    <div v-if="!loading && statuses.length === 0" class="text-center py-12 text-muted-foreground">
       <p>No posts yet</p>
     </div>
 
@@ -107,14 +107,14 @@ function getReplyParent(status: StatusType): StatusType | null {
 
     <!-- Loading indicator -->
     <div v-if="loading" class="flex justify-center py-8">
-      <div class="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+      <div class="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
     </div>
 
     <!-- Load more button -->
     <div v-else-if="hasMore && statuses.length > 0" class="flex justify-center py-4">
       <button
         type="button"
-        class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        class="px-4 py-2 text-sm font-medium text-muted-foreground bg-muted rounded-lg hover:bg-accent transition-colors"
         @click="emit('loadMore')"
       >
         Load more

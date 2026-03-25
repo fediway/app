@@ -23,6 +23,21 @@ export const WithMentions: Story = {
   args: { content: '<p>Hey <span class="mention">@alice@mastodon.social</span>, great post!</p>' },
 };
 
+export const WithHashtags: Story = {
+  args: { content: '<p>Just finished reading the best book this year <a href="/tags/BookReview" class="hashtag">#BookReview</a> <a href="/tags/Fantasy" class="hashtag">#Fantasy</a> <a href="/tags/SusannaClarke" class="hashtag">#SusannaClarke</a></p>' },
+};
+
+export const WithExternalLink: Story = {
+  args: { content: '<p>Really interesting article about the fediverse: <a href="https://example.com/article">https://example.com/article</a></p>' },
+};
+
+export const AllDiscoveryElements: Story = {
+  name: 'Mentions + Hashtags + Links',
+  args: {
+    content: '<p>Just finished <strong>Piranesi</strong> by <a href="https://books.social/@SusannaClarke" class="mention">@SusannaClarke</a>. The way she builds atmosphere through negative space is extraordinary.</p><p>Reminded me of <a href="https://books.social/@Borges" class="mention">@Borges</a> at his most labyrinthine. <a href="/tags/BookReview" class="hashtag">#BookReview</a> <a href="/tags/Fantasy" class="hashtag">#Fantasy</a></p><p>Full review: <a href="https://fediway.com/reviews/piranesi">https://fediway.com/reviews/piranesi</a></p>',
+  },
+};
+
 export const Empty: Story = {
   args: { content: '' },
 };

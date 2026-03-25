@@ -43,7 +43,7 @@ const processedName = computed(() => {
   <component
     :is="asLink && href ? 'a' : 'span'"
     :href="asLink && href ? href : undefined"
-    class="font-semibold text-gray-900 break-words" :class="[
+    class="font-semibold text-foreground break-words" :class="[
       asLink && href && 'no-underline hover:underline',
     ]"
     v-html="processedName"

@@ -47,7 +47,7 @@ defineEmits<{
       >
         <DialogContent
           v-if="open"
-          class="fixed bottom-0 top-0 z-50 flex w-[280px] max-w-[80vw] flex-col overflow-y-auto bg-white dark:bg-gray-900"
+          class="fixed bottom-0 top-0 z-50 flex w-[280px] max-w-[80vw] flex-col overflow-y-auto bg-card"
           :class="side === 'left' ? 'left-0' : 'right-0'"
           @escape-key-down="$emit('update:open', false)"
         >
@@ -57,17 +57,17 @@ defineEmits<{
           </VisuallyHidden>
 
           <!-- Header slot (user profile section) -->
-          <div v-if="$slots.header" class="border-b border-gray-100 dark:border-gray-800">
+          <div v-if="$slots.header" class="border-b border-border">
             <slot name="header" />
           </div>
 
           <!-- Menu items -->
-          <nav aria-label="Main menu" class="flex flex-col p-2">
+          <nav aria-label="Main menu" class="flex flex-col gap-1 p-2">
             <slot />
           </nav>
 
           <!-- Footer slot -->
-          <div v-if="$slots.footer" class="mt-auto border-t border-gray-100 dark:border-gray-800 p-2">
+          <div v-if="$slots.footer" class="mt-auto border-t border-border p-2">
             <slot name="footer" />
           </div>
         </DialogContent>

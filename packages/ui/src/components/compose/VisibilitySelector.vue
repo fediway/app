@@ -29,8 +29,8 @@ const options = [
       class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors"
       :class="[
         props.modelValue === option.value
-          ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400',
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-muted text-muted-foreground hover:bg-accent',
       ]"
       @click="emit('update:modelValue', option.value)"
     >

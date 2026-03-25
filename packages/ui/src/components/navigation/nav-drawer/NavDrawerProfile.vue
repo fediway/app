@@ -11,10 +11,10 @@ defineProps<{
 <template>
   <div class="flex flex-col items-center px-4 pb-6 pt-8">
     <Avatar :src="avatar" :alt="name" size="lg" class="mb-3" />
-    <div class="text-base font-semibold text-gray-900 dark:text-gray-100">
+    <div class="text-base font-semibold text-foreground">
       {{ name }}
     </div>
-    <div class="text-sm text-gray-500 dark:text-gray-400">
+    <div class="text-sm text-muted-foreground">
       {{ handle }}
     </div>
   </div>

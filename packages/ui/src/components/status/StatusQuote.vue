@@ -33,7 +33,7 @@ const firstMediaUrl = computed(() => {
 
 <template>
   <div
-    class="border border-gray-200 rounded-xl overflow-hidden hover:bg-gray-50 transition-colors cursor-pointer"
+    class="border border-border rounded-xl overflow-hidden hover:bg-muted transition-colors cursor-pointer"
     @click="handleClick"
   >
     <div class="p-3">
@@ -45,13 +45,13 @@ const firstMediaUrl = computed(() => {
           class="w-5 h-5 rounded-full"
         >
         <span class="font-medium text-sm truncate">{{ status.account.displayName }}</span>
-        <span class="text-gray-500 text-sm truncate">@{{ status.account.acct }}</span>
-        <span class="text-gray-400 text-sm">·</span>
-        <RelativeTime :datetime="status.createdAt" class="text-gray-500 text-sm" />
+        <span class="text-muted-foreground text-sm truncate">@{{ status.account.acct }}</span>
+        <span class="text-gray-400 dark:text-gray-500 text-sm">·</span>
+        <RelativeTime :datetime="status.createdAt" class="text-sm" />
       </div>
 
       <!-- Content -->
-      <RichText :content="status.content" :emojis="status.emojis" class="text-sm text-gray-900 line-clamp-3" />
+      <RichText :content="status.content" :emojis="status.emojis" class="text-sm text-foreground line-clamp-3" />
 
       <!-- Media preview (if has media) -->
       <div

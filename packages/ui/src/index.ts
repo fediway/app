@@ -96,9 +96,9 @@ export { Timeline } from './components/timeline';
 export { TagList, TagListItem } from './components/trending';
 
 // UI primitives
-export { Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonSK, ButtonText, Divider, Headline, RelativeTime, RichText, SearchInput, Section } from './components/ui';
+export { Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonText, Divider, Headline, RelativeTime, RichText, SearchInput, Section } from './components/ui';
 export type { AvatarStackItem } from './components/ui';
-export type { ButtonSKVariants, HeadlineVariants } from './components/ui';
+export type { HeadlineVariants } from './components/ui';
 export { Button, buttonVariants } from './components/ui/button';
 export type { ButtonVariants } from './components/ui/button';
 export {

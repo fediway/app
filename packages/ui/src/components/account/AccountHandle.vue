@@ -25,7 +25,7 @@ const formattedHandle = computed(() => {
 </script>
 
 <template>
-  <span class="text-gray-500 break-all">
+  <span class="text-gray-400 dark:text-gray-500 break-all">
     {{ formattedHandle }}
   </span>
 </template>

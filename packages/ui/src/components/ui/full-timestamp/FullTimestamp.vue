@@ -21,7 +21,7 @@ const formatted = computed(() => {
 </script>
 
 <template>
-  <time v-if="formatted" :datetime="datetime" class="text-sm text-gray-500">
+  <time v-if="formatted" :datetime="datetime" class="text-sm text-gray-400 dark:text-gray-500">
     {{ formatted }}
   </time>
 </template>
