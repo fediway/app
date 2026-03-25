@@ -39,16 +39,15 @@ withDefaults(defineProps<Props>(), {
     />
 
     <div class="flex flex-col min-w-0 flex-1">
-      <div class="flex items-baseline gap-2 flex-wrap">
-        <AccountDisplayName
-          :name="account.displayName || account.username"
-          :emojis="account.emojis"
-          :as-link="!!profileUrl"
-          :href="profileUrl"
-          :class="size === 'sm' ? 'text-sm' : 'text-[15px]'"
-        />
-      </div>
-      <AccountHandle :acct="account.acct" :class="size === 'sm' ? 'text-xs' : 'text-sm'" />
+      <AccountDisplayName
+        :name="account.displayName || account.username"
+        :emojis="account.emojis"
+        :as-link="!!profileUrl"
+        :href="profileUrl"
+        class="truncate"
+        :class="size === 'sm' ? 'text-sm' : 'text-base'"
+      />
+      <AccountHandle :acct="account.acct" class="truncate" :class="size === 'sm' ? 'text-xs' : 'text-sm'" />
       <RichText
         v-if="showBio && account.note"
         :content="account.note"

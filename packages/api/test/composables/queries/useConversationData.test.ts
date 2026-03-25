@@ -216,6 +216,40 @@ describe('useConversationData', () => {
       expect(result.id).toBe('new-1');
     });
 
+    it('passes inReplyToId when provided for threading', async () => {
+      const created = makeStatus('new-2', 'me@example.com', '@alice Reply');
+      mockStatusCreate.mockResolvedValue(created);
+
+      const { sendDirectMessage } = await getComposable();
+      await sendDirectMessage('alice@example.com', 'Reply', 'prev-msg-42');
+
+      expect(mockStatusCreate).toHaveBeenCalledWith({
+        status: '@alice@example.com Reply',
+        visibility: 'direct',
+        inReplyToId: 'prev-msg-42',
+      });
+    });
+
+    it('omits inReplyToId when not provided', async () => {
+      mockStatusCreate.mockResolvedValue(makeStatus('new-3', 'me@example.com', 'Hi'));
+
+      const { sendDirectMessage } = await getComposable();
+      await sendDirectMessage('alice@example.com', 'Hi');
+
+      const call = mockStatusCreate.mock.calls[0]![0];
+      expect(call).not.toHaveProperty('inReplyToId');
+    });
+
+    it('omits inReplyToId when passed undefined (new conversation)', async () => {
+      mockStatusCreate.mockResolvedValue(makeStatus('new-4', 'me@example.com', 'First'));
+
+      const { sendDirectMessage } = await getComposable();
+      await sendDirectMessage('alice@example.com', 'First', undefined);
+
+      const call = mockStatusCreate.mock.calls[0]![0];
+      expect(call).not.toHaveProperty('inReplyToId');
+    });
+
     it('propagates API errors to caller', async () => {
       mockStatusCreate.mockRejectedValue(new Error('Forbidden'));
 
@@ -228,6 +262,17 @@ describe('useConversationData', () => {
   });
 
   describe('shareStatus', () => {
+    it('does not thread into existing conversation (no inReplyToId)', async () => {
+      mockStatusCreate.mockResolvedValue(makeStatus('new-1', 'me', 'msg'));
+
+      const sharedStatus = makeStatus('shared-1', 'bob@example.com', 'Cool post');
+      const { shareStatus } = await getComposable();
+      await shareStatus('alice@example.com', 'Check this out', sharedStatus);
+
+      const call = mockStatusCreate.mock.calls[0]![0];
+      expect(call).not.toHaveProperty('inReplyToId');
+    });
+
     it('sends message + status URL when custom message provided', async () => {
       mockStatusCreate.mockResolvedValue(makeStatus('new-1', 'me', 'msg'));
 

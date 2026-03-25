@@ -27,7 +27,7 @@ defineEmits<{
     <template v-if="isOwnProfile">
       <button
         type="button"
-        class="flex-1 h-[44px] flex items-center justify-center rounded-full text-base font-semibold cursor-pointer transition-colors bg-secondary text-foreground hover:bg-secondary/80"
+        class="flex-1 h-[44px] flex items-center justify-center rounded-full text-base font-semibold cursor-pointer transition-colors bg-muted text-foreground hover:bg-accent"
         @click="$emit('editProfile')"
       >
         Edit Profile
@@ -40,8 +40,8 @@ defineEmits<{
         class="flex-1 h-[44px] flex items-center justify-center rounded-full text-base font-semibold cursor-pointer transition-colors"
         :class="[
           props.following || props.requested
-            ? 'bg-secondary text-foreground hover:bg-secondary/80'
-            : 'bg-foreground text-background hover:bg-foreground/90',
+            ? 'bg-muted text-foreground hover:bg-accent'
+            : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ]"
         @click="props.following ? $emit('unfollow') : $emit('follow')"
       >
@@ -58,7 +58,7 @@ defineEmits<{
 
       <button
         type="button"
-        class="size-[44px] shrink-0 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-secondary text-foreground hover:bg-secondary/80"
+        class="size-[44px] shrink-0 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-muted text-foreground hover:bg-accent"
         aria-label="More options"
         @click="$emit('more')"
       >

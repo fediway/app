@@ -116,11 +116,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 lg:bg-gray-100 dark:bg-gray-950">
+  <div class="min-h-screen bg-background">
     <!-- Skip to content -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-ring dark:focus:bg-gray-900"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-ring"
     >
       Skip to content
     </a>
@@ -162,7 +162,7 @@ onMounted(() => {
 
       <!-- Mobile content wrapper (pushed right when sidebar opens) -->
       <div
-        class="flex flex-col min-h-screen transition-transform duration-250 ease-out bg-white dark:bg-gray-900"
+        class="flex flex-col min-h-screen transition-transform duration-250 ease-out bg-card"
         :class="navigation.isSidebarOpen ? 'translate-x-[280px]' : 'translate-x-0'"
       >
         <!-- Overlay to close sidebar when tapping pushed content -->
@@ -195,7 +195,7 @@ onMounted(() => {
           <main
             id="main-content"
             ref="feedRef"
-            class="bg-white dark:bg-gray-900 pb-20 lg:flex-1 lg:border-x lg:border-border"
+            class="bg-card pb-20 lg:flex-1 lg:border-x lg:border-border"
           >
             <slot />
           </main>

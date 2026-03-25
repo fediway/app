@@ -3,8 +3,8 @@ export { default as AccountCard } from './AccountCard.vue';
 export { default as AccountCarousel } from './AccountCarousel.vue';
 export { default as AccountDisplayName } from './AccountDisplayName.vue';
 export { default as AccountHandle } from './AccountHandle.vue';
-export { default as AccountList } from './AccountList.vue';
-export type { UserSuggestion as AccountListUser } from './AccountList.vue';
+export { default as AccountList, type UserSuggestion as AccountListUser } from './AccountList.vue';
+export { default as AccountListItem } from './AccountListItem.vue';
 
 // Standalone — context-independent
 export { default as CurrentUserCard } from './CurrentUserCard.vue';

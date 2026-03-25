@@ -11,6 +11,7 @@ import StatusContent from './StatusContent.vue';
 import StatusMedia from './StatusMedia.vue';
 import StatusQuote from './StatusQuote.vue';
 import StatusTags from './StatusTags.vue';
+import { useCleanContent } from './useCleanContent';
 
 interface Props {
   status: StatusType;
@@ -20,6 +21,8 @@ interface Props {
   showReblogIndicator?: boolean;
   /** Parent status for reply context (resolved by consumer) */
   replyParent?: StatusType | null;
+  /** Show vertical thread connector above avatar */
+  hasReplyAbove?: boolean;
   /** Show vertical thread connector below avatar */
   hasReplyBelow?: boolean;
   /** Show bottom separator line */
@@ -33,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
   profileUrl: undefined,
   showReblogIndicator: true,
   replyParent: null,
+  hasReplyAbove: false,
   hasReplyBelow: false,
   showSeparator: true,
   hideActions: false,
@@ -71,6 +75,13 @@ const quotedStatus = computed(() => {
   return null;
 });
 
+// Clean content: strip ActivityPub artifacts
+const cleanedContent = useCleanContent(
+  () => displayStatus.value.content,
+  () => displayStatus.value.tags,
+  () => !!quotedStatus.value,
+);
+
 function getDomain(acct: string): string {
   const parts = acct.split('@');
   return parts.length > 1 ? parts[1]! : '';
@@ -93,10 +104,10 @@ function handleStatusClick(event: MouseEvent) {
       class="contain-layout-style-paint cursor-pointer transition-colors hover:bg-muted/50"
       @click="emit('statusClick', replyParent.id)"
     >
-      <div class="flex gap-2 px-5 py-3">
-        <div class="flex shrink-0 flex-col items-center">
+      <div class="flex gap-3 px-4 pt-3 pb-0">
+        <div class="flex shrink-0 flex-col items-center self-stretch">
           <Avatar :src="replyParent.account.avatar" :alt="replyParent.account.displayName" size="md" />
-          <div class="mt-1 w-0.5 flex-1 rounded-full bg-foreground/20" />
+          <div class="mt-1 w-0.5 flex-1 bg-foreground/20" />
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-baseline gap-1 text-base">
@@ -104,7 +115,7 @@ function handleStatusClick(event: MouseEvent) {
             <span class="shrink truncate text-foreground/80">@{{ replyParent.account.acct }}</span>
             <RelativeTime :datetime="replyParent.createdAt" class="ml-auto shrink-0 text-foreground/60" />
           </div>
-          <div class="mt-1">
+          <div class="mt-0.5">
             <StatusContent
               :content="replyParent.content"
               :spoiler-text="replyParent.spoilerText"
@@ -123,17 +134,20 @@ function handleStatusClick(event: MouseEvent) {
       <!-- Reblog indicator -->
       <div
         v-if="isReblog && showReblogIndicator && booster"
-        class="flex items-center gap-2 px-5 pt-2 text-sm text-foreground/60"
+        class="flex items-center gap-3 px-4 pt-2 text-sm text-foreground/60"
       >
-        <PhArrowsClockwise :size="16" class="ml-[28px] text-green" />
-        <span>{{ booster.displayName || booster.username }} boosted</span>
+        <div class="flex w-11 shrink-0 justify-end">
+          <PhArrowsClockwise :size="16" class="text-green" />
+        </div>
+        <span class="truncate">{{ booster.displayName || booster.username }} boosted</span>
       </div>
 
-      <div class="flex gap-2 px-5 py-3">
+      <div class="flex gap-3 px-4 py-3" :class="{ 'pt-0': replyParent || hasReplyAbove, 'pt-1': isReblog && showReblogIndicator && booster }">
         <!-- Left: avatar + thread connector -->
-        <div class="flex shrink-0 flex-col items-center">
+        <div class="flex shrink-0 flex-col items-center" :class="{ 'self-stretch': hasReplyBelow }">
+          <div v-if="replyParent || hasReplyAbove" class="w-0.5 h-3 bg-foreground/20" />
           <Avatar :src="displayStatus.account.avatar" :alt="displayStatus.account.displayName" size="md" />
-          <div v-if="hasReplyBelow" class="mt-1 w-0.5 flex-1 rounded-full bg-foreground/20" />
+          <div v-if="hasReplyBelow" class="mt-1 w-0.5 flex-1 bg-foreground/20" />
         </div>
 
         <!-- Right: header + content + actions -->
@@ -146,9 +160,9 @@ function handleStatusClick(event: MouseEvent) {
           </div>
 
           <!-- Content -->
-          <div class="mt-1">
+          <div class="mt-0.5">
             <StatusContent
-              :content="displayStatus.content"
+              :content="cleanedContent"
               :spoiler-text="displayStatus.spoilerText"
               :emojis="displayStatus.emojis"
             />
@@ -159,7 +173,7 @@ function handleStatusClick(event: MouseEvent) {
             v-if="displayStatus.mediaAttachments.length > 0"
             :attachments="displayStatus.mediaAttachments"
             :sensitive="displayStatus.sensitive"
-            class="mt-2"
+            class="mt-3"
             @media-click="(attachment, index) => emit('mediaClick', displayStatus.mediaAttachments, index)"
           />
 
@@ -167,14 +181,14 @@ function handleStatusClick(event: MouseEvent) {
           <StatusCard
             v-if="displayStatus.card"
             :card="displayStatus.card"
-            class="mt-2"
+            class="mt-3"
           />
 
           <!-- Quoted Status -->
           <StatusQuote
             v-if="quotedStatus"
             :status="quotedStatus"
-            class="mt-2"
+            class="mt-3"
             @click="emit('quoteClick', $event)"
           />
 
@@ -189,7 +203,7 @@ function handleStatusClick(event: MouseEvent) {
           <!-- Actions -->
           <StatusActions
             v-if="!hideActions"
-            class="mt-2 mb-1"
+            class="mt-2"
             :replies-count="displayStatus.repliesCount"
             :reblogs-count="displayStatus.reblogsCount"
             :favourites-count="displayStatus.favouritesCount"
@@ -212,8 +226,8 @@ function handleStatusClick(event: MouseEvent) {
         </div>
       </div>
 
-      <!-- Separator -->
-      <div v-if="showSeparator" class="h-px w-full bg-border" />
+      <!-- Separator (hidden when connected to reply below) -->
+      <div v-if="showSeparator && !hasReplyBelow" class="h-px w-full bg-border" />
     </article>
   </div>
 </template>

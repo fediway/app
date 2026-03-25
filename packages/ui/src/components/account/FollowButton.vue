@@ -25,7 +25,7 @@ const isHovered = ref(false);
 <template>
   <Button
     :size="size === 'sm' ? 'sm' : 'default'"
-    :variant="isFollowing || props.requested ? 'secondary' : 'default'"
+    :variant="isFollowing || props.requested ? 'muted' : 'secondary'"
     :disabled="loading || props.requested"
     class="shrink-0"
     :class="[

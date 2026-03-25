@@ -46,7 +46,7 @@ function extractText(html: string): string {
   <div class="flex flex-col gap-3 px-5">
     <!-- Display Name + Handle -->
     <div class="flex flex-col gap-0.5">
-      <p class="text-[22px] font-bold leading-normal text-foreground">
+      <p class="text-xl font-bold leading-normal text-foreground">
         {{ account.displayName || account.username }}
       </p>
       <p class="text-sm text-foreground/80">

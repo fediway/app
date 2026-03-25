@@ -13,12 +13,12 @@ function handleAccountClick(acct: string) {
 </script>
 
 <template>
-  <div v-if="suggestions.length > 0" class="border-b border-gray-200 bg-gray-50/50 py-4 dark:border-gray-800 dark:bg-gray-800/20">
+  <div v-if="suggestions.length > 0" class="border-b border-border bg-muted/50 py-4">
     <div class="mb-3 flex items-center justify-between px-4">
-      <h3 class="font-semibold text-gray-900 dark:text-white">
+      <h3 class="font-semibold text-foreground">
         Who to follow
       </h3>
-      <NuxtLink to="/explore" class="text-sm text-blue-500 no-underline hover:text-blue-600">
+      <NuxtLink to="/explore" class="text-sm text-galaxy-500 no-underline hover:text-galaxy-600">
         See all
       </NuxtLink>
     </div>

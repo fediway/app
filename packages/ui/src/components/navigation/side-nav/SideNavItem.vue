@@ -24,7 +24,7 @@ defineEmits<{ click: [] }>();
     @click="$emit('click')"
   >
     <NavIcon :name="(icon as any)" :size="22" :weight="active ? 'fill' : 'regular'" />
-    <span class="flex-1 text-[15px]">{{ label }}</span>
+    <span class="flex-1 text-base">{{ label }}</span>
     <span
       v-if="badge"
       class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-galaxy-500 px-1.5 text-xs font-medium text-white"

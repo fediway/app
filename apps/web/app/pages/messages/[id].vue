@@ -51,7 +51,8 @@ async function handleSend() {
   newMessage.value = '';
 
   try {
-    await sendDirectMessage(participant.value.acct, content);
+    const lastMessageId = threadStatuses.value.at(-1)?.id;
+    await sendDirectMessage(participant.value.acct, content, lastMessageId);
     refetch();
   }
   catch {
@@ -117,7 +118,7 @@ watch(() => threadStatuses.value.length, () => {
         </div>
 
         <!-- Message Input -->
-        <div class="border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
+        <div class="border-t border-border bg-card px-4 py-3">
           <MessageInput
             v-model="newMessage"
             placeholder="Write a message..."

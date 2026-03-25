@@ -38,17 +38,17 @@ function handleLogout() {
     <PageHeader title="Settings" />
 
     <!-- Account Section -->
-    <section class="border-b border-gray-200 px-4 py-4 dark:border-gray-700">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <section class="border-b border-border px-4 py-4">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Account
       </h2>
       <div v-if="navigation.currentUser" class="flex items-center gap-4">
         <Avatar :src="navigation.currentUser.avatar" :alt="navigation.currentUser.name" size="lg" />
         <div>
-          <div class="font-semibold text-gray-900 dark:text-white">
+          <div class="font-semibold text-foreground">
             {{ navigation.currentUser.name }}
           </div>
-          <div class="text-sm text-gray-500 dark:text-gray-400">
+          <div class="text-sm text-muted-foreground">
             {{ navigation.currentUser.username }}
           </div>
         </div>
@@ -56,8 +56,8 @@ function handleLogout() {
     </section>
 
     <!-- Data Source Section -->
-    <section class="border-b border-gray-200 px-4 py-4 dark:border-gray-700">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <section class="border-b border-border px-4 py-4">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Data Source
       </h2>
 
@@ -74,11 +74,11 @@ function handleLogout() {
         <div v-if="mode === 'live'" class="space-y-2 text-sm">
           <div v-if="isAuthenticated" class="flex items-center gap-2">
             <span class="size-2 rounded-full bg-green-500" />
-            <span class="text-gray-600 dark:text-gray-300">Connected to {{ instanceUrl }}</span>
+            <span class="text-foreground">Connected to {{ instanceUrl }}</span>
           </div>
           <div v-else class="flex items-center gap-2">
             <span class="size-2 rounded-full bg-yellow-500" />
-            <span class="text-gray-600 dark:text-gray-300">Not connected</span>
+            <span class="text-foreground">Not connected</span>
           </div>
           <Button
             v-if="isAuthenticated"
@@ -100,13 +100,13 @@ function handleLogout() {
     </section>
 
     <!-- Appearance Section -->
-    <section class="border-b border-gray-200 px-4 py-4 dark:border-gray-700">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <section class="border-b border-border px-4 py-4">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Appearance
       </h2>
 
       <div class="space-y-2">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</label>
+        <label class="text-sm font-medium text-foreground">Theme</label>
         <SegmentedControl
           :model-value="activeTheme ?? 'system'"
           :options="[
@@ -120,8 +120,8 @@ function handleLogout() {
     </section>
 
     <!-- Notifications Section -->
-    <section class="border-b border-gray-200 px-4 py-4 dark:border-gray-700">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <section class="border-b border-border px-4 py-4">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Notifications
       </h2>
 
@@ -138,14 +138,14 @@ function handleLogout() {
     </section>
 
     <!-- Privacy Section -->
-    <section class="border-b border-gray-200 px-4 py-4 dark:border-gray-700">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <section class="border-b border-border px-4 py-4">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Privacy
       </h2>
 
       <div class="space-y-4">
         <div>
-          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Default post visibility</label>
+          <label class="mb-2 block text-sm font-medium text-foreground">Default post visibility</label>
           <VisibilitySelector
             :model-value="settings.privacy.defaultVisibility"
             @update:model-value="setDefaultVisibility($event as 'public' | 'unlisted' | 'private')"
@@ -163,35 +163,35 @@ function handleLogout() {
 
     <!-- About Section -->
     <section class="px-4 py-4">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         About
       </h2>
 
       <div class="space-y-3 text-sm">
         <div class="flex justify-between">
-          <span class="text-gray-500 dark:text-gray-400">Version</span>
-          <span class="text-gray-900 dark:text-white">1.0.0</span>
+          <span class="text-muted-foreground">Version</span>
+          <span class="text-foreground">1.0.0</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-500 dark:text-gray-400">Source code</span>
-          <a href="#" class="text-blue-500 hover:underline">GitHub</a>
+          <span class="text-muted-foreground">Source code</span>
+          <a href="#" class="text-galaxy-500 hover:underline">GitHub</a>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-500 dark:text-gray-400">Report an issue</span>
-          <a href="#" class="text-blue-500 hover:underline">Open issue</a>
+          <span class="text-muted-foreground">Report an issue</span>
+          <a href="#" class="text-galaxy-500 hover:underline">Open issue</a>
         </div>
       </div>
     </section>
 
     <!-- Danger Zone -->
-    <section class="mx-4 mb-4 mt-4 rounded-lg bg-red-50 px-4 py-4 dark:bg-red-950/30">
-      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-red-600 dark:text-red-400">
+    <section class="mx-4 mb-4 mt-4 rounded-lg bg-red-background px-4 py-4">
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-red">
         Danger Zone
       </h2>
       <Button
         variant="secondary"
         size="sm"
-        class="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/50"
+        class="border-red-200 text-red hover:bg-red-background dark:border-red-800"
         @click="handleLogout"
       >
         Log out

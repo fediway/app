@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+  <div class="min-h-screen bg-background">
     <slot />
   </div>
 </template>

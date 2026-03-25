@@ -22,14 +22,14 @@ defineEmits<{ click: [] }>();
       v-if="avatar"
       :src="avatar"
       :alt="name"
-      class="size-8 shrink-0 rounded-full"
+      class="size-10 shrink-0 rounded-full"
     >
-    <div v-else class="size-8 shrink-0 rounded-full bg-accent" />
+    <div v-else class="size-10 shrink-0 rounded-full bg-accent" />
     <div class="min-w-0">
-      <div class="truncate text-[13px] font-semibold leading-tight text-foreground">
+      <div class="truncate text-base font-semibold leading-tight text-foreground">
         {{ name }}
       </div>
-      <div class="truncate text-xs leading-tight text-muted-foreground">
+      <div class="truncate text-base leading-tight text-muted-foreground">
         {{ handle }}
       </div>
     </div>

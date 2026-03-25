@@ -88,7 +88,10 @@ export function useWebActions() {
   function getStoreStatus(raw: Status | undefined): Status | undefined {
     if (!raw)
       return undefined;
-    return (store.get(raw.id) as Status) ?? raw;
+    const stored = store.get(raw.id);
+    if (!stored)
+      return raw;
+    return { ...raw, ...stored } as Status;
   }
 
   return {

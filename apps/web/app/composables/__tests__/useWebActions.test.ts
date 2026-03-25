@@ -116,15 +116,20 @@ describe('useWebActions', () => {
       expect(getStoreStatus(status)).toBe(status);
     });
 
-    it('returns store version when available', () => {
-      const storeStatus = { id: '1', favourited: true } as Partial<Status>;
-      mockStore.set('1', storeStatus);
+    it('merges store state into raw status', () => {
+      mockStore.set('1', { id: '1', favourited: true, favouritesCount: 5 } as Partial<Status>);
 
       const { getStoreStatus } = useWebActions();
-      const raw = makeStatus('1', { favourited: false });
+      const raw = makeStatus('1', { favourited: false, favouritesCount: 0 });
       const result = getStoreStatus(raw);
 
-      expect(result).toBe(storeStatus);
+      // Store flags override raw
+      expect(result!.favourited).toBe(true);
+      expect(result!.favouritesCount).toBe(5);
+      // Raw fields are preserved (not lost)
+      expect(result!.mediaAttachments).toEqual(raw.mediaAttachments);
+      expect(result!.content).toBe(raw.content);
+      expect(result!.account).toEqual(raw.account);
     });
   });
 

@@ -39,10 +39,11 @@ export function useConversationData() {
     );
   }
 
-  async function sendDirectMessage(recipientAcct: string, content: string): Promise<Status> {
+  async function sendDirectMessage(recipientAcct: string, content: string, inReplyToId?: string): Promise<Status> {
     const status = await client.rest.v1.statuses.create({
       status: `@${recipientAcct} ${content}`,
       visibility: 'direct',
+      ...(inReplyToId ? { inReplyToId } : {}),
     });
     return status;
   }

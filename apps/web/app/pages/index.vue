@@ -151,9 +151,6 @@ onUnmounted(() => {
           @media-click="handleMediaClick"
         />
 
-        <!-- Follow suggestions slider (only show when feed has content) -->
-        <FollowSuggestions v-if="allStatuses.length > 0" />
-
         <!-- Remaining posts -->
         <StatusComponent
           v-for="status in remainingStatuses"

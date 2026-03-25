@@ -38,11 +38,11 @@ function getDomain(url: string): string {
           >
         </div>
         <div class="p-3">
-          <div class="text-xs text-muted-foreground mb-1">{{ getDomain(card.url) }}</div>
-          <div v-if="card.title" class="font-medium text-foreground line-clamp-2 mb-1">
+          <div class="text-xs text-muted-foreground mb-0.5">{{ getDomain(card.url) }}</div>
+          <div v-if="card.title" class="text-sm font-medium text-foreground line-clamp-2 mb-0.5">
             {{ card.title }}
           </div>
-          <div v-if="card.description" class="text-sm text-muted-foreground line-clamp-2">
+          <div v-if="card.description" class="text-xs text-muted-foreground line-clamp-2">
             {{ card.description }}
           </div>
         </div>
@@ -59,11 +59,11 @@ function getDomain(url: string): string {
           >
         </div>
         <div class="flex-1 p-3 min-w-0">
-          <div class="text-xs text-muted-foreground mb-1">{{ getDomain(card.url) }}</div>
-          <div v-if="card.title" class="font-medium text-foreground line-clamp-2 mb-1">
+          <div class="text-xs text-muted-foreground mb-0.5">{{ getDomain(card.url) }}</div>
+          <div v-if="card.title" class="text-sm font-medium text-foreground line-clamp-2 mb-0.5">
             {{ card.title }}
           </div>
-          <div v-if="card.description" class="text-sm text-muted-foreground line-clamp-2">
+          <div v-if="card.description" class="text-xs text-muted-foreground line-clamp-2">
             {{ card.description }}
           </div>
         </div>
@@ -72,11 +72,11 @@ function getDomain(url: string): string {
 
     <!-- Card without image -->
     <div v-else class="p-3">
-      <div class="text-xs text-muted-foreground mb-1">{{ getDomain(card.url) }}</div>
-      <div v-if="card.title" class="font-medium text-foreground line-clamp-2 mb-1">
+      <div class="text-xs text-muted-foreground mb-0.5">{{ getDomain(card.url) }}</div>
+      <div v-if="card.title" class="text-sm font-medium text-foreground line-clamp-2 mb-0.5">
         {{ card.title }}
       </div>
-      <div v-if="card.description" class="text-sm text-muted-foreground line-clamp-3">
+      <div v-if="card.description" class="text-xs text-muted-foreground line-clamp-3">
         {{ card.description }}
       </div>
     </div>

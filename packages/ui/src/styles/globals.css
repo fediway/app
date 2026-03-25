@@ -7,16 +7,22 @@
 
 /*
  * Text Style Reference (Figma → Tailwind)
- * H1:         text-xl font-bold          (22px/700)
- * H2:         text-lg font-bold           (18px/700)
- * H3:         text-base font-bold         (16px/700)
- * Body:       text-base leading-[22px]    (16px/400/22px)
- * Caption:    text-sm                     (14px/400)
- * Navigation: text-xs                     (12px/400)
- * Button:     text-base font-semibold     (16px/600) — applied in button CVA
- * Button sm:  text-sm font-semibold       (14px/600) — applied in button CVA
- * Tab label:  text-base font-medium       (16px/500)
- * Tab active: text-base font-bold         (16px/700)
+ *
+ * Type scale tuned for dense social feeds (Twitter/Bluesky density).
+ * text-base is 15px (social standard), text-sm is 13px for clear hierarchy.
+ * Line heights ~1.4 ratio across the board.
+ *
+ * H1:         text-xl font-bold          (20px/28px/700)
+ * H2:         text-lg font-bold          (17px/24px/700)
+ * H3:         text-base font-bold        (15px/21px/700)
+ * Body:       text-base                  (15px/21px/400) — feed posts
+ * Body lg:    text-lg                    (17px/24px/400) — detail view
+ * Caption:    text-sm                    (13px/18px/400)
+ * Navigation: text-xs                    (12px/16px/400)
+ * Button:     text-base font-semibold    (15px/21px/600)
+ * Button sm:  text-sm font-semibold      (13px/18px/600)
+ * Tab label:  text-base font-medium      (15px/21px/500)
+ * Tab active: text-base font-bold        (15px/21px/700)
  */
 
 @font-face { font-display: swap; font-family: 'Asta Sans'; font-style: normal; font-weight: 300; src: url('../fonts/asta-sans-v3-latin-300.woff2') format('woff2'); }
@@ -28,7 +34,20 @@
 
 @theme inline {
   --font-sans: 'Asta Sans', ui-sans-serif, system-ui, sans-serif;
-  --text-xl: 22px;
+
+  /* ── Type scale (social-density) ── */
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 13px;
+  --text-sm--line-height: 18px;
+  --text-base: 15px;
+  --text-base--line-height: 21px;
+  --text-lg: 17px;
+  --text-lg--line-height: 24px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 30px;
 
   /* ── shadcn semantic colors ── */
   --color-background: var(--background);
@@ -304,8 +323,8 @@
   --primary:                oklch(0.287 0.025 258);  /* #232B37 */
   --primary-foreground:     oklch(1.00  0     0);
 
-  --secondary:              oklch(0.91  0.020 75);   /* gray-200 */
-  --secondary-foreground:   oklch(0.35  0.020 275);
+  --secondary:              #DBDDFF;                  /* design team lavender */
+  --secondary-foreground:   oklch(0.287 0.025 258);   /* navy */
 
   --muted:                  oklch(0.963 0.014 88);   /* #F7F3E9 */
   --muted-foreground:       oklch(0.64  0.008 10);
@@ -358,8 +377,8 @@
   --primary:                oklch(0.95  0.008 85);   /* cream */
   --primary-foreground:     oklch(0.19  0.022 255);
 
-  --secondary:              oklch(0.48  0.100 278);  /* interactive */
-  --secondary-foreground:   oklch(0.78  0.035 280);
+  --secondary:              #484A6C;                  /* design team dark indigo */
+  --secondary-foreground:   oklch(0.95  0.008 85);   /* cream */
 
   --muted:                  oklch(0.27  0.030 262);  /* dark-overlay */
   --muted-foreground:       oklch(0.54  0.010 345);

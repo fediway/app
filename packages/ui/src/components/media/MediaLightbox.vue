@@ -210,8 +210,8 @@ onUnmounted(() => {
         class="fixed inset-0 z-[100] flex items-center justify-center"
         @click="handleBackdropClick"
       >
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/95" />
+        <!-- Backdrop — click to close -->
+        <div class="absolute inset-0 bg-black/95 cursor-pointer" @click="close" />
 
         <!-- Close button -->
         <button

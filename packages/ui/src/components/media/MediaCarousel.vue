@@ -58,6 +58,15 @@ function updateNavState(swiper: SwiperType) {
   isBeginning.value = swiper.isBeginning;
   isEnd.value = swiper.isEnd;
 }
+
+function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
+  const focus = attachment.meta?.focus;
+  if (!focus)
+    return {};
+  const x = ((focus.x + 1) / 2) * 100;
+  const y = ((1 - focus.y) / 2) * 100;
+  return { objectPosition: `${x.toFixed(1)}% ${y.toFixed(1)}%` };
+}
 </script>
 
 <template>
@@ -65,7 +74,7 @@ function updateNavState(swiper: SwiperType) {
     <!-- Sensitive content overlay -->
     <div
       v-if="sensitive && !revealed"
-      class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-muted cursor-pointer"
+      class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-muted cursor-pointer"
       @click="toggleReveal"
     >
       <svg class="w-8 h-8 text-muted-foreground/60 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,13 +85,13 @@ function updateNavState(swiper: SwiperType) {
     </div>
 
     <!-- Swiper Carousel -->
-    <div :class="{ 'blur-xl': sensitive && !revealed }">
+    <div class="rounded-xl overflow-hidden" :class="{ 'blur-xl': sensitive && !revealed }">
       <Swiper
         :modules="modules"
         :slides-per-view="1"
         :space-between="0"
         :pagination="{ clickable: true }"
-        class="media-carousel overflow-hidden"
+        class="media-carousel"
         @swiper="onSwiper"
         @slide-change="(swiper: any) => { onSlideChange(swiper); updateNavState(swiper); }"
         @init="updateNavState"
@@ -102,6 +111,7 @@ function updateNavState(swiper: SwiperType) {
               :src="attachment.previewUrl || attachment.url || ''"
               :alt="attachment.description || 'Image'"
               class="w-full h-full object-cover"
+              :style="focalPointStyle(attachment)"
               loading="lazy"
             >
 
@@ -114,14 +124,21 @@ function updateNavState(swiper: SwiperType) {
                 :src="attachment.previewUrl"
                 :alt="attachment.description || 'Video'"
                 class="w-full h-full object-cover"
+                :style="focalPointStyle(attachment)"
                 loading="lazy"
               >
               <div class="absolute inset-0 flex items-center justify-center">
                 <div class="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
-                  <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
+              </div>
+              <div
+                v-if="attachment.type === 'gifv'"
+                class="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded"
+              >
+                GIF
               </div>
             </div>
 
@@ -138,7 +155,7 @@ function updateNavState(swiper: SwiperType) {
             <!-- Alt text indicator -->
             <div
               v-if="attachment.description"
-              class="absolute bottom-8 left-2 px-1.5 py-0.5 bg-black/60 text-white text-xs rounded font-medium"
+              class="absolute bottom-8 left-2 px-1 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded"
             >
               ALT
             </div>
@@ -150,7 +167,7 @@ function updateNavState(swiper: SwiperType) {
       <button
         v-if="attachments.length > 1 && !isBeginning"
         type="button"
-        class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+        class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
         @click="slidePrev"
       >
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -160,7 +177,7 @@ function updateNavState(swiper: SwiperType) {
       <button
         v-if="attachments.length > 1 && !isEnd"
         type="button"
-        class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+        class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
         @click="slideNext"
       >
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -181,7 +198,7 @@ function updateNavState(swiper: SwiperType) {
     <button
       v-if="sensitive && revealed"
       type="button"
-      class="absolute top-2 left-2 z-10 px-2 py-1 bg-black/50 text-white text-xs rounded hover:bg-black/70 transition-colors"
+      class="absolute top-2 left-2 z-10 px-2 py-1 bg-black/50 text-white text-xs rounded-full hover:bg-black/70 transition-colors cursor-pointer"
       @click="toggleReveal"
     >
       Hide
@@ -194,16 +211,6 @@ function updateNavState(swiper: SwiperType) {
   --swiper-pagination-color: white;
   --swiper-pagination-bullet-inactive-color: rgba(255, 255, 255, 0.5);
   --swiper-pagination-bullet-inactive-opacity: 1;
-  border-radius: 0 !important;
-}
-
-.media-carousel,
-.media-carousel .swiper,
-.media-carousel .swiper-wrapper,
-.media-carousel .swiper-slide,
-.media-carousel .swiper-slide img,
-.media-carousel .swiper-slide button {
-  border-radius: 0 !important;
 }
 
 .media-carousel .swiper-pagination {

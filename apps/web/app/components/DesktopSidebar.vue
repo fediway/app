@@ -32,7 +32,7 @@ const { open: openComposer } = usePostComposer();
     </template>
 
     <template #action>
-      <Button class="w-full py-3 text-[15px]" @click="openComposer()">
+      <Button class="w-full py-3 text-base" @click="openComposer()">
         <PhPlus :size="20" />
         <span>New Post</span>
       </Button>

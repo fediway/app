@@ -6,6 +6,7 @@ export {
   AccountDisplayName,
   AccountHandle,
   AccountList,
+  AccountListItem,
   CurrentUserCard,
   FollowButton,
   ProfileActions,

@@ -50,7 +50,7 @@ export default defineNuxtConfig({
         { name: 'description', content: 'A short-form social platform for the fediverse' },
         {
           'http-equiv': 'Content-Security-Policy',
-          'content': `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; connect-src 'self' https:; font-src 'self' data:; frame-src 'none'`,
+          'content': `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; connect-src 'self' https: wss:; font-src 'self' data:; frame-src 'none'`,
         },
       ],
     },

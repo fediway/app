@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
 import { computed } from 'vue';
+import { Avatar } from '../ui/avatar';
 import { RelativeTime } from '../ui/relative-time';
 import { RichText } from '../ui/rich-text';
 
@@ -38,16 +39,12 @@ const firstMediaUrl = computed(() => {
   >
     <div class="p-3">
       <!-- Author row -->
-      <div class="flex items-center gap-2 mb-2">
-        <img
-          :src="status.account.avatar"
-          :alt="status.account.displayName"
-          class="w-5 h-5 rounded-full"
-        >
+      <div class="flex items-center gap-1.5 mb-1.5">
+        <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="xs" />
         <span class="font-medium text-sm truncate">{{ status.account.displayName }}</span>
         <span class="text-muted-foreground text-sm truncate">@{{ status.account.acct }}</span>
-        <span class="text-gray-400 dark:text-gray-500 text-sm">·</span>
-        <RelativeTime :datetime="status.createdAt" class="text-sm" />
+        <span class="text-muted-foreground text-sm">·</span>
+        <RelativeTime :datetime="status.createdAt" class="text-sm text-muted-foreground" />
       </div>
 
       <!-- Content -->

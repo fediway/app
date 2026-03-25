@@ -64,13 +64,13 @@ function getLinkPageUrl(url: string): string {
               >
             </div>
             <div class="min-w-0 flex-1">
-              <div class="mb-1 text-[15px] font-medium leading-snug text-foreground">
+              <div class="mb-1 text-base font-medium leading-snug text-foreground">
                 {{ link.title }}
               </div>
-              <p class="mb-2 line-clamp-2 text-[14px] text-foreground/60">
+              <p class="mb-2 line-clamp-2 text-sm text-foreground/60">
                 {{ link.description }}
               </p>
-              <div class="flex items-center gap-3 text-[13px] text-foreground/40">
+              <div class="flex items-center gap-3 text-sm text-muted-foreground">
                 <span>{{ link.source }}</span>
                 <span v-if="link.posts">{{ link.posts }}</span>
               </div>

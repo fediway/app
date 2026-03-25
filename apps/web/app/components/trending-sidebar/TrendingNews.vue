@@ -29,11 +29,11 @@ function handleFaviconError(event: Event) {
   <ClientOnly>
     <Card v-if="topLinks.length > 0" class="rounded-xl border-border shadow-none">
       <CardHeader class="p-4 pb-0">
-        <CardTitle class="text-[13px] font-medium text-foreground/40">
+        <CardTitle class="text-sm font-medium text-muted-foreground">
           Trending News
         </CardTitle>
       </CardHeader>
-      <CardContent class="p-4 pt-3">
+      <CardContent class="p-4 pt-3 pb-2">
         <ul class="m-0 list-none space-y-1 p-0">
           <li v-for="link in topLinks" :key="link.url">
             <NuxtLink
@@ -49,10 +49,10 @@ function handleFaviconError(event: Event) {
                   @error="handleFaviconError"
                 >
                 <div class="min-w-0 flex-1">
-                  <div class="line-clamp-2 text-[13px] leading-snug text-foreground">
+                  <div class="line-clamp-2 text-sm leading-snug text-foreground">
                     {{ link.title }}
                   </div>
-                  <div class="mt-0.5 text-[12px] text-foreground/40">
+                  <div class="mt-0.5 text-xs text-muted-foreground">
                     {{ getDomain(link.url) }}
                   </div>
                 </div>
@@ -64,7 +64,7 @@ function handleFaviconError(event: Event) {
       <CardFooter class="px-4 pb-4">
         <NuxtLink
           to="/explore/news"
-          class="text-[13px] text-foreground/40 transition-colors hover:text-foreground/60"
+          class="text-sm text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
         >
           See more
         </NuxtLink>

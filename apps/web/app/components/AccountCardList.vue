@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
-import { AccountCard, EmptyState, FollowButton } from '@repo/ui';
+import { AccountListItem, EmptyState, FollowButton } from '@repo/ui';
 import { watch } from 'vue';
 import { useFollows } from '~/composables/useFollows';
 
@@ -30,18 +30,15 @@ watch(() => props.accounts, (accts) => {
     class="py-12"
   />
 
-  <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">
-    <div
+  <div v-else class="divide-y divide-border">
+    <AccountListItem
       v-for="account in accounts"
       :key="account.id"
-      class="px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+      :account="account"
+      :profile-url="getProfilePath(account.acct)"
+      @profile-click="navigateTo(getProfilePath($event))"
     >
-      <div class="flex items-center justify-between gap-3">
-        <AccountCard
-          :account="account"
-          :profile-url="getProfilePath(account.acct)"
-          class="min-w-0 flex-1"
-        />
+      <template #action>
         <FollowButton
           v-if="hasRelationship(account.id)"
           :is-following="isFollowing(account.id)"
@@ -50,7 +47,7 @@ watch(() => props.accounts, (accts) => {
           @follow="toggleFollow(account.id)"
           @unfollow="toggleFollow(account.id)"
         />
-      </div>
-    </div>
+      </template>
+    </AccountListItem>
   </div>
 </template>

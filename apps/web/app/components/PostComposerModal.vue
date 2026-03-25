@@ -209,7 +209,7 @@ function confirmDiscard() {
         <Textarea
           v-model="content"
           :placeholder="showContentWarning ? 'Write the content behind the warning...' : 'What\'s on your mind?'"
-          class="min-h-[150px] w-full resize-none border-none bg-transparent p-0 text-[17px] leading-relaxed outline-hidden placeholder-gray-400"
+          class="min-h-[150px] w-full resize-none border-none bg-transparent p-0 text-lg leading-relaxed outline-hidden placeholder-muted-foreground"
           autofocus
         />
       </div>

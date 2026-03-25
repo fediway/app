@@ -83,7 +83,7 @@ function formatTime(dateString: string): string {
         </div>
 
         <!-- Message text -->
-        <p v-if="content" class="whitespace-pre-wrap text-[15px] leading-relaxed">
+        <p v-if="content" class="whitespace-pre-wrap text-base leading-relaxed">
           {{ content }}
         </p>
       </div>
@@ -96,7 +96,7 @@ function formatTime(dateString: string): string {
         <span v-if="favourited && isOwn" class="text-red">
           <PhHeart :size="12" weight="fill" />
         </span>
-        <span class="text-[11px] text-foreground/40">
+        <span class="text-xs text-foreground/40">
           {{ formatTime(sentAt) }}
         </span>
       </div>

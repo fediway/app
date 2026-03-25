@@ -7,7 +7,7 @@ const showSearch = computed(() => !route.path.startsWith('/explore') && !route.p
   <!-- Sticky scroll container: viewport height, scrolls independently from feed -->
   <div class="sidebar-scroll lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
     <!-- Search: sticky within the sidebar scroll, hidden on explore/search pages -->
-    <div class="lg:sticky lg:top-0 lg:z-10 lg:bg-gray-100 lg:pt-14 dark:lg:bg-gray-950" :class="showSearch ? 'lg:pb-4' : ''">
+    <div class="lg:sticky lg:top-0 lg:z-10 lg:bg-background lg:pt-14" :class="showSearch ? 'lg:pb-4' : ''">
       <SidebarSearch v-if="showSearch" />
     </div>
     <!-- Sidebar content -->

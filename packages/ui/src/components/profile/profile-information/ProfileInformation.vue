@@ -21,7 +21,7 @@ withDefaults(defineProps<Props>(), {
   <div class="flex flex-col gap-3 px-5">
     <!-- Display Name -->
     <div class="flex flex-col gap-0.5">
-      <p class="text-[22px] font-bold text-foreground leading-normal">
+      <p class="text-xl font-bold text-foreground leading-normal">
         {{ displayName }}
       </p>
       <p class="text-sm text-foreground/80">

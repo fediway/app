@@ -128,7 +128,7 @@ function goBack() {
         <ProfileInformation :account="account" />
 
         <!-- Actions row -->
-        <div class="border-b border-gray-200 px-4 pb-4 dark:border-gray-800">
+        <div class="border-b border-border px-5 pt-4 pb-4">
           <ProfileActions
             :following="relationship?.following ?? false"
             :requested="relationship?.requested ?? false"

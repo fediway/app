@@ -9,8 +9,9 @@ import StatusActions from './StatusActions.vue';
 import StatusMedia from './StatusMedia.vue';
 import StatusStats from './StatusStats.vue';
 import StatusTags from './StatusTags.vue';
+import { useCleanContent } from './useCleanContent';
 
-defineProps<{
+const props = defineProps<{
   status: Status;
 }>();
 
@@ -26,6 +27,12 @@ defineEmits<{
   viewReblogs: [statusId: string];
   viewFavourites: [statusId: string];
 }>();
+
+const cleanedContent = useCleanContent(
+  () => props.status.content,
+  () => props.status.tags,
+  () => !!(props.status.quote && 'quotedStatus' in props.status.quote && props.status.quote.quotedStatus),
+);
 </script>
 
 <template>
@@ -47,19 +54,19 @@ defineEmits<{
       </a>
     </div>
 
-    <!-- Media (full width) -->
-    <StatusMedia
-      v-if="status.mediaAttachments.length > 0"
-      :attachments="status.mediaAttachments"
-      :sensitive="status.sensitive"
-      class="mb-3"
-      @media-click="(att, idx) => $emit('mediaClick', status.mediaAttachments, idx)"
-    />
-
     <div class="px-4">
+      <!-- Media -->
+      <StatusMedia
+        v-if="status.mediaAttachments?.length > 0"
+        :attachments="status.mediaAttachments"
+        :sensitive="status.sensitive"
+        class="mb-3"
+        @media-click="(att, idx) => $emit('mediaClick', status.mediaAttachments, idx)"
+      />
+
       <!-- Content (larger text for detail view) -->
       <RichText
-        :content="status.content"
+        :content="cleanedContent"
         :emojis="status.emojis"
         class="mb-2 text-lg leading-relaxed text-foreground"
       />

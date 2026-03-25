@@ -23,7 +23,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="flex items-center gap-3 px-5">
+  <div class="flex items-center gap-3">
     <template v-if="isOwnProfile">
       <button
         type="button"

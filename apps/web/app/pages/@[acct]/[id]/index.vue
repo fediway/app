@@ -100,6 +100,22 @@ function handleSendMessage(s: Status) {
   openSendMessage(s);
 }
 
+// Determine if a descendant's parent is directly above (previous item or main post)
+function hasReplyAbove(reply: Status, index: number): boolean {
+  if (!reply.inReplyToId)
+    return false;
+  // Parent is the main post and this is the first descendant
+  if (reply.inReplyToId === status.value?.id)
+    return false; // Main post handles its own line via StatusDetailMain
+  // Parent is the previous descendant
+  if (index > 0) {
+    const prev = context.value.descendants[index - 1];
+    if (prev && prev.id === reply.inReplyToId)
+      return true;
+  }
+  return false;
+}
+
 // Determine if a descendant has a reply directly below it in the thread
 function hasReplyBelow(index: number): boolean {
   const descendants = context.value.descendants;
@@ -111,11 +127,18 @@ function hasReplyBelow(index: number): boolean {
 }
 
 // Find the reply parent for a descendant (for thread context)
-function getReplyParent(reply: Status): Status | null {
+// Skip if parent is the main post or already the previous item in the list
+function getReplyParent(reply: Status, index?: number): Status | null {
   if (!reply.inReplyToId)
     return null;
   if (reply.inReplyToId === status.value?.id)
     return null;
+  // If the parent is the previous descendant, it's already visible above — skip
+  if (index != null && index > 0) {
+    const prev = context.value.descendants[index - 1];
+    if (prev && prev.id === reply.inReplyToId)
+      return null;
+  }
   const all = [...context.value.ancestors, ...(rawStatus.value ? [rawStatus.value] : []), ...context.value.descendants];
   return all.find(s => s.id === reply.inReplyToId) ?? null;
 }
@@ -152,7 +175,7 @@ function getReplyParent(reply: Status): Status | null {
           v-if="context.ancestors.length"
           class="relative h-3"
         >
-          <div class="absolute left-8 bottom-0 top-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+          <div class="absolute left-8 bottom-0 top-0 w-0.5 bg-accent" />
         </div>
 
         <!-- Main (focused) status -->
@@ -177,8 +200,9 @@ function getReplyParent(reply: Status): Status | null {
           :key="reply.id"
           :status="reply"
           :profile-url="getProfilePath(reply.account.acct)"
+          :has-reply-above="hasReplyAbove(reply, index)"
           :has-reply-below="hasReplyBelow(index)"
-          :reply-parent="getReplyParent(reply)"
+          :reply-parent="getReplyParent(reply, index)"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"

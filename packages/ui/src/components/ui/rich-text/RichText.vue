@@ -34,7 +34,7 @@ const processedContent = computed(() => {
 
 <template>
   <div
-    class="rich-text leading-relaxed break-words"
+    class="rich-text leading-snug break-words"
     v-html="processedContent"
   />
 </template>
@@ -54,7 +54,7 @@ const processedContent = computed(() => {
 }
 
 .rich-text p + p {
-  margin-top: 0.75rem;
+  margin-top: 0.5em;
 }
 
 .rich-text .mention,

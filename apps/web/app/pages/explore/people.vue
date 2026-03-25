@@ -39,11 +39,11 @@ watch(accounts, (accts) => {
         class="py-12"
       />
 
-      <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+      <div v-else class="divide-y divide-border">
         <div
           v-for="account in accounts"
           :key="account.id"
-          class="px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+          class="px-4 py-3 transition-colors hover:bg-muted"
         >
           <div class="flex items-center justify-between gap-3">
             <AccountCard
@@ -61,9 +61,9 @@ watch(accounts, (accts) => {
               @unfollow="toggleFollow(account.id)"
             />
           </div>
-          <div class="mt-2 flex items-center gap-4 pl-12 text-sm text-gray-500">
-            <span><strong class="text-gray-900 dark:text-gray-100">{{ account.followersCount?.toLocaleString() }}</strong> followers</span>
-            <span><strong class="text-gray-900 dark:text-gray-100">{{ account.followingCount?.toLocaleString() }}</strong> following</span>
+          <div class="mt-2 flex items-center gap-4 pl-12 text-sm text-muted-foreground">
+            <span><strong class="text-foreground">{{ account.followersCount?.toLocaleString() }}</strong> followers</span>
+            <span><strong class="text-foreground">{{ account.followingCount?.toLocaleString() }}</strong> following</span>
           </div>
         </div>
       </div>
