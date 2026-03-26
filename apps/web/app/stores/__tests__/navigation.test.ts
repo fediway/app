@@ -77,13 +77,25 @@ describe('useNavigationStore', () => {
     });
 
     it('returns / when user is null', () => {
+      setAuthUser(DEFAULT_USER);
       const store = useNavigationStore();
-      expect(store.menuItems.find((i: any) => i.id === 'profile')!.to).toBe('/');
+      expect(store.menuItems.find((i: any) => i.id === 'profile')!.to).toBe('/@jane@social.network');
     });
   });
 
   describe('menuItems', () => {
-    it('generates all 8 menu items', () => {
+    it('shows limited menu when logged out', () => {
+      const store = useNavigationStore();
+
+      expect(store.menuItems).toHaveLength(2);
+      expect(store.menuItems.map((i: any) => i.id)).toEqual([
+        'home',
+        'explore',
+      ]);
+    });
+
+    it('generates all 8 menu items when logged in', () => {
+      setAuthUser(DEFAULT_USER);
       const store = useNavigationStore();
 
       expect(store.menuItems).toHaveLength(8);
@@ -99,7 +111,8 @@ describe('useNavigationStore', () => {
       ]);
     });
 
-    it('maps static routes correctly', () => {
+    it('maps static routes correctly when logged in', () => {
+      setAuthUser(DEFAULT_USER);
       const store = useNavigationStore();
       const routes = Object.fromEntries(store.menuItems.map((i: any) => [i.id, i.to]));
 
@@ -114,17 +127,29 @@ describe('useNavigationStore', () => {
 
     it('profile route updates reactively with auth', () => {
       const store = useNavigationStore();
-      const getProfileRoute = () => store.menuItems.find((i: any) => i.id === 'profile')!.to;
 
-      expect(getProfileRoute()).toBe('/');
+      // Logged out — no profile item
+      expect(store.menuItems.find((i: any) => i.id === 'profile')).toBeUndefined();
 
+      // Log in — profile item appears
       setAuthUser(DEFAULT_USER);
-      expect(getProfileRoute()).toBe('/@jane@social.network');
+      expect(store.menuItems.find((i: any) => i.id === 'profile')!.to).toBe('/@jane@social.network');
     });
   });
 
   describe('mobileFooterItems', () => {
-    it('generates 5 footer items', () => {
+    it('shows limited footer when logged out', () => {
+      const store = useNavigationStore();
+
+      expect(store.mobileFooterItems).toHaveLength(2);
+      expect(store.mobileFooterItems.map((i: any) => i.id)).toEqual([
+        'home',
+        'search',
+      ]);
+    });
+
+    it('generates 5 footer items when logged in', () => {
+      setAuthUser(DEFAULT_USER);
       const store = useNavigationStore();
 
       expect(store.mobileFooterItems).toHaveLength(5);

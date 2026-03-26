@@ -5,22 +5,23 @@ export type DataMode = 'mock' | 'live';
 
 const STORAGE_KEY = 'fediway-data-mode';
 
-const mode = ref<DataMode>('mock');
+const mode = ref<DataMode>('live');
 let initialized = false;
 
 function loadFromStorage(): DataMode {
-  // Env var takes priority (set by dev scripts)
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'live')
-    return 'live';
+  // Env var ALWAYS overrides localStorage
   if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'mock')
     return 'mock';
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'live')
+    return 'live';
   // Fall back to localStorage
   if (typeof localStorage === 'undefined')
-    return 'mock';
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === 'live')
     return 'live';
-  return 'mock';
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === 'mock')
+    return 'mock';
+  // Default is ALWAYS live
+  return 'live';
 }
 
 function saveToStorage(m: DataMode) {
@@ -48,6 +49,6 @@ export function useDataMode() {
 
 /** Reset all state — for testing only */
 export function _resetDataModeState() {
-  mode.value = 'mock';
+  mode.value = 'live';
   initialized = false;
 }

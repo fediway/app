@@ -52,23 +52,23 @@ onMounted(async () => {
         <img src="/images/icon.png" alt="Fediway" class="w-16 h-16">
       </div>
 
-      <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 text-center">
+      <div class="bg-card rounded-2xl shadow-xl border border-border p-6 text-center">
         <!-- Loading -->
         <div v-if="isLoading" class="space-y-4">
-          <PhCircleNotch :size="32" class="animate-spin mx-auto text-gray-400" />
-          <p class="text-sm text-gray-500">
+          <PhCircleNotch :size="32" class="animate-spin mx-auto text-muted-foreground" />
+          <p class="text-sm text-muted-foreground">
             Completing sign in...
           </p>
         </div>
 
         <!-- Error -->
         <div v-else class="space-y-4">
-          <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+          <div class="p-3 bg-red-background border border-red-200 rounded-xl text-sm text-red">
             {{ errorMessage }}
           </div>
           <NuxtLink
             to="/login"
-            class="inline-block py-2.5 px-6 rounded-xl font-medium text-sm bg-gray-900 text-white hover:bg-gray-700 transition-all"
+            class="inline-block py-2.5 px-6 rounded-xl font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
           >
             Try again
           </NuxtLink>

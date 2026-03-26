@@ -66,13 +66,27 @@ export function useNavigationStore() {
     return id === 'profile' ? profileUrl.value : (MENU_ROUTES[id] ?? '/');
   }
 
-  const menuItems = computed<MenuItem[]>(() =>
-    MENU_ITEMS.map(item => ({ ...item, to: getRoute(item.id) })),
-  );
+  const isLoggedIn = computed(() => !!currentUser.value);
 
-  const mobileFooterItems = computed<MenuItem[]>(() =>
-    FOOTER_ITEMS.map(item => ({ ...item, to: getRoute(item.id) })),
-  );
+  const LOGGED_OUT_MENU: Omit<MenuItem, 'to'>[] = [
+    { id: 'home', label: 'Home', icon: 'home' },
+    { id: 'explore', label: 'Explore', icon: 'explore' },
+  ];
+
+  const LOGGED_OUT_FOOTER: Omit<MenuItem, 'to'>[] = [
+    { id: 'home', label: 'Home', icon: 'home' },
+    { id: 'search', label: 'Search', icon: 'search' },
+  ];
+
+  const menuItems = computed<MenuItem[]>(() => {
+    const items = isLoggedIn.value ? MENU_ITEMS : LOGGED_OUT_MENU;
+    return items.map(item => ({ ...item, to: getRoute(item.id) }));
+  });
+
+  const mobileFooterItems = computed<MenuItem[]>(() => {
+    const items = isLoggedIn.value ? FOOTER_ITEMS : LOGGED_OUT_FOOTER;
+    return items.map(item => ({ ...item, to: getRoute(item.id) }));
+  });
 
   const activeItemId = computed(() => {
     const path = route.path;

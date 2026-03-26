@@ -119,12 +119,15 @@ function handleKeydown(event: KeyboardEvent) {
 
       <!-- Sign In Card -->
       <div class="rounded-2xl border border-border bg-card p-6 shadow-xl">
-        <h1 class="mb-6 text-center text-xl font-semibold text-foreground">
+        <h1 class="mb-1 text-center text-xl font-semibold text-foreground">
           Sign in
         </h1>
+        <p class="mb-6 text-center text-sm text-muted-foreground">
+          Social media as it should be
+        </p>
 
         <!-- Error -->
-        <div v-if="errorMessage" class="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+        <div v-if="errorMessage" class="mb-4 rounded-xl border border-red-200 bg-red-background p-3 text-sm text-red">
           {{ errorMessage }}
         </div>
 

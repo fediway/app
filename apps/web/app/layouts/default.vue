@@ -78,8 +78,6 @@ registerBackHandler(50, () => {
   return false;
 });
 
-// Initialize Capacitor back button listener (client-only to avoid SSR crash)
-
 function handlePost(data: { content: string; spoilerText: string; visibility: string }) {
   addPost({
     content: data.content,
@@ -128,29 +126,32 @@ onMounted(() => {
     <!-- Route announcer for screen readers -->
     <AriaAnnouncer />
 
-    <!-- Post Composer Modal -->
-    <PostComposerModal
-      :is-open="isOpen"
-      :reply-to="replyingTo"
-      @close="close"
-      @post="handlePost"
-    />
+    <!-- Auth-only modals -->
+    <ClientOnly>
+      <template v-if="navigation.currentUser">
+        <PostComposerModal
+          :is-open="isOpen"
+          :reply-to="replyingTo"
+          @close="close"
+          @post="handlePost"
+        />
 
-    <!-- Send Message Modal -->
-    <SendMessageModal
-      :is-open="isSendMessageOpen"
-      :status="statusToShare"
-      @close="closeSendMessage"
-      @send="handleSendMessage"
-    />
+        <SendMessageModal
+          :is-open="isSendMessageOpen"
+          :status="statusToShare"
+          @close="closeSendMessage"
+          @send="handleSendMessage"
+        />
+      </template>
 
-    <!-- Media Lightbox -->
-    <MediaLightbox
-      :is-open="isLightboxOpen"
-      :attachments="lightboxAttachments"
-      :initial-index="lightboxIndex"
-      @close="closeLightbox"
-    />
+      <!-- Media Lightbox -->
+      <MediaLightbox
+        :is-open="isLightboxOpen"
+        :attachments="lightboxAttachments"
+        :initial-index="lightboxIndex"
+        @close="closeLightbox"
+      />
+    </ClientOnly>
 
     <!-- Mobile: push-style sidebar layout -->
     <div class="lg:hidden relative min-h-screen" style="overflow-x: clip;">

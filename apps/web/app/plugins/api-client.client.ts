@@ -1,78 +1,86 @@
 import { useAccountStore, useAuth, useClient, useDarkMode } from '@repo/api';
 import { watch } from 'vue';
+import { useAuthState } from '~/composables/useAuthState';
 import { useDataMode } from '~/composables/useDataMode';
 
 export default defineNuxtPlugin(async () => {
   const { restoreSession, isAuthenticated } = useAuth();
+  const { setAuthenticated, clearAuthenticated } = useAuthState();
   const { mode, setMode } = useDataMode();
   const { init: initDarkMode, theme, isDark } = useDarkMode();
 
   await initDarkMode();
 
-  // Preference cookie — stores 'system', 'dark', or 'light' (for settings button SSR).
+  // ── Theme cookies (SSR) ──
   const themeCookie = useCookie('fediway_theme', { maxAge: 60 * 60 * 24 * 365 });
   if (themeCookie.value !== theme.value) {
     themeCookie.value = theme.value;
   }
 
-  // Resolved cookie — always 'dark' or 'light' (for SSR .dark class).
-  // Handles the 'system' case: resolves via matchMedia so the server knows what to render.
   const resolvedCookie = useCookie('fediway_theme_resolved', { maxAge: 60 * 60 * 24 * 365 });
   resolvedCookie.value = isDark.value ? 'dark' : 'light';
 
-  // Keep resolved cookie in sync when system preference changes.
   watch(isDark, (dark) => {
     resolvedCookie.value = dark ? 'dark' : 'light';
   });
 
-  const envMode = import.meta.env.VITE_API_MODE as string | undefined;
+  // ── Session restore ──
+  const isMockMode = mode.value === 'mock';
 
-  if (mode.value === 'live') {
-    try {
-      await restoreSession();
-      if (!isAuthenticated.value) {
-        if (envMode === 'live') {
-          // Env forced live mode — redirect to login, never fall back to mock
-          navigateTo('/login');
-        }
-        else {
-          setMode('mock');
-        }
-      }
-    }
-    catch {
-      if (envMode === 'live') {
-        navigateTo('/login');
-      }
-      else {
-        setMode('mock');
-      }
-    }
-  }
-  else {
-    // In mock mode, try session restore in case user has a stored session
+  if (isMockMode) {
+    // Mock mode — explicitly requested via VITE_API_MODE=mock
     try {
       await restoreSession();
       if (isAuthenticated.value) {
         setMode('live');
+        setAuthenticated();
       }
     }
     catch {
       // Stay in mock mode
     }
-  }
 
-  // In mock mode without a real session, set the mock user
-  // so the sidebar/navigation shows the mock identity (not a skeleton)
-  if (mode.value === 'mock' && !isAuthenticated.value) {
+    // Set mock user for sidebar/navigation
+    if (mode.value === 'mock' && !isAuthenticated.value) {
+      try {
+        const client = useClient();
+        const mockUser = await client.rest.v1.accounts.verifyCredentials();
+        const store = useAccountStore();
+        store.currentUser.value = mockUser;
+      }
+      catch {
+        // Mock client not available
+      }
+    }
+  }
+  else {
+    // Live mode (default) — restore session
     try {
-      const client = useClient();
-      const mockUser = await client.rest.v1.accounts.verifyCredentials();
-      const store = useAccountStore();
-      store.currentUser.value = mockUser;
+      await restoreSession();
     }
     catch {
-      // Mock client not available — sidebar will show skeleton
+      // Session restore failed
+    }
+
+    // Sync auth cookie with real auth state
+    if (isAuthenticated.value) {
+      setAuthenticated();
+    }
+    else {
+      clearAuthenticated();
     }
   }
+
+  // ── Auth state watcher — sync cookie + handle 401 ──
+  watch(isAuthenticated, (authenticated) => {
+    if (authenticated) {
+      setAuthenticated();
+    }
+    else {
+      clearAuthenticated();
+      if (mode.value === 'live') {
+        navigateTo('/', { replace: true });
+      }
+    }
+  });
 });

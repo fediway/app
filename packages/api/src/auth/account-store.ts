@@ -105,33 +105,9 @@ async function switchAccount(key: string): Promise<void> {
 
     activeClient.value = createClientForAccount(account, token);
 
-    // Pre-populate currentUser from stored data (instant, no network)
-    // verifyCredentials() below will replace with the full object
-    currentUser.value = {
-      id: account.accountId,
-      username: account.username,
-      acct: account.acct ?? account.username,
-      displayName: account.displayName ?? account.username,
-      avatar: account.avatarUrl ?? '',
-      avatarStatic: account.avatarUrl ?? '',
-      header: '',
-      headerStatic: '',
-      note: '',
-      url: account.instanceUrl,
-      locked: false,
-      fields: [],
-      emojis: [],
-      bot: false,
-      group: false,
-      createdAt: '',
-      followersCount: 0,
-      followingCount: 0,
-      statusesCount: 0,
-      lastStatusAt: null,
-      source: { privacy: 'public', sensitive: false, language: '', fields: [], note: '' },
-    } as unknown as AccountCredentials;
-
-    // Verify credentials and update with full data
+    // Verify credentials against the server — this is the source of truth.
+    // Don't show user data until the server confirms the session is valid.
+    // The UI shows a loading skeleton until this resolves.
     const user = await activeClient.value.rest.v1.accounts.verifyCredentials();
     currentUser.value = user;
 

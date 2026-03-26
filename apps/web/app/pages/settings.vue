@@ -24,12 +24,11 @@ const notificationLabels: Record<string, { label: string; description: string }>
 function handleDisconnect() {
   apiLogout();
   invalidateAllQueries();
-  setMode('mock');
 }
 
 function handleLogout() {
   handleDisconnect();
-  router.push('/login');
+  router.push('/');
 }
 </script>
 

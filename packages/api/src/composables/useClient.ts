@@ -1,8 +1,10 @@
 import type { MastoClient } from '../client';
+import { createMastoClient } from '../client';
 import { createMockClient } from '../mock/client';
 import { useAuth } from './useAuth';
 
 let mockClientSingleton: MastoClient | null = null;
+let publicClientSingleton: MastoClient | null = null;
 
 function isMockMode(): boolean {
   try {
@@ -15,6 +17,17 @@ function isMockMode(): boolean {
   }
 }
 
+function getDefaultInstanceUrl(): string {
+  try {
+    // eslint-disable-next-line ts/ban-ts-comment
+    // @ts-ignore
+    return `https://${import.meta.env?.NUXT_PUBLIC_DEFAULT_INSTANCE || 'mastodon.social'}`;
+  }
+  catch {
+    return 'https://mastodon.social';
+  }
+}
+
 function getMockClient(): MastoClient {
   if (!mockClientSingleton) {
     mockClientSingleton = createMockClient();
@@ -22,10 +35,21 @@ function getMockClient(): MastoClient {
   return mockClientSingleton;
 }
 
+function getPublicClient(): MastoClient {
+  if (!publicClientSingleton) {
+    publicClientSingleton = createMastoClient({
+      url: getDefaultInstanceUrl(),
+      // No accessToken — read-only public API access
+    });
+  }
+  return publicClientSingleton;
+}
+
 /**
- * Returns the current MastoClient.
- * In mock mode, returns a mock client when no authenticated session exists.
- * In live mode, throws if not initialized.
+ * Returns the current MastoClient. Always returns a working client:
+ * 1. Authenticated client (full read + write access)
+ * 2. Mock client (when VITE_API_MODE=mock)
+ * 3. Public client (unauthenticated, read-only for default instance)
  */
 export function useClient(): MastoClient {
   const { getClient } = useAuth();
@@ -34,10 +58,12 @@ export function useClient(): MastoClient {
     return client;
   }
 
-  // Fall back to mock client when no auth client exists and we're in mock mode
   if (isMockMode()) {
     return getMockClient();
   }
 
-  throw new Error('API client not initialized — call useAuth().login() or restoreSession() first');
+  // Unauthenticated — return a public client for the default instance.
+  // Supports read-only API calls (public timelines, profiles, trending).
+  // Write operations (favourite, boost, etc.) will fail with a 401.
+  return getPublicClient();
 }

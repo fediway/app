@@ -20,8 +20,10 @@ export interface UseStatusActionsReturn {
 }
 
 export function useStatusActions(options?: UseStatusActionsOptions): UseStatusActionsReturn {
-  const client = useClient();
+  // Lazy client — resolved on first action, not during setup.
+  // This allows the composable to be called before auth is initialized.
   const store = useStatusStore();
+  const getClient = () => useClient();
 
   async function toggleFavourite(id: string): Promise<void> {
     const current = store.get(id);
@@ -41,8 +43,8 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
 
     try {
       const updated = wasFavourited
-        ? await client.rest.v1.statuses.$select(id).unfavourite()
-        : await client.rest.v1.statuses.$select(id).favourite();
+        ? await getClient().rest.v1.statuses.$select(id).unfavourite()
+        : await getClient().rest.v1.statuses.$select(id).favourite();
       store.set(updated as FediwayStatus);
     }
     catch (err) {
@@ -73,8 +75,8 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
 
     try {
       const updated = wasReblogged
-        ? await client.rest.v1.statuses.$select(id).unreblog()
-        : await client.rest.v1.statuses.$select(id).reblog();
+        ? await getClient().rest.v1.statuses.$select(id).unreblog()
+        : await getClient().rest.v1.statuses.$select(id).reblog();
       store.set(updated as FediwayStatus);
     }
     catch (err) {
@@ -102,8 +104,8 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
 
     try {
       const updated = wasBookmarked
-        ? await client.rest.v1.statuses.$select(id).unbookmark()
-        : await client.rest.v1.statuses.$select(id).bookmark();
+        ? await getClient().rest.v1.statuses.$select(id).unbookmark()
+        : await getClient().rest.v1.statuses.$select(id).bookmark();
       store.set(updated as FediwayStatus);
     }
     catch (err) {
@@ -122,7 +124,7 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
       return;
 
     try {
-      await client.rest.v1.statuses.$select(id).remove();
+      await getClient().rest.v1.statuses.$select(id).remove();
       store.remove(id);
     }
     catch (err) {

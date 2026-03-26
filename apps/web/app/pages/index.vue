@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status, Tag } from '@repo/types';
-import { useTimeline } from '@repo/api';
+import { useAuth, useTimeline } from '@repo/api';
 import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -15,7 +15,16 @@ const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
-const timeline = useTimeline({ type: 'home' });
+const { isAuthenticated } = useAuth();
+
+// Authenticated → home timeline, unauthenticated → trending statuses
+const timeline = isAuthenticated.value ? useTimeline({ type: 'home' }) : null;
+const { getTrendingStatuses } = useExploreData();
+const trending = !isAuthenticated.value ? getTrendingStatuses() : null;
+
+// Unified status list
+const isLoading = computed(() => timeline?.isLoading.value ?? trending?.isLoading.value ?? false);
+const errorValue = computed(() => timeline?.error.value ?? trending?.error.value ?? null);
 
 function getReplyParent(status: Status): Status | null {
   const displayStatus = status.reblog ?? status;
@@ -24,14 +33,13 @@ function getReplyParent(status: Status): Status | null {
   return store.get(displayStatus.inReplyToId) ?? null;
 }
 
-if (import.meta.client) {
-  timeline.fetch();
-}
-
-const rawStatuses = computed(() => timeline.statuses.value ?? []);
+const rawStatuses = computed(() => {
+  if (timeline)
+    return timeline.statuses.value ?? [];
+  return trending?.data.value ?? [];
+});
 const allStatuses = withStoreState(rawStatuses);
 
-// Split statuses for inserting follow suggestions after second post
 const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
 const remainingStatuses = computed(() => allStatuses.value.slice(2));
 
@@ -68,29 +76,41 @@ function handleTagClick(tag: Tag) {
 }
 
 function handleLoadMore() {
-  timeline.loadMore();
+  timeline?.loadMore();
 }
 
 function handleMediaClick(attachments: MediaAttachment[], index: number) {
   openLightbox(attachments, index);
 }
 
+function handleRetry() {
+  if (timeline) {
+    timeline.fetch();
+  }
+  else {
+    trending?.refetch();
+  }
+}
+
 onMounted(() => {
-  timeline.startPolling(30_000);
+  if (timeline) {
+    timeline.fetch();
+    timeline.startPolling(30_000);
+  }
+  // trending fetches automatically via createQuery
 });
 
 onUnmounted(() => {
-  timeline.stopPolling();
+  timeline?.stopPolling();
 });
 </script>
 
 <template>
-  <section class="w-full py-2">
-    <!-- Client-only: timeline data is fetched client-side -->
+  <section class="w-full">
     <ClientOnly>
       <div>
         <!-- Loading skeleton -->
-        <div v-if="timeline.isLoading.value && allStatuses.length === 0" class="space-y-4 p-4">
+        <div v-if="isLoading && allStatuses.length === 0" class="space-y-4 p-4">
           <div v-for="i in 3" :key="i" class="space-y-3">
             <div class="flex items-center gap-3">
               <Skeleton class="size-10 rounded-full" />
@@ -106,23 +126,23 @@ onUnmounted(() => {
 
         <!-- Error state -->
         <EmptyState
-          v-else-if="timeline.error.value"
-          :title="timeline.error.value.message || 'Failed to load timeline'"
+          v-else-if="errorValue"
+          :title="errorValue.message || 'Failed to load timeline'"
           action-label="Try again"
           class="py-12"
-          @action="timeline.fetch()"
+          @action="handleRetry"
         />
 
         <!-- Empty state -->
         <EmptyState
-          v-else-if="!timeline.isLoading.value && allStatuses.length === 0"
-          title="Your timeline is empty"
-          description="Follow some people to see their posts here"
+          v-else-if="!isLoading && allStatuses.length === 0"
+          :title="isAuthenticated ? 'Your timeline is empty' : 'No trending posts'"
+          :description="isAuthenticated ? 'Follow some people to see their posts here' : 'Check back soon for new posts'"
           class="py-12"
         />
 
-        <!-- New posts banner -->
-        <div v-if="timeline.newStatusCount.value > 0" class="flex justify-center py-2">
+        <!-- New posts banner (home timeline only) -->
+        <div v-if="timeline && timeline.newStatusCount.value > 0" class="flex justify-center py-2">
           <Button
             variant="secondary"
             size="sm"
@@ -170,14 +190,15 @@ onUnmounted(() => {
           @media-click="handleMediaClick"
         />
 
-        <!-- Load more button -->
-        <div v-if="timeline.hasMore.value" class="flex justify-center py-4">
+        <!-- Load more button (home timeline only) -->
+        <div v-if="timeline?.hasMore.value" class="flex justify-center py-4">
           <Button
             variant="muted"
             size="sm"
+            :disabled="isLoading"
             @click="handleLoadMore"
           >
-            Load more
+            {{ isLoading ? 'Loading...' : 'Load more' }}
           </Button>
         </div>
       </div>

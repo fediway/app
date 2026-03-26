@@ -16,6 +16,14 @@ export function useExploreData() {
     });
   }
 
+  function getTrendingStatuses(): QueryResult<Status[]> {
+    return createQuery('trendingStatuses', [] as Status[], async () => {
+      const result = await client.rest.v1.trends.statuses.list({ limit: 40 });
+      store.setMany(result as FediwayStatus[]);
+      return result;
+    });
+  }
+
   function getTrendingLinks(): QueryResult<TrendLink[]> {
     return createQuery('trendingLinks', [] as TrendLink[], async () => {
       return await client.rest.v1.trends.links.list();
@@ -80,5 +88,5 @@ export function useExploreData() {
     }
   }
 
-  return { getTrendingTags, getTrendingLinks, getStatusesByTag, getTagInfo, getStatusesByLink, getLinkInfo };
+  return { getTrendingTags, getTrendingStatuses, getTrendingLinks, getStatusesByTag, getTagInfo, getStatusesByLink, getLinkInfo };
 }

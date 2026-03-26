@@ -15,7 +15,10 @@ export default defineNuxtConfig({
 
   css: [new URL('../../packages/ui/src/styles/globals.css', import.meta.url).pathname],
 
-  ssr: true,
+  // SPA mode — auth tokens live client-side, all content is API-driven.
+  // The spa-loading-template.html provides the initial paint (galaxy icon).
+  // This is the correct architecture for a federated OAuth app (Elk does the same).
+  ssr: false,
 
   runtimeConfig: {
     public: {

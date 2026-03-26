@@ -25,7 +25,7 @@ function goBack() {
   <!-- Sticky at browser top, page bg masks content under rounded corners -->
   <div class="hidden lg:sticky lg:top-0 lg:z-20 lg:block lg:bg-background">
     <!-- Header content -->
-    <div class="relative flex items-center justify-center py-3">
+    <div class="relative flex h-14 items-center justify-center">
       <!-- Back button — absolute left, doesn't affect centering -->
       <button
         v-if="navigation.showBack"
@@ -44,16 +44,24 @@ function goBack() {
           alt=""
           class="size-9 shrink-0 rounded-full object-cover"
         >
-        <!-- Icon — only if no image -->
+        <!-- Icon — if set by page -->
         <div
           v-else-if="navigation.pageIcon && iconMap[navigation.pageIcon]"
           class="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted"
         >
           <component :is="iconMap[navigation.pageIcon]" :size="18" class="text-foreground/60" />
         </div>
+        <!-- App icon only — on top-level pages (Home, Explore) -->
+        <template v-else-if="['home', 'explore'].includes(navigation.activeItemId)">
+          <img
+            src="/images/app-icon-transparent.svg"
+            alt="Fediway"
+            class="size-10 shrink-0"
+          >
+        </template>
 
-        <!-- Title + subtitle -->
-        <div class="text-center" :class="{ 'text-left': navigation.pageImage || navigation.pageIcon }">
+        <!-- Title + subtitle — on all other pages -->
+        <div v-if="!['home', 'explore'].includes(navigation.activeItemId)" class="text-center" :class="{ 'text-left': navigation.pageImage || navigation.pageIcon }">
           <h1 class="text-base font-bold leading-tight">
             {{ navigation.pageTitle }}
           </h1>

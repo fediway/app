@@ -11,7 +11,7 @@ const pageTransition = computed(() => {
 </script>
 
 <template>
-  <NuxtLoadingIndicator color="#3b82f6" />
+  <NuxtLoadingIndicator color="var(--primary)" />
   <NuxtLayout>
     <NuxtPage
       :transition="pageTransition"
