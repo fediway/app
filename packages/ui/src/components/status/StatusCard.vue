@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PreviewCard } from '@repo/types';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 
 interface Props {
   card: PreviewCard;
@@ -31,6 +32,7 @@ function getDomain(url: string): string {
       <div v-if="card.type === 'link'" class="flex flex-col">
         <div class="aspect-[1.91/1] bg-muted overflow-hidden">
           <img
+            v-fade-on-load
             :src="card.image"
             :alt="card.title || ''"
             loading="lazy"
@@ -52,6 +54,7 @@ function getDomain(url: string): string {
       <div v-else class="flex">
         <div class="w-32 h-32 shrink-0 bg-muted overflow-hidden">
           <img
+            v-fade-on-load
             :src="card.image"
             :alt="card.title || ''"
             loading="lazy"

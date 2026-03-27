@@ -4,6 +4,8 @@ import type { Swiper as SwiperType } from 'swiper';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { ref } from 'vue';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
+import { blurhashStyle } from '../../utils/blurhash';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -103,11 +105,13 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
           <button
             type="button"
             class="w-full aspect-[16/9] relative bg-muted cursor-pointer"
+            :style="blurhashStyle(attachment.blurhash)"
             @click="handleMediaClick(attachment, index)"
           >
             <!-- Image -->
             <img
               v-if="attachment.type === 'image'"
+              v-fade-on-load
               :src="attachment.previewUrl || attachment.url || ''"
               :alt="attachment.description || 'Image'"
               class="w-full h-full object-cover"
@@ -121,6 +125,7 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
               class="w-full h-full relative"
             >
               <img
+                v-fade-on-load
                 :src="attachment.previewUrl"
                 :alt="attachment.description || 'Video'"
                 class="w-full h-full object-cover"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PhArrowLeft } from '@phosphor-icons/vue';
 import profileHeaderPlaceholder from '../../assets/profile-header-placeholder.svg?url';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { Avatar } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 
@@ -28,6 +29,7 @@ defineEmits<{ back: [] }>();
       <!-- Custom header image -->
       <img
         v-if="headerImage"
+        v-fade-on-load
         :src="headerImage"
         alt="Profile header"
         class="w-full h-full object-cover"

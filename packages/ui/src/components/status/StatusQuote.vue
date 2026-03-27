@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
 import { computed } from 'vue';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
+import { blurhashStyle } from '../../utils/blurhash';
 import { Avatar } from '../ui/avatar';
 import { RelativeTime } from '../ui/relative-time';
 import { RichText } from '../ui/rich-text';
@@ -53,12 +55,15 @@ const firstMediaUrl = computed(() => {
       <!-- Media preview (if has media) -->
       <div
         v-if="firstMediaUrl"
-        class="mt-2 rounded-lg overflow-hidden"
+        class="mt-2 rounded-lg overflow-hidden bg-muted"
+        :style="blurhashStyle(status.mediaAttachments[0]?.blurhash)"
       >
         <img
+          v-fade-on-load
           :src="firstMediaUrl"
           alt="Media"
           class="w-full h-32 object-cover"
+          loading="lazy"
         >
       </div>
     </div>

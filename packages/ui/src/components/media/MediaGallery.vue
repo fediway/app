@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { MediaAttachment } from '@repo/types';
 import { computed, ref } from 'vue';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
+import { blurhashStyle } from '../../utils/blurhash';
 import MediaCarousel from './MediaCarousel.vue';
 
 interface Props {
@@ -195,12 +197,13 @@ function toggleReveal() {
           type="button"
           class="relative overflow-hidden bg-muted cursor-pointer h-full w-full"
           :class="[cornerClass(index)]"
-          :style="cellStyle(index)"
+          :style="{ ...cellStyle(index), ...blurhashStyle(attachment.blurhash) }"
           @click="emit('mediaClick', attachment, index)"
         >
           <!-- Image -->
           <img
             v-if="attachment.type === 'image'"
+            v-fade-on-load
             :src="imageSrc(attachment)"
             :alt="attachment.description || 'Image'"
             class="w-full h-full object-cover"
@@ -214,6 +217,7 @@ function toggleReveal() {
             class="w-full h-full relative"
           >
             <img
+              v-fade-on-load
               :src="imageSrc(attachment)"
               :alt="attachment.description || 'Video'"
               class="w-full h-full object-cover"
@@ -235,6 +239,7 @@ function toggleReveal() {
             class="w-full h-full relative"
           >
             <img
+              v-fade-on-load
               :src="imageSrc(attachment)"
               :alt="attachment.description || 'GIF'"
               class="w-full h-full object-cover"

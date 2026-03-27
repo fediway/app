@@ -154,6 +154,9 @@ export { Toast, ToastContainer, useToast } from './components/ui/toast';
 export type { ToastType } from './components/ui/toast';
 export { Toggle } from './components/ui/toggle';
 
+// Directives
+export { vFadeOnLoad } from './directives/fadeOnLoad';
 // Utilities
 export { cn } from './lib/utils';
-export { decodeBlurhash, isBlurhashValid } from './utils';
+
+export { blurhashStyle, decodeBlurhash, isBlurhashValid } from './utils';

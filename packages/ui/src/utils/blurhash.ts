@@ -20,6 +20,22 @@ export function isBlurhashValid(hash: string): boolean {
 }
 
 /**
+ * Get a CSS background style for a blurhash placeholder.
+ * Returns empty object if blurhash is invalid or missing.
+ */
+export function blurhashStyle(hash: string | undefined | null): Record<string, string> {
+  if (!hash || !isBlurhashValid(hash))
+    return {};
+  try {
+    const dataUrl = decodeBlurhash(hash, 32, 32);
+    return { backgroundImage: `url(${dataUrl})`, backgroundSize: 'cover' };
+  }
+  catch {
+    return {};
+  }
+}
+
+/**
  * Decode a blurhash string into a data URL.
  * Results are cached to avoid re-decoding the same hash.
  */

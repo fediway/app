@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from 'vue';
 import type { AvatarStackItem } from '../../ui/avatar-stack';
 import { PhArrowLeft, PhShareNetwork } from '@phosphor-icons/vue';
+import { vFadeOnLoad } from '../../../directives/fadeOnLoad';
 import { cn } from '../../../lib/utils';
 import { AvatarStack } from '../../ui/avatar-stack';
 import { AverageRating } from '../../ui/average-rating';
@@ -113,7 +114,7 @@ function formatCount(n: number): string {
     <!-- Poster + Synopsis -->
     <div v-if="posterSrc || synopsis" class="flex gap-4 px-5 mt-4">
       <div v-if="posterSrc" class="shrink-0 w-[132px] h-[195px] rounded-sm border border-foreground/10 overflow-hidden">
-        <img loading="lazy" :src="posterSrc" :alt="posterAlt" class="size-full object-cover">
+        <img v-fade-on-load loading="lazy" :src="posterSrc" :alt="posterAlt" class="size-full object-cover">
       </div>
       <p v-if="synopsis" class="flex-1 text-sm text-foreground leading-normal overflow-hidden">
         {{ synopsis }}

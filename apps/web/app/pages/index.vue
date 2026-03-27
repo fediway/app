@@ -18,7 +18,7 @@ const { open: openComposer } = usePostComposer();
 const { isAuthenticated } = useAuth();
 
 // Authenticated → home timeline, unauthenticated → trending statuses
-const timeline = isAuthenticated.value ? useTimeline({ type: 'home' }) : null;
+const timeline = isAuthenticated.value ? useTimeline({ type: 'home', cache: true }) : null;
 const { getTrendingStatuses } = useExploreData();
 const trending = !isAuthenticated.value ? getTrendingStatuses() : null;
 

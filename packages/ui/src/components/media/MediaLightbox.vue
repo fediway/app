@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment } from '@repo/types';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 
 interface Props {
   attachments: MediaAttachment[];
@@ -297,6 +298,7 @@ onUnmounted(() => {
           <!-- Image -->
           <img
             v-if="currentAttachment.type === 'image'"
+            v-fade-on-load
             :src="currentAttachment.url || currentAttachment.previewUrl || ''"
             :alt="currentAttachment.description || 'Image'"
             class="max-w-[90vw] max-h-[85vh] object-contain transition-transform duration-100"

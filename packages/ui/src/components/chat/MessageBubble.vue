@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PhHeart } from '@phosphor-icons/vue';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 
 defineProps<{
   content?: string;
@@ -53,6 +54,7 @@ function formatTime(dateString: string): string {
         >
           <img
             v-if="sharedStatus.imageUrl"
+            v-fade-on-load
             :src="sharedStatus.imageUrl"
             alt="Shared post image"
             class="h-32 w-full object-cover"

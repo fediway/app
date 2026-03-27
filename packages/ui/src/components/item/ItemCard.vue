@@ -3,6 +3,7 @@ import type { Item, ItemType } from '@repo/types';
 import type { Component } from 'vue';
 import { PhBook, PhFilmSlate, PhLink, PhMusicNote } from '@phosphor-icons/vue';
 import { computed } from 'vue';
+import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { TagItem } from '../ui/tag-item';
 
 const props = defineProps<{
@@ -84,9 +85,11 @@ const sublabel = computed(() => {
   <div v-if="item" class="inline-flex items-center gap-3">
     <img
       v-if="item.image"
+      v-fade-on-load
       :src="item.image"
       :alt="item.title"
       class="min-h-12 w-12 shrink-0 rounded-sm border border-border bg-muted object-cover" :class="[config.aspect]"
+      loading="lazy"
     >
     <div
       v-else
