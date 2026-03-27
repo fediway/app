@@ -4,7 +4,7 @@ import { computed } from 'vue';
 
 const router = useRouter();
 const { getTrendingTags } = useExploreData();
-const { data: tags } = getTrendingTags();
+const { data: tags, error } = getTrendingTags();
 
 const trendingTags = computed(() =>
   tags.value.slice(0, 7).map(tag => ({
@@ -19,7 +19,7 @@ function handleTagClick(name: string) {
 </script>
 
 <template>
-  <Card class="rounded-xl border-border shadow-none">
+  <Card v-if="!error && trendingTags.length > 0" class="rounded-xl border-border shadow-none">
     <CardHeader class="p-4 pb-0">
       <CardTitle class="text-sm font-medium text-muted-foreground">
         Trending Tags

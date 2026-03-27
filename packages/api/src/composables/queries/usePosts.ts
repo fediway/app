@@ -23,6 +23,12 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
     visibility?: string;
     inReplyToId?: string | null;
     inReplyToAccountId?: string | null;
+    poll?: {
+      options: string[];
+      expiresIn: number;
+      multiple?: boolean;
+    };
+    mediaIds?: string[];
   }): Status {
     const tempId = `temp-${nextId++}`;
     const { currentUser } = useAuth();
@@ -87,12 +93,19 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
 
     (async () => {
       try {
-        const created = await client.rest.v1.statuses.create({
+        const createParams: Record<string, unknown> = {
           status: opts.content,
           spoilerText: opts.spoilerText || undefined,
           visibility: (opts.visibility ?? 'public') as 'public' | 'unlisted' | 'private' | 'direct',
           inReplyToId: opts.inReplyToId || undefined,
-        });
+        };
+        if (opts.poll) {
+          createParams.poll = opts.poll;
+        }
+        if (opts.mediaIds) {
+          createParams.mediaIds = opts.mediaIds;
+        }
+        const created = await client.rest.v1.statuses.create(createParams as any);
         const idx = userPosts.findIndex(s => s.id === tempId);
         if (idx !== -1) {
           userPosts.splice(idx, 1, created);

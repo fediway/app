@@ -6,7 +6,7 @@ const { getSuggestedAccounts } = useAccountData();
 const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
 const { getProfilePath } = useAccountData();
 
-const { data: suggestedAccounts } = getSuggestedAccounts();
+const { data: suggestedAccounts, error } = getSuggestedAccounts();
 
 watch(suggestedAccounts, (accounts) => {
   if (accounts.length > 0) {
@@ -16,7 +16,7 @@ watch(suggestedAccounts, (accounts) => {
 </script>
 
 <template>
-  <Card class="rounded-xl border-border shadow-none">
+  <Card v-if="!error && suggestedAccounts.length > 0" class="rounded-xl border-border shadow-none">
     <CardHeader class="p-4 pb-0">
       <CardTitle class="text-sm font-medium text-muted-foreground">
         Who to follow

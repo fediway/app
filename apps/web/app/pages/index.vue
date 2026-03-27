@@ -191,7 +191,7 @@ onUnmounted(() => {
         />
 
         <!-- Load more button (home timeline only) -->
-        <div v-if="timeline?.hasMore.value" class="flex justify-center py-4">
+        <div v-if="timeline?.hasMore.value && allStatuses.length > 0 && !errorValue" class="flex justify-center py-4">
           <Button
             variant="muted"
             size="sm"

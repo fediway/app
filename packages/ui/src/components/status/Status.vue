@@ -57,7 +57,6 @@ const emit = defineEmits<{
   tagClick: [tag: Tag];
   profileClick: [accountId: string];
   statusClick: [statusId: string];
-  quoteClick: [statusId: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
 }>();
 
@@ -189,7 +188,7 @@ function handleStatusClick(event: MouseEvent) {
             v-if="quotedStatus"
             :status="quotedStatus"
             class="mt-3"
-            @click="emit('quoteClick', $event)"
+            @click="emit('statusClick', $event)"
           />
 
           <!-- Hashtags -->

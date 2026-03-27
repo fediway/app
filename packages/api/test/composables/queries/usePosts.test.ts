@@ -131,6 +131,61 @@ describe('usePosts (shared)', () => {
         inReplyToId: 'reply-to-42',
       });
     });
+
+    it('passes poll data to API when provided', async () => {
+      mockCreate.mockResolvedValue({ id: 'real-poll-1' } as Status);
+
+      const { addPost } = usePosts();
+      addPost({
+        content: 'What is your favorite framework?',
+        poll: {
+          options: ['Vue', 'React', 'Svelte'],
+          expiresIn: 86400,
+          multiple: false,
+        },
+      });
+
+      await flushPromises();
+
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+        status: 'What is your favorite framework?',
+        poll: {
+          options: ['Vue', 'React', 'Svelte'],
+          expiresIn: 86400,
+          multiple: false,
+        },
+      }));
+    });
+
+    it('passes mediaIds to API when provided', async () => {
+      mockCreate.mockResolvedValue({ id: 'real-media-1' } as Status);
+
+      const { addPost } = usePosts();
+      addPost({
+        content: 'Check out this photo',
+        mediaIds: ['media-1', 'media-2'],
+      });
+
+      await flushPromises();
+
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+        status: 'Check out this photo',
+        mediaIds: ['media-1', 'media-2'],
+      }));
+    });
+
+    it('does not include poll or mediaIds when not provided', async () => {
+      mockCreate.mockResolvedValue({ id: 'real-plain-1' } as Status);
+
+      const { addPost } = usePosts();
+      addPost({ content: 'Simple post' });
+
+      await flushPromises();
+
+      const callArgs = mockCreate.mock.calls[0][0];
+      expect(callArgs).not.toHaveProperty('poll');
+      expect(callArgs).not.toHaveProperty('mediaIds');
+    });
   });
 
   describe('callbacks', () => {
