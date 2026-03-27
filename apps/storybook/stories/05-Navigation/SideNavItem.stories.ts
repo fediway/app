@@ -22,3 +22,7 @@ export const Active: Story = {
 export const WithBadge: Story = {
   args: { icon: 'notifications', label: 'Notifications', badge: 42 },
 };
+
+export const WithDot: Story = {
+  args: { icon: 'notifications', label: 'Notifications', dot: true },
+};

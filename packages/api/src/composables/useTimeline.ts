@@ -241,7 +241,6 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
       return;
 
     isLoading.value = true;
-    error.value = null;
 
     try {
       const result = await fetchTimeline({ olderThan: maxId });

@@ -89,10 +89,10 @@ function getMessageText(conversation: Conversation): string {
           class="truncate text-sm" :class="[
             conversation.unread && !isOwnMessage(conversation)
               ? 'font-medium text-foreground'
-              : 'text-gray-500 dark:text-gray-400',
+              : 'text-muted-foreground',
           ]"
         >
-          <span v-if="getSenderName(conversation)" class="text-gray-400 dark:text-gray-500">{{ getSenderName(conversation) }}: </span>{{ getMessageText(conversation) }}
+          <span v-if="getSenderName(conversation)" class="text-muted-foreground">{{ getSenderName(conversation) }}: </span>{{ getMessageText(conversation) }}
         </p>
         <span
           v-if="conversation.unread"

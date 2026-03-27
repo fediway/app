@@ -46,7 +46,7 @@ const overflowCount = computed(() => Math.max(0, props.avatars.length - props.ma
         >
         <span
           v-else
-          class="flex size-full items-center justify-center text-sm text-foreground/80"
+          class="flex size-full items-center justify-center text-sm text-muted-foreground"
         >
           {{ avatar.initial ?? '?' }}
         </span>
@@ -57,14 +57,14 @@ const overflowCount = computed(() => Math.max(0, props.avatars.length - props.ma
         v-if="overflowCount > 0"
         class="relative shrink-0 size-7 -ml-1.5 rounded-full border border-background bg-muted flex items-center justify-center"
       >
-        <span class="text-xs font-medium text-foreground/80">
+        <span class="text-xs font-medium text-muted-foreground">
           +{{ overflowCount > 99 ? '99' : overflowCount }}
         </span>
       </div>
     </div>
 
     <!-- Label -->
-    <span v-if="label" class="text-sm text-foreground/80">
+    <span v-if="label" class="text-sm text-muted-foreground">
       {{ label }}
     </span>
   </div>

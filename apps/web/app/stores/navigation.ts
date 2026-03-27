@@ -40,7 +40,7 @@ const FOOTER_ITEMS: Omit<MenuItem, 'to'>[] = [
   { id: 'home', label: 'Home', icon: 'home' },
   { id: 'search', label: 'Search', icon: 'search' },
   { id: 'new-post', label: 'New Post', icon: 'new-post' },
-  { id: 'notifications', label: 'Notifications', icon: 'notifications' },
+  { id: 'messages', label: 'Chats', icon: 'chat' },
   { id: 'profile', label: 'Profile', icon: 'profile' },
 ];
 
@@ -94,7 +94,6 @@ export function useNavigationStore() {
     return items.map(item => ({
       ...item,
       to: getRoute(item.id),
-      dot: item.id === 'notifications' ? hasUnreadNotifications.value : undefined,
     }));
   });
 
@@ -162,6 +161,7 @@ export function useNavigationStore() {
   return reactive({
     isSidebarOpen,
     activeItemId,
+    hasUnreadNotifications,
     pageTitle,
     pageSubtitle,
     pageImage,

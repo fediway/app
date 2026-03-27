@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
+import { PhArrowLeft, PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
 import { Button, InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
 import { computed, ref } from 'vue';
@@ -14,6 +14,7 @@ definePageMeta({
 });
 
 const route = useRoute();
+const router = useRouter();
 const config = useRuntimeConfig();
 const { login, loginWithOAuth } = useAuth();
 const { setMode } = useDataMode();
@@ -119,7 +120,7 @@ function handleSubmit() {
     <!-- Full-screen hero background (inlined SVG — no network request, instant render) -->
     <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       <!-- Light mode shapes -->
-      <svg class="absolute inset-0 h-full w-full dark:hidden" preserveAspectRatio="none" viewBox="0 0 582.548 550.548" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="absolute inset-0 h-full w-full dark:hidden" preserveAspectRatio="xMidYMid slice" viewBox="0 0 582.548 550.548" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g opacity="0.6" filter="url(#login-blur-light)">
           <path d="M501.894 371.74H402.068L496.636 346.773C497.531 346.537 498.37 346.126 499.106 345.564C499.841 345.002 500.458 344.3 500.921 343.498C501.384 342.697 501.683 341.811 501.802 340.893C501.921 339.975 501.857 339.043 501.613 338.15L494.462 311.859C493.478 308.322 491.14 305.315 487.955 303.489C484.769 301.664 480.993 301.166 477.443 302.105L343.983 337.335C342.206 337.796 340.539 338.607 339.079 339.721C337.619 340.834 336.396 342.228 335.482 343.82C334.562 345.392 333.968 347.133 333.735 348.94C333.502 350.746 333.634 352.581 334.124 354.336L340.644 378.366C340.644 378.488 340.644 378.62 340.644 378.751V455.871C340.644 459.59 342.121 463.156 344.751 465.786C347.38 468.415 350.947 469.893 354.665 469.893H494.883C498.602 469.893 502.168 468.415 504.798 465.786C507.427 463.156 508.905 459.59 508.905 455.871V378.751C508.905 376.892 508.166 375.109 506.851 373.794C505.536 372.479 503.753 371.74 501.894 371.74ZM481.001 315.653L486.259 334.995L466.436 340.253L441.793 326.021L481.001 315.653ZM422.557 331.077L447.2 345.309L414.827 353.854L390.184 339.639L422.557 331.077ZM352.974 370.181L347.716 350.831L370.939 344.696L395.583 358.946L352.974 370.181ZM494.883 455.871H354.665V385.762H494.883V455.871Z" fill="#383AAA" />
           <path d="M371.752 66.6326H252.567C245.13 66.6326 237.997 69.5872 232.738 74.8463C227.479 80.1055 224.524 87.2385 224.524 94.6761V241.904C224.524 243.764 225.263 245.547 226.577 246.862C227.892 248.177 229.675 248.915 231.535 248.915H357.731C359.59 248.915 361.373 248.177 362.688 246.862C364.003 245.547 364.741 243.764 364.741 241.904C364.741 240.045 364.003 238.262 362.688 236.947C361.373 235.632 359.59 234.893 357.731 234.893H238.546C238.546 231.175 240.023 227.608 242.653 224.979C245.282 222.349 248.849 220.872 252.567 220.872H371.752C373.612 220.872 375.395 220.133 376.71 218.818C378.024 217.504 378.763 215.72 378.763 213.861V73.6435C378.763 71.7841 378.024 70.0008 376.71 68.686C375.395 67.3712 373.612 66.6326 371.752 66.6326ZM364.741 206.85H252.567C247.644 206.843 242.806 208.14 238.546 210.61V94.6761C238.546 90.9573 240.023 87.3908 242.653 84.7612C245.282 82.1316 248.849 80.6543 252.567 80.6543H364.741V206.85Z" fill="#DB741A" />
@@ -132,7 +133,7 @@ function handleSubmit() {
         </defs>
       </svg>
       <!-- Dark mode shapes -->
-      <svg class="absolute inset-0 hidden h-full w-full dark:block" preserveAspectRatio="none" viewBox="0 0 582.548 540.548" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="absolute inset-x-0 top-[5%] mx-auto hidden h-[55%] w-[90%] max-w-lg dark:block" preserveAspectRatio="xMidYMid slice" viewBox="0 0 582.548 540.548" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g opacity="0.6" filter="url(#login-blur-dark)">
           <path d="M501.894 361.74H402.068L496.636 336.773C497.531 336.537 498.37 336.126 499.106 335.564C499.841 335.002 500.458 334.3 500.921 333.498C501.384 332.697 501.683 331.811 501.802 330.893C501.921 329.975 501.857 329.043 501.613 328.15L494.462 301.859C493.478 298.322 491.14 295.315 487.955 293.489C484.769 291.664 480.993 291.166 477.443 292.105L343.983 327.335C342.206 327.796 340.539 328.607 339.079 329.721C337.619 330.834 336.396 332.228 335.482 333.82C334.562 335.392 333.968 337.133 333.735 338.94C333.502 340.746 333.634 342.581 334.124 344.336L340.644 368.366C340.644 368.488 340.644 368.62 340.644 368.751V445.871C340.644 449.59 342.121 453.156 344.751 455.786C347.38 458.415 350.947 459.893 354.665 459.893H494.883C498.602 459.893 502.168 458.415 504.798 455.786C507.427 453.156 508.905 449.59 508.905 445.871V368.751C508.905 366.892 508.166 365.109 506.851 363.794C505.536 362.479 503.753 361.74 501.894 361.74ZM481.001 305.653L486.259 324.995L466.436 330.253L441.793 316.021L481.001 305.653ZM422.557 321.077L447.2 335.309L414.827 343.854L390.184 329.639L422.557 321.077ZM352.974 360.181L347.716 340.831L370.939 334.696L395.583 348.946L352.974 360.181ZM494.883 445.871H354.665V375.762H494.883V445.871Z" fill="#383AAA" />
           <path d="M371.752 66.6326H252.567C245.13 66.6326 237.997 69.5872 232.738 74.8463C227.479 80.1055 224.524 87.2385 224.524 94.6761V241.904C224.524 243.764 225.263 245.547 226.577 246.862C227.892 248.177 229.675 248.915 231.535 248.915H357.731C359.59 248.915 361.373 248.177 362.688 246.862C364.003 245.547 364.741 243.764 364.741 241.904C364.741 240.045 364.003 238.262 362.688 236.947C361.373 235.632 359.59 234.893 357.731 234.893H238.546C238.546 231.175 240.023 227.608 242.653 224.979C245.282 222.349 248.849 220.872 252.567 220.872H371.752C373.612 220.872 375.395 220.133 376.71 218.818C378.024 217.504 378.763 215.72 378.763 213.861V73.6435C378.763 71.7841 378.024 70.0008 376.71 68.686C375.395 67.3712 373.612 66.6326 371.752 66.6326ZM364.741 206.85H252.567C247.644 206.843 242.806 208.14 238.546 210.61V94.6761C238.546 90.9573 240.023 87.3908 242.653 84.7612C245.282 82.1316 248.849 80.6543 252.567 80.6543H364.741V206.85Z" fill="#DB741A" />
@@ -146,21 +147,34 @@ function handleSubmit() {
       </svg>
     </div>
 
-    <!-- Centered composition: logo + action card as one group -->
-    <div class="relative z-10 flex flex-1 flex-col items-center justify-center px-5 py-12">
+    <!-- Mobile: logo centered in hero, form pinned to bottom -->
+    <!-- Desktop: everything centered as one group -->
+    <!-- Back button -->
+    <button
+      type="button"
+      class="absolute left-4 top-4 z-20 flex size-10 items-center justify-center rounded-full text-[#232b37]/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
+      aria-label="Go back"
+      @click="router.back()"
+    >
+      <PhArrowLeft :size="20" />
+    </button>
+
+    <div class="relative z-10 flex flex-1 flex-col px-5 pt-12 pb-0 lg:py-12">
       <!-- Logo + Wordmark -->
-      <div class="mb-10 flex items-center gap-3">
-        <img
-          src="/images/app-icon.svg"
-          alt=""
-          aria-hidden="true"
-          class="h-12 w-12"
-        >
-        <span class="text-3xl font-bold text-[#232b37] dark:text-white">Fediway</span>
+      <div class="flex flex-1 flex-col items-center justify-center lg:mb-10 lg:flex-none">
+        <div class="flex items-center gap-3">
+          <img
+            src="/images/app-icon.svg"
+            alt=""
+            aria-hidden="true"
+            class="h-12 w-12"
+          >
+          <span class="text-3xl font-bold text-[#232b37] dark:text-white">Fediway</span>
+        </div>
       </div>
 
-      <!-- Action card -->
-      <div class="w-full max-w-md bg-[#fefeff] px-5 py-8 dark:bg-[#232b37] rounded-3xl shadow-2xl">
+      <!-- Action card / bottom panel -->
+      <div class="-mx-5 mt-auto w-[calc(100%+2.5rem)] bg-[#fefeff] px-5 py-8 dark:bg-[#232b37] lg:mx-auto lg:mt-0 lg:w-full lg:max-w-md lg:rounded-3xl lg:shadow-2xl">
         <form
           :aria-busy="isLoading"
           @submit.prevent="handleSubmit"

@@ -14,12 +14,12 @@ function handleSearch() {
 <template>
   <InputGroup class="rounded-xl border-border bg-card py-0.5">
     <InputGroupAddon>
-      <NavIcon name="search" :size="18" class="text-foreground/40" />
+      <NavIcon name="search" :size="18" class="text-muted-foreground/70" />
     </InputGroupAddon>
     <InputGroupInput
       v-model="searchQuery"
       placeholder="Search"
-      class="text-base placeholder:text-foreground/40"
+      class="text-base placeholder:text-muted-foreground/70"
       @keydown.enter="handleSearch"
     />
   </InputGroup>

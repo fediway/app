@@ -57,6 +57,18 @@ export const DarkMode: Story = {
   }),
 };
 
+export const WithNotificationDot: Story = {
+  args: {
+    items: [
+      { id: 'home', icon: PhHouse, label: 'Home', active: true },
+      { id: 'search', icon: PhMagnifyingGlass, label: 'Search' },
+      { id: 'new-post', icon: PhPlus, main: true },
+      { id: 'notifications', icon: PhBell, label: 'Alerts', dot: true },
+      { id: 'profile', icon: PhUser, label: 'Profile' },
+    ],
+  },
+};
+
 export const NoLabels: Story = {
   args: {
     items: [

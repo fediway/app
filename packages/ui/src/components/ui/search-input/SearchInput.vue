@@ -33,12 +33,12 @@ function onInput(event: Event) {
       props.class,
     )"
   >
-    <PhMagnifyingGlass :size="20" class="shrink-0 text-foreground/80" />
+    <PhMagnifyingGlass :size="20" class="shrink-0 text-muted-foreground" />
     <input
       type="search"
       :value="modelValue"
       :placeholder="placeholder"
-      class="min-w-0 flex-1 bg-transparent text-base font-medium text-foreground placeholder:text-foreground/80 outline-none"
+      class="min-w-0 flex-1 bg-transparent text-base font-medium text-foreground placeholder:text-muted-foreground outline-none"
       @input="onInput"
     >
   </div>

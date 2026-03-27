@@ -128,26 +128,26 @@ const canReblog = computed(() =>
 
         <DropdownMenuContent side="top" align="end" :side-offset="8">
           <DropdownMenuItem @select="emit('copyLink')">
-            <PhLink :size="16" class="text-foreground/60" />
+            <PhLink :size="16" class="text-muted-foreground" />
             Copy link
           </DropdownMenuItem>
           <DropdownMenuItem @select="emit('sendMessage')">
-            <PhPaperPlaneRight :size="16" class="text-foreground/60" />
+            <PhPaperPlaneRight :size="16" class="text-muted-foreground" />
             Send as message
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
 
           <DropdownMenuItem @select="emit('mute')">
-            <PhSpeakerSlash :size="16" class="text-foreground/60" />
+            <PhSpeakerSlash :size="16" class="text-muted-foreground" />
             Mute user
           </DropdownMenuItem>
           <DropdownMenuItem @select="emit('block')">
-            <PhProhibit :size="16" class="text-foreground/60" />
+            <PhProhibit :size="16" class="text-muted-foreground" />
             Block user
           </DropdownMenuItem>
           <DropdownMenuItem @select="emit('blockDomain')">
-            <PhProhibit :size="16" class="text-foreground/60" />
+            <PhProhibit :size="16" class="text-muted-foreground" />
             Block domain
           </DropdownMenuItem>
 

@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { AppBar } from '@repo/ui';
-import { useScrollDirection } from '~/composables/useScrollDirection';
+import { PhBell } from '@phosphor-icons/vue';
+import { AppBar, Button } from '@repo/ui';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
 const { canGoBack } = useTabNavigation();
-const { hidden } = useScrollDirection();
 
 function handleLeftClick() {
   if (canGoBack.value) {
@@ -20,18 +19,29 @@ function handleLeftClick() {
 </script>
 
 <template>
-  <header
-    class="sticky top-0 left-0 right-0 z-[100] transition-transform duration-300 ease-out"
-    :class="hidden ? '-translate-y-full' : 'translate-y-0'"
-  >
+  <header class="sticky top-0 left-0 right-0 z-[100]">
     <AppBar
       :title="navigation.pageTitle"
       :left-icon="canGoBack ? 'back' : 'menu'"
       :left-label="canGoBack ? 'Go back' : 'Open menu'"
-      right-icon="explore"
-      right-label="Explore"
       @left-click="handleLeftClick"
-      @right-click="router.push('/explore')"
-    />
+    >
+      <template #trailing>
+        <Button
+          variant="muted"
+          size="icon"
+          aria-label="Notifications"
+          @click="router.push('/notifications')"
+        >
+          <span class="relative">
+            <PhBell :size="24" />
+            <span
+              v-if="navigation.hasUnreadNotifications"
+              class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-galaxy-500"
+            />
+          </span>
+        </Button>
+      </template>
+    </AppBar>
   </header>
 </template>

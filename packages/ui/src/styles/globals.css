@@ -382,7 +382,7 @@
   --secondary-foreground:   oklch(0.95  0.008 85);   /* cream */
 
   --muted:                  oklch(0.27  0.030 262);  /* dark-overlay */
-  --muted-foreground:       oklch(0.54  0.010 345);
+  --muted-foreground:       var(--gray-400);             /* warm gray, readable in dark */
 
   --accent:                 oklch(0.31  0.032 265);  /* dark-elevated */
   --accent-foreground:      oklch(0.95  0.008 85);

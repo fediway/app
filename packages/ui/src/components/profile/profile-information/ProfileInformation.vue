@@ -24,7 +24,7 @@ withDefaults(defineProps<Props>(), {
       <p class="text-xl font-bold text-foreground leading-normal">
         {{ displayName }}
       </p>
-      <p class="text-sm text-foreground/80">
+      <p class="text-sm text-muted-foreground">
         {{ handle }}
       </p>
     </div>
@@ -48,7 +48,7 @@ withDefaults(defineProps<Props>(), {
         class="flex items-baseline gap-[3px]"
       >
         <span class="text-base font-bold text-foreground">{{ stat.count.toLocaleString() }}</span>
-        <span class="text-sm text-foreground/80">{{ stat.label }}</span>
+        <span class="text-sm text-muted-foreground">{{ stat.label }}</span>
       </div>
     </div>
   </div>

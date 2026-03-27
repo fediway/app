@@ -23,6 +23,10 @@ export const WithBadge: Story = {
   args: { icon: 'notifications', label: 'Notifications', badge: 12 },
 };
 
+export const WithDot: Story = {
+  args: { icon: 'notifications', label: 'Notifications', dot: true },
+};
+
 export const AllItems: Story = {
   render: () => ({
     components: { NavDrawerItem },

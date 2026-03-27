@@ -198,16 +198,17 @@ watch(isAuthenticated, (authenticated) => {
           class="absolute inset-0 z-[200]"
           @click="navigation.closeSidebar()"
         />
-        <MobileHeader />
-        <main class="flex-1">
+        <MobileHeader v-if="isAuthenticated" />
+        <main class="flex-1 pb-20">
           <slot />
         </main>
-        <MobileFooter />
       </div>
+      <!-- Footer outside transformed wrapper — fixed positioning needs viewport as containing block -->
+      <MobileFooter />
     </div>
 
-    <!-- Responsive Layout: page scrolls normally, sidebars + header stay fixed via sticky -->
-    <div class="flex justify-center min-h-screen">
+    <!-- Desktop Layout: page scrolls normally, sidebars + header stay fixed via sticky -->
+    <div class="hidden lg:flex justify-center min-h-screen">
       <div class="w-full max-w-[1200px] lg:grid lg:grid-cols-[240px_minmax(0,650px)_280px] lg:gap-8 lg:px-4">
         <!-- Left Column: Menu Sidebar (desktop only) -->
         <nav aria-label="Main navigation" class="hidden lg:block">

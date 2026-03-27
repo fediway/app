@@ -77,7 +77,7 @@ function formatTime(dateString: string): string {
             </div>
             <p
               class="line-clamp-2 text-xs"
-              :class="[isOwn ? 'text-primary-foreground/70' : 'text-foreground/60']"
+              :class="[isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground']"
             >
               {{ sharedStatus.content }}
             </p>
@@ -98,7 +98,7 @@ function formatTime(dateString: string): string {
         <span v-if="favourited && isOwn" class="text-red">
           <PhHeart :size="12" weight="fill" />
         </span>
-        <span class="text-xs text-foreground/40">
+        <span class="text-xs text-muted-foreground/70">
           {{ formatTime(sentAt) }}
         </span>
       </div>

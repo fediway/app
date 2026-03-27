@@ -202,7 +202,7 @@ function confirmDiscard() {
           Cancel
         </Button>
         <div class="flex items-center gap-3">
-          <span v-if="draftStatus === 'saved'" class="text-xs text-foreground/40">Draft saved</span>
+          <span v-if="draftStatus === 'saved'" class="text-xs text-muted-foreground/70">Draft saved</span>
           <Button size="sm" :disabled="!canPost" @click="handlePost">
             {{ isSubmitting ? 'Posting...' : 'Post' }}
           </Button>
@@ -240,7 +240,7 @@ function confirmDiscard() {
           <template #close>
             <button
               type="button"
-              class="text-foreground/40 transition-colors hover:text-foreground/80"
+              class="text-muted-foreground/70 transition-colors hover:text-muted-foreground"
               @click="showPoll = false"
             >
               <PhX :size="20" />
@@ -252,7 +252,7 @@ function confirmDiscard() {
       <!-- Bottom toolbar -->
       <div class="border-t border-border px-4 py-3">
         <div class="mb-4">
-          <label class="mb-2 block text-xs font-medium text-foreground/60">Visibility</label>
+          <label class="mb-2 block text-xs font-medium text-muted-foreground">Visibility</label>
           <VisibilitySelector v-model="visibility" />
         </div>
 

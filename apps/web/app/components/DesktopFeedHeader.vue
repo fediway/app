@@ -29,7 +29,7 @@ function goBack() {
       <!-- Back button — absolute left, doesn't affect centering -->
       <button
         v-if="navigation.showBack"
-        class="absolute left-2 flex size-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
+        class="absolute left-2 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
         @click="goBack"
       >
         <PhArrowLeft :size="18" weight="bold" />
@@ -49,7 +49,7 @@ function goBack() {
           v-else-if="navigation.pageIcon && iconMap[navigation.pageIcon]"
           class="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted"
         >
-          <component :is="iconMap[navigation.pageIcon]" :size="18" class="text-foreground/60" />
+          <component :is="iconMap[navigation.pageIcon]" :size="18" class="text-muted-foreground" />
         </div>
         <!-- App icon only — on top-level pages (Home, Explore) -->
         <template v-else-if="['home', 'explore'].includes(navigation.activeItemId)">
@@ -65,7 +65,7 @@ function goBack() {
           <h1 class="text-base font-bold leading-tight">
             {{ navigation.pageTitle }}
           </h1>
-          <p v-if="navigation.pageSubtitle" class="text-xs leading-tight text-foreground/50">
+          <p v-if="navigation.pageSubtitle" class="text-xs leading-tight text-muted-foreground/70">
             {{ navigation.pageSubtitle }}
           </p>
         </div>

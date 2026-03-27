@@ -79,7 +79,7 @@ function formatCount(n: number): string {
 
     <!-- Meta info -->
     <div class="flex flex-col gap-0.5 px-5 mt-1">
-      <p v-if="creator || year" class="text-sm text-foreground/80">
+      <p v-if="creator || year" class="text-sm text-muted-foreground">
         <template v-if="creator">
           {{ creator }}
         </template>
@@ -90,7 +90,7 @@ function formatCount(n: number): string {
           {{ year }}
         </template>
       </p>
-      <p v-if="duration || genres" class="text-sm text-foreground/80">
+      <p v-if="duration || genres" class="text-sm text-muted-foreground">
         <template v-if="duration">
           {{ duration }}
         </template>

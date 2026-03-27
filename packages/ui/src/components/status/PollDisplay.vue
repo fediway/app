@@ -74,9 +74,9 @@ const timeRemaining = computed(() => {
     <!-- Footer -->
     <div class="flex items-center gap-2 text-sm text-muted-foreground">
       <span>{{ totalVotes }} vote{{ totalVotes !== 1 ? 's' : '' }}</span>
-      <span v-if="poll.multiple" class="text-gray-400 dark:text-gray-500">·</span>
+      <span v-if="poll.multiple" class="text-muted-foreground">·</span>
       <span v-if="poll.multiple">Multiple choices</span>
-      <span v-if="timeRemaining" class="text-gray-400 dark:text-gray-500">·</span>
+      <span v-if="timeRemaining" class="text-muted-foreground">·</span>
       <span v-if="timeRemaining">{{ timeRemaining }}</span>
     </div>
   </div>

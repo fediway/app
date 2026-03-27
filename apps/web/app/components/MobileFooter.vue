@@ -2,15 +2,15 @@
 import type { BottomNavItemType } from '@repo/ui';
 import type { Component } from 'vue';
 import {
-  PhBell,
+  PhChatCircle,
   PhHouse,
   PhMagnifyingGlass,
   PhPlus,
   PhUser,
 } from '@phosphor-icons/vue';
-import { BottomNav } from '@repo/ui';
+import { useAuth } from '@repo/api';
+import { BottomNav, Button } from '@repo/ui';
 import { usePostComposer } from '~/composables/usePostComposer';
-import { useScrollDirection } from '~/composables/useScrollDirection';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
@@ -18,13 +18,15 @@ const router = useRouter();
 const navigation = useNavigationStore();
 const { open: openComposer } = usePostComposer();
 const { activeTab, switchTab } = useTabNavigation();
-const { hidden } = useScrollDirection();
+const { isAuthenticated } = useAuth();
+const config = useRuntimeConfig();
+const defaultInstance = config.public.defaultInstance as string;
 
 const iconMap: Record<string, Component> = {
   'home': PhHouse,
   'search': PhMagnifyingGlass,
   'new-post': PhPlus,
-  'notifications': PhBell,
+  'chat': PhChatCircle,
   'profile': PhUser,
 };
 
@@ -51,14 +53,32 @@ function handleItemClick(item: BottomNavItemType) {
 </script>
 
 <template>
-  <nav
-    aria-label="Tab navigation"
-    class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out"
-    :class="hidden ? 'translate-y-full' : 'translate-y-0'"
+  <div
+    class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
   >
-    <BottomNav
-      :items="navItems"
-      @item-click="handleItemClick"
-    />
-  </nav>
+    <!-- Logged out: auth buttons in the same floating pill -->
+    <div
+      v-if="!isAuthenticated"
+      class="flex items-center gap-3 rounded-full bg-card px-4 py-2.5 shadow-[0_2px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.4)]"
+    >
+      <Button as-child variant="secondary" class="flex-1 rounded-full">
+        <NuxtLink to="/login">
+          Sign in
+        </NuxtLink>
+      </Button>
+      <Button as-child class="flex-1 rounded-full">
+        <a :href="`https://${defaultInstance}/auth/sign_up`" target="_blank" rel="noopener noreferrer">
+          Create account
+        </a>
+      </Button>
+    </div>
+
+    <!-- Logged in: full navigation -->
+    <nav v-else aria-label="Tab navigation">
+      <BottomNav
+        :items="navItems"
+        @item-click="handleItemClick"
+      />
+    </nav>
+  </div>
 </template>

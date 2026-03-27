@@ -24,7 +24,7 @@ defineEmits<{
 </script>
 
 <template>
-  <nav class="flex flex-1 items-center justify-between rounded-full bg-card px-6 py-3 shadow-lg dark:border dark:border-border dark:shadow-none">
+  <nav class="flex flex-1 items-center justify-between rounded-full bg-card px-6 py-3 shadow-[0_2px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.4)]">
     <BottomNavItem
       v-for="(item, i) in items"
       :key="item.id ?? i"

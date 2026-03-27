@@ -27,3 +27,17 @@ export const Follow: Story = {
 export const Mention: Story = {
   args: { notification: createMockNotification('mention') },
 };
+
+export const Unread: Story = {
+  args: {
+    notification: createMockNotification('favourite'),
+    unread: true,
+  },
+};
+
+export const UnreadMention: Story = {
+  args: {
+    notification: createMockNotification('mention'),
+    unread: true,
+  },
+};

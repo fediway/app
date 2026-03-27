@@ -160,7 +160,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
                   <p class="truncate text-base font-bold text-foreground">
                     {{ account.displayName || account.username }}
                   </p>
-                  <p class="truncate text-sm text-foreground/80">
+                  <p class="truncate text-sm text-muted-foreground">
                     @{{ account.acct }}
                   </p>
                 </div>

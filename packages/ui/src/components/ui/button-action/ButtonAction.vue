@@ -34,7 +34,7 @@ function formatCount(n: number): string {
     :aria-pressed="ariaPressed"
     :class="cn(
       'inline-flex items-center gap-[6px]',
-      'cursor-pointer text-gray-500 dark:text-gray-400 transition-colors',
+      'cursor-pointer text-muted-foreground transition-colors',
       'hover:text-foreground',
       'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
       'disabled:cursor-not-allowed disabled:opacity-50',

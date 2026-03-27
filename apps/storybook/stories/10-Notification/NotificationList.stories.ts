@@ -34,3 +34,15 @@ export const Empty: Story = {
 export const Error: Story = {
   args: { notifications: [], error: 'Failed to load notifications' },
 };
+
+export const WithUnreadItems: Story = {
+  args: {
+    notifications: [
+      createMockNotification('favourite', { id: '100' }),
+      createMockNotification('reblog', { id: '99' }),
+      createMockNotification('mention', { id: '98' }),
+      createMockNotification('follow', { id: '50' }),
+    ],
+    lastReadId: '98',
+  },
+};

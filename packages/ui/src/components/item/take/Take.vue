@@ -75,7 +75,7 @@ const emit = defineEmits<{
         </div>
 
         <!-- Time -->
-        <p class="text-sm text-foreground/80">
+        <p class="text-sm text-muted-foreground">
           {{ timeAgo }}
         </p>
 

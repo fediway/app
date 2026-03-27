@@ -108,7 +108,7 @@ const sublabel = computed(() => {
           </template>
           {{ config.label }}
         </TagItem>
-        <span v-if="sublabel" class="text-sm text-foreground/80">
+        <span v-if="sublabel" class="text-sm text-muted-foreground">
           {{ sublabel }}
         </span>
       </div>

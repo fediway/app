@@ -44,7 +44,7 @@ const emit = defineEmits<{
               @click.stop="$emit('profileClick', status.account.acct)"
             />
             <AccountHandle :acct="status.account.acct" class="truncate text-sm" />
-            <span class="text-gray-400 dark:text-gray-500">·</span>
+            <span class="text-muted-foreground">·</span>
             <RelativeTime :datetime="status.createdAt" class="text-sm" />
           </div>
           <RichText

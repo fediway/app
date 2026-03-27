@@ -43,7 +43,7 @@ defineEmits<{
         <h1 class="truncate text-xl font-bold text-foreground">
           {{ title }}
         </h1>
-        <p v-if="subtitle" class="truncate text-sm text-foreground/60">
+        <p v-if="subtitle" class="truncate text-sm text-muted-foreground">
           {{ subtitle }}
         </p>
       </div>

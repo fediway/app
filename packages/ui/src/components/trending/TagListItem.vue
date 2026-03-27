@@ -15,6 +15,6 @@ defineEmits<{
     @click="$emit('click', name)"
   >
     <span class="min-w-0 truncate text-sm font-medium text-foreground">#{{ name }}</span>
-    <span v-if="postCount" class="shrink-0 text-sm text-gray-500 dark:text-gray-400">{{ postCount }}</span>
+    <span v-if="postCount" class="shrink-0 text-sm text-muted-foreground">{{ postCount }}</span>
   </button>
 </template>

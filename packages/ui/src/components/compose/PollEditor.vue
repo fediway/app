@@ -93,7 +93,7 @@ const validCount = computed(() => props.options.filter(o => o.trim().length > 0)
     <button
       v-if="options.length < MAX_OPTIONS"
       type="button"
-      class="mb-4 flex items-center gap-2 text-sm text-foreground transition-colors hover:text-foreground/80"
+      class="mb-4 flex items-center gap-2 text-sm text-foreground transition-colors hover:text-muted-foreground"
       @click="addOption"
     >
       <PhPlus :size="16" />

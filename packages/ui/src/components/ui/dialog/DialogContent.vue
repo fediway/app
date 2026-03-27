@@ -47,7 +47,7 @@ const sizeClasses: Record<string, string> = {
       <!-- Close button -->
       <DialogClose
         v-if="showClose"
-        class="absolute right-4 top-4 rounded-full p-1.5 text-foreground/60 transition-colors hover:bg-muted hover:text-foreground focus:outline-hidden focus:ring-2 focus:ring-ring"
+        class="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-hidden focus:ring-2 focus:ring-ring"
       >
         <PhX :size="18" />
         <span class="sr-only">Close</span>

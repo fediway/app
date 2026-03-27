@@ -85,7 +85,7 @@ const cleanedContent = useCleanContent(
       </div>
 
       <!-- Timestamp + Visibility -->
-      <div class="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-2">
+      <div class="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
         <FullTimestamp :datetime="status.createdAt" />
         <span>·</span>
         <span class="capitalize">{{ status.visibility }}</span>

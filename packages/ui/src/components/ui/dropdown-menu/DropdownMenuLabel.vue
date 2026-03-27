@@ -12,7 +12,7 @@ const props = defineProps<Props>();
 
 <template>
   <DropdownMenuLabel
-    :class="cn('px-4 py-1.5 text-xs font-medium text-foreground/60', props.class)"
+    :class="cn('px-4 py-1.5 text-xs font-medium text-muted-foreground', props.class)"
   >
     <slot />
   </DropdownMenuLabel>

@@ -68,18 +68,18 @@ function clearSearch() {
   <div class="sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:top-[3.25rem]">
     <!-- Search Input -->
     <div class="relative">
-      <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" />
+      <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
       <input
         v-model="search"
         type="text"
         :placeholder="searchPlaceholder"
-        class="w-full rounded-full bg-muted py-2 pl-10 pr-4 text-base text-foreground outline-hidden transition-colors placeholder:text-foreground/40 focus:bg-card focus:ring-2 focus:ring-ring"
+        class="w-full rounded-full bg-muted py-2 pl-10 pr-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted-foreground/70 focus:bg-card focus:ring-2 focus:ring-ring"
         @keydown="handleKeydown"
       >
       <button
         v-if="search"
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground/80"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
         @click="clearSearch"
       >
         <PhX :size="20" />
@@ -97,7 +97,7 @@ function clearSearch() {
         :class="[
           isActiveTab(t)
             ? 'bg-foreground text-background'
-            : 'bg-muted text-foreground/80 hover:bg-muted/80',
+            : 'bg-muted text-muted-foreground hover:bg-muted/80',
         ]"
         @click="handleTabClick(t)"
       >

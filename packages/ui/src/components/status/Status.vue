@@ -118,10 +118,10 @@ function handleStatusClick(event: MouseEvent) {
             <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
               {{ replyParent.account.displayName || replyParent.account.username }}
             </button>
-            <button type="button" class="shrink truncate text-foreground/80 hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
+            <button type="button" class="shrink truncate text-muted-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
               @{{ replyParent.account.acct }}
             </button>
-            <RelativeTime :datetime="replyParent.createdAt" class="ml-auto shrink-0 text-foreground/60" />
+            <RelativeTime :datetime="replyParent.createdAt" class="ml-auto shrink-0 text-muted-foreground" />
           </div>
           <div class="mt-0.5">
             <StatusContent
@@ -145,7 +145,7 @@ function handleStatusClick(event: MouseEvent) {
       <!-- Reblog indicator -->
       <div
         v-if="isReblog && showReblogIndicator && booster"
-        class="flex items-center gap-3 px-4 pt-2 text-sm text-foreground/60"
+        class="flex items-center gap-3 px-4 pt-2 text-sm text-muted-foreground"
       >
         <div class="flex w-11 shrink-0 justify-end">
           <PhArrowsClockwise :size="16" class="text-green" />
@@ -170,10 +170,10 @@ function handleStatusClick(event: MouseEvent) {
             <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
               {{ displayStatus.account.displayName || displayStatus.account.username }}
             </button>
-            <button type="button" class="shrink truncate text-foreground/80 hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
+            <button type="button" class="shrink truncate text-muted-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
               @{{ displayStatus.account.acct }}
             </button>
-            <RelativeTime :datetime="displayStatus.createdAt" class="ml-auto shrink-0 text-foreground/60" />
+            <RelativeTime :datetime="displayStatus.createdAt" class="ml-auto shrink-0 text-muted-foreground" />
           </div>
 
           <!-- Content -->

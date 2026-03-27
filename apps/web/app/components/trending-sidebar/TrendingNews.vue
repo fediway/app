@@ -29,7 +29,7 @@ function handleFaviconError(event: Event) {
   <ClientOnly>
     <Card v-if="!error && topLinks.length > 0" class="rounded-xl border-border shadow-none">
       <CardHeader class="p-4 pb-0">
-        <CardTitle class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <CardTitle class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Trending News
         </CardTitle>
       </CardHeader>
@@ -52,7 +52,7 @@ function handleFaviconError(event: Event) {
                   <div class="line-clamp-2 text-sm leading-snug text-foreground">
                     {{ link.title }}
                   </div>
-                  <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  <div class="mt-0.5 text-xs text-muted-foreground">
                     {{ getDomain(link.url) }}
                   </div>
                 </div>
@@ -64,7 +64,7 @@ function handleFaviconError(event: Event) {
       <CardFooter class="px-4 pb-4">
         <NuxtLink
           to="/explore/news"
-          class="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:text-foreground cursor-pointer"
+          class="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
         >
           See more
         </NuxtLink>
