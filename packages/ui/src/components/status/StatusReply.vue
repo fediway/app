@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted active:bg-muted"
+    class="cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-foreground/[0.03] active:bg-foreground/[0.03]"
     @click="emit('click', status.id)"
   >
     <article class="px-4 py-3">

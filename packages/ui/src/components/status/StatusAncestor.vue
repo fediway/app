@@ -22,7 +22,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="relative cursor-pointer transition-colors hover:bg-muted active:bg-muted"
+    class="relative cursor-pointer transition-colors hover:bg-foreground/[0.03] active:bg-foreground/[0.03]"
     @click="$emit('click', status.id)"
   >
     <ThreadConnector

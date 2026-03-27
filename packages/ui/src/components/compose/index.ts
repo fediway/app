@@ -1,6 +1,18 @@
+export { default as AltTextModal } from './AltTextModal.vue';
 export { default as CharacterCounter } from './CharacterCounter.vue';
+export { default as ComposeTextarea } from './ComposeTextarea.vue';
 export { default as ComposeToolbar } from './ComposeToolbar.vue';
 export { default as ContentWarningToggle } from './ContentWarningToggle.vue';
+export { default as EmojiList } from './EmojiList.vue';
+export type { EmojiSuggestion } from './EmojiList.vue';
+export { default as EmojiPickerButton } from './EmojiPickerButton.vue';
+export { default as HashtagList } from './HashtagList.vue';
+export type { HashtagSuggestion } from './HashtagList.vue';
+export { default as MediaPreviewGrid } from './MediaPreviewGrid.vue';
+export type { MediaItem } from './MediaPreviewGrid.vue';
+export { default as MediaPreviewItem } from './MediaPreviewItem.vue';
+export { default as MentionList } from './MentionList.vue';
+export type { MentionSuggestion } from './MentionList.vue';
 export { default as PollEditor } from './PollEditor.vue';
 export { default as ReplyContext } from './ReplyContext.vue';
 export { default as VisibilitySelector } from './VisibilitySelector.vue';

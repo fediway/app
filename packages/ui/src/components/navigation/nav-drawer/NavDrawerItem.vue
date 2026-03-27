@@ -15,7 +15,7 @@ defineEmits<{ click: [] }>();
 <template>
   <button
     type="button"
-    class="flex w-full items-center gap-4 rounded-lg border-none bg-transparent px-4 py-3.5 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    class="flex w-full items-center gap-4 rounded-full border-none bg-transparent px-4 py-3.5 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     :class="[
       active
         ? 'font-bold text-foreground'

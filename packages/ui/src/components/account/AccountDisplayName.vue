@@ -30,7 +30,7 @@ const processedName = computed(() => {
     const pattern = new RegExp(`:${escapeRegExp(emoji.shortcode)}:`, 'g');
     html = html.replace(
       pattern,
-      `<img loading="lazy" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-4 w-4 align-text-bottom" draggable="false" />`,
+      `<img loading="lazy" decoding="async" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-4 w-4 align-text-bottom" draggable="false" />`,
     );
   }
 

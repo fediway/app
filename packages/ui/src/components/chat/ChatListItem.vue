@@ -57,7 +57,7 @@ function getMessageText(conversation: Conversation): string {
 
 <template>
   <button
-    class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
+    class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/[0.03]"
     @click="$emit('click', conversation.id)"
   >
     <AvatarStack

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PhArrowLeft } from '@phosphor-icons/vue';
-import profileHeaderPlaceholder from '../../assets/profile-header-placeholder.svg?url';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { Avatar } from '../ui/avatar';
 import { Badge } from '../ui/badge';
@@ -24,30 +23,19 @@ defineEmits<{ back: [] }>();
 
 <template>
   <div class="relative">
-    <!-- Header Banner -->
-    <div class="relative w-full h-[157px] overflow-hidden bg-border">
-      <!-- Custom header image -->
+    <!-- Header Banner — gradient fallback always behind, image covers when loaded -->
+    <div
+      class="relative w-full h-[157px] overflow-hidden bg-muted"
+      style="background-image: linear-gradient(138deg, rgba(53, 13, 255, 0.056) 15%, rgba(168, 0, 253, 0.07) 35%, rgba(191, 128, 255, 0.063) 69%, rgba(255, 255, 255, 0.07) 92%);"
+    >
       <img
         v-if="headerImage"
         v-fade-on-load
         :src="headerImage"
         alt="Profile header"
+        decoding="async"
         class="w-full h-full object-cover"
       >
-
-      <!-- Placeholder: decorative blob overlay -->
-      <div
-        v-else
-        class="absolute left-[48px] top-[-103px] w-[308px] h-[328px]"
-      >
-        <img
-          :src="profileHeaderPlaceholder"
-          alt=""
-          aria-hidden="true"
-          class="absolute block max-w-none"
-          style="top: -13.89%; right: -14.8%; bottom: -13.89%; left: -14.8%;"
-        >
-      </div>
     </div>
 
     <!-- Back Button -->

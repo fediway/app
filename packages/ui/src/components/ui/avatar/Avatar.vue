@@ -32,6 +32,7 @@ const sizeClasses = {
       v-if="src"
       :src="src"
       :alt="alt"
+      decoding="async"
       class="w-full h-full object-cover"
     >
   </div>

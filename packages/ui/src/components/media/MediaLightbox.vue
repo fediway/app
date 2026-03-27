@@ -306,6 +306,7 @@ onUnmounted(() => {
               transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
             }"
             draggable="false"
+            decoding="async"
           >
 
           <!-- Video -->

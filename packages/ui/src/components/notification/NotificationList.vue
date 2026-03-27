@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
+import { PhCircleNotch } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { useInfiniteScroll } from '../../composables/useInfiniteScroll';
 import { EmptyState } from '../ui/empty-state';
@@ -85,7 +86,7 @@ const { sentinelRef } = useInfiniteScroll({
 
   <!-- Loading more spinner -->
   <div v-if="loadingMore" class="flex justify-center py-4">
-    <div class="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
+    <PhCircleNotch :size="20" class="animate-spin text-muted-foreground" />
   </div>
 
   <!-- Infinite scroll sentinel -->

@@ -2,10 +2,19 @@
 import { PhChartBar, PhImage } from '@phosphor-icons/vue';
 import ContentWarningToggle from './ContentWarningToggle.vue';
 
-defineProps<{
+interface Props {
   showContentWarning: boolean;
   showPoll: boolean;
-}>();
+  /** Disable poll button (when media is attached) */
+  disablePoll?: boolean;
+  /** Disable media button (when poll is active or at max) */
+  disableMedia?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  disablePoll: false,
+  disableMedia: false,
+});
 
 defineEmits<{
   'update:showContentWarning': [value: boolean];
@@ -27,8 +36,11 @@ defineEmits<{
       :class="[
         showPoll
           ? 'bg-primary text-primary-foreground'
-          : 'bg-muted text-foreground hover:bg-accent',
+          : disablePoll
+            ? 'bg-muted text-muted-foreground opacity-50 cursor-not-allowed'
+            : 'bg-muted text-foreground hover:bg-accent',
       ]"
+      :disabled="disablePoll && !showPoll"
       @click="$emit('togglePoll')"
     >
       <PhChartBar :size="16" />
@@ -37,7 +49,13 @@ defineEmits<{
 
     <button
       type="button"
-      class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm bg-muted text-foreground hover:bg-accent transition-colors"
+      class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors"
+      :class="[
+        disableMedia
+          ? 'bg-muted text-muted-foreground opacity-50 cursor-not-allowed'
+          : 'bg-muted text-foreground hover:bg-accent',
+      ]"
+      :disabled="disableMedia"
       @click="$emit('addMedia')"
     >
       <PhImage :size="16" />

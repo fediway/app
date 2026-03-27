@@ -165,7 +165,7 @@ describe('useNavigationStore', () => {
         'home',
         'search',
         'new-post',
-        'notifications',
+        'messages',
         'profile',
       ]);
     });

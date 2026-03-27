@@ -43,7 +43,8 @@ watch(accounts, (accts) => {
         <div
           v-for="account in accounts"
           :key="account.id"
-          class="px-4 py-3 transition-colors hover:bg-muted"
+          class="cursor-pointer px-4 py-3 transition-colors hover:bg-foreground/[0.03]"
+          @click="navigateTo(getProfilePath(account.acct))"
         >
           <div class="flex items-center justify-between gap-3">
             <AccountCard

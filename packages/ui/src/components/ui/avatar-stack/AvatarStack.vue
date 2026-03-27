@@ -42,6 +42,7 @@ const overflowCount = computed(() => Math.max(0, props.avatars.length - props.ma
           v-if="avatar.src"
           :src="avatar.src"
           :alt="avatar.alt ?? ''"
+          decoding="async"
           class="size-full object-cover"
         >
         <span

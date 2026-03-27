@@ -31,6 +31,8 @@ interface Props {
   hideActions?: boolean;
   /** Whether the user is authenticated (mutes actions when false) */
   authenticated?: boolean;
+  /** Whether the current user authored this post */
+  isOwnPost?: boolean;
   class?: string;
 }
 
@@ -43,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
   showSeparator: true,
   hideActions: false,
   authenticated: true,
+  isOwnPost: false,
 });
 
 const emit = defineEmits<{
@@ -53,6 +56,7 @@ const emit = defineEmits<{
   share: [statusId: string];
   sendMessage: [status: StatusType];
   copyLink: [statusId: string];
+  delete: [statusId: string];
   mute: [accountId: string];
   block: [accountId: string];
   blockDomain: [domain: string];
@@ -103,7 +107,7 @@ function handleStatusClick(event: MouseEvent) {
     <!-- Reply parent context -->
     <article
       v-if="replyParent"
-      class="contain-layout-style-paint cursor-pointer transition-colors hover:bg-muted/50"
+      class="contain-layout-style-paint content-visibility-auto cursor-pointer transition-colors hover:bg-foreground/[0.03]"
       @click="emit('statusClick', replyParent.id)"
     >
       <div class="flex gap-3 px-4 pt-3 pb-0">
@@ -139,7 +143,7 @@ function handleStatusClick(event: MouseEvent) {
 
     <!-- Main status -->
     <article
-      :class="cn('contain-layout-style-paint cursor-pointer transition-colors hover:bg-muted/50', props.class)"
+      :class="cn('contain-layout-style-paint content-visibility-auto cursor-pointer transition-colors hover:bg-foreground/[0.03]', props.class)"
       @click="handleStatusClick"
     >
       <!-- Reblog indicator -->
@@ -234,6 +238,7 @@ function handleStatusClick(event: MouseEvent) {
             :bookmarked="displayStatus.bookmarked ?? false"
             :visibility="displayStatus.visibility"
             :authenticated="authenticated"
+            :is-own-post="isOwnPost"
             @reply="emit('reply', displayStatus.id)"
             @reblog="emit('reblog', displayStatus.id)"
             @favourite="emit('favourite', displayStatus.id)"
@@ -241,6 +246,7 @@ function handleStatusClick(event: MouseEvent) {
             @share="emit('share', displayStatus.id)"
             @send-message="emit('sendMessage', displayStatus)"
             @copy-link="emit('copyLink', displayStatus.id)"
+            @delete="emit('delete', displayStatus.id)"
             @mute="emit('mute', displayStatus.account.id)"
             @block="emit('block', displayStatus.account.id)"
             @block-domain="emit('blockDomain', getDomain(displayStatus.account.acct))"

@@ -90,6 +90,7 @@ const sublabel = computed(() => {
       :alt="item.title"
       class="min-h-12 w-12 shrink-0 rounded-sm border border-border bg-muted object-cover" :class="[config.aspect]"
       loading="lazy"
+      decoding="async"
     >
     <div
       v-else

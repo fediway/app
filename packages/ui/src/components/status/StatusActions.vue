@@ -11,6 +11,7 @@ import {
   PhPaperPlaneRight,
   PhProhibit,
   PhSpeakerSlash,
+  PhTrash,
 } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { cn } from '../../lib/utils';
@@ -34,6 +35,8 @@ interface Props {
   visibility?: 'public' | 'unlisted' | 'private' | 'direct';
   /** When false, action buttons render muted (logged-out state) */
   authenticated?: boolean;
+  /** Whether the current user authored this post */
+  isOwnPost?: boolean;
   class?: HTMLAttributes['class'];
 }
 
@@ -46,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
   bookmarked: false,
   visibility: 'public',
   authenticated: true,
+  isOwnPost: false,
 });
 
 const emit = defineEmits<{
@@ -56,6 +60,7 @@ const emit = defineEmits<{
   share: [];
   copyLink: [];
   sendMessage: [];
+  delete: [];
   mute: [];
   block: [];
   report: [];
@@ -136,27 +141,37 @@ const canReblog = computed(() =>
             Send as message
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+          <!-- Own post actions -->
+          <template v-if="isOwnPost">
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive @select="emit('delete')">
+              <PhTrash :size="16" />
+              Delete post
+            </DropdownMenuItem>
+          </template>
 
-          <DropdownMenuItem @select="emit('mute')">
-            <PhSpeakerSlash :size="16" class="text-muted-foreground" />
-            Mute user
-          </DropdownMenuItem>
-          <DropdownMenuItem @select="emit('block')">
-            <PhProhibit :size="16" class="text-muted-foreground" />
-            Block user
-          </DropdownMenuItem>
-          <DropdownMenuItem @select="emit('blockDomain')">
-            <PhProhibit :size="16" class="text-muted-foreground" />
-            Block domain
-          </DropdownMenuItem>
+          <!-- Other user actions -->
+          <template v-else>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem @select="emit('mute')">
+              <PhSpeakerSlash :size="16" class="text-muted-foreground" />
+              Mute user
+            </DropdownMenuItem>
+            <DropdownMenuItem @select="emit('block')">
+              <PhProhibit :size="16" class="text-muted-foreground" />
+              Block user
+            </DropdownMenuItem>
+            <DropdownMenuItem @select="emit('blockDomain')">
+              <PhProhibit :size="16" class="text-muted-foreground" />
+              Block domain
+            </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem destructive @select="emit('report')">
-            <PhFlag :size="16" />
-            Report
-          </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive @select="emit('report')">
+              <PhFlag :size="16" />
+              Report
+            </DropdownMenuItem>
+          </template>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

@@ -27,10 +27,31 @@ function handleLeftClick() {
   >
     <AppBar
       :title="!navigation.pageImage ? navigation.pageTitle : undefined"
-      :left-icon="canGoBack ? 'back' : 'menu'"
+      :left-icon="canGoBack ? 'back' : undefined"
       :left-label="canGoBack ? 'Go back' : 'Open menu'"
+      :bordered="false"
       @left-click="handleLeftClick"
     >
+      <!-- Leading: user avatar (top-level) or back arrow (sub-page) -->
+      <template v-if="!canGoBack" #leading>
+        <button
+          type="button"
+          class="cursor-pointer"
+          aria-label="Open menu"
+          @click="navigation.openSidebar()"
+        >
+          <img
+            v-if="navigation.currentUser?.avatar"
+            :src="navigation.currentUser.avatar"
+            :alt="navigation.currentUser.name"
+            class="size-8 rounded-full object-cover"
+          >
+          <span v-else class="flex size-8 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
+            ?
+          </span>
+        </button>
+      </template>
+
       <!-- Rich title with avatar (for conversation, profile, etc.) -->
       <template v-if="navigation.pageImage" #title>
         <div class="flex min-w-0 items-center justify-center gap-2.5">

@@ -23,19 +23,20 @@ function getDomain(url: string): string {
     :href="card.url"
     target="_blank"
     rel="noopener noreferrer"
-    class="block border border-border rounded-xl overflow-hidden hover:bg-muted transition-colors"
+    class="block border border-border rounded-xl overflow-hidden hover:bg-foreground/[0.03] transition-colors"
     @click.stop
   >
     <!-- Card with image -->
     <template v-if="card.image">
       <!-- Large image layout (for link type with big image) -->
       <div v-if="card.type === 'link'" class="flex flex-col">
-        <div class="aspect-[1.91/1] bg-muted overflow-hidden">
+        <div class="aspect-[1.91/1] bg-muted overflow-hidden" style="background-image: linear-gradient(138deg, rgba(53, 13, 255, 0.056) 15%, rgba(168, 0, 253, 0.07) 35%, rgba(191, 128, 255, 0.063) 69%, rgba(255, 255, 255, 0.07) 92%)">
           <img
             v-fade-on-load
             :src="card.image"
             :alt="card.title || ''"
             loading="lazy"
+            decoding="async"
             class="w-full h-full object-cover"
           >
         </div>
@@ -52,12 +53,13 @@ function getDomain(url: string): string {
 
       <!-- Compact layout (for video/rich embeds) -->
       <div v-else class="flex">
-        <div class="w-32 h-32 shrink-0 bg-muted overflow-hidden">
+        <div class="w-32 h-32 shrink-0 bg-muted overflow-hidden" style="background-image: linear-gradient(138deg, rgba(53, 13, 255, 0.056) 15%, rgba(168, 0, 253, 0.07) 35%, rgba(191, 128, 255, 0.063) 69%, rgba(255, 255, 255, 0.07) 92%)">
           <img
             v-fade-on-load
             :src="card.image"
             :alt="card.title || ''"
             loading="lazy"
+            decoding="async"
             class="w-full h-full object-cover"
           >
         </div>

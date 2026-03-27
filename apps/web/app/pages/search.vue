@@ -15,7 +15,7 @@ import { ref, shallowRef, watch, watchEffect } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-definePageMeta({});
+definePageMeta({ keepalive: true });
 
 const route = useRoute();
 const router = useRouter();

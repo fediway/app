@@ -4,12 +4,12 @@
 <template>
   <div class="flex flex-col">
     <!-- Profile section -->
-    <div v-if="$slots.profile" class="mb-2">
+    <div v-if="$slots.profile" class="px-2">
       <slot name="profile" />
     </div>
 
     <!-- Primary action (e.g., "New Post" button) -->
-    <div v-if="$slots.action" class="mb-4 px-4">
+    <div v-if="$slots.action" class="my-3 px-4">
       <slot name="action" />
     </div>
 

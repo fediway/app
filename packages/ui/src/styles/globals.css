@@ -309,103 +309,104 @@
   --interactive-text:      oklch(0.78  0.035 280);
   --interactive-text-dark: oklch(0.90  0.025 280);
 
-  /* ── shadcn Semantic Tokens — Light Mode ─────────────────────────── */
-  --background:             oklch(0.975 0.006 90);  /* surface-base */
-  --foreground:             oklch(0.27  0.025 260);
-  --card:                   oklch(1.00  0     0);    /* white */
-  --card-foreground:        oklch(0.27  0.025 260);
+  /* ── shadcn Semantic Tokens — Light Mode (v6) ────────────────────── */
+  --background:             oklch(1.00  0     0);      /* white — flat canvas */
+  --foreground:             oklch(0.287 0.025 258);    /* #232B37 navy */
+  --card:                   oklch(1.00  0     0);      /* same as background */
+  --card-foreground:        oklch(0.287 0.025 258);
   --popover:                oklch(1.00  0     0);
-  --popover-foreground:     oklch(0.27  0.025 260);
+  --popover-foreground:     oklch(0.287 0.025 258);
 
-  --primary:                oklch(0.287 0.025 258);  /* #232B37 */
+  --primary:                oklch(0.287 0.025 258);    /* #232B37 — the "do" button */
   --primary-foreground:     oklch(1.00  0     0);
 
-  --secondary:              #DBDDFF;                  /* design team lavender */
-  --secondary-foreground:   oklch(0.287 0.025 258);   /* navy */
+  --secondary:              oklch(0.907 0.046 283);    /* #DBDDFF — design team */
+  --secondary-foreground:   oklch(0.287 0.025 258);
 
-  --muted:                  oklch(0.963 0.014 88);   /* #F7F3E9 */
-  --muted-foreground:       oklch(0.64  0.008 10);
+  --muted:                  oklch(0.963 0.014 88);     /* #F7F3E9 — design team */
+  --muted-foreground:       oklch(0.54  0.010 345);    /* v6: gray-600 for contrast */
 
-  --accent:                 oklch(0.94  0.018 87);   /* surface-sunken */
-  --accent-foreground:      oklch(0.27  0.025 260);
+  --accent:                 oklch(0.95  0.030 280);    /* v6: lavender tint (distinct from muted) */
+  --accent-foreground:      oklch(0.287 0.025 258);
 
-  --destructive:            oklch(0.55  0.192 20);   /* red-600 */
+  --destructive:            oklch(0.55  0.192 20);
   --destructive-foreground: oklch(1.00  0     0);
 
-  --border:                 oklch(0.87  0.014 70);
-  --input:                  oklch(0.87  0.014 70);
-  --ring:                   oklch(0.44  0.065 280);  /* interactive */
+  --border:                 oklch(0.91  0.012 75);     /* v6: subtler on white */
+  --input:                  oklch(0.91  0.012 75);
+  --ring:                   oklch(0.44  0.065 280);
   --radius: 0.5rem;
 
   /* Semantic action colors */
-  --red:             oklch(0.64  0.188 21);   /* red-500 — action icons */
-  --red-foreground:  oklch(0.45  0.160 19);   /* red-700 */
-  --red-background:  oklch(0.975 0.012 25);   /* red-50 */
+  --red:             oklch(0.64  0.188 21);
+  --red-foreground:  oklch(0.45  0.160 19);
+  --red-background:  oklch(0.975 0.012 25);
 
-  --blue:             oklch(0.55  0.145 253);  /* galaxy-600 */
-  --blue-foreground:  oklch(0.45  0.125 252);  /* galaxy-700 */
-  --blue-background:  oklch(0.975 0.012 258);  /* galaxy-50 */
+  --blue:             oklch(0.55  0.145 253);
+  --blue-foreground:  oklch(0.45  0.125 252);
+  --blue-background:  oklch(0.975 0.012 258);
 
-  --green:             oklch(0.66  0.172 154);  /* emerald-500 */
-  --green-foreground:  oklch(0.45  0.140 152);  /* emerald-700 */
-  --green-background:  oklch(0.975 0.016 160);  /* emerald-50 */
+  --green:             oklch(0.66  0.172 154);
+  --green-foreground:  oklch(0.45  0.140 152);
+  --green-background:  oklch(0.975 0.016 160);
 
-  --yellow:             oklch(0.76  0.155 87);   /* gold-400 */
-  --yellow-foreground:  oklch(0.50  0.098 80);   /* gold-700 */
-  --yellow-background:  oklch(0.975 0.014 93);   /* gold-50 */
+  --yellow:             oklch(0.76  0.155 87);
+  --yellow-foreground:  oklch(0.50  0.098 80);
+  --yellow-background:  oklch(0.975 0.014 93);
 
-  --gray:             oklch(0.54  0.010 345);  /* gray-600 */
-  --gray-foreground:  oklch(0.27  0.025 260);
-  --gray-background:  oklch(0.94  0.018 87);   /* surface-sunken */
+  --gray:             oklch(0.54  0.010 345);
+  --gray-foreground:  oklch(0.287 0.025 258);
+  --gray-background:  oklch(0.963 0.014 88);
 }
 
 .dark {
-  --background:             oklch(0.19  0.022 255);  /* deep space */
+  /* ── Dark Mode Semantic Tokens (v6) ─────────────────────────────── */
+  --background:             oklch(0.287 0.025 258);    /* #232B37 — flat canvas */
   --foreground:             oklch(0.95  0.008 85);
-  --card:                   oklch(0.23  0.025 258);  /* dark-raised */
+  --card:                   oklch(0.287 0.025 258);    /* same as background */
   --card-foreground:        oklch(0.95  0.008 85);
-  --popover:                oklch(0.27  0.030 262);  /* dark-overlay */
+  --popover:                oklch(0.341 0.038 274);    /* v6: same as muted for float */
   --popover-foreground:     oklch(0.95  0.008 85);
 
-  --primary:                oklch(0.95  0.008 85);   /* cream */
-  --primary-foreground:     oklch(0.19  0.022 255);
+  --primary:                oklch(0.95  0.008 85);     /* cream — inverted */
+  --primary-foreground:     oklch(0.287 0.025 258);
 
-  --secondary:              #484A6C;                  /* design team dark indigo */
-  --secondary-foreground:   oklch(0.95  0.008 85);   /* cream */
+  --secondary:              oklch(0.422 0.056 281);    /* #484A6C — design team */
+  --secondary-foreground:   oklch(0.95  0.008 85);
 
-  --muted:                  oklch(0.27  0.030 262);  /* dark-overlay */
-  --muted-foreground:       var(--gray-400);             /* warm gray, readable in dark */
+  --muted:                  oklch(0.341 0.038 274);    /* #32374C — design team */
+  --muted-foreground:       oklch(0.74  0.010 30);     /* gray-400 */
 
-  --accent:                 oklch(0.31  0.032 265);  /* dark-elevated */
+  --accent:                 oklch(0.36  0.045 280);    /* v6: dark lavender tint */
   --accent-foreground:      oklch(0.95  0.008 85);
 
-  --destructive:            oklch(0.55  0.192 20);   /* red-600 */
+  --destructive:            oklch(0.55  0.192 20);
   --destructive-foreground: oklch(1.00  0     0);
 
-  --border:                 oklch(0.33  0.028 265);
-  --input:                  oklch(0.33  0.028 265);
-  --ring:                   oklch(0.65  0.045 280);  /* interactive lighter */
+  --border:                 oklch(0.366 0.043 282);    /* #3B3C55 — design team */
+  --input:                  oklch(0.366 0.043 282);
+  --ring:                   oklch(0.65  0.045 280);
 
-  /* Semantic action colors — dark mode */
-  --red:             oklch(0.74  0.158 22);
-  --red-foreground:  oklch(0.82  0.115 22);
+  /* Semantic action colors — dark mode (v6: reduced chroma) */
+  --red:             oklch(0.74  0.148 22);
+  --red-foreground:  oklch(0.82  0.110 22);
   --red-background:  oklch(0.20  0.045 16);
 
-  --blue:             oklch(0.74  0.125 255);  /* galaxy-400 */
-  --blue-foreground:  oklch(0.82  0.095 255);
+  --blue:             oklch(0.74  0.115 255);
+  --blue-foreground:  oklch(0.82  0.090 255);
   --blue-background:  oklch(0.20  0.038 249);
 
-  --green:             oklch(0.74  0.162 155);  /* emerald-400 */
-  --green-foreground:  oklch(0.82  0.120 156);
+  --green:             oklch(0.74  0.150 155);
+  --green-foreground:  oklch(0.82  0.115 156);
   --green-background:  oklch(0.20  0.040 149);
 
-  --yellow:             oklch(0.76  0.155 87);
-  --yellow-foreground:  oklch(0.82  0.122 88);
+  --yellow:             oklch(0.74  0.130 87);         /* v6: chroma 0.155→0.130 */
+  --yellow-foreground:  oklch(0.80  0.105 88);
   --yellow-background:  oklch(0.22  0.026 74);
 
   --gray:             oklch(0.54  0.010 345);
   --gray-foreground:  oklch(0.95  0.008 85);
-  --gray-background:  oklch(0.23  0.025 258);
+  --gray-background:  oklch(0.341 0.038 274);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -424,4 +425,10 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
+}
+
+/* Performance: skip rendering for off-screen feed items */
+@utility content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
 }

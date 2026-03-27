@@ -20,7 +20,7 @@ defineEmits<{
 
 <template>
   <div
-    class="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted cursor-pointer"
+    class="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-foreground/[0.03] cursor-pointer"
     @click="$emit('profileClick', account.acct)"
   >
     <AccountCard

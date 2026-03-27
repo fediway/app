@@ -27,7 +27,7 @@ function handleFaviconError(event: Event) {
 
 <template>
   <ClientOnly>
-    <Card v-if="!error && topLinks.length > 0" class="rounded-xl border-border shadow-none">
+    <Card v-if="!error && topLinks.length > 0" class="rounded-2xl border-border shadow-none">
       <CardHeader class="p-4 pb-0">
         <CardTitle class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Trending News

@@ -224,6 +224,17 @@ export function createMockClient(): MastoClient {
   // Only implements the ~20 methods the app actually calls
   const rest = {
     v1: {
+      customEmojis: {
+        async list() {
+          await delay();
+          return [
+            { shortcode: 'fediway', url: '/images/app-icon-transparent.svg', staticUrl: '/images/app-icon-transparent.svg', visibleInPicker: true, category: 'Fediway' },
+            { shortcode: 'blobcat', url: 'https://cdn.mastodon.social/emoji/blobcat.png', staticUrl: 'https://cdn.mastodon.social/emoji/blobcat.png', visibleInPicker: true, category: 'Blobs' },
+            { shortcode: 'blobfox', url: 'https://cdn.mastodon.social/emoji/blobfox.png', staticUrl: 'https://cdn.mastodon.social/emoji/blobfox.png', visibleInPicker: true, category: 'Blobs' },
+            { shortcode: 'verified', url: 'https://cdn.mastodon.social/emoji/verified.png', staticUrl: 'https://cdn.mastodon.social/emoji/verified.png', visibleInPicker: true, category: 'Status' },
+          ];
+        },
+      },
       timelines: {
         home: {
           async list(params?: { limit?: number; maxId?: string; sinceId?: string }) {
@@ -641,6 +652,19 @@ export function createMockClient(): MastoClient {
             accounts: searchAccounts(params.q),
             statuses: searchStatuses(params.q),
             hashtags: searchTags(params.q),
+          };
+        },
+      },
+      media: {
+        async create(params: { file: Blob | string; description?: string | null }) {
+          await delay();
+          return {
+            id: `media-${Date.now()}`,
+            type: 'image',
+            url: typeof params.file === 'string' ? params.file : URL.createObjectURL(params.file as Blob),
+            previewUrl: typeof params.file === 'string' ? params.file : URL.createObjectURL(params.file as Blob),
+            description: params.description ?? null,
+            meta: {},
           };
         },
       },

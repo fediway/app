@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status as StatusType } from '@repo/types';
+import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { computed } from 'vue';
 import { useInfiniteScroll } from '../../composables/useInfiniteScroll';
@@ -117,12 +118,12 @@ function getReplyParent(status: StatusType): StatusType | null {
 
     <!-- Initial loading indicator -->
     <div v-if="loading" class="flex justify-center py-8">
-      <div class="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
+      <PhCircleNotch :size="24" class="animate-spin text-muted-foreground" />
     </div>
 
     <!-- Loading more spinner (bottom of list) -->
     <div v-if="loadingMore" class="flex justify-center py-4">
-      <div class="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
+      <PhCircleNotch :size="20" class="animate-spin text-muted-foreground" />
     </div>
 
     <!-- Infinite scroll sentinel (invisible, observed by IntersectionObserver) -->

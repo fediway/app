@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import type { MediaAttachment } from '@repo/types';
-import { computed, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { blurhashStyle } from '../../utils/blurhash';
-import MediaCarousel from './MediaCarousel.vue';
-
-interface Props {
-  attachments: MediaAttachment[];
-  sensitive?: boolean;
-  /** Maximum number of items in grid before switching to carousel */
-  maxGridItems?: number;
-  /** Force carousel mode regardless of count */
-  forceCarousel?: boolean;
-}
 
 const props = withDefaults(defineProps<Props>(), {
   sensitive: false,
@@ -23,6 +13,17 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   mediaClick: [attachment: MediaAttachment, index: number];
 }>();
+
+const MediaCarousel = defineAsyncComponent(() => import('./MediaCarousel.vue'));
+
+interface Props {
+  attachments: MediaAttachment[];
+  sensitive?: boolean;
+  /** Maximum number of items in grid before switching to carousel */
+  maxGridItems?: number;
+  /** Force carousel mode regardless of count */
+  forceCarousel?: boolean;
+}
 
 const revealed = ref(!props.sensitive);
 
@@ -211,6 +212,7 @@ function toggleReveal() {
             class="w-full h-full object-cover"
             :style="focalPointStyle(attachment)"
             loading="lazy"
+            decoding="async"
           >
 
           <!-- Video thumbnail -->
@@ -225,6 +227,7 @@ function toggleReveal() {
               class="w-full h-full object-cover"
               :style="focalPointStyle(attachment)"
               loading="lazy"
+              decoding="async"
             >
             <div class="absolute inset-0 flex items-center justify-center">
               <div class="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
@@ -247,6 +250,7 @@ function toggleReveal() {
               class="w-full h-full object-cover"
               :style="focalPointStyle(attachment)"
               loading="lazy"
+              decoding="async"
             >
             <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded">
               GIF

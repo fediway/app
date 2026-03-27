@@ -3,7 +3,7 @@ import { useNotificationMarker } from '@repo/api';
 import { PageHeader, TabBar } from '@repo/ui';
 import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
-definePageMeta({});
+definePageMeta({ keepalive: true });
 
 const { markAsRead } = useNotificationMarker();
 

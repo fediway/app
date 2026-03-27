@@ -117,6 +117,7 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
               class="w-full h-full object-cover"
               :style="focalPointStyle(attachment)"
               loading="lazy"
+              decoding="async"
             >
 
             <!-- Video -->
@@ -131,6 +132,7 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
                 class="w-full h-full object-cover"
                 :style="focalPointStyle(attachment)"
                 loading="lazy"
+                decoding="async"
               >
               <div class="absolute inset-0 flex items-center justify-center">
                 <div class="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">

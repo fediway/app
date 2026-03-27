@@ -12,7 +12,7 @@ function handleSearch() {
 </script>
 
 <template>
-  <InputGroup class="rounded-xl border-border bg-card py-0.5">
+  <InputGroup class="rounded-full border-border bg-card py-0.5">
     <InputGroupAddon>
       <NavIcon name="search" :size="18" class="text-muted-foreground/70" />
     </InputGroupAddon>

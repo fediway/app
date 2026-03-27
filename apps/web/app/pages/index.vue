@@ -1,22 +1,28 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
+import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useAuth, useTimeline } from '@repo/api';
-import { Button, EmptyState, Skeleton, Status as StatusComponent, useInfiniteScroll } from '@repo/ui';
+import { Button, EmptyState, Skeleton, Status as StatusComponent, useInfiniteScroll, usePullToRefresh } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-definePageMeta({});
+definePageMeta({ keepalive: true });
 
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, withStoreState, store, isAuthenticated: isAuthed } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleDelete, withStoreState, store, isAuthenticated: isAuthed } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
 const { requireAuth } = useAuthGate();
-const { isAuthenticated } = useAuth();
+const { isAuthenticated, currentUser } = useAuth();
+
+function isOwnPost(status: Status): boolean {
+  const acct = status.reblog?.account.id ?? status.account.id;
+  return !!currentUser.value && currentUser.value.id === acct;
+}
 
 // Authenticated → home timeline, unauthenticated → trending statuses
 const timeline = isAuthenticated.value ? useTimeline({ type: 'home', cache: true }) : null;
@@ -110,10 +116,35 @@ if (timeline) {
   timeline.fetch();
 }
 
+// Pull-to-refresh — only on touch devices, only for authenticated timeline
+const pullContainerRef = ref<HTMLElement>();
+const { isRefreshing, pullDistance, threshold, bind: bindPull } = usePullToRefresh(async () => {
+  if (timeline) {
+    await timeline.refresh();
+  }
+  else {
+    trending?.refetch();
+  }
+});
+
 onMounted(() => {
   if (timeline) {
     timeline.startPolling(30_000);
   }
+  if (pullContainerRef.value) {
+    bindPull(pullContainerRef.value);
+  }
+});
+
+// KeepAlive lifecycle — pause/resume polling when tab switches
+onActivated(() => {
+  if (timeline) {
+    timeline.startPolling(30_000);
+  }
+});
+
+onDeactivated(() => {
+  timeline?.stopPolling();
 });
 
 onUnmounted(() => {
@@ -122,7 +153,22 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="w-full">
+  <section ref="pullContainerRef" class="w-full">
+    <!-- Pull-to-refresh indicator -->
+    <div
+      v-if="pullDistance > 0 || isRefreshing"
+      class="flex items-center justify-center overflow-hidden text-sm text-muted-foreground transition-[height]"
+      :style="{ height: isRefreshing ? '48px' : `${pullDistance}px` }"
+    >
+      <span v-if="isRefreshing" class="flex items-center gap-2">
+        <PhCircleNotch :size="16" class="animate-spin" />
+        Refreshing
+      </span>
+      <span v-else>
+        {{ pullDistance >= threshold ? 'Release to refresh' : 'Pull to refresh' }}
+      </span>
+    </div>
+
     <ClientOnly>
       <div>
         <!-- Loading skeleton -->
@@ -175,13 +221,15 @@ onUnmounted(() => {
           :status="status"
           :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
-          :authenticated="isAuthed.value"
+          :authenticated="isAuthed"
+          :is-own-post="isOwnPost(status)"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
           @copy-link="handleCopyLink"
+          @delete="handleDelete"
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
@@ -196,13 +244,15 @@ onUnmounted(() => {
           :status="status"
           :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
-          :authenticated="isAuthed.value"
+          :authenticated="isAuthed"
+          :is-own-post="isOwnPost(status)"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
           @copy-link="handleCopyLink"
+          @delete="handleDelete"
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
@@ -212,7 +262,7 @@ onUnmounted(() => {
 
         <!-- Loading more spinner -->
         <div v-if="isLoadingMore" class="flex justify-center py-4">
-          <div class="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
+          <PhCircleNotch :size="20" class="animate-spin text-muted-foreground" />
         </div>
 
         <!-- Infinite scroll sentinel -->

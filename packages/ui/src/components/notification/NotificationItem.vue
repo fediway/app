@@ -44,8 +44,8 @@ function getText(type: string): string {
 
 <template>
   <button
-    class="flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
-    :class="unread ? 'bg-galaxy-500/5' : ''"
+    class="flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/[0.03]"
+    :class="unread ? 'bg-muted' : ''"
     @click="$emit('click', notification)"
   >
     <!-- Type icon -->
@@ -77,7 +77,7 @@ function getText(type: string): string {
       </div>
 
       <!-- Status preview -->
-      <div v-if="notification.status" class="mt-2 rounded-lg bg-muted p-3">
+      <div v-if="notification.status" class="mt-2 rounded-lg border border-border p-3">
         <StatusContent
           :content="notification.status.content"
           :spoiler-text="notification.status.spoilerText"

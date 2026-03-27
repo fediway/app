@@ -22,3 +22,11 @@ export const CWActive: Story = {
 export const PollActive: Story = {
   args: { showContentWarning: false, showPoll: true },
 };
+
+export const MediaDisabled: Story = {
+  args: { showContentWarning: false, showPoll: false, disableMedia: true },
+};
+
+export const PollDisabled: Story = {
+  args: { showContentWarning: false, showPoll: false, disablePoll: true },
+};

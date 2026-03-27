@@ -30,6 +30,7 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
       multiple?: boolean;
     };
     mediaIds?: string[];
+    idempotencyKey?: string;
   }): Status {
     const tempId = `temp-${nextId++}`;
     const { currentUser } = useAuth();
@@ -106,7 +107,10 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
         if (opts.mediaIds) {
           createParams.mediaIds = opts.mediaIds;
         }
-        const created = await client.rest.v1.statuses.create(createParams as any);
+        const meta = opts.idempotencyKey
+          ? { requestInit: { headers: { 'Idempotency-Key': opts.idempotencyKey } } }
+          : undefined;
+        const created = await client.rest.v1.statuses.create(createParams as any, meta);
         const idx = userPosts.findIndex(s => s.id === tempId);
         if (idx !== -1) {
           userPosts.splice(idx, 1, created);

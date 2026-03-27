@@ -28,13 +28,19 @@ export {
 
 // Compose components
 export {
+  AltTextModal,
   CharacterCounter,
+  ComposeTextarea,
   ComposeToolbar,
   ContentWarningToggle,
+  EmojiPickerButton,
+  MediaPreviewGrid,
+  MediaPreviewItem,
   PollEditor,
   ReplyContext,
   VisibilitySelector,
 } from './components/compose';
+export type { MediaItem } from './components/compose';
 
 // Item components
 export { ItemCard, ItemHeader, Take } from './components/item';
@@ -156,6 +162,7 @@ export { Toggle } from './components/ui/toggle';
 
 // Composables
 export { useInfiniteScroll } from './composables/useInfiniteScroll';
+export { usePullToRefresh } from './composables/usePullToRefresh';
 
 // Directives
 export { vFadeOnLoad } from './directives/fadeOnLoad';

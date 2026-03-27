@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
 export { default as TagItem } from './TagItem.vue';
 
 export const tagItemVariants = cva(
-  'inline-flex h-5 items-center gap-0.5 rounded px-1 text-xs font-medium text-primary [&_svg]:size-4',
+  'inline-flex h-5 items-center gap-0.5 rounded-full px-2 text-xs font-medium text-primary [&_svg]:size-4',
   {
     variants: {
       variant: {

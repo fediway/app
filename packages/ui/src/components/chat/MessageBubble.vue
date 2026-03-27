@@ -59,6 +59,7 @@ function formatTime(dateString: string): string {
             alt="Shared post image"
             class="h-32 w-full object-cover"
             loading="lazy"
+            decoding="async"
           >
           <div class="p-2">
             <div class="mb-1 flex items-center gap-2">
@@ -67,6 +68,7 @@ function formatTime(dateString: string): string {
                 :alt="sharedStatus.authorName"
                 class="size-5 rounded-full"
                 loading="lazy"
+                decoding="async"
               >
               <span
                 class="truncate text-xs font-medium"

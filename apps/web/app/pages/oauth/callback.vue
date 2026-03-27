@@ -48,7 +48,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-[100dvh] flex-col items-center justify-center px-5">
+  <div class="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-5">
     <!-- Happy path: just logo + subtle text, feels like a transition -->
     <template v-if="isLoading">
       <img

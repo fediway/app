@@ -38,7 +38,7 @@ const firstMediaUrl = computed(() => {
 
 <template>
   <div
-    class="border border-border rounded-xl overflow-hidden hover:bg-muted transition-colors cursor-pointer"
+    class="border border-border rounded-xl overflow-hidden hover:bg-foreground/[0.03] transition-colors cursor-pointer"
     @click="handleClick"
   >
     <div class="p-3">
@@ -73,6 +73,7 @@ const firstMediaUrl = computed(() => {
           alt="Media"
           class="w-full h-32 object-cover"
           loading="lazy"
+          decoding="async"
         >
       </div>
     </div>

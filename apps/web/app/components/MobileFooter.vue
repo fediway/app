@@ -54,7 +54,7 @@ function handleItemClick(item: BottomNavItemType) {
 
 <template>
   <div
-    class="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+    class="fixed bottom-0 left-0 right-0 z-[100] px-3 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
   >
     <!-- Logged out: auth buttons in the same floating pill -->
     <div
