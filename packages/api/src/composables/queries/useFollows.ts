@@ -118,8 +118,8 @@ export function useFollows(callbacks?: UseFollowsCallbacks) {
   return { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships, followState };
 }
 
-/** Reset all state — for testing only */
-export function _resetFollowsState() {
+/** Reset all follow state. Called on account switch and in tests. */
+export function resetFollowsState() {
   followState.clear();
   relationshipCache.clear();
   toggleSeq.clear();

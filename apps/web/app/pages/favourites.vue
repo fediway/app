@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PageHeader, Skeleton } from '@repo/ui';
 
-const { getFavouritedStatuses } = useTimelineData();
-const { data: rawStatuses, isLoading, error, refetch } = getFavouritedStatuses();
+const { getFavouritedStatusesPaginated } = useTimelineData();
+const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getFavouritedStatusesPaginated();
 const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 
@@ -14,9 +14,12 @@ const statuses = useWebActions().withStoreState(rawStatuses);
       <StatusTimeline
         :statuses="statuses"
         :is-loading="isLoading"
+        :is-loading-more="isLoadingMore"
+        :has-more="hasMore"
         :error="error"
         empty-title="No favourites yet"
         empty-description="Posts you like will appear here"
+        @load-more="loadMore()"
         @retry="refetch()"
       />
 

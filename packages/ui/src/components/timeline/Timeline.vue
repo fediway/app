@@ -2,12 +2,15 @@
 import type { MediaAttachment, Status as StatusType } from '@repo/types';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { computed } from 'vue';
+import { useInfiniteScroll } from '../../composables/useInfiniteScroll';
 import Status from '../status/Status.vue';
 
 interface Props {
   statuses: StatusType[];
-  /** Loading state */
+  /** Loading state (initial fetch — shows skeleton) */
   loading?: boolean;
+  /** Loading more pages (shows bottom spinner) */
+  loadingMore?: boolean;
   /** Whether there are more statuses to load */
   hasMore?: boolean;
   /** Function to generate profile URL from account */
@@ -18,6 +21,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  loadingMore: false,
   hasMore: true,
   getProfileUrl: undefined,
   getStatus: undefined,
@@ -36,6 +40,11 @@ const emit = defineEmits<{
   profileClick: [acct: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
 }>();
+
+const { sentinelRef } = useInfiniteScroll({
+  enabled: computed(() => props.hasMore && !props.loadingMore && !props.loading && props.statuses.length > 0),
+  onLoadMore: () => emit('loadMore'),
+});
 
 const virtualizer = useWindowVirtualizer(computed(() => ({
   count: props.statuses.length,
@@ -106,13 +115,21 @@ function getReplyParent(status: StatusType): StatusType | null {
       </div>
     </div>
 
-    <!-- Loading indicator -->
+    <!-- Initial loading indicator -->
     <div v-if="loading" class="flex justify-center py-8">
       <div class="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
     </div>
 
-    <!-- Load more button -->
-    <div v-else-if="hasMore && statuses.length > 0" class="flex justify-center py-4">
+    <!-- Loading more spinner (bottom of list) -->
+    <div v-if="loadingMore" class="flex justify-center py-4">
+      <div class="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
+    </div>
+
+    <!-- Infinite scroll sentinel (invisible, observed by IntersectionObserver) -->
+    <div ref="sentinelRef" class="h-px" />
+
+    <!-- Manual load more fallback -->
+    <div v-if="hasMore && statuses.length > 0 && !loadingMore && !loading" class="flex justify-center py-4">
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium text-muted-foreground bg-muted rounded-lg hover:bg-accent transition-colors"

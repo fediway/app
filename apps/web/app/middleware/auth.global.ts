@@ -20,6 +20,12 @@ export default defineNuxtRouteMiddleware((to) => {
   if (mode.value === 'mock')
     return;
 
+  // Authenticated user on login page → redirect to home (or saved redirect)
+  if (isAuthenticated.value && to.path === '/login') {
+    const redirect = to.query.redirect as string;
+    return navigateTo(redirect || '/', { replace: true });
+  }
+
   // Public routes — accessible without auth
   if (PUBLIC_ROUTES.some(route => to.path === route || to.path.startsWith(`${route}/`)))
     return;

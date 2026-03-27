@@ -7,7 +7,7 @@ import type { UsePostsCallbacks } from '@repo/api';
 import { usePosts as usePostsCore } from '@repo/api';
 import { useToast } from '@repo/ui';
 
-export { _resetPostsState } from '@repo/api';
+export { resetPostsState } from '@repo/api';
 
 export function usePosts() {
   const { toast } = useToast();

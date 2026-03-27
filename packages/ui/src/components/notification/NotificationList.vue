@@ -1,23 +1,31 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
+import { computed } from 'vue';
+import { useInfiniteScroll } from '../../composables/useInfiniteScroll';
 import { EmptyState } from '../ui/empty-state';
 import { Skeleton } from '../ui/skeleton';
 import NotificationItem from './NotificationItem.vue';
 
-defineProps<{
+const props = defineProps<{
   notifications: Notification[];
   loading?: boolean;
+  loadingMore?: boolean;
   hasMore?: boolean;
   error?: string;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   click: [notification: Notification];
   profileClick: [acct: string];
   tagClick: [tag: string];
   loadMore: [];
   retry: [];
 }>();
+
+const { sentinelRef } = useInfiniteScroll({
+  enabled: computed(() => (props.hasMore ?? false) && !props.loadingMore && !props.loading && !props.error && props.notifications.length > 0),
+  onLoadMore: () => emit('loadMore'),
+});
 </script>
 
 <template>
@@ -61,4 +69,12 @@ defineEmits<{
     title="No notifications yet"
     description="When someone interacts with you, you'll see it here"
   />
+
+  <!-- Loading more spinner -->
+  <div v-if="loadingMore" class="flex justify-center py-4">
+    <div class="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
+  </div>
+
+  <!-- Infinite scroll sentinel -->
+  <div ref="sentinelRef" class="h-px" />
 </template>

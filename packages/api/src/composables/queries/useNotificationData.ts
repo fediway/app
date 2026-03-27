@@ -1,5 +1,7 @@
 import type { Notification } from '@repo/types';
+import type { PaginatedQueryResult } from '../createPaginatedQuery';
 import type { QueryResult } from '../createQuery';
+import { createPaginatedQuery } from '../createPaginatedQuery';
 import { createQuery } from '../createQuery';
 import { useClient } from '../useClient';
 
@@ -18,9 +20,9 @@ export function useNotificationData() {
 
   function getNotifications(filter?: NotificationFilter): QueryResult<Notification[]> {
     const types = filter ? NOTIFICATION_FILTERS[filter].types : undefined;
-    const key = filter ? `notifications:${filter}` : 'notifications';
+    const baseKey = filter ? `notifications:${filter}` : 'notifications';
 
-    return createQuery(key, [] as Notification[], async () => {
+    return createQuery(baseKey, [] as Notification[], async () => {
       const result = await client.rest.v1.notifications.list({
         limit: 30,
         ...(types ? { types: [...types] } : {}),
@@ -29,5 +31,19 @@ export function useNotificationData() {
     });
   }
 
-  return { getNotifications };
+  function getNotificationsPaginated(filter?: NotificationFilter): PaginatedQueryResult<Notification> {
+    const types = filter ? NOTIFICATION_FILTERS[filter].types : undefined;
+    const baseKey = filter ? `notifications:${filter}:paginated` : 'notifications:paginated';
+
+    return createPaginatedQuery(baseKey, async ({ limit, maxId }) => {
+      const result = await client.rest.v1.notifications.list({
+        limit,
+        maxId,
+        ...(types ? { types: [...types] } : {}),
+      });
+      return result as Notification[];
+    });
+  }
+
+  return { getNotifications, getNotificationsPaginated };
 }

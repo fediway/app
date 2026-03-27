@@ -32,6 +32,8 @@ interface Props {
   bookmarked?: boolean;
   /** Direct messages and private posts cannot be boosted */
   visibility?: 'public' | 'unlisted' | 'private' | 'direct';
+  /** When false, action buttons render muted (logged-out state) */
+  authenticated?: boolean;
   class?: HTMLAttributes['class'];
 }
 
@@ -43,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
   reblogged: false,
   bookmarked: false,
   visibility: 'public',
+  authenticated: true,
 });
 
 const emit = defineEmits<{
@@ -67,7 +70,7 @@ const canReblog = computed(() =>
 <template>
   <div
     data-slot="status-actions"
-    :class="cn('flex items-center justify-between', props.class)"
+    :class="cn('flex items-center justify-between', !authenticated && 'opacity-50', props.class)"
   >
     <!-- Left cluster: favourite, reply, reblog -->
     <div class="flex items-center gap-2">

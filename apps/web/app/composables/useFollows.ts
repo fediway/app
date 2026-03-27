@@ -7,7 +7,7 @@ import type { UseFollowsCallbacks } from '@repo/api';
 import { useFollows as useFollowsCore } from '@repo/api';
 import { useToast } from '@repo/ui';
 
-export { _resetFollowsState } from '@repo/api';
+export { resetFollowsState } from '@repo/api';
 
 export function useFollows() {
   const { toast } = useToast();

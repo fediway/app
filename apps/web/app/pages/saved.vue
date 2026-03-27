@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PageHeader, Skeleton } from '@repo/ui';
 
-const { getBookmarkedStatuses } = useTimelineData();
-const { data: rawStatuses, isLoading, error, refetch } = getBookmarkedStatuses();
+const { getBookmarkedStatusesPaginated } = useTimelineData();
+const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getBookmarkedStatusesPaginated();
 const statuses = useWebActions().withStoreState(rawStatuses);
 </script>
 
@@ -14,9 +14,12 @@ const statuses = useWebActions().withStoreState(rawStatuses);
       <StatusTimeline
         :statuses="statuses"
         :is-loading="isLoading"
+        :is-loading-more="isLoadingMore"
+        :has-more="hasMore"
         :error="error"
         empty-title="No bookmarks yet"
         empty-description="Save posts to read later"
+        @load-more="loadMore()"
         @retry="refetch()"
       />
 

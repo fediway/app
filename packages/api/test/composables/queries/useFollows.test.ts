@@ -1,7 +1,7 @@
 import type { Relationship } from '@repo/types';
 import { flushPromises, makeRelationship } from '@repo/config/vitest/helpers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { _resetFollowsState, useFollows } from '../../../src/composables/queries/useFollows';
+import { resetFollowsState, useFollows } from '../../../src/composables/queries/useFollows';
 
 // Mock useClient — can be toggled to throw for no-auth tests
 const mockFetch = vi.fn();
@@ -29,7 +29,7 @@ vi.mock('../../../src/composables/useClient', () => ({
 }));
 
 beforeEach(() => {
-  _resetFollowsState();
+  resetFollowsState();
   mockFetch.mockReset();
   mockFollow.mockReset();
   mockUnfollow.mockReset();
@@ -40,7 +40,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  _resetFollowsState();
+  resetFollowsState();
 });
 
 describe('useFollows (shared)', () => {

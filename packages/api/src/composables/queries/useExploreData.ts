@@ -1,5 +1,7 @@
 import type { FediwayStatus, Status, Tag, TrendLink } from '@repo/types';
+import type { PaginatedQueryResult } from '../createPaginatedQuery';
 import type { QueryResult } from '../createQuery';
+import { createPaginatedQuery } from '../createPaginatedQuery';
 import { createQuery } from '../createQuery';
 import { useClient } from '../useClient';
 import { useStatusStore } from '../useStatusStore';
@@ -13,7 +15,7 @@ export function useExploreData() {
   function getTrendingTags(): QueryResult<Tag[]> {
     return createQuery('trendingTags', [] as Tag[], async () => {
       return await client.rest.v1.trends.tags.list();
-    });
+    }, { scope: 'public' });
   }
 
   function getTrendingStatuses(): QueryResult<Status[]> {
@@ -21,19 +23,28 @@ export function useExploreData() {
       const result = await client.rest.v1.trends.statuses.list({ limit: 40 });
       store.setMany(result as FediwayStatus[]);
       return result;
-    });
+    }, { scope: 'public' });
   }
 
   function getTrendingLinks(): QueryResult<TrendLink[]> {
     return createQuery('trendingLinks', [] as TrendLink[], async () => {
       return await client.rest.v1.trends.links.list();
-    });
+    }, { scope: 'public' });
   }
 
   function getStatusesByTag(tagName: string): QueryResult<Status[]> {
     const normalized = tagName.toLowerCase().replace(LEADING_HASH_RE, '');
     return createQuery(`tag:${normalized}`, [] as Status[], async () => {
       const result = await client.rest.v1.timelines.tag.$select(normalized).list({ limit: 40 });
+      store.setMany(result as FediwayStatus[]);
+      return result;
+    });
+  }
+
+  function getStatusesByTagPaginated(tagName: string): PaginatedQueryResult<Status> {
+    const normalized = tagName.toLowerCase().replace(LEADING_HASH_RE, '');
+    return createPaginatedQuery(`tag:${normalized}:paginated`, async ({ limit, maxId }) => {
+      const result = await client.rest.v1.timelines.tag.$select(normalized).list({ limit, maxId });
       store.setMany(result as FediwayStatus[]);
       return result;
     });
@@ -88,5 +99,5 @@ export function useExploreData() {
     }
   }
 
-  return { getTrendingTags, getTrendingStatuses, getTrendingLinks, getStatusesByTag, getTagInfo, getStatusesByLink, getLinkInfo };
+  return { getTrendingTags, getTrendingStatuses, getTrendingLinks, getStatusesByTag, getStatusesByTagPaginated, getTagInfo, getStatusesByLink, getLinkInfo };
 }

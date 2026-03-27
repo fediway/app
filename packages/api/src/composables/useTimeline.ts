@@ -1,6 +1,7 @@
 import type { FediwayStatus, Status } from '@repo/types';
 import type { ComputedRef } from 'vue';
 import { computed, ref, shallowRef } from 'vue';
+import { getActiveAccountKeySync } from '../auth/account-store';
 import { useTimelineCache } from '../cache/timeline-cache';
 import { useClient } from './useClient';
 import { useStatusStore } from './useStatusStore';
@@ -50,13 +51,14 @@ const DEFAULT_LIMIT = 20;
  * Derive a cache key from timeline options.
  */
 function getCacheKey(options: TimelineOptions): string {
+  const prefix = getActiveAccountKeySync();
   switch (options.type) {
-    case 'home': return 'home';
-    case 'public': return 'public';
-    case 'local': return 'local';
-    case 'hashtag': return `hashtag:${options.hashtag}`;
-    case 'list': return `list:${options.listId}`;
-    case 'account': return `account:${options.accountId}`;
+    case 'home': return `${prefix}:home`;
+    case 'public': return `${prefix}:public`;
+    case 'local': return `${prefix}:local`;
+    case 'hashtag': return `${prefix}:hashtag:${options.hashtag}`;
+    case 'list': return `${prefix}:list:${options.listId}`;
+    case 'account': return `${prefix}:account:${options.accountId}`;
   }
 }
 
@@ -236,7 +238,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
    * Load more (older) statuses.
    */
   async function loadMore() {
-    if (!hasMore.value || isLoading.value)
+    if (!hasMore.value || isLoading.value || error.value)
       return;
 
     isLoading.value = true;

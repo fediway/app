@@ -22,6 +22,9 @@ vi.mock('@repo/api', () => {
       toggleBookmark,
       deleteStatus,
     }),
+    useAuth: () => ({
+      isAuthenticated: ref(true),
+    }),
   };
 });
 

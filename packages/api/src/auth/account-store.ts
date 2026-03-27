@@ -3,6 +3,7 @@ import type { MastoClient } from '../client';
 import { computed, ref, shallowRef } from 'vue';
 import { createMastoClient } from '../client';
 import { setOn401Handler } from '../utils/request';
+import { clearAllAccountState } from './account-state-cleanup';
 import {
   addAccountToList,
   clearAllAccounts,
@@ -17,6 +18,15 @@ import {
 // Module-level state (singleton, shared across all useAccountStore() calls)
 const accounts = ref<StoredAccount[]>([]);
 const activeAccountKey = ref<string | null>(null);
+
+/**
+ * Synchronous getter for the active account key.
+ * Used by createQuery/createPaginatedQuery for auto-scoping cache keys.
+ * Not a composable — reads module-level ref directly, no Vue context needed.
+ */
+export function getActiveAccountKeySync(): string {
+  return activeAccountKey.value ?? 'anon';
+}
 const activeClient = shallowRef<MastoClient | null>(null);
 const currentUser = shallowRef<AccountCredentials | null>(null);
 const isLoading = ref(false);
@@ -91,6 +101,9 @@ async function switchAccount(key: string): Promise<void> {
     throw new Error(`Account not found: ${key}`);
   }
 
+  // Clear all cached data from previous account before loading new data
+  clearAllAccountState();
+
   isLoading.value = true;
   error.value = null;
 
@@ -146,6 +159,7 @@ async function removeAccount(key: string): Promise<void> {
     }
     else {
       activeAccountKey.value = null;
+      clearAllAccountState();
     }
   }
 }
@@ -179,6 +193,7 @@ function handleAccountExpired(): void {
 
   currentUser.value = null;
   error.value = new Error('Session expired — please log in again');
+  clearAllAccountState();
 
   // Fire and forget — async cleanup
   removeAccount(key);
@@ -191,6 +206,7 @@ async function logoutAll(): Promise<void> {
   activeClient.value = null;
   currentUser.value = null;
   error.value = null;
+  clearAllAccountState();
 }
 
 function getClient(): MastoClient | null {

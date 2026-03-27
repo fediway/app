@@ -91,3 +91,11 @@ export function useTimelineCache(timelineKey: string) {
 
   return { load, save, prune, clear };
 }
+
+/**
+ * Clear ALL timeline cache entries. Called during account transitions.
+ * Timeline cache is an optimization (cold-start rendering) — safe to lose.
+ */
+export async function clearTimelineCache(): Promise<void> {
+  await getDb().timelineCache.clear();
+}

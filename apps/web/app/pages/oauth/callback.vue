@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { PhCircleNotch } from '@phosphor-icons/vue';
-import { invalidateAllQueries, useAuth } from '@repo/api';
+import { useAuth } from '@repo/api';
+import { Button } from '@repo/ui';
 import { onMounted, ref } from 'vue';
 import { useDataMode } from '~/composables/useDataMode';
 
@@ -33,9 +33,12 @@ onMounted(async () => {
 
   try {
     await handleOAuthCallback(code);
-    invalidateAllQueries();
     setMode('live');
-    navigateTo('/');
+
+    // Restore redirect destination saved before OAuth round-trip
+    const redirect = sessionStorage.getItem('fediway_login_redirect') || '/';
+    sessionStorage.removeItem('fediway_login_redirect');
+    navigateTo(redirect);
   }
   catch (err) {
     errorMessage.value = err instanceof Error ? err.message : 'Authentication failed';
@@ -45,35 +48,47 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-    <div class="w-full max-w-sm">
-      <!-- Logo -->
-      <div class="flex justify-center mb-8">
-        <img src="/images/icon.png" alt="Fediway" class="w-16 h-16">
+  <div class="flex min-h-[100dvh] flex-col items-center justify-center px-5">
+    <!-- Happy path: just logo + subtle text, feels like a transition -->
+    <template v-if="isLoading">
+      <img
+        src="/images/app-icon.svg"
+        alt=""
+        aria-hidden="true"
+        class="h-14 w-14"
+      >
+      <p class="mt-4 text-sm text-[#232b37]/50 dark:text-white/50">
+        Signing in…
+      </p>
+    </template>
+
+    <!-- Error: show card with action -->
+    <template v-else>
+      <div class="mb-10 flex items-center gap-3">
+        <img
+          src="/images/app-icon.svg"
+          alt=""
+          aria-hidden="true"
+          class="h-12 w-12"
+        >
+        <span class="text-3xl font-bold text-[#232b37] dark:text-white">Fediway</span>
       </div>
 
-      <div class="bg-card rounded-2xl shadow-xl border border-border p-6 text-center">
-        <!-- Loading -->
-        <div v-if="isLoading" class="space-y-4">
-          <PhCircleNotch :size="32" class="animate-spin mx-auto text-muted-foreground" />
-          <p class="text-sm text-muted-foreground">
-            Completing sign in...
-          </p>
-        </div>
-
-        <!-- Error -->
-        <div v-else class="space-y-4">
-          <div class="p-3 bg-red-background border border-red-200 rounded-xl text-sm text-red">
+      <div class="w-full max-w-md rounded-3xl bg-[#fefeff] px-5 py-8 text-center shadow-2xl dark:bg-[#232b37]">
+        <div class="space-y-4">
+          <div
+            role="alert"
+            class="rounded-xl border border-red-200 bg-red-background p-3 text-sm text-red"
+          >
             {{ errorMessage }}
           </div>
-          <NuxtLink
-            to="/login"
-            class="inline-block py-2.5 px-6 rounded-xl font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-          >
-            Try again
-          </NuxtLink>
+          <Button as-child class="w-full">
+            <NuxtLink to="/login">
+              Try again
+            </NuxtLink>
+          </Button>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>

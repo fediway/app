@@ -2,7 +2,7 @@ import type { Status } from '@repo/types';
 import { flushPromises } from '@repo/config/vitest/helpers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { _resetQueryCache } from '../../../src/composables/createQuery';
-import { _resetPostsState, usePosts } from '../../../src/composables/queries/usePosts';
+import { resetPostsState, usePosts } from '../../../src/composables/queries/usePosts';
 
 // Mock useClient — can be toggled to throw for no-auth tests
 const mockCreate = vi.fn();
@@ -36,14 +36,14 @@ vi.mock('../../../src/composables/useAuth', () => ({
 }));
 
 beforeEach(() => {
-  _resetPostsState();
+  resetPostsState();
   _resetQueryCache();
   mockCreate.mockReset();
   clientAvailable = true;
 });
 
 afterEach(() => {
-  _resetPostsState();
+  resetPostsState();
   _resetQueryCache();
 });
 

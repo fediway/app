@@ -1,6 +1,8 @@
 import type { Account, FediwayStatus, Status } from '@repo/types';
+import type { PaginatedQueryResult } from '../createPaginatedQuery';
 import type { QueryResult } from '../createQuery';
 import { getProfilePath as buildProfilePath, getStatusPath as buildStatusPath } from '../../utils/paths';
+import { createPaginatedQuery } from '../createPaginatedQuery';
 import { createQuery } from '../createQuery';
 import { useClient } from '../useClient';
 import { useStatusStore } from '../useStatusStore';
@@ -27,6 +29,25 @@ export function useAccountData() {
     });
   }
 
+  function getAccountStatusesPaginated(acct: string): PaginatedQueryResult<Status> {
+    // Cache the account ID to avoid redundant lookups on loadMore
+    let accountId: string | undefined;
+
+    return createPaginatedQuery(`accountStatuses:${acct}:paginated`, async ({ limit, maxId }) => {
+      if (!accountId) {
+        const account = await client.rest.v1.accounts.lookup({ acct });
+        accountId = account.id;
+      }
+      const statuses = await client.rest.v1.accounts.$select(accountId).statuses.list({
+        limit,
+        maxId,
+        excludeReplies: true,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
   function getAccountStatusesWithReplies(acct: string): QueryResult<Status[]> {
     return createQuery(`accountReplies:${acct}`, [] as Status[], async () => {
       const account = await client.rest.v1.accounts.lookup({ acct });
@@ -38,11 +59,46 @@ export function useAccountData() {
     });
   }
 
+  function getAccountStatusesWithRepliesPaginated(acct: string): PaginatedQueryResult<Status> {
+    let accountId: string | undefined;
+
+    return createPaginatedQuery(`accountReplies:${acct}:paginated`, async ({ limit, maxId }) => {
+      if (!accountId) {
+        const account = await client.rest.v1.accounts.lookup({ acct });
+        accountId = account.id;
+      }
+      const statuses = await client.rest.v1.accounts.$select(accountId).statuses.list({
+        limit,
+        maxId,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
   function getAccountMediaStatuses(acct: string): QueryResult<Status[]> {
     return createQuery(`accountMedia:${acct}`, [] as Status[], async () => {
       const account = await client.rest.v1.accounts.lookup({ acct });
       const statuses = await client.rest.v1.accounts.$select(account.id).statuses.list({
         limit: 20,
+        onlyMedia: true,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
+  function getAccountMediaStatusesPaginated(acct: string): PaginatedQueryResult<Status> {
+    let accountId: string | undefined;
+
+    return createPaginatedQuery(`accountMedia:${acct}:paginated`, async ({ limit, maxId }) => {
+      if (!accountId) {
+        const account = await client.rest.v1.accounts.lookup({ acct });
+        accountId = account.id;
+      }
+      const statuses = await client.rest.v1.accounts.$select(accountId).statuses.list({
+        limit,
+        maxId,
         onlyMedia: true,
       });
       store.setMany(statuses as FediwayStatus[]);
@@ -94,8 +150,11 @@ export function useAccountData() {
   return {
     getAccountByAcct,
     getAccountStatuses,
+    getAccountStatusesPaginated,
     getAccountStatusesWithReplies,
+    getAccountStatusesWithRepliesPaginated,
     getAccountMediaStatuses,
+    getAccountMediaStatusesPaginated,
     getAccountFollowers,
     getAccountFollowing,
     getSuggestedAccounts,

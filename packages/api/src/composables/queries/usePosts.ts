@@ -1,6 +1,7 @@
 import type { Account, Status } from '@repo/types';
 import { reactive } from 'vue';
 import { escapeHtml } from '../../utils/html';
+import { invalidateAllPaginatedQueries } from '../createPaginatedQuery';
 import { invalidateAllQueries } from '../createQuery';
 import { useAuth } from '../useAuth';
 import { useClient } from '../useClient';
@@ -111,6 +112,7 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
           userPosts.splice(idx, 1, created);
         }
         invalidateAllQueries();
+        invalidateAllPaginatedQueries();
         callbacks?.onPublished?.(created);
       }
       catch (err) {
@@ -128,8 +130,8 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
   return { userPosts, addPost };
 }
 
-/** Reset all state — for testing only */
-export function _resetPostsState() {
+/** Reset all posts state. Called on account switch and in tests. */
+export function resetPostsState() {
   userPosts.splice(0, userPosts.length);
   nextId = 1000;
 }

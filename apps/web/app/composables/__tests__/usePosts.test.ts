@@ -13,7 +13,7 @@ vi.mock('@repo/api', () => ({
       userPosts: [],
     };
   },
-  _resetPostsState: vi.fn(),
+  resetPostsState: vi.fn(),
 }));
 
 // Mock @repo/ui — capture toast calls

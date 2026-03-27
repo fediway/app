@@ -17,8 +17,10 @@ const { open: openComposer } = usePostComposer();
     <p class="text-sm text-muted-foreground mb-6">
       Social media as it should be
     </p>
-    <Button class="w-full py-3 text-base" @click="navigateTo('/login')">
-      Sign in
+    <Button as-child class="w-full py-3 text-base">
+      <NuxtLink to="/login">
+        Sign in
+      </NuxtLink>
     </Button>
   </div>
 

@@ -11,9 +11,13 @@ import StatusStats from './StatusStats.vue';
 import StatusTags from './StatusTags.vue';
 import { useCleanContent } from './useCleanContent';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   status: Status;
-}>();
+  /** Whether the user is authenticated (mutes actions when false) */
+  authenticated?: boolean;
+}>(), {
+  authenticated: true,
+});
 
 const emit = defineEmits<{
   reply: [statusId: string];
@@ -107,6 +111,7 @@ const cleanedContent = useCleanContent(
           :reblogged="status.reblogged ?? false"
           :bookmarked="status.bookmarked ?? false"
           :visibility="status.visibility"
+          :authenticated="authenticated"
           @reply="$emit('reply', status.id)"
           @reblog="$emit('reblog', status.id)"
           @favourite="$emit('favourite', status.id)"

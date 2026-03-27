@@ -4,10 +4,11 @@ import { EmptyState, Timeline } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-// TODO: Accept hasMore + onLoadMore props for pagination
 defineProps<{
   statuses: Status[];
   isLoading: boolean;
+  isLoadingMore?: boolean;
+  hasMore?: boolean;
   error?: Error | null;
   emptyTitle: string;
   emptyDescription: string;
@@ -15,6 +16,7 @@ defineProps<{
 
 const emit = defineEmits<{
   retry: [];
+  loadMore: [];
 }>();
 
 const router = useRouter();
@@ -44,7 +46,8 @@ const { open: openLightbox } = useMediaLightbox();
     v-else
     :statuses="statuses"
     :loading="isLoading"
-    :has-more="false"
+    :loading-more="isLoadingMore ?? false"
+    :has-more="hasMore ?? false"
     :get-profile-url="(acct) => getProfilePath(acct)"
     :get-status="store.get"
     @reblog="(id) => toggleReblog(id)"
@@ -55,5 +58,6 @@ const { open: openLightbox } = useMediaLightbox();
     @status-click="(id) => router.push(getStatusPath(id))"
     @profile-click="(acct) => router.push(getProfilePath(acct))"
     @media-click="(attachments, index) => openLightbox(attachments, index)"
+    @load-more="emit('loadMore')"
   />
 </template>

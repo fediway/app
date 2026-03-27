@@ -1,5 +1,7 @@
-export { type AddAccountOptions, useAccountStore } from '../auth/account-store';
-export { _resetQueryCache, createQuery, invalidateAllQueries, type QueryResult } from './createQuery';
+export { clearAllAccountState } from '../auth/account-state-cleanup';
+export { type AddAccountOptions, getActiveAccountKeySync, useAccountStore } from '../auth/account-store';
+export { _resetPaginatedQueryCache, createPaginatedQuery, invalidateAllPaginatedQueries, type PaginatedQueryOptions, type PaginatedQueryResult } from './createPaginatedQuery';
+export { _resetQueryCache, createQuery, invalidateAllQueries, type QueryOptions, type QueryResult } from './createQuery';
 export * from './queries';
 export { useAccount, type UseAccountReturn } from './useAccount';
 export { type ActionQueueError, useActionQueue, type UseActionQueueOptions, type UseActionQueueReturn } from './useActionQueue';

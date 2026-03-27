@@ -144,6 +144,9 @@ onMounted(() => {
         />
       </template>
 
+      <!-- Auth prompt (shown when logged-out user tries to interact) -->
+      <AuthPromptModal />
+
       <!-- Media Lightbox -->
       <MediaLightbox
         :is-open="isLightboxOpen"

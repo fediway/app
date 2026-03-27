@@ -6,13 +6,13 @@ import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
 const route = useRoute();
 const router = useRouter();
-const { getNotifications } = useNotificationData();
+const { getNotificationsPaginated } = useNotificationData();
 const { getProfilePath, getStatusPath } = useAccountData();
 
 const filter = computed(() => route.params.filter as NotificationFilter);
 const filterLabel = computed(() => NOTIFICATION_FILTERS[filter.value]?.label ?? 'Notifications');
 
-const { data: notifications, isLoading, error, refetch } = getNotifications(filter.value);
+const { data: notifications, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getNotificationsPaginated(filter.value);
 
 function handleNotificationClick(notification: Notification) {
   if (notification.status) {
@@ -49,9 +49,12 @@ function navigateToProfile(acct: string) {
       v-else
       :notifications="notifications"
       :loading="isLoading && notifications.length === 0"
+      :loading-more="isLoadingMore"
+      :has-more="hasMore"
       @click="handleNotificationClick"
       @profile-click="navigateToProfile"
       @tag-click="(tag) => router.push(`/tags/${tag}`)"
+      @load-more="loadMore()"
     />
 
     <template #fallback>

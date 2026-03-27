@@ -154,6 +154,9 @@ export { Toast, ToastContainer, useToast } from './components/ui/toast';
 export type { ToastType } from './components/ui/toast';
 export { Toggle } from './components/ui/toggle';
 
+// Composables
+export { useInfiniteScroll } from './composables/useInfiniteScroll';
+
 // Directives
 export { vFadeOnLoad } from './directives/fadeOnLoad';
 // Utilities

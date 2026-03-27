@@ -20,7 +20,7 @@ vi.mock('@repo/api', () => ({
       followState: new Map(),
     };
   },
-  _resetFollowsState: vi.fn(),
+  resetFollowsState: vi.fn(),
 }));
 
 // Mock @repo/ui — capture toast calls

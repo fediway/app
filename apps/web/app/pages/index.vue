@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
 import { useAuth, useTimeline } from '@repo/api';
-import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
+import { Button, EmptyState, Skeleton, Status as StatusComponent, useInfiniteScroll } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -10,11 +10,12 @@ definePageMeta({});
 
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, withStoreState, store } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, withStoreState, store, isAuthenticated: isAuthed } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 
+const { requireAuth } = useAuthGate();
 const { isAuthenticated } = useAuth();
 
 // Authenticated → home timeline, unauthenticated → trending statuses
@@ -47,11 +48,11 @@ function handleStatusClick(statusId: string) {
   router.push(getStatusPath(statusId));
 }
 
-function handleReply(statusId: string) {
+const handleReply = requireAuth((statusId: string) => {
   const status = rawStatuses.value.find(s => s.id === statusId || s.reblog?.id === statusId);
   const replyTarget = status?.reblog ?? status;
   openComposer(replyTarget);
-}
+}, 'reply to this post');
 
 function handleReblog(statusId: string) {
   toggleReblog(statusId);
@@ -75,9 +76,20 @@ function handleTagClick(tag: string) {
   router.push(`/tags/${tag}`);
 }
 
-function handleLoadMore() {
-  timeline?.loadMore();
+const isLoadingMore = ref(false);
+
+async function handleLoadMore() {
+  if (!timeline || isLoadingMore.value)
+    return;
+  isLoadingMore.value = true;
+  await timeline.loadMore();
+  isLoadingMore.value = false;
 }
+
+const { sentinelRef } = useInfiniteScroll({
+  enabled: computed(() => (timeline?.hasMore.value ?? false) && !isLoadingMore.value && !isLoading.value && !errorValue.value && allStatuses.value.length > 0),
+  onLoadMore: handleLoadMore,
+});
 
 function handleMediaClick(attachments: MediaAttachment[], index: number) {
   openLightbox(attachments, index);
@@ -124,9 +136,9 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Error state -->
+        <!-- Error state (only when no data — stale data is better than an error screen) -->
         <EmptyState
-          v-else-if="errorValue"
+          v-else-if="errorValue && allStatuses.length === 0"
           :title="errorValue.message || 'Failed to load timeline'"
           action-label="Try again"
           class="py-12"
@@ -159,6 +171,7 @@ onUnmounted(() => {
           :status="status"
           :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
+          :authenticated="isAuthed.value"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
@@ -179,6 +192,7 @@ onUnmounted(() => {
           :status="status"
           :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
+          :authenticated="isAuthed.value"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
@@ -192,17 +206,13 @@ onUnmounted(() => {
           @media-click="handleMediaClick"
         />
 
-        <!-- Load more button (home timeline only) -->
-        <div v-if="timeline?.hasMore.value && allStatuses.length > 0 && !errorValue" class="flex justify-center py-4">
-          <Button
-            variant="muted"
-            size="sm"
-            :disabled="isLoading"
-            @click="handleLoadMore"
-          >
-            {{ isLoading ? 'Loading...' : 'Load more' }}
-          </Button>
+        <!-- Loading more spinner -->
+        <div v-if="isLoadingMore" class="flex justify-center py-4">
+          <div class="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
         </div>
+
+        <!-- Infinite scroll sentinel -->
+        <div ref="sentinelRef" class="h-px" />
       </div>
     </ClientOnly>
   </section>

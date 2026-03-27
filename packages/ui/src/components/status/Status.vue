@@ -29,6 +29,8 @@ interface Props {
   showSeparator?: boolean;
   /** Hide the action bar */
   hideActions?: boolean;
+  /** Whether the user is authenticated (mutes actions when false) */
+  authenticated?: boolean;
   class?: string;
 }
 
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
   hasReplyBelow: false,
   showSeparator: true,
   hideActions: false,
+  authenticated: true,
 });
 
 const emit = defineEmits<{
@@ -230,6 +233,7 @@ function handleStatusClick(event: MouseEvent) {
             :reblogged="displayStatus.reblogged ?? false"
             :bookmarked="displayStatus.bookmarked ?? false"
             :visibility="displayStatus.visibility"
+            :authenticated="authenticated"
             @reply="emit('reply', displayStatus.id)"
             @reblog="emit('reblog', displayStatus.id)"
             @favourite="emit('favourite', displayStatus.id)"

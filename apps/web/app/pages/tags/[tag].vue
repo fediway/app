@@ -2,14 +2,14 @@
 import { computed } from 'vue';
 
 const route = useRoute();
-const { getStatusesByTag } = useExploreData();
+const { getStatusesByTagPaginated } = useExploreData();
 
 const tagName = computed(() => {
   const tag = route.params.tag;
   return Array.isArray(tag) ? tag[0] : tag;
 });
 
-const { data: rawStatuses, isLoading } = getStatusesByTag(tagName.value || '');
+const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getStatusesByTagPaginated(tagName.value || '');
 const statuses = useWebActions().withStoreState(rawStatuses);
 
 usePageHeader({
@@ -23,8 +23,13 @@ usePageHeader({
     <StatusTimeline
       :statuses="statuses"
       :is-loading="isLoading"
+      :is-loading-more="isLoadingMore"
+      :has-more="hasMore"
+      :error="error"
       empty-title="No posts yet"
       :empty-description="`Be the first to post with #${tagName}`"
+      @load-more="loadMore()"
+      @retry="refetch()"
     />
   </div>
 </template>

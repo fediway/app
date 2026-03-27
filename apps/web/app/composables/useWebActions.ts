@@ -2,11 +2,13 @@ import type { Status } from '@repo/types';
 import { useStatusActions, useStatusStore } from '@repo/api';
 import { useToast } from '@repo/ui';
 import { computed } from 'vue';
+import { useAuthGate } from './useAuthGate';
 
 /**
  * Web-specific wrapper around useStatusActions.
- * Centralizes toast feedback and error handling for all interaction pages.
+ * Centralizes toast feedback, error handling, and auth gating for all interaction pages.
  *
+ * - Auth: all mutations gated via useAuthGate (opens modal for logged-out users)
  * - Bookmark: shows "Saved" / "Removed" toast (the only interaction needing confirmation)
  * - Errors: dev mode shows error detail, prod shows generic message
  * - Favourite/reblog: no toast (icon state change is sufficient feedback)
@@ -14,6 +16,7 @@ import { computed } from 'vue';
 export function useWebActions() {
   const store = useStatusStore();
   const { toast, removeToast } = useToast();
+  const { requireAuth, isAuthenticated } = useAuthGate();
 
   // Track bookmark toast so we can dismiss it on error
   let bookmarkToastId: string | undefined;
@@ -95,13 +98,14 @@ export function useWebActions() {
   }
 
   return {
-    toggleFavourite,
-    toggleReblog,
-    handleBookmark,
+    toggleFavourite: requireAuth(toggleFavourite, 'like this post'),
+    toggleReblog: requireAuth(toggleReblog, 'boost this post'),
+    handleBookmark: requireAuth(handleBookmark, 'bookmark this post'),
     handleCopyLink,
-    handleDelete,
+    handleDelete: requireAuth(handleDelete, 'delete this post'),
     withStoreState,
     getStoreStatus,
     store,
+    isAuthenticated,
   };
 }

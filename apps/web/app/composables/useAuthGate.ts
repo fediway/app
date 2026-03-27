@@ -1,18 +1,21 @@
 import { useAuth } from '@repo/api';
-import { useToast } from '@repo/ui';
+import { ref } from 'vue';
+
+// Module-level state — shared across all callers (singleton)
+const isPromptOpen = ref(false);
+const promptLabel = ref('');
 
 /**
  * Composable for gating actions behind authentication.
- * Shows a toast prompt and redirects to login when not authenticated.
+ * Opens a modal prompt instead of redirecting — keeps the user in context.
  */
 export function useAuthGate() {
   const { isAuthenticated } = useAuth();
-  const { toast } = useToast();
 
   /**
    * Wrap an action function with an auth check.
    * If authenticated, executes the action.
-   * If not, shows a toast and redirects to login.
+   * If not, opens the auth prompt modal with a contextual message.
    */
   function requireAuth<T extends (...args: any[]) => any>(
     action: T,
@@ -22,16 +25,20 @@ export function useAuthGate() {
       if (isAuthenticated.value) {
         return action(...args);
       }
-
-      toast(`Sign in to ${actionLabel}`);
-
-      // Small delay so the user sees the toast before navigating
-      setTimeout(() => {
-        const currentPath = window.location.pathname;
-        navigateTo(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      }, 1000);
+      promptLabel.value = actionLabel;
+      isPromptOpen.value = true;
     }) as T;
   }
 
-  return { requireAuth, isAuthenticated };
+  function closePrompt() {
+    isPromptOpen.value = false;
+  }
+
+  return {
+    requireAuth,
+    isAuthenticated,
+    isPromptOpen,
+    promptLabel,
+    closePrompt,
+  };
 }
