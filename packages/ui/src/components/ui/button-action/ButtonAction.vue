@@ -4,11 +4,15 @@ import { cn } from '../../../lib/utils';
 
 interface Props {
   count?: number | null;
+  ariaLabel?: string;
+  ariaPressed?: boolean;
   class?: HTMLAttributes['class'];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   count: null,
+  ariaLabel: undefined,
+  ariaPressed: undefined,
 });
 
 const TRAILING_ZERO_RE = /\.0$/;
@@ -26,6 +30,8 @@ function formatCount(n: number): string {
   <button
     type="button"
     data-slot="button-action"
+    :aria-label="ariaLabel"
+    :aria-pressed="ariaPressed"
     :class="cn(
       'inline-flex items-center gap-[6px]',
       'cursor-pointer text-gray-500 dark:text-gray-400 transition-colors',

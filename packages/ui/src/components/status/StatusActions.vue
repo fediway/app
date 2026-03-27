@@ -73,6 +73,8 @@ const canReblog = computed(() =>
     <div class="flex items-center gap-2">
       <ButtonAction
         :count="favouritesCount || null"
+        :aria-label="`${favourited ? 'Unfavourite' : 'Favourite'}${favouritesCount ? `, ${favouritesCount} ${favouritesCount === 1 ? 'like' : 'likes'}` : ''}`"
+        :aria-pressed="favourited"
         class="w-[60px]"
         :class="{ 'text-rose-500 hover:text-rose-500': favourited }"
         @click="emit('favourite')"
@@ -82,6 +84,7 @@ const canReblog = computed(() =>
 
       <ButtonAction
         :count="repliesCount || null"
+        :aria-label="`Reply${repliesCount ? `, ${repliesCount} ${repliesCount === 1 ? 'reply' : 'replies'}` : ''}`"
         class="w-[60px]"
         @click="emit('reply')"
       >
@@ -90,6 +93,8 @@ const canReblog = computed(() =>
 
       <ButtonAction
         :count="reblogsCount || null"
+        :aria-label="`${reblogged ? 'Undo boost' : 'Boost'}${reblogsCount ? `, ${reblogsCount} ${reblogsCount === 1 ? 'boost' : 'boosts'}` : ''}`"
+        :aria-pressed="reblogged"
         class="w-[60px]"
         :class="{ 'text-green hover:text-green': reblogged, 'disabled:opacity-40': !canReblog }"
         :disabled="!canReblog"
@@ -102,6 +107,8 @@ const canReblog = computed(() =>
     <!-- Right cluster: bookmark, more -->
     <div class="flex items-center gap-[6px]">
       <ButtonAction
+        :aria-label="bookmarked ? 'Remove bookmark' : 'Bookmark'"
+        :aria-pressed="bookmarked"
         :class="{ 'text-yellow hover:text-yellow': bookmarked }"
         @click="emit('bookmark')"
       >
@@ -111,7 +118,7 @@ const canReblog = computed(() =>
       <!-- More menu -->
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <ButtonAction>
+          <ButtonAction aria-label="More actions">
             <PhDotsThree :size="20" />
           </ButtonAction>
         </DropdownMenuTrigger>
