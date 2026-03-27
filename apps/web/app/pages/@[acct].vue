@@ -125,7 +125,11 @@ function goBack() {
         </div>
 
         <!-- Profile Info Section -->
-        <ProfileInformation :account="account" />
+        <ProfileInformation
+          :account="account"
+          @profile-click="(acct) => router.push(getProfilePath(acct))"
+          @tag-click="(tag) => router.push(`/tags/${tag}`)"
+        />
 
         <!-- Actions row -->
         <div class="border-b border-border px-5 pt-4 pb-4">

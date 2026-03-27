@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status as StatusType, Tag } from '@repo/types';
+import type { MediaAttachment, Status as StatusType } from '@repo/types';
 import { PhArrowsClockwise } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { cn } from '../../lib/utils';
@@ -54,7 +54,7 @@ const emit = defineEmits<{
   block: [accountId: string];
   blockDomain: [domain: string];
   report: [statusId: string];
-  tagClick: [tag: Tag];
+  tagClick: [tagName: string];
   profileClick: [accountId: string];
   statusClick: [statusId: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
@@ -105,13 +105,19 @@ function handleStatusClick(event: MouseEvent) {
     >
       <div class="flex gap-3 px-4 pt-3 pb-0">
         <div class="flex shrink-0 flex-col items-center self-stretch">
-          <Avatar :src="replyParent.account.avatar" :alt="replyParent.account.displayName" size="md" />
+          <button type="button" class="shrink-0" @click.stop="emit('profileClick', replyParent.account.acct)">
+            <Avatar :src="replyParent.account.avatar" :alt="replyParent.account.displayName" size="md" />
+          </button>
           <div class="mt-1 w-0.5 flex-1 bg-foreground/20" />
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-baseline gap-1 text-base">
-            <span class="truncate font-bold text-foreground">{{ replyParent.account.displayName || replyParent.account.username }}</span>
-            <span class="shrink truncate text-foreground/80">@{{ replyParent.account.acct }}</span>
+            <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
+              {{ replyParent.account.displayName || replyParent.account.username }}
+            </button>
+            <button type="button" class="shrink truncate text-foreground/80 hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
+              @{{ replyParent.account.acct }}
+            </button>
             <RelativeTime :datetime="replyParent.createdAt" class="ml-auto shrink-0 text-foreground/60" />
           </div>
           <div class="mt-0.5">
@@ -119,6 +125,9 @@ function handleStatusClick(event: MouseEvent) {
               :content="replyParent.content"
               :spoiler-text="replyParent.spoilerText"
               :emojis="replyParent.emojis"
+              :mentions="replyParent.mentions"
+              @mention-click="emit('profileClick', $event)"
+              @hashtag-click="emit('tagClick', $event)"
             />
           </div>
         </div>
@@ -145,7 +154,9 @@ function handleStatusClick(event: MouseEvent) {
         <!-- Left: avatar + thread connector -->
         <div class="flex shrink-0 flex-col items-center" :class="{ 'self-stretch': hasReplyBelow }">
           <div v-if="replyParent || hasReplyAbove" class="w-0.5 h-3 bg-foreground/20" />
-          <Avatar :src="displayStatus.account.avatar" :alt="displayStatus.account.displayName" size="md" />
+          <button type="button" class="shrink-0 cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
+            <Avatar :src="displayStatus.account.avatar" :alt="displayStatus.account.displayName" size="md" />
+          </button>
           <div v-if="hasReplyBelow" class="mt-1 w-0.5 flex-1 bg-foreground/20" />
         </div>
 
@@ -153,8 +164,12 @@ function handleStatusClick(event: MouseEvent) {
         <div class="min-w-0 flex-1">
           <!-- Header row -->
           <div class="flex items-baseline gap-1 text-base">
-            <span class="truncate font-bold text-foreground">{{ displayStatus.account.displayName || displayStatus.account.username }}</span>
-            <span class="shrink truncate text-foreground/80">@{{ displayStatus.account.acct }}</span>
+            <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
+              {{ displayStatus.account.displayName || displayStatus.account.username }}
+            </button>
+            <button type="button" class="shrink truncate text-foreground/80 hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
+              @{{ displayStatus.account.acct }}
+            </button>
             <RelativeTime :datetime="displayStatus.createdAt" class="ml-auto shrink-0 text-foreground/60" />
           </div>
 
@@ -164,6 +179,9 @@ function handleStatusClick(event: MouseEvent) {
               :content="cleanedContent"
               :spoiler-text="displayStatus.spoilerText"
               :emojis="displayStatus.emojis"
+              :mentions="displayStatus.mentions"
+              @mention-click="emit('profileClick', $event)"
+              @hashtag-click="emit('tagClick', $event)"
             />
           </div>
 
@@ -189,6 +207,8 @@ function handleStatusClick(event: MouseEvent) {
             :status="quotedStatus"
             class="mt-3"
             @click="emit('statusClick', $event)"
+            @profile-click="emit('profileClick', $event)"
+            @tag-click="emit('tagClick', $event)"
           />
 
           <!-- Hashtags -->

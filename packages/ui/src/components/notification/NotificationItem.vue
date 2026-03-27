@@ -11,9 +11,10 @@ defineProps<{
   notification: Notification;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   click: [notification: Notification];
   profileClick: [acct: string];
+  tagClick: [tag: string];
 }>();
 
 const ICON_MAP: Record<string, { icon: Component; color: string }> = {
@@ -58,9 +59,9 @@ function getText(type: string): string {
     <!-- Content -->
     <div class="min-w-0 flex-1">
       <div class="flex items-start gap-2">
-        <a @click.stop="$emit('profileClick', notification.account.acct)">
+        <button type="button" class="shrink-0" @click.stop="$emit('profileClick', notification.account.acct)">
           <Avatar :src="notification.account.avatar" :alt="notification.account.displayName" size="sm" />
-        </a>
+        </button>
         <div class="min-w-0 flex-1">
           <p class="text-sm">
             <AccountDisplayName
@@ -79,7 +80,10 @@ function getText(type: string): string {
           :content="notification.status.content"
           :spoiler-text="notification.status.spoilerText"
           :emojis="notification.status.emojis"
+          :mentions="notification.status.mentions"
           :collapsed="notification.status.content.length > 200"
+          @mention-click="emit('profileClick', $event)"
+          @hashtag-click="emit('tagClick', $event)"
         />
       </div>
     </div>

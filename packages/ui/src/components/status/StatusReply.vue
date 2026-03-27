@@ -11,32 +11,33 @@ defineProps<{
   status: Status;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   click: [statusId: string];
   reply: [statusId: string];
   reblog: [statusId: string];
   favourite: [statusId: string];
   profileClick: [acct: string];
+  tagClick: [tagName: string];
 }>();
 </script>
 
 <template>
   <div
     class="cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted active:bg-muted"
-    @click="$emit('click', status.id)"
+    @click="emit('click', status.id)"
   >
     <article class="px-4 py-3">
       <div class="flex gap-3">
-        <a class="shrink-0" @click.stop="$emit('profileClick', status.account.acct)">
+        <button type="button" class="shrink-0" @click.stop="emit('profileClick', status.account.acct)">
           <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="sm" />
-        </a>
+        </button>
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-1 text-sm">
             <AccountDisplayName
               :name="status.account.displayName || status.account.username"
               :emojis="status.account.emojis"
               class="truncate text-sm"
-              @click.stop="$emit('profileClick', status.account.acct)"
+              @click.stop="emit('profileClick', status.account.acct)"
             />
             <AccountHandle :acct="status.account.acct" class="truncate text-sm" />
             <span class="text-gray-400 dark:text-gray-500">·</span>
@@ -45,7 +46,10 @@ defineEmits<{
           <RichText
             :content="status.content"
             :emojis="status.emojis"
+            :mentions="status.mentions"
             class="mt-1 text-foreground"
+            @mention-click="emit('profileClick', $event)"
+            @hashtag-click="emit('tagClick', $event)"
           />
 
           <!-- Compact reply actions -->
@@ -53,7 +57,7 @@ defineEmits<{
             <button
               type="button"
               class="flex items-center gap-1 hover:text-foreground active:text-foreground"
-              @click.stop="$emit('reply', status.id)"
+              @click.stop="emit('reply', status.id)"
             >
               <PhChatCircle :size="16" />
               <span v-if="status.repliesCount > 0">{{ status.repliesCount }}</span>
@@ -61,7 +65,7 @@ defineEmits<{
             <button
               type="button"
               class="flex items-center gap-1 hover:text-foreground active:text-foreground"
-              @click.stop="$emit('reblog', status.id)"
+              @click.stop="emit('reblog', status.id)"
             >
               <PhRepeat :size="16" />
               <span v-if="status.reblogsCount > 0">{{ status.reblogsCount }}</span>
@@ -69,7 +73,7 @@ defineEmits<{
             <button
               type="button"
               class="flex items-center gap-1 hover:text-foreground active:text-foreground"
-              @click.stop="$emit('favourite', status.id)"
+              @click.stop="emit('favourite', status.id)"
             >
               <PhHeart :size="16" />
               <span v-if="status.favouritesCount > 0">{{ status.favouritesCount }}</span>

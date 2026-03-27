@@ -13,9 +13,10 @@ defineProps<{
   showConnector?: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   click: [statusId: string];
   profileClick: [acct: string];
+  tagClick: [tagName: string];
 }>();
 </script>
 
@@ -31,9 +32,9 @@ defineEmits<{
 
     <article class="px-4 py-3">
       <div class="flex gap-3">
-        <a class="shrink-0" @click.stop="$emit('profileClick', status.account.acct)">
+        <button type="button" class="shrink-0" @click.stop="emit('profileClick', status.account.acct)">
           <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="sm" />
-        </a>
+        </button>
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-1 text-sm">
             <AccountDisplayName
@@ -49,7 +50,10 @@ defineEmits<{
           <RichText
             :content="status.content"
             :emojis="status.emojis"
+            :mentions="status.mentions"
             class="mt-1 text-foreground"
+            @mention-click="emit('profileClick', $event)"
+            @hashtag-click="emit('tagClick', $event)"
           />
         </div>
       </div>

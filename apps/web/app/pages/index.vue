@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
+import type { MediaAttachment, Status } from '@repo/types';
 import { useAuth, useTimeline } from '@repo/api';
 import { Button, EmptyState, Skeleton, Status as StatusComponent } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -71,8 +71,8 @@ function handleSendMessage(status: Status) {
   openSendMessage(status);
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${tag.name}`);
+function handleTagClick(tag: string) {
+  router.push(`/tags/${tag}`);
 }
 
 function handleLoadMore() {
@@ -168,6 +168,7 @@ onUnmounted(() => {
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
+          @profile-click="(acct) => router.push(getProfilePath(acct))"
           @media-click="handleMediaClick"
         />
 
@@ -187,6 +188,7 @@ onUnmounted(() => {
           @send-message="handleSendMessage"
           @tag-click="handleTagClick"
           @status-click="handleStatusClick"
+          @profile-click="(acct) => router.push(getProfilePath(acct))"
           @media-click="handleMediaClick"
         />
 

@@ -14,6 +14,7 @@ defineProps<{
 defineEmits<{
   click: [notification: Notification];
   profileClick: [acct: string];
+  tagClick: [tag: string];
   loadMore: [];
   retry: [];
 }>();
@@ -50,6 +51,7 @@ defineEmits<{
       :notification="notification"
       @click="n => $emit('click', n)"
       @profile-click="acct => $emit('profileClick', acct)"
+      @tag-click="tag => $emit('tagClick', tag)"
     />
   </div>
 

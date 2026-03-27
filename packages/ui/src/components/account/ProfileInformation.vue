@@ -8,6 +8,11 @@ const props = defineProps<{
   account: Account;
 }>();
 
+const emit = defineEmits<{
+  profileClick: [acct: string];
+  tagClick: [tag: string];
+}>();
+
 const stats = computed(() => [
   { count: props.account.followersCount, label: 'Followers' },
   { count: props.account.followingCount, label: 'Following' },
@@ -72,6 +77,8 @@ function extractText(html: string): string {
       :content="account.note"
       :emojis="account.emojis"
       class="text-base leading-[22px] text-foreground"
+      @mention-click="emit('profileClick', $event)"
+      @hashtag-click="emit('tagClick', $event)"
     />
 
     <!-- Profile fields + Join date -->

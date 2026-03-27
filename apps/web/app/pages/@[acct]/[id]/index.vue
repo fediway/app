@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
+import type { MediaAttachment, Status } from '@repo/types';
 import { EmptyState, PageHeader, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
 import { computed } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -76,8 +76,8 @@ function handleShare(id: string) {
   }
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${tag.name}`);
+function handleTagClick(tag: string) {
+  router.push(`/tags/${tag}`);
 }
 
 function handleReply(id: string) {
@@ -168,6 +168,7 @@ function getReplyParent(reply: Status, index?: number): Status | null {
           :show-connector="index < context.ancestors.length - 1 || !!status"
           @click="navigateToStatus"
           @profile-click="navigateToProfile"
+          @tag-click="handleTagClick"
         />
 
         <!-- Connector from last ancestor to main -->

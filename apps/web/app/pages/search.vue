@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
+import type { MediaAttachment, Status } from '@repo/types';
 import type { AccountListUser } from '@repo/ui';
 import {
   AccountList,
@@ -98,8 +98,8 @@ function handleProfileClick(acct: string) {
   navigateTo(getProfilePath(acct));
 }
 
-function handleTagClick(tag: Tag) {
-  navigateTo(`/tags/${tag.name}`);
+function handleTagClick(tag: string) {
+  navigateTo(`/tags/${tag}`);
 }
 
 function handleSendMessage(status: Status) {

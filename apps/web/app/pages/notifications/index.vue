@@ -45,6 +45,7 @@ function navigateToProfile(acct: string) {
       :loading="isLoading && notifications.length === 0"
       @click="handleNotificationClick"
       @profile-click="navigateToProfile"
+      @tag-click="(tag) => router.push(`/tags/${tag}`)"
     />
 
     <template #fallback>

@@ -28,7 +28,6 @@ defineEmits<{
       :profile-url="profileUrl"
       :show-bio="showBio"
       class="min-w-0 flex-1"
-      @click.stop
     />
     <div v-if="$slots.action" class="shrink-0" @click.stop>
       <slot name="action" />

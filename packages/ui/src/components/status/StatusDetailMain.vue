@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status, Tag } from '@repo/types';
+import type { MediaAttachment, Status } from '@repo/types';
 import AccountDisplayName from '../account/AccountDisplayName.vue';
 import AccountHandle from '../account/AccountHandle.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
@@ -15,13 +15,13 @@ const props = defineProps<{
   status: Status;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   reply: [statusId: string];
   reblog: [statusId: string];
   favourite: [statusId: string];
   bookmark: [statusId: string];
   share: [statusId: string];
-  tagClick: [tag: Tag];
+  tagClick: [tagName: string];
   profileClick: [acct: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
   viewReblogs: [statusId: string];
@@ -39,19 +39,20 @@ const cleanedContent = useCleanContent(
   <article class="bg-card">
     <!-- Author info -->
     <div class="mb-3 px-4 pt-3">
-      <a
-        class="flex items-center gap-3 cursor-pointer no-underline"
-        @click="$emit('profileClick', status.account.acct)"
+      <button
+        type="button"
+        class="flex items-center gap-3 cursor-pointer"
+        @click="emit('profileClick', status.account.acct)"
       >
         <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="md" />
-        <div>
+        <div class="text-left">
           <AccountDisplayName
             :name="status.account.displayName || status.account.username"
             :emojis="status.account.emojis"
           />
           <AccountHandle :acct="status.account.acct" class="block text-sm" />
         </div>
-      </a>
+      </button>
     </div>
 
     <div class="px-4">
@@ -68,7 +69,10 @@ const cleanedContent = useCleanContent(
       <RichText
         :content="cleanedContent"
         :emojis="status.emojis"
+        :mentions="status.mentions"
         class="mb-2 text-lg leading-relaxed text-foreground"
+        @mention-click="emit('profileClick', $event)"
+        @hashtag-click="emit('tagClick', $event)"
       />
 
       <!-- Tags -->

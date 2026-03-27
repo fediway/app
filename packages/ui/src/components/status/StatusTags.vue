@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  tagClick: [tag: Tag];
+  tagClick: [tagName: string];
 }>();
 
 const visibleTags = computed(() => props.tags.slice(0, props.limit));
@@ -27,7 +27,7 @@ const hiddenCount = computed(() => Math.max(0, props.tags.length - props.limit))
       :key="tag.name"
       type="button"
       class="text-sm text-foreground/50 hover:text-foreground/70 cursor-pointer transition-colors"
-      @click="emit('tagClick', tag)"
+      @click="emit('tagClick', tag.name)"
     >
       #{{ tag.name }}
     </button>

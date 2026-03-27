@@ -51,8 +51,9 @@ const { open: openLightbox } = useMediaLightbox();
     @favourite="(id) => toggleFavourite(id)"
     @bookmark="(id) => handleBookmark(id)"
     @send-message="(s) => openSendMessage(s)"
-    @tag-click="(tag) => router.push(`/tags/${tag.name}`)"
+    @tag-click="(tag) => router.push(`/tags/${tag}`)"
     @status-click="(id) => router.push(getStatusPath(id))"
+    @profile-click="(acct) => router.push(getProfilePath(acct))"
     @media-click="(attachments, index) => openLightbox(attachments, index)"
   />
 </template>

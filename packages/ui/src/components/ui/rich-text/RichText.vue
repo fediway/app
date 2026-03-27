@@ -1,20 +1,30 @@
 <script setup lang="ts">
 import type { CustomEmoji } from '@repo/types';
+import type { StatusMention } from '../../../utils/content-links';
 import { computed } from 'vue';
+import { extractTagName, resolveMentionAcct } from '../../../utils/content-links';
 import { escapeRegExp, sanitizeHtml } from '../../../utils/sanitize';
-
-const props = withDefaults(defineProps<Props>(), {
-  emojis: () => [],
-});
-
-const QUOTE_RE = /"/g;
 
 interface Props {
   /** HTML content to render */
   content: string;
   /** Custom emoji map for replacement */
   emojis?: CustomEmoji[];
+  /** Status mentions for resolving @mention links */
+  mentions?: StatusMention[];
 }
+
+const props = withDefaults(defineProps<Props>(), {
+  emojis: () => [],
+  mentions: () => [],
+});
+
+const emit = defineEmits<{
+  mentionClick: [acct: string];
+  hashtagClick: [tag: string];
+}>();
+
+const QUOTE_RE = /"/g;
 
 // Process content to replace custom emoji shortcodes with images
 const processedContent = computed(() => {
@@ -30,11 +40,56 @@ const processedContent = computed(() => {
 
   return html;
 });
+
+function handleContentClick(e: MouseEvent) {
+  // Allow modifier keys to work normally (Cmd-click to open in new tab)
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+    return;
+
+  const anchor = (e.target as HTMLElement).closest('a');
+  if (!anchor)
+    return;
+
+  const href = anchor.getAttribute('href');
+  if (!href)
+    return;
+
+  // 1. Mention
+  if (anchor.classList.contains('mention') || anchor.classList.contains('u-url')) {
+    const acct = resolveMentionAcct(href, anchor.textContent ?? '', props.mentions);
+    if (acct) {
+      e.preventDefault();
+      e.stopPropagation();
+      emit('mentionClick', acct);
+      return;
+    }
+  }
+
+  // 2. Hashtag
+  if (anchor.classList.contains('hashtag')) {
+    const tag = extractTagName(href, anchor.textContent ?? '');
+    if (tag) {
+      e.preventDefault();
+      e.stopPropagation();
+      emit('hashtagClick', tag);
+      return;
+    }
+  }
+
+  // 3. External link — ensure safe attributes, let browser handle
+  if (!anchor.getAttribute('target')) {
+    anchor.setAttribute('target', '_blank');
+  }
+  if (!anchor.getAttribute('rel')?.includes('noopener')) {
+    anchor.setAttribute('rel', 'noopener noreferrer');
+  }
+}
 </script>
 
 <template>
   <div
     class="rich-text leading-snug break-words"
+    @click="handleContentClick"
     v-html="processedContent"
   />
 </template>

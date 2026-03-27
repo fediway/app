@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MediaAttachment, Status as StatusType, Tag } from '@repo/types';
+import type { MediaAttachment, Status as StatusType } from '@repo/types';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { computed } from 'vue';
 import Status from '../status/Status.vue';
@@ -30,7 +30,7 @@ const emit = defineEmits<{
   bookmark: [statusId: string];
   share: [statusId: string];
   sendMessage: [status: StatusType];
-  tagClick: [tag: Tag];
+  tagClick: [tagName: string];
   loadMore: [];
   statusClick: [statusId: string];
   profileClick: [acct: string];
@@ -100,6 +100,7 @@ function getReplyParent(status: StatusType): StatusType | null {
           @send-message="emit('sendMessage', $event)"
           @tag-click="emit('tagClick', $event)"
           @status-click="emit('statusClick', $event)"
+          @profile-click="emit('profileClick', $event)"
           @media-click="(attachments, index) => emit('mediaClick', attachments, index)"
         />
       </div>

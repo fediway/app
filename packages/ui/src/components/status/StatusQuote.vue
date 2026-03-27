@@ -19,6 +19,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   click: [statusId: string];
+  profileClick: [acct: string];
+  tagClick: [tag: string];
 }>();
 
 function handleClick(event: MouseEvent) {
@@ -50,7 +52,14 @@ const firstMediaUrl = computed(() => {
       </div>
 
       <!-- Content -->
-      <RichText :content="status.content" :emojis="status.emojis" class="text-sm text-foreground line-clamp-3" />
+      <RichText
+        :content="status.content"
+        :emojis="status.emojis"
+        :mentions="status.mentions"
+        class="text-sm text-foreground line-clamp-3"
+        @mention-click="emit('profileClick', $event)"
+        @hashtag-click="emit('tagClick', $event)"
+      />
 
       <!-- Media preview (if has media) -->
       <div
