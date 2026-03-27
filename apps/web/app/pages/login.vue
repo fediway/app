@@ -152,7 +152,7 @@ function handleSubmit() {
     <!-- Back button -->
     <button
       type="button"
-      class="absolute left-4 top-4 z-20 flex size-10 items-center justify-center rounded-full text-[#232b37]/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
+      class="absolute left-4 top-4 z-20 flex size-10 cursor-pointer items-center justify-center rounded-full text-[#232b37]/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
       aria-label="Go back"
       @click="router.back()"
     >

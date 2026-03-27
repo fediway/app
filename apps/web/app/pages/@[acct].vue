@@ -5,6 +5,7 @@ import {
   ProfileActions,
   ProfileHeader,
   ProfileInformation,
+  Skeleton,
   TabBar,
 } from '@repo/ui';
 import { useFollows } from '~/composables/useFollows';
@@ -22,7 +23,7 @@ const { toggleFollow, getRelationship, fetchRelationships } = useFollows();
 const acct = computed(() => route.params.acct as string);
 const isStatusDetail = computed(() => !!route.params.id);
 
-const { data: account } = getAccountByAcct(acct.value);
+const { data: account, isLoading: isAccountLoading } = getAccountByAcct(acct.value);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
 
 // Set desktop header — show profile info
@@ -152,6 +153,18 @@ function goBack() {
         <!-- Child route (posts / replies / media / followers / following) -->
         <NuxtPage />
       </template>
+
+      <!-- Loading -->
+      <div v-else-if="isAccountLoading" class="space-y-4 p-4">
+        <Skeleton class="h-32 w-full rounded-xl" />
+        <div class="flex items-center gap-3 px-1">
+          <Skeleton class="size-16 rounded-full" />
+          <div class="space-y-2">
+            <Skeleton class="h-5 w-32" />
+            <Skeleton class="h-3 w-24" />
+          </div>
+        </div>
+      </div>
 
       <!-- Account not found -->
       <EmptyState

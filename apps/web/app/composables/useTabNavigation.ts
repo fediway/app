@@ -2,7 +2,7 @@ import { computed, nextTick, ref } from 'vue';
 import { useFeedScroll } from '~/composables/useFeedScroll';
 import { useNavigationStore } from '~/stores/navigation';
 
-export type TabId = 'home' | 'search' | 'new-post' | 'notifications' | 'profile';
+export type TabId = 'home' | 'search' | 'new-post' | 'messages' | 'notifications' | 'profile';
 
 interface TabState {
   lastPath: string;
@@ -12,6 +12,7 @@ interface TabState {
 const TAB_ROOTS: Record<Exclude<TabId, 'new-post' | 'profile'>, string> = {
   home: '/',
   search: '/search',
+  messages: '/messages',
   notifications: '/notifications',
 };
 
@@ -96,7 +97,7 @@ export function useTabNavigation() {
     }
 
     // Check if the new path matches a tab root
-    const allTabIds: TabId[] = ['home', 'search', 'notifications', 'profile'];
+    const allTabIds: TabId[] = ['home', 'search', 'messages', 'notifications', 'profile'];
     const matchedTab = allTabIds.find(id => getTabRoot(id) === toPath);
 
     if (matchedTab) {

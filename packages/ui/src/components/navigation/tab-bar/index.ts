@@ -9,7 +9,7 @@ export interface TabItem {
 }
 
 export const tabItemVariants = cva(
-  'min-w-max flex-1 shrink-0 cursor-pointer flex items-center justify-center px-4 text-base whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring',
+  'min-w-max shrink-0 cursor-pointer flex items-center justify-center px-3 py-3 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring',
   {
     variants: {
       active: {

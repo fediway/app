@@ -32,7 +32,7 @@ const emit = defineEmits<{
         :class="cn(tabItemVariants({ active: modelValue === tab.value }))"
         @click="emit('update:modelValue', tab.value)"
       >
-        <span class="relative flex h-8 items-center">
+        <span class="relative pb-3 -mb-3">
           {{ tab.label }}
           <span
             v-if="modelValue === tab.value"

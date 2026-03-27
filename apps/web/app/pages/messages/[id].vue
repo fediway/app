@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useAuth } from '@repo/api';
-import { ChatHeader, EmptyState, MessageBubble, MessageInput, Skeleton } from '@repo/ui';
+import { EmptyState, MessageBubble, MessageInput, Skeleton } from '@repo/ui';
 import { computed, nextTick, ref, watch } from 'vue';
+import { usePageHeader } from '~/composables/usePageHeader';
+
+definePageMeta({ mobileFullscreen: true });
 
 const route = useRoute();
 const router = useRouter();
@@ -68,6 +71,13 @@ function goBack() {
   router.push('/messages');
 }
 
+// Set page header to show participant avatar + name in MobileHeader
+usePageHeader({
+  title: computed(() => participant.value?.displayName ?? 'Conversation'),
+  subtitle: computed(() => participant.value ? `@${participant.value.acct}` : undefined),
+  image: computed(() => participant.value?.avatar),
+});
+
 // Scroll to bottom on new messages
 watch(() => threadStatuses.value.length, () => {
   nextTick(() => {
@@ -80,14 +90,7 @@ watch(() => threadStatuses.value.length, () => {
 </script>
 
 <template>
-  <div class="flex h-full min-h-[calc(100vh-112px)] flex-col lg:min-h-[calc(100vh-32px)]">
-    <!-- Chat Header -->
-    <ChatHeader
-      v-if="participant"
-      :participant="participant"
-      @back="goBack"
-    />
-
+  <div class="flex min-h-[calc(100dvh-3.5rem)] flex-col lg:min-h-[calc(100vh-32px)]">
     <ClientOnly>
       <!-- Loading -->
       <div v-if="isLoading" class="flex-1 space-y-3 p-4">
@@ -117,8 +120,8 @@ watch(() => threadStatuses.value.length, () => {
           />
         </div>
 
-        <!-- Message Input -->
-        <div class="border-t border-border bg-card px-4 py-3">
+        <!-- Message Input — sticky at bottom -->
+        <div class="sticky bottom-0 border-t border-border bg-card px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:pb-3">
           <MessageInput
             v-model="newMessage"
             placeholder="Write a message..."

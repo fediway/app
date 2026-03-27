@@ -12,7 +12,11 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
+const route = useRoute();
 const router = useRouter();
+
+// Pages with mobileFullscreen meta hide the mobile header/footer chrome
+const isMobileFullscreen = computed(() => !!route.meta.mobileFullscreen);
 useNetworkStatus();
 const navigation = useNavigationStore();
 const { isOpen, replyingTo, close } = usePostComposer();
@@ -199,12 +203,12 @@ watch(isAuthenticated, (authenticated) => {
           @click="navigation.closeSidebar()"
         />
         <MobileHeader v-if="isAuthenticated" />
-        <main class="flex-1 pb-20">
+        <main class="flex-1" :class="isMobileFullscreen ? '' : 'pb-20'">
           <slot />
         </main>
       </div>
       <!-- Footer outside transformed wrapper — fixed positioning needs viewport as containing block -->
-      <MobileFooter />
+      <MobileFooter v-if="!isMobileFullscreen" />
     </div>
 
     <!-- Desktop Layout: page scrolls normally, sidebars + header stay fixed via sticky -->

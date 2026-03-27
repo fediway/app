@@ -87,10 +87,6 @@
   --color-yellow-foreground: var(--yellow-foreground);
   --color-yellow-background: var(--yellow-background);
 
-  --color-camel: var(--camel);
-  --color-camel-foreground: var(--camel-foreground);
-  --color-camel-background: var(--camel-background);
-
   --color-gray: var(--gray);
   --color-gray-foreground: var(--gray-foreground);
   --color-gray-background: var(--gray-background);
@@ -358,10 +354,6 @@
   --yellow-foreground:  oklch(0.50  0.098 80);   /* gold-700 */
   --yellow-background:  oklch(0.975 0.014 93);   /* gold-50 */
 
-  --camel:             oklch(0.68  0.142 85);   /* gold-500 */
-  --camel-foreground:  oklch(1.00  0     0);
-  --camel-background:  oklch(0.94  0.042 92);   /* gold-100 */
-
   --gray:             oklch(0.54  0.010 345);  /* gray-600 */
   --gray-foreground:  oklch(0.27  0.025 260);
   --gray-background:  oklch(0.94  0.018 87);   /* surface-sunken */
@@ -410,10 +402,6 @@
   --yellow:             oklch(0.76  0.155 87);
   --yellow-foreground:  oklch(0.82  0.122 88);
   --yellow-background:  oklch(0.22  0.026 74);
-
-  --camel:             oklch(0.76  0.155 87);
-  --camel-foreground:  oklch(1.00  0     0);
-  --camel-background:  oklch(0.22  0.026 74);
 
   --gray:             oklch(0.54  0.010 345);
   --gray-foreground:  oklch(0.95  0.008 85);

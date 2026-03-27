@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
 import type { AccountListUser } from '@repo/ui';
+import type { Ref } from 'vue';
 import {
   AccountList,
   Avatar,
@@ -10,7 +11,7 @@ import {
   Skeleton,
   Timeline,
 } from '@repo/ui';
-import { computed, ref, watch } from 'vue';
+import { ref, shallowRef, watch, watchEffect } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
@@ -42,10 +43,37 @@ watch(() => route.query.q, (newQuery) => {
   searchQuery.value = (newQuery as string) || '';
 });
 
-// Search results — QueryResult is keyed by query, so same query returns cached refs
-const postResults = computed(() => searchStatuses(searchQuery.value).data.value);
-const accountResults = computed(() => searchAccounts(searchQuery.value).data.value);
-const tagResults = computed(() => searchTags(searchQuery.value).data.value);
+// Search results — createQuery returns stable refs for the same key,
+// but must not be called inside computed (triggers SWR revalidation on every access).
+// Instead, call once per query change and read the returned refs.
+const postResults = shallowRef<Status[]>([]);
+const accountResults = shallowRef<any[]>([]);
+const tagResults = shallowRef<any[]>([]);
+
+let currentQueryRefs: { posts: Ref<Status[]>; accounts: Ref<any[]>; tags: Ref<any[]> } | null = null;
+
+watch(searchQuery, (query) => {
+  if (!query.trim()) {
+    postResults.value = [];
+    accountResults.value = [];
+    tagResults.value = [];
+    currentQueryRefs = null;
+    return;
+  }
+  const posts = searchStatuses(query);
+  const accounts = searchAccounts(query);
+  const tags = searchTags(query);
+  currentQueryRefs = { posts: posts.data, accounts: accounts.data, tags: tags.data };
+}, { immediate: true });
+
+// Sync the query result refs into our local refs (reactive bridge)
+watchEffect(() => {
+  if (currentQueryRefs) {
+    postResults.value = currentQueryRefs.posts.value;
+    accountResults.value = currentQueryRefs.accounts.value;
+    tagResults.value = currentQueryRefs.tags.value;
+  }
+});
 
 const isSearching = computed(() => searchQuery.value.trim().length > 0);
 const hasResults = computed(() =>
