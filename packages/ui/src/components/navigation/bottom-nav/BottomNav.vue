@@ -10,6 +10,7 @@ export interface BottomNavItemType {
   main?: boolean;
   active?: boolean;
   badge?: number | string;
+  dot?: boolean;
   ariaLabel?: string;
 }
 
@@ -33,6 +34,7 @@ defineEmits<{
       :main="item.main"
       :active="item.active"
       :badge="item.badge"
+      :dot="item.dot"
       :aria-label="item.ariaLabel ?? item.label"
       @click="$emit('itemClick', item, i)"
     />

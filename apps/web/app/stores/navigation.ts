@@ -1,10 +1,11 @@
-import { useAuth } from '@repo/api';
+import { useAuth, useNotificationMarker } from '@repo/api';
 
 export interface MenuItem {
   id: string;
   label: string;
   icon: string;
   to: string;
+  dot?: boolean;
 }
 
 export interface CurrentUser {
@@ -66,6 +67,7 @@ export function useNavigationStore() {
     return id === 'profile' ? profileUrl.value : (MENU_ROUTES[id] ?? '/');
   }
 
+  const { hasUnread: hasUnreadNotifications } = useNotificationMarker();
   const isLoggedIn = computed(() => !!currentUser.value);
 
   const LOGGED_OUT_MENU: Omit<MenuItem, 'to'>[] = [
@@ -80,12 +82,20 @@ export function useNavigationStore() {
 
   const menuItems = computed<MenuItem[]>(() => {
     const items = isLoggedIn.value ? MENU_ITEMS : LOGGED_OUT_MENU;
-    return items.map(item => ({ ...item, to: getRoute(item.id) }));
+    return items.map(item => ({
+      ...item,
+      to: getRoute(item.id),
+      dot: item.id === 'notifications' ? hasUnreadNotifications.value : undefined,
+    }));
   });
 
   const mobileFooterItems = computed<MenuItem[]>(() => {
     const items = isLoggedIn.value ? FOOTER_ITEMS : LOGGED_OUT_FOOTER;
-    return items.map(item => ({ ...item, to: getRoute(item.id) }));
+    return items.map(item => ({
+      ...item,
+      to: getRoute(item.id),
+      dot: item.id === 'notifications' ? hasUnreadNotifications.value : undefined,
+    }));
   });
 
   const activeItemId = computed(() => {

@@ -173,17 +173,19 @@ function toggleReveal() {
     <!-- Grid / Single (1-4) -->
     <div v-else-if="displayMode !== 'empty'" class="relative">
       <!-- Sensitive content overlay -->
-      <div
+      <button
         v-if="sensitive && !revealed"
+        type="button"
+        aria-label="Reveal sensitive content"
         class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-muted cursor-pointer"
         @click="toggleReveal"
       >
-        <svg class="w-8 h-8 text-muted-foreground/60 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg aria-hidden="true" class="w-8 h-8 text-muted-foreground/60 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
         </svg>
         <span class="text-sm text-muted-foreground font-medium">Sensitive content</span>
         <span class="text-xs text-muted-foreground/60 mt-1">Click to reveal</span>
-      </div>
+      </button>
 
       <!-- Grid container -->
       <div
@@ -273,6 +275,7 @@ function toggleReveal() {
       <button
         v-if="sensitive && revealed"
         type="button"
+        aria-label="Hide sensitive content"
         class="absolute top-2 right-2 z-10 px-2 py-1 bg-black/50 text-white text-xs rounded-full hover:bg-black/70 transition-colors cursor-pointer"
         @click="toggleReveal"
       >

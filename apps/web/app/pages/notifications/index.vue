@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
+import { useNotificationMarker } from '@repo/api';
 import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
 
 const router = useRouter();
 const { getNotifications } = useNotificationData();
 const { getProfilePath, getStatusPath } = useAccountData();
+const { lastReadId } = useNotificationMarker();
 
 const { data: notifications, isLoading, error, refetch } = getNotifications();
 
@@ -43,6 +45,7 @@ function navigateToProfile(acct: string) {
       v-else
       :notifications="notifications"
       :loading="isLoading && notifications.length === 0"
+      :last-read-id="lastReadId ?? undefined"
       @click="handleNotificationClick"
       @profile-click="navigateToProfile"
       @tag-click="(tag) => router.push(`/tags/${tag}`)"

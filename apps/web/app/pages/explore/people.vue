@@ -61,7 +61,7 @@ watch(accounts, (accts) => {
               @unfollow="toggleFollow(account.id)"
             />
           </div>
-          <div class="mt-2 flex items-center gap-4 pl-12 text-sm text-muted-foreground">
+          <div class="mt-2 flex items-center gap-4 pl-12 text-sm text-gray-500 dark:text-gray-400">
             <span><strong class="text-foreground">{{ account.followersCount?.toLocaleString() }}</strong> followers</span>
             <span><strong class="text-foreground">{{ account.followingCount?.toLocaleString() }}</strong> following</span>
           </div>

@@ -27,7 +27,7 @@ function handleTagClick(name: string) {
     />
 
     <div class="p-4">
-      <h2 class="mb-3 text-sm font-medium text-muted-foreground">
+      <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
         Trending now
       </h2>
       <TagList

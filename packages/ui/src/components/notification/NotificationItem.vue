@@ -9,6 +9,7 @@ import RelativeTime from '../ui/relative-time/RelativeTime.vue';
 
 defineProps<{
   notification: Notification;
+  unread?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -44,6 +45,7 @@ function getText(type: string): string {
 <template>
   <button
     class="flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
+    :class="unread ? 'bg-galaxy-500/5' : ''"
     @click="$emit('click', notification)"
   >
     <!-- Type icon -->

@@ -81,7 +81,7 @@ const canPost = computed(() => {
 const hasUnsavedContent = computed(() => content.value.trim().length > 0);
 
 // Draft autosave — debounced via useDraft (1s)
-watch([content, spoilerText, visibility], () => {
+watch([content, spoilerText, visibility, pollOptions, pollDuration, pollMultiple, showPoll], () => {
   if (!props.isOpen || !hasUnsavedContent.value)
     return;
   draftStatus.value = 'saving';
@@ -90,6 +90,13 @@ watch([content, spoilerText, visibility], () => {
     spoilerText: spoilerText.value,
     visibility: visibility.value,
     inReplyToId: props.replyTo?.id,
+    ...(showPoll.value
+      ? {
+          pollOptions: pollOptions.value,
+          pollDuration: pollDuration.value,
+          pollMultiple: pollMultiple.value,
+        }
+      : {}),
   });
   setTimeout(() => {
     if (draftStatus.value === 'saving')
@@ -118,6 +125,12 @@ watch(() => props.isOpen, async (isOpen) => {
       spoilerText.value = saved.spoilerText;
       showContentWarning.value = saved.spoilerText.length > 0;
       visibility.value = saved.visibility;
+      if (saved.pollOptions && saved.pollOptions.length >= 2) {
+        showPoll.value = true;
+        pollOptions.value = saved.pollOptions;
+        pollDuration.value = saved.pollDuration ?? 86400;
+        pollMultiple.value = saved.pollMultiple ?? false;
+      }
       draftStatus.value = 'saved';
     }
     else {

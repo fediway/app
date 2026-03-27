@@ -13,6 +13,7 @@ export { type DeepLinkRoute, useDeepLinks, type UseDeepLinksReturn } from './use
 export { useDraft, type UseDraftReturn } from './useDraft';
 export { type CreateFilterParams, type FilterError, type UpdateFilterParams, useFilters, type UseFiltersOptions, type UseFiltersReturn } from './useFilters';
 export { type ModerationError, type MuteAccountParams, useModeration, type UseModerationOptions, type UseModerationReturn } from './useModeration';
+export { resetNotificationMarkerState, useNotificationMarker, type UseNotificationMarkerReturn } from './useNotificationMarker';
 export { type ReportCategory, type ReportError, type SubmitReportParams, useReport, type UseReportOptions, type UseReportReturn } from './useReport';
 export { type SharedContent, type ShareReceivedEvent, useShareTarget } from './useShareTarget';
 export { useStatus, type UseStatusReturn } from './useStatus';

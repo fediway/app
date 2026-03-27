@@ -11,6 +11,14 @@ const mockAuthUser = ref<{
 
 vi.mock('@repo/api', () => ({
   useAuth: () => ({ currentUser: mockAuthUser }),
+  useNotificationMarker: () => ({
+    hasUnread: computed(() => false),
+    lastReadId: ref(null),
+    fetchMarker: vi.fn(),
+    markAsRead: vi.fn(),
+    startPolling: vi.fn(),
+    stopPolling: vi.fn(),
+  }),
 }));
 
 // Mock Nuxt auto-imports — use real Vue primitives

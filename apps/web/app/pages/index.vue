@@ -104,12 +104,16 @@ function handleRetry() {
   }
 }
 
+// Fetch eagerly in setup — sets isLoading=true synchronously,
+// preventing flash-of-empty-state before first render
+if (timeline) {
+  timeline.fetch();
+}
+
 onMounted(() => {
   if (timeline) {
-    timeline.fetch();
     timeline.startPolling(30_000);
   }
-  // trending fetches automatically via createQuery
 });
 
 onUnmounted(() => {

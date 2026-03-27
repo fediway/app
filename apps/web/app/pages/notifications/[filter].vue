@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
 import type { NotificationFilter } from '~/composables/useNotificationData';
+import { useNotificationMarker } from '@repo/api';
 import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
 import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
@@ -8,6 +9,7 @@ const route = useRoute();
 const router = useRouter();
 const { getNotificationsPaginated } = useNotificationData();
 const { getProfilePath, getStatusPath } = useAccountData();
+const { lastReadId } = useNotificationMarker();
 
 const filter = computed(() => route.params.filter as NotificationFilter);
 const filterLabel = computed(() => NOTIFICATION_FILTERS[filter.value]?.label ?? 'Notifications');
@@ -51,6 +53,7 @@ function navigateToProfile(acct: string) {
       :loading="isLoading && notifications.length === 0"
       :loading-more="isLoadingMore"
       :has-more="hasMore"
+      :last-read-id="lastReadId ?? undefined"
       @click="handleNotificationClick"
       @profile-click="navigateToProfile"
       @tag-click="(tag) => router.push(`/tags/${tag}`)"

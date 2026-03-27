@@ -8,6 +8,7 @@ defineProps<{
   main?: boolean;
   active?: boolean;
   badge?: number | string;
+  dot?: boolean;
   ariaLabel?: string;
 }>();
 
@@ -33,6 +34,11 @@ defineEmits<{
       >
         {{ typeof badge === 'number' && badge > 99 ? '99+' : badge }}
       </span>
+      <span
+        v-else-if="dot"
+        class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-galaxy-500"
+        aria-label="New notifications"
+      />
     </span>
     <span v-if="!main && label" class="text-xs text-foreground">
       {{ label }}

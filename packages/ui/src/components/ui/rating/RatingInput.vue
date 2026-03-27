@@ -25,12 +25,14 @@ function handleClick(star: number) {
 </script>
 
 <template>
-  <div class="inline-flex gap-0.5" :class="{ 'opacity-50 cursor-not-allowed': disabled }">
+  <div role="radiogroup" :aria-label="`Rating, ${modelValue} out of ${max} stars`" class="inline-flex gap-0.5" :class="{ 'opacity-50 cursor-not-allowed': disabled }">
     <button
       v-for="i in max"
       :key="i"
       type="button"
       :disabled="disabled"
+      :aria-label="`Rate ${i} out of ${max} stars`"
+      :aria-pressed="modelValue === i"
       class="transition-colors"
       :class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
       @mouseenter="hovered = i"

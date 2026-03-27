@@ -57,6 +57,8 @@ export function createMockClient(): MastoClient {
   const blockedDomainsSet = new Set<string>();
   const mockReports: Array<{ id: string; category: string; comment: string; statusIds: string[]; targetAccount: { id: string }; ruleIds: string[]; actionTaken: boolean; createdAt: string }> = [];
   const mockFiltersList: Array<{ id: string; title: string; context: string[]; filterAction: string; expiresAt: string | null; keywords: Array<{ id: string; keyword: string; wholeWord: boolean }>; statuses: [] }> = [];
+  // Marker state — initialize to older ID so some notifications appear unread in dev
+  let mockMarkerLastReadId = 'notif-3';
   let nextFilterId = 1;
   let nextFilterKeywordId = 1;
   let nextReportId = 1;
@@ -479,13 +481,37 @@ export function createMockClient(): MastoClient {
         },
       },
       notifications: {
-        async list(params?: { limit?: number; types?: string[] }) {
+        async list(params?: { limit?: number; maxId?: string; types?: string[] }) {
           await delay();
           let result = mockNotifications as Notification[];
           if (params?.types?.length) {
             result = result.filter(n => params.types!.includes(n.type));
           }
+          if (params?.maxId) {
+            const idx = result.findIndex(n => n.id === params.maxId);
+            result = idx !== -1 ? result.slice(idx + 1) : [];
+          }
           return result.slice(0, params?.limit ?? 30);
+        },
+      },
+      markers: {
+        async fetch(_params?: { timeline?: string[] }) {
+          await delay();
+          return {
+            notifications: {
+              lastReadId: mockMarkerLastReadId,
+              last_read_id: mockMarkerLastReadId,
+              version: 0,
+              updatedAt: new Date().toISOString(),
+            },
+          };
+        },
+        async create(params: Record<string, any>) {
+          await delay();
+          if (params.notifications?.lastReadId) {
+            mockMarkerLastReadId = params.notifications.lastReadId;
+          }
+          return {};
         },
       },
       conversations: {

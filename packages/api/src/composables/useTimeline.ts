@@ -189,6 +189,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
     pendingStatuses.value = [];
     hasGap.value = false;
     error.value = null;
+    isLoading.value = true;
 
     // 1. Try loading from cache (non-blocking, silent on error)
     if (timelineCache) {
@@ -197,13 +198,11 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
         if (cached.length > 0) {
           trackIds(cached);
           statuses.value = cached;
+          isLoading.value = false; // Cache hit — stop showing spinner
         }
       }
       catch { /* cache errors are silent */ }
     }
-
-    // 2. Only show loading spinner if no cached data
-    isLoading.value = statuses.value.length === 0;
 
     try {
       const result = await fetchTimeline();

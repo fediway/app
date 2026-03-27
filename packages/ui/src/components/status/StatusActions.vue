@@ -79,7 +79,7 @@ const canReblog = computed(() =>
         :aria-label="`${favourited ? 'Unfavourite' : 'Favourite'}${favouritesCount ? `, ${favouritesCount} ${favouritesCount === 1 ? 'like' : 'likes'}` : ''}`"
         :aria-pressed="favourited"
         class="w-[60px]"
-        :class="{ 'text-rose-500 hover:text-rose-500': favourited }"
+        :class="{ 'text-rose-500 dark:text-rose-500 hover:text-rose-500': favourited }"
         @click="emit('favourite')"
       >
         <PhHeart :size="20" :weight="favourited ? 'fill' : 'regular'" />
@@ -99,7 +99,7 @@ const canReblog = computed(() =>
         :aria-label="`${reblogged ? 'Undo boost' : 'Boost'}${reblogsCount ? `, ${reblogsCount} ${reblogsCount === 1 ? 'boost' : 'boosts'}` : ''}`"
         :aria-pressed="reblogged"
         class="w-[60px]"
-        :class="{ 'text-green hover:text-green': reblogged, 'disabled:opacity-40': !canReblog }"
+        :class="{ 'text-green dark:text-green hover:text-green': reblogged, 'disabled:opacity-40': !canReblog }"
         :disabled="!canReblog"
         @click="canReblog && emit('reblog')"
       >
@@ -112,7 +112,7 @@ const canReblog = computed(() =>
       <ButtonAction
         :aria-label="bookmarked ? 'Remove bookmark' : 'Bookmark'"
         :aria-pressed="bookmarked"
-        :class="{ 'text-yellow hover:text-yellow': bookmarked }"
+        :class="{ 'text-yellow dark:text-yellow hover:text-yellow': bookmarked }"
         @click="emit('bookmark')"
       >
         <PhBookmarkSimple :size="20" :weight="bookmarked ? 'fill' : 'regular'" />

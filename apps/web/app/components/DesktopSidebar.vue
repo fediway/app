@@ -56,6 +56,7 @@ const { open: openComposer } = usePostComposer();
       :icon="item.icon"
       :label="item.label"
       :active="navigation.activeItemId === item.id"
+      :dot="item.dot"
       @click="navigateTo(item.to)"
     />
   </SideNav>

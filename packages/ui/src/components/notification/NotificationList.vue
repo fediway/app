@@ -11,6 +11,7 @@ const props = defineProps<{
   loading?: boolean;
   loadingMore?: boolean;
   hasMore?: boolean;
+  lastReadId?: string;
   error?: string;
 }>();
 
@@ -21,6 +22,17 @@ const emit = defineEmits<{
   loadMore: [];
   retry: [];
 }>();
+
+function isUnread(id: string): boolean {
+  if (!props.lastReadId)
+    return false;
+  try {
+    return BigInt(id) > BigInt(props.lastReadId);
+  }
+  catch {
+    return id > props.lastReadId;
+  }
+}
 
 const { sentinelRef } = useInfiniteScroll({
   enabled: computed(() => (props.hasMore ?? false) && !props.loadingMore && !props.loading && !props.error && props.notifications.length > 0),
@@ -57,6 +69,7 @@ const { sentinelRef } = useInfiniteScroll({
       v-for="notification in notifications"
       :key="notification.id"
       :notification="notification"
+      :unread="isUnread(notification.id)"
       @click="n => $emit('click', n)"
       @profile-click="acct => $emit('profileClick', acct)"
       @tag-click="tag => $emit('tagClick', tag)"

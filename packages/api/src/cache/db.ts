@@ -24,6 +24,9 @@ export interface DraftData {
   itemUrl?: string;
   itemType?: string;
   rating?: number;
+  pollOptions?: string[];
+  pollDuration?: number;
+  pollMultiple?: boolean;
 }
 
 export interface StoredDraft extends DraftData {

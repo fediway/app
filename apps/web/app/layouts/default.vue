@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
+import { useAuth, useNotificationMarker } from '@repo/api';
 import { MediaLightbox, ToastContainer, useToast } from '@repo/ui';
 import { useBackButton } from '~/composables/useBackButton';
 import { useConversationData } from '~/composables/useConversationData';
@@ -108,8 +109,30 @@ async function handleSendMessage(data: { recipients: Account[]; message: string;
   }
 }
 
+// Notification polling — check for new notifications every 60s
+const { isAuthenticated } = useAuth();
+const { fetchMarker, startPolling: startNotifPolling, stopPolling: stopNotifPolling } = useNotificationMarker();
+
 onMounted(() => {
   initCapacitorBackButton();
+  if (isAuthenticated.value) {
+    fetchMarker();
+    startNotifPolling(60_000);
+  }
+});
+
+onUnmounted(() => {
+  stopNotifPolling();
+});
+
+watch(isAuthenticated, (authenticated) => {
+  if (authenticated) {
+    fetchMarker();
+    startNotifPolling(60_000);
+  }
+  else {
+    stopNotifPolling();
+  }
 });
 </script>
 

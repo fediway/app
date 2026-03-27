@@ -1,4 +1,5 @@
 import { useAccountStore, useAuth, useClient, useDarkMode } from '@repo/api';
+import { useToast } from '@repo/ui';
 import { watch } from 'vue';
 import { useAuthState } from '~/composables/useAuthState';
 import { useDataMode } from '~/composables/useDataMode';
@@ -72,6 +73,8 @@ export default defineNuxtPlugin(async () => {
   }
 
   // ── Auth state watcher — sync cookie + handle 401 ──
+  const { toast } = useToast();
+
   watch(isAuthenticated, (authenticated) => {
     if (authenticated) {
       setAuthenticated();
@@ -79,7 +82,12 @@ export default defineNuxtPlugin(async () => {
     else {
       clearAuthenticated();
       if (mode.value === 'live') {
-        navigateTo('/', { replace: true });
+        const currentPath = window.location.pathname;
+        const redirect = currentPath !== '/' && currentPath !== '/login'
+          ? `?redirect=${encodeURIComponent(currentPath)}`
+          : '';
+        toast('Session expired — please sign in again');
+        navigateTo(`/login${redirect}`, { replace: true });
       }
     }
   });

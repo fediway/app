@@ -18,7 +18,7 @@ watch(suggestedAccounts, (accounts) => {
 <template>
   <Card v-if="!error && suggestedAccounts.length > 0" class="rounded-xl border-border shadow-none">
     <CardHeader class="p-4 pb-0">
-      <CardTitle class="text-sm font-medium text-muted-foreground">
+      <CardTitle class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
         Who to follow
       </CardTitle>
     </CardHeader>
@@ -45,7 +45,7 @@ watch(suggestedAccounts, (accounts) => {
     <CardFooter class="px-4 pb-4">
       <NuxtLink
         to="/explore/people"
-        class="text-sm text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+        class="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:text-foreground cursor-pointer"
       >
         See more
       </NuxtLink>

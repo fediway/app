@@ -46,6 +46,7 @@ function handleOpenChange(open: boolean) {
         :icon="item.icon"
         :label="item.label"
         :active="navigation.activeItemId === item.id"
+        :dot="item.dot"
         @click="handleItemClick(item)"
       />
     </nav>

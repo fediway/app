@@ -3,6 +3,7 @@ import { invalidateAllPaginatedQueries } from '../composables/createPaginatedQue
 import { invalidateAllQueries } from '../composables/createQuery';
 import { resetFollowsState } from '../composables/queries/useFollows';
 import { resetPostsState } from '../composables/queries/usePosts';
+import { resetNotificationMarkerState } from '../composables/useNotificationMarker';
 import { useStatusStore } from '../composables/useStatusStore';
 
 /**
@@ -27,6 +28,9 @@ export function clearAllAccountState(): void {
 
   // User posts (optimistic placeholders)
   resetPostsState();
+
+  // Notification marker (unread badge state + polling)
+  resetNotificationMarkerState();
 
   // IndexedDB timeline cache (fire-and-forget, async)
   clearTimelineCache().catch(() => {});

@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import { useNotificationMarker } from '@repo/api';
 import { PageHeader, TabBar } from '@repo/ui';
 import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
 definePageMeta({});
+
+const { markAsRead } = useNotificationMarker();
+
+// Mark all notifications as read when the user opens this page
+onMounted(() => {
+  markAsRead();
+});
 
 const route = useRoute();
 const router = useRouter();

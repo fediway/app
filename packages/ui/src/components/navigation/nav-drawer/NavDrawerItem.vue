@@ -6,6 +6,7 @@ defineProps<{
   label: string;
   active?: boolean;
   badge?: number | string;
+  dot?: boolean;
 }>();
 
 defineEmits<{ click: [] }>();
@@ -31,5 +32,10 @@ defineEmits<{ click: [] }>();
     >
       {{ badge }}
     </span>
+    <span
+      v-else-if="dot"
+      class="ml-auto h-2.5 w-2.5 rounded-full bg-galaxy-500"
+      aria-label="New notifications"
+    />
   </button>
 </template>

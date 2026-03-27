@@ -35,6 +35,7 @@ const navItems = computed<BottomNavItemType[]>(() =>
     label: item.id === 'new-post' ? undefined : item.label,
     main: item.id === 'new-post',
     active: activeTab.value === item.id,
+    dot: item.dot,
   })),
 );
 
