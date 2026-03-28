@@ -455,15 +455,15 @@ function confirmDiscard() {
 <template>
   <!-- Compose Dialog -->
   <Dialog :open="isOpen" @update:open="handleOpenChange">
-    <DialogContent size="lg" :show-close="false">
-      <div ref="dropZoneRef" :class="{ 'ring-2 ring-ring ring-inset': isOverDropZone }">
+    <DialogContent size="lg" :show-close="false" full-screen-mobile>
+      <div ref="dropZoneRef" class="flex h-full flex-col" :class="{ 'ring-2 ring-ring ring-inset': isOverDropZone }">
         <VisuallyHidden>
           <DialogTitle>{{ replyTo ? 'Write a reply' : 'New post' }}</DialogTitle>
           <DialogDescription>Compose and publish a post</DialogDescription>
         </VisuallyHidden>
 
         <!-- Header -->
-        <header class="flex items-center justify-between border-b border-border px-4 py-3">
+        <header class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
           <Button variant="muted" size="sm" @click="handleClose">
             Cancel
           </Button>
@@ -503,7 +503,7 @@ function confirmDiscard() {
             :search-hashtags="searchHashtags"
             :search-emoji="searchEmoji"
             :reply-to-acct="replyTo?.account.acct"
-            class="p-4"
+            class="flex-1 overflow-y-auto p-4"
             @submit="handlePost"
             @paste-media="handlePasteMedia"
             @update="saveDraft"
@@ -545,7 +545,7 @@ function confirmDiscard() {
         </div>
 
         <!-- Bottom toolbar -->
-        <div class="border-t border-border px-4 py-3">
+        <div class="mt-auto border-t border-border px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div class="mb-4">
             <label class="mb-2 block text-xs font-medium text-muted-foreground">Visibility</label>
             <VisibilitySelector v-model="visibility" />
