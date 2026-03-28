@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import ChatListItem from '@/components/chat/ChatListItem.vue';
+import { createMockAccount, createMockStatus } from '../../mocks';
 
 const meta = {
   title: '11-Chat/ChatListItem',
@@ -11,54 +12,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const participant = {
+const participant = createMockAccount({
   id: '1',
   username: 'sarah',
-  acct: 'sarah@mastodon.social',
   displayName: 'Sarah Chen',
-  avatar: 'https://picsum.photos/seed/sarah/200/200',
-  avatarStatic: 'https://picsum.photos/seed/sarah/200/200',
-  header: '',
-  headerStatic: '',
-  note: '',
-  url: '',
-  locked: false,
-  bot: false,
-  group: false,
-  createdAt: '',
-  lastStatusAt: '',
-  statusesCount: 0,
-  followersCount: 0,
-  followingCount: 0,
-  emojis: [],
-  fields: [],
-  roles: [],
-};
-
-const baseStatus = {
-  id: '1',
-  uri: '',
-  createdAt: new Date(Date.now() - 3600000).toISOString(),
-  editedAt: null,
-  visibility: 'direct' as const,
-  sensitive: false,
-  spoilerText: '',
-  mediaAttachments: [],
-  mentions: [],
-  tags: [],
-  emojis: [],
-  reblogsCount: 0,
-  favouritesCount: 0,
-  repliesCount: 0,
-  application: { name: '', website: null },
-  reblog: null,
-  poll: null,
-  card: null,
-  quote: null,
-  quotesCount: 0,
-  quoteApproval: { state: 'pending' as const },
-  filtered: [],
-};
+});
 
 /** They sent the last message — read */
 export const TheirMessageRead: Story = {
@@ -67,11 +25,11 @@ export const TheirMessageRead: Story = {
       id: '1',
       accounts: [participant],
       unread: false,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>Sounds great, see you tomorrow!</p>',
         account: participant,
-      },
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -83,11 +41,11 @@ export const TheirMessageUnread: Story = {
       id: '2',
       accounts: [participant],
       unread: true,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>Hey, have you read that new book by Susanna Clarke?</p>',
         account: participant,
-      },
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -99,11 +57,11 @@ export const YourMessageRead: Story = {
       id: '3',
       accounts: [participant],
       unread: false,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>Yes I loved it! The atmosphere is incredible.</p>',
-        account: { ...participant, id: '99', acct: 'me@fediway.social' },
-      },
+        account: createMockAccount({ id: '99', acct: 'me@fediway.social' }),
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -115,44 +73,34 @@ export const YourMessageUnread: Story = {
       id: '4',
       accounts: [participant],
       unread: true,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>Just sent you the link!</p>',
-        account: { ...participant, id: '99', acct: 'me@fediway.social' },
-      },
+        account: createMockAccount({ id: '99', acct: 'me@fediway.social' }),
+        visibility: 'direct',
+      }),
     },
   },
 };
 
-const alex = {
-  ...participant,
+const alex = createMockAccount({
   id: '2',
   username: 'alex',
-  acct: 'alex@mastodon.social',
   displayName: 'Alex Rivera',
-  avatar: 'https://picsum.photos/seed/alex/200/200',
-  avatarStatic: 'https://picsum.photos/seed/alex/200/200',
-};
+});
 
-const maria = {
-  ...participant,
+const maria = createMockAccount({
   id: '3',
   username: 'maria',
-  acct: 'maria@mastodon.social',
   displayName: 'Maria Santos',
-  avatar: 'https://picsum.photos/seed/maria/200/200',
-  avatarStatic: 'https://picsum.photos/seed/maria/200/200',
-};
+});
 
-const james = {
-  ...participant,
+const james = createMockAccount({
   id: '4',
   username: 'james',
-  acct: 'james@mastodon.social',
   displayName: 'James Park',
-  avatar: 'https://picsum.photos/seed/james/200/200',
-  avatarStatic: 'https://picsum.photos/seed/james/200/200',
-};
+});
+
+const me = createMockAccount({ id: '99', acct: 'me@fediway.social' });
 
 /** Group chat — someone else sent last message, unread */
 export const GroupUnread: Story = {
@@ -161,11 +109,11 @@ export const GroupUnread: Story = {
       id: '10',
       accounts: [participant, alex, maria],
       unread: true,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>What time works for everyone?</p>',
         account: alex,
-      },
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -177,11 +125,11 @@ export const GroupRead: Story = {
       id: '11',
       accounts: [participant, alex, maria],
       unread: false,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>See you all at 7!</p>',
         account: maria,
-      },
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -193,11 +141,11 @@ export const GroupYourMessage: Story = {
       id: '12',
       accounts: [participant, alex, maria],
       unread: false,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>I\'ll bring the books!</p>',
-        account: { ...participant, id: '99', acct: 'me@fediway.social' },
-      },
+        account: me,
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -209,11 +157,11 @@ export const GroupLarge: Story = {
       id: '13',
       accounts: [participant, alex, maria, james],
       unread: true,
-      lastStatus: {
-        ...baseStatus,
+      lastStatus: createMockStatus({
         content: '<p>Has anyone read the new Piranesi sequel?</p>',
         account: james,
-      },
+        visibility: 'direct',
+      }),
     },
   },
 };
@@ -227,49 +175,49 @@ export const AllVariants: Story = {
         id: '1',
         accounts: [participant],
         unread: true,
-        lastStatus: { ...baseStatus, content: '<p>Have you seen this?</p>', account: participant },
+        lastStatus: createMockStatus({ content: '<p>Have you seen this?</p>', account: participant, visibility: 'direct' as const }),
       };
       const theirRead = {
         id: '2',
         accounts: [participant],
         unread: false,
-        lastStatus: { ...baseStatus, content: '<p>Sounds great, see you tomorrow!</p>', account: participant },
+        lastStatus: createMockStatus({ content: '<p>Sounds great, see you tomorrow!</p>', account: participant, visibility: 'direct' as const }),
       };
       const yourRead = {
         id: '3',
         accounts: [participant],
         unread: false,
-        lastStatus: { ...baseStatus, content: '<p>Yes I loved it!</p>', account: { ...participant, id: '99', acct: 'me@fediway.social' } },
+        lastStatus: createMockStatus({ content: '<p>Yes I loved it!</p>', account: me, visibility: 'direct' as const }),
       };
       const yourUnread = {
         id: '4',
         accounts: [participant],
         unread: true,
-        lastStatus: { ...baseStatus, content: '<p>Just sent the link!</p>', account: { ...participant, id: '99', acct: 'me@fediway.social' } },
+        lastStatus: createMockStatus({ content: '<p>Just sent the link!</p>', account: me, visibility: 'direct' as const }),
       };
       const groupUnread = {
         id: '5',
         accounts: [participant, alex, maria],
         unread: true,
-        lastStatus: { ...baseStatus, content: '<p>What time works?</p>', account: alex },
+        lastStatus: createMockStatus({ content: '<p>What time works?</p>', account: alex, visibility: 'direct' as const }),
       };
       const groupRead = {
         id: '6',
         accounts: [participant, alex, maria],
         unread: false,
-        lastStatus: { ...baseStatus, content: '<p>See you at 7!</p>', account: maria },
+        lastStatus: createMockStatus({ content: '<p>See you at 7!</p>', account: maria, visibility: 'direct' as const }),
       };
       const groupYours = {
         id: '7',
         accounts: [participant, alex, maria],
         unread: false,
-        lastStatus: { ...baseStatus, content: '<p>I\'ll bring the books!</p>', account: { ...participant, id: '99', acct: 'me@fediway.social' } },
+        lastStatus: createMockStatus({ content: '<p>I\'ll bring the books!</p>', account: me, visibility: 'direct' as const }),
       };
       const groupLarge = {
         id: '8',
         accounts: [participant, alex, maria, james],
         unread: true,
-        lastStatus: { ...baseStatus, content: '<p>Has anyone read the sequel?</p>', account: james },
+        lastStatus: createMockStatus({ content: '<p>Has anyone read the sequel?</p>', account: james, visibility: 'direct' as const }),
       };
       return { theirUnread, theirRead, yourRead, yourUnread, groupUnread, groupRead, groupYours, groupLarge };
     },

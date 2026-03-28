@@ -1,0 +1,89 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="01-Foundations/Typography" />
+
+# Typography
+
+**Font:** Asta Sans (300–800 weights). A warm, humanist sans-serif that pairs with the cream/navy palette.
+
+**Philosophy:** Social-density type scale. `text-base` is 15px (not the web default 16px) — matching Twitter, Bluesky, and Mastodon's reading density for feed content. Every size has a paired line-height tuned for ~1.4 ratio.
+
+## Type Scale
+
+| Name | Class | Size | Line Height | Weight | Use For |
+|------|-------|------|-------------|--------|---------|
+| **XS** | `text-xs` | 12px | 16px | 400 | Navigation labels, badges, section headings (uppercase) |
+| **SM** | `text-sm` | 13px | 18px | 400 | Captions, metadata, action counts, button (small) |
+| **Base** | `text-base` | 15px | 21px | 400 | Feed post content, body text, button labels |
+| **LG** | `text-lg` | 17px | 24px | 400 | Detail view post content, enlarged body |
+| **XL** | `text-xl` | 20px | 28px | 700 | Page titles, H1 |
+| **2XL** | `text-2xl` | 24px | 30px | 700 | Hero text (login tagline), large display |
+
+## Weight Pairings
+
+| Weight | Class | Use For |
+|--------|-------|---------|
+| 400 (Regular) | `font-normal` | Body text, metadata, captions |
+| 500 (Medium) | `font-medium` | Tab labels, section headings, subtle emphasis |
+| 600 (Semibold) | `font-semibold` | Button labels, stat counts, tag names |
+| 700 (Bold) | `font-bold` | Page titles, display names, headings, active tabs |
+
+## Common Patterns
+
+### Feed Post Header
+```
+Display Name    @handle · 3h
+font-semibold   text-muted-foreground
+text-base       text-sm
+```
+
+### Section Heading (Sidebar)
+```
+TRENDING TAGS
+text-xs font-semibold uppercase tracking-wider text-muted-foreground
+```
+
+### Page Title
+```
+Explore
+text-xl font-bold text-foreground
+```
+
+### Button
+```
+Post
+text-base font-semibold
+```
+
+### Caption / Metadata
+```
+42 posts · 3 days left
+text-sm text-muted-foreground
+```
+
+### Stat Display
+```
+1,234 followers
+font-bold text-foreground (number) + text-muted-foreground (label)
+```
+
+## Responsive Considerations
+
+The type scale is fixed — no responsive font size changes. Social content reads at the same density on all screens. Layout adapts (card width, column count), but text size stays consistent.
+
+Exception: the login page hero text uses `text-3xl` (Asta Sans Bold) for brand expression. This is the only place larger than `text-2xl` appears.
+
+## Line Height Rules
+
+Every text size has one paired line-height. Don't override line-heights unless you have a specific reason (e.g., `leading-relaxed` in the compose editor for comfortable typing).
+
+```
+text-xs  → 16px (1.33)
+text-sm  → 18px (1.38)
+text-base → 21px (1.40)
+text-lg  → 24px (1.41)
+text-xl  → 28px (1.40)
+text-2xl → 30px (1.25)
+```
+
+The ratio stays ~1.4 across the scale, creating consistent vertical rhythm in mixed-size layouts (like a post with header text + body text + metadata).

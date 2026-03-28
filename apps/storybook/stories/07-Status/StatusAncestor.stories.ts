@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import StatusAncestor from '@/components/status/StatusAncestor.vue';
 import { createMockStatus } from '../../mocks';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '07-Status/StatusAncestor',
   component: StatusAncestor,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof StatusAncestor>;
 
 export default meta;

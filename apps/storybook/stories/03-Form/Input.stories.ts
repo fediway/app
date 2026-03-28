@@ -8,13 +8,6 @@ const meta = {
   args: {
     placeholder: 'Enter text...',
   },
-  render: args => ({
-    components: { Input },
-    setup() {
-      return { args };
-    },
-    template: '<Input v-bind="args" />',
-  }),
 } satisfies Meta<typeof Input>;
 
 export default meta;

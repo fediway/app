@@ -1,12 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { PhBell } from '@phosphor-icons/vue';
 import { EmptyState } from '@/components/ui/empty-state';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '04-Layout/EmptyState',
   component: EmptyState,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
+  argTypes: {
+    title: {
+      control: 'text',
+    },
+    description: {
+      control: 'text',
+    },
+    actionLabel: {
+      control: 'text',
+    },
+  },
 } satisfies Meta<typeof EmptyState>;
 
 export default meta;

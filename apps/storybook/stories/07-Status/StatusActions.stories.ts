@@ -1,11 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { StatusActions } from '@/components/status';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '07-Status/StatusActions',
   component: StatusActions,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
+  argTypes: {
+    visibility: {
+      control: 'select',
+      options: ['public', 'unlisted', 'private', 'direct'],
+    },
+    authenticated: {
+      control: 'boolean',
+    },
+    isOwnPost: {
+      control: 'boolean',
+    },
+  },
 } satisfies Meta<typeof StatusActions>;
 
 export default meta;

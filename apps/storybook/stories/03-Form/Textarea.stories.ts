@@ -8,13 +8,6 @@ const meta = {
   args: {
     placeholder: 'Type your message...',
   },
-  render: args => ({
-    components: { Textarea },
-    setup() {
-      return { args };
-    },
-    template: '<Textarea v-bind="args" />',
-  }),
 } satisfies Meta<typeof Textarea>;
 
 export default meta;

@@ -182,6 +182,7 @@ function handleSubmit() {
           <!-- Error -->
           <div
             v-if="errorMessage"
+            id="login-error"
             role="alert"
             class="mb-4 rounded-xl border border-red-200 bg-red-background p-3 text-sm text-red"
           >
@@ -194,10 +195,14 @@ function handleSubmit() {
               <PhGlobe :size="20" aria-hidden="true" />
             </InputGroupAddon>
             <InputGroupInput
+              id="instance-domain"
               v-model="instanceDomain"
               type="text"
               placeholder="Instance (e.g. mastodon.social)"
               aria-label="Mastodon instance domain"
+              :aria-describedby="errorMessage ? 'login-error' : undefined"
+              :aria-invalid="errorMessage ? true : undefined"
+              required
               autocomplete="off"
               autocapitalize="none"
               spellcheck="false"
@@ -269,11 +274,13 @@ function handleSubmit() {
                 type="password"
                 placeholder="Access token"
                 aria-label="Access token"
+                aria-describedby="dev-login-hint"
+                required
                 autocomplete="off"
                 class="h-12 text-base"
               />
             </InputGroup>
-            <p class="text-xs text-muted-foreground">
+            <p id="dev-login-hint" class="text-xs text-muted-foreground">
               Generate a token in your instance's Settings &gt; Development &gt; New Application
             </p>
             <Button

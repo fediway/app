@@ -43,6 +43,16 @@ router.beforeEach(() => {
 
 router.afterEach((to, from) => {
   onRouteChange(to.path, from.path);
+
+  // Focus management: move focus to main content after navigation
+  // Critical for keyboard-only users who'd be lost after route change
+  nextTick(() => {
+    const main = document.getElementById('main-content');
+    if (main) {
+      main.setAttribute('tabindex', '-1');
+      main.focus({ preventScroll: true });
+    }
+  });
 });
 
 // Back button — register handlers by priority

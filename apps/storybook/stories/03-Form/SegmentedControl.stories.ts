@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { mediumDecorator } from '../decorators';
 
 const meta = {
   title: '03-Form/SegmentedControl',
   component: SegmentedControl,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 400px"><story /></div>' })],
+  decorators: [mediumDecorator],
 } satisfies Meta<typeof SegmentedControl>;
 
 export default meta;

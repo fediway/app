@@ -37,6 +37,8 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.4.3",
+    "@axe-core/playwright": "^4.11.1",
+    "@playwright/test": "^1.58.2",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^10.0.3",
     "fake-indexeddb": "^6.2.5",

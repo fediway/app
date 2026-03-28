@@ -52,7 +52,6 @@ const TypographyShowcase = defineComponent({
 const meta = {
   title: '01-Foundations/Typography',
   component: TypographyShowcase,
-  tags: ['autodocs'],
 } satisfies Meta<typeof TypographyShowcase>;
 
 export default meta;

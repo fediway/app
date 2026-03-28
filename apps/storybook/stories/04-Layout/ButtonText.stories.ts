@@ -5,23 +5,22 @@ const meta = {
   title: '04-Layout/ButtonText',
   component: ButtonText,
   tags: ['autodocs'],
+  render: args => ({
+    components: { ButtonText },
+    setup() { return { args }; },
+    template: '<ButtonText v-bind="args">{{ args.default }}</ButtonText>',
+  }),
 } satisfies Meta<typeof ButtonText>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: () => ({
-    components: { ButtonText },
-    template: '<ButtonText>View all</ButtonText>',
-  }),
+  args: { default: 'View all' },
 };
 
 export const AsLink: Story = {
-  render: () => ({
-    components: { ButtonText },
-    template: '<ButtonText as="a" href="#">View all</ButtonText>',
-  }),
+  args: { as: 'a', href: '#', default: 'View all' },
 };
 
 export const CustomLabel: Story = {
@@ -38,8 +37,5 @@ export const CustomLabel: Story = {
 };
 
 export const Disabled: Story = {
-  render: () => ({
-    components: { ButtonText },
-    template: '<ButtonText disabled>View all</ButtonText>',
-  }),
+  args: { disabled: true, default: 'View all' },
 };

@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '04-Layout/PageHeader',
   component: PageHeader,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 650px; border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof PageHeader>;
 
 export default meta;

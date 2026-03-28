@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/vue3';
 import { withThemeByClassName } from '@storybook/addon-themes';
+import { MINIMAL_VIEWPORTS } from '@storybook/addon-viewport';
 
 // Import the UI package's global styles (Tailwind + CSS variables)
 import '@repo/ui/styles/globals.css';
@@ -10,6 +11,16 @@ const preview: Preview = {
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
+      },
+    },
+    viewport: {
+      options: {
+        ...MINIMAL_VIEWPORTS,
+        mobile: { name: 'Mobile', styles: { width: '375px', height: '812px' } },
+        mobileLarge: { name: 'Mobile Large', styles: { width: '428px', height: '926px' } },
+        tablet: { name: 'Tablet', styles: { width: '768px', height: '1024px' } },
+        desktop: { name: 'Desktop', styles: { width: '1280px', height: '800px' } },
+        desktopWide: { name: 'Wide', styles: { width: '1440px', height: '900px' } },
       },
     },
     sidebar: {

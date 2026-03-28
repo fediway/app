@@ -11,36 +11,26 @@ const meta = {
   args: {
     level: 'h2',
   },
+  render: args => ({
+    components: { Headline },
+    setup() { return { args }; },
+    template: '<Headline v-bind="args">{{ args.default }}</Headline>',
+  }),
 } satisfies Meta<typeof Headline>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const H1: Story = {
-  args: { level: 'h1' },
-  render: args => ({
-    components: { Headline },
-    setup() { return { args }; },
-    template: '<Headline v-bind="args">Page Title (H1 · 22px)</Headline>',
-  }),
+  args: { level: 'h1', default: 'Page Title (H1 · 22px)' },
 };
 
 export const H2: Story = {
-  args: { level: 'h2' },
-  render: args => ({
-    components: { Headline },
-    setup() { return { args }; },
-    template: '<Headline v-bind="args">Section Title (H2 · 18px)</Headline>',
-  }),
+  args: { level: 'h2', default: 'Section Title (H2 · 18px)' },
 };
 
 export const H3: Story = {
-  args: { level: 'h3' },
-  render: args => ({
-    components: { Headline },
-    setup() { return { args }; },
-    template: '<Headline v-bind="args">Subsection Title (H3 · 16px)</Headline>',
-  }),
+  args: { level: 'h3', default: 'Subsection Title (H3 · 16px)' },
 };
 
 export const AllLevels: Story = {

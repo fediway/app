@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import AccountList from '@/components/account/AccountList.vue';
 import Section from '@/components/ui/section/Section.vue';
+import { mediumDecorator } from '../decorators';
 
 const meta = {
   title: '04-Layout/Section',
   component: Section,
   tags: ['autodocs'],
+  decorators: [mediumDecorator],
   args: {
     title: 'Section Title',
     showAction: false,
@@ -17,11 +19,9 @@ const meta = {
       return { args };
     },
     template: `
-      <div style="max-width: 390px">
-        <Section v-bind="args">
-          <p class="px-5 text-foreground/80">Section content goes here.</p>
-        </Section>
-      </div>
+      <Section v-bind="args">
+        <p class="px-5 text-foreground/80">Section content goes here.</p>
+      </Section>
     `,
   }),
 } satisfies Meta<typeof Section>;
@@ -51,24 +51,22 @@ export const PopularFilms: Story = {
       return { args, films };
     },
     template: `
-      <div style="max-width: 390px">
-        <Section v-bind="args">
-          <ul class="flex flex-col">
-            <li v-for="film in films" :key="film.title" class="flex items-center gap-3 px-5 py-2">
-              <div class="shrink-0 w-12 h-[71px] rounded-sm border border-border overflow-hidden bg-muted">
-                <img :src="film.image" :alt="film.title" class="w-full h-full object-cover" />
+      <Section v-bind="args">
+        <ul class="flex flex-col">
+          <li v-for="film in films" :key="film.title" class="flex items-center gap-3 px-5 py-2">
+            <div class="shrink-0 w-12 h-[71px] rounded-sm border border-border overflow-hidden bg-muted">
+              <img :src="film.image" :alt="film.title" class="w-full h-full object-cover" />
+            </div>
+            <div class="min-w-0 flex-1 flex flex-col gap-1.5">
+              <p class="font-bold text-base text-foreground truncate">{{ film.title }}</p>
+              <div class="flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-0.5 rounded px-1 text-xs font-medium bg-blue-100 text-foreground h-5">Film</span>
+                <span class="text-sm text-foreground/80">{{ film.meta }}</span>
               </div>
-              <div class="min-w-0 flex-1 flex flex-col gap-1.5">
-                <p class="font-bold text-base text-foreground truncate">{{ film.title }}</p>
-                <div class="flex items-center gap-1.5">
-                  <span class="inline-flex items-center gap-0.5 rounded px-1 text-xs font-medium bg-blue-100 text-foreground h-5">Film</span>
-                  <span class="text-sm text-foreground/80">{{ film.meta }}</span>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </Section>
-      </div>
+            </div>
+          </li>
+        </ul>
+      </Section>
     `,
   }),
   args: {
@@ -90,24 +88,22 @@ export const RecentFavorites: Story = {
       return { args, items };
     },
     template: `
-      <div style="max-width: 390px">
-        <Section v-bind="args">
-          <ul class="flex flex-col">
-            <li v-for="item in items" :key="item.title" class="flex items-center gap-3 px-5 py-2">
-              <div class="shrink-0 rounded-sm border border-border overflow-hidden bg-muted" :class="item.square ? 'w-12 h-12' : 'w-12 h-[71px]'">
-                <img :src="item.image" :alt="item.title" class="w-full h-full object-cover" />
+      <Section v-bind="args">
+        <ul class="flex flex-col">
+          <li v-for="item in items" :key="item.title" class="flex items-center gap-3 px-5 py-2">
+            <div class="shrink-0 rounded-sm border border-border overflow-hidden bg-muted" :class="item.square ? 'w-12 h-12' : 'w-12 h-[71px]'">
+              <img :src="item.image" :alt="item.title" class="w-full h-full object-cover" />
+            </div>
+            <div class="min-w-0 flex-1 flex flex-col gap-1.5">
+              <p class="font-bold text-base text-foreground truncate">{{ item.title }}</p>
+              <div class="flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-0.5 rounded px-1 text-xs font-medium text-foreground h-5" :class="item.tagClass">{{ item.tag }}</span>
+                <span class="text-sm text-foreground/80">{{ item.meta }}</span>
               </div>
-              <div class="min-w-0 flex-1 flex flex-col gap-1.5">
-                <p class="font-bold text-base text-foreground truncate">{{ item.title }}</p>
-                <div class="flex items-center gap-1.5">
-                  <span class="inline-flex items-center gap-0.5 rounded px-1 text-xs font-medium text-foreground h-5" :class="item.tagClass">{{ item.tag }}</span>
-                  <span class="text-sm text-foreground/80">{{ item.meta }}</span>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </Section>
-      </div>
+            </div>
+          </li>
+        </ul>
+      </Section>
     `,
   }),
   args: {
@@ -129,11 +125,9 @@ export const AccountListSection: Story = {
       return { args, users: mockUsers };
     },
     template: `
-      <div style="max-width: 390px">
-        <Section v-bind="args">
-          <AccountList :users="users" />
-        </Section>
-      </div>
+      <Section v-bind="args">
+        <AccountList :users="users" />
+      </Section>
     `,
   }),
   args: {

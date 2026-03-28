@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { RelativeTime } from '@/components/ui/relative-time';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '02-Primitives/RelativeTime',
   component: RelativeTime,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof RelativeTime>;
 
 export default meta;

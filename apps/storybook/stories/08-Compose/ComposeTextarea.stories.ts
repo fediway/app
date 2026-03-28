@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
 import ComposeTextarea from '@/components/compose/ComposeTextarea.vue';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '08-Compose/ComposeTextarea',
   component: ComposeTextarea,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px; border: 1px solid var(--border); border-radius: 12px;"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof ComposeTextarea>;
 
 export default meta;

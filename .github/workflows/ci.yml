@@ -12,34 +12,98 @@ concurrency:
 
 env:
   TURBO_TELEMETRY_DISABLED: 1
+  NODE_VERSION: 20
 
 jobs:
-  ci:
-    name: Lint, Type-check & Test
+  # ── Quality Gate (fast, parallel) ──────────────────────────
+  quality:
+    name: Lint & Type-check
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
-
-      - name: Cache Turbo
-        uses: actions/cache@v4
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
         with:
           path: .turbo
           key: turbo-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ runner.os }}-
+          restore-keys: turbo-${{ runner.os }}-
+      - run: npx turbo run lint type-check
 
-      - name: Lint, Type-check & Test
-        run: npx turbo run lint type-check test
+  # ── Unit & Integration Tests (parallel with quality) ───────
+  unit-tests:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+      - run: npx turbo run test
+
+  # ── E2E Tests (after unit tests pass) ──────────────────────
+  e2e:
+    name: E2E Tests (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E tests
+        run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project chromium
+        env:
+          VITE_API_MODE: mock
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 14
+
+  # ── E2E Mobile (merge to main only) ────────────────────────
+  e2e-mobile:
+    name: E2E Tests (Mobile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [unit-tests]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps webkit
+      - name: Run Mobile E2E tests
+        run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project mobile
+        env:
+          VITE_API_MODE: mock
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-mobile
+          path: apps/web/playwright-report/
+          retention-days: 14

@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { AccountCard } from '@/components/account';
 import { createMockAccount } from '../../mocks';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '06-Account/AccountCard',
   component: AccountCard,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof AccountCard>;
 
 export default meta;

@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import CurrentUserCard from '@/components/account/CurrentUserCard.vue';
+import { narrowDecorator } from '../decorators';
 
 const meta = {
   title: '06-Account/CurrentUserCard',
   component: CurrentUserCard,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 280px"><story /></div>' })],
+  decorators: [narrowDecorator],
 } satisfies Meta<typeof CurrentUserCard>;
 
 export default meta;

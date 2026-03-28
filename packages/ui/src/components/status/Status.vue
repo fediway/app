@@ -33,6 +33,8 @@ interface Props {
   authenticated?: boolean;
   /** Whether the current user authored this post */
   isOwnPost?: boolean;
+  /** Position in feed (1-based) for aria-posinset */
+  feedPosition?: number;
   class?: string;
 }
 
@@ -46,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
   hideActions: false,
   authenticated: true,
   isOwnPost: false,
+  feedPosition: undefined,
 });
 
 const emit = defineEmits<{
@@ -144,6 +147,10 @@ function handleStatusClick(event: MouseEvent) {
     <!-- Main status -->
     <article
       :class="cn('contain-layout-style-paint content-visibility-auto cursor-pointer transition-colors hover:bg-foreground/[0.03]', props.class)"
+      :tabindex="feedPosition ? 0 : undefined"
+      :aria-posinset="feedPosition"
+      :aria-setsize="feedPosition ? -1 : undefined"
+      :aria-label="feedPosition ? `Post by ${displayStatus.account.displayName || displayStatus.account.username}` : undefined"
       @click="handleStatusClick"
     >
       <!-- Reblog indicator -->

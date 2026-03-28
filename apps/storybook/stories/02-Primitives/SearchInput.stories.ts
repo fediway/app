@@ -1,25 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import SearchInput from '@/components/ui/search-input/SearchInput.vue';
+import { mediumDecorator } from '../decorators';
 
 const meta = {
   title: '02-Primitives/SearchInput',
   component: SearchInput,
   tags: ['autodocs'],
+  decorators: [mediumDecorator],
   args: {
     modelValue: '',
     placeholder: 'Search',
   },
-  render: args => ({
-    components: { SearchInput },
-    setup() {
-      return { args };
-    },
-    template: `
-      <div style="max-width: 390px">
-        <SearchInput v-bind="args" />
-      </div>
-    `,
-  }),
 } satisfies Meta<typeof SearchInput>;
 
 export default meta;

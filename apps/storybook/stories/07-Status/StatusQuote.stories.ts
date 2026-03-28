@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { StatusQuote } from '@/components/status';
 import { createMockAccount, createMockStatus } from '../../mocks';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '07-Status/StatusQuote',
   component: StatusQuote,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof StatusQuote>;
 
 export default meta;

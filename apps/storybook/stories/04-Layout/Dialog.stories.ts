@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
+import { expect, userEvent, within } from '@storybook/test';
 import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,18 @@ const meta = {
   title: '04-Layout/Dialog',
   component: Dialog,
   tags: ['autodocs'],
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg', 'xl', 'full'],
+    },
+    showClose: {
+      control: 'boolean',
+    },
+    fullScreenMobile: {
+      control: 'boolean',
+    },
+  },
 } satisfies Meta<typeof Dialog>;
 
 export default meta;
@@ -145,7 +158,7 @@ export const Large: Story = {
             <DialogTitle>Compose post</DialogTitle>
           </DialogHeader>
           <div class="p-6">
-            <div class="min-h-[200px] rounded-lg border border-border bg-muted/30 p-4 text-sm text-foreground/60">
+            <div class="min-h-[200px] rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
               Compose area would go here...
             </div>
           </div>
@@ -159,4 +172,75 @@ export const Large: Story = {
       </Dialog>
     `,
   }),
+};
+
+export const OpenAndClose: Story = {
+  parameters: {
+    docs: { description: { story: 'Tests that the dialog opens on trigger click and closes via Cancel.' } },
+  },
+  render: () => ({
+    components: { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose, Button },
+    template: `
+      <Dialog>
+        <DialogTrigger>
+          <Button>Open Dialog</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Test Dialog</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose>
+              <Button variant="muted" size="sm">Cancel</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(canvas.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Open Dialog' }));
+
+    const dialog = within(document.body).getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+
+    await expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+  },
+};
+
+export const EscapeToClose: Story = {
+  parameters: {
+    docs: { description: { story: 'Tests that pressing Escape closes the dialog.' } },
+  },
+  render: () => ({
+    components: { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Button },
+    template: `
+      <Dialog>
+        <DialogTrigger>
+          <Button>Open Dialog</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Escape Test</DialogTitle>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Open Dialog' }));
+    expect(within(document.body).getByRole('dialog')).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+
+    await expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+  },
 };

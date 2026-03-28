@@ -6,12 +6,13 @@ import {
   createMockAttachment,
   createVideoAttachment,
 } from '../../mocks';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '07-Status/StatusMedia',
   component: StatusMedia,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof StatusMedia>;
 
 export default meta;

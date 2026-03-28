@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import ProfileInformation from '@/components/account/ProfileInformation.vue';
 import { createMockAccount } from '../../mocks';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '06-Account/ProfileInformation',
   component: ProfileInformation,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof ProfileInformation>;
 
 export default meta;

@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { NavDrawerProfile } from '@/components/navigation';
+import { narrowDecorator } from '../decorators';
 
 const meta = {
   title: '05-Navigation/NavDrawerProfile',
   component: NavDrawerProfile,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 280px"><story /></div>' })],
+  decorators: [narrowDecorator],
 } satisfies Meta<typeof NavDrawerProfile>;
 
 export default meta;

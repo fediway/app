@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import AccountList from '@/components/account/AccountList.vue';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '06-Account/AccountList',
   component: AccountList,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof AccountList>;
 
 export default meta;

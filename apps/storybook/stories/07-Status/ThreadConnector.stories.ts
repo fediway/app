@@ -20,3 +20,25 @@ export const Default: Story = {
     `,
   }),
 };
+
+export const Short: Story = {
+  render: () => ({
+    components: { ThreadConnector },
+    template: `
+      <div class="relative h-8" style="max-width: 600px">
+        <ThreadConnector class="top-0 bottom-0" />
+      </div>
+    `,
+  }),
+};
+
+export const Long: Story = {
+  render: () => ({
+    components: { ThreadConnector },
+    template: `
+      <div class="relative h-60" style="max-width: 600px">
+        <ThreadConnector class="top-0 bottom-0" />
+      </div>
+    `,
+  }),
+};

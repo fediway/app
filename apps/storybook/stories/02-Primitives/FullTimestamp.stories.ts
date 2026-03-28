@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import FullTimestamp from '@/components/ui/full-timestamp/FullTimestamp.vue';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '02-Primitives/FullTimestamp',
   component: FullTimestamp,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof FullTimestamp>;
 
 export default meta;

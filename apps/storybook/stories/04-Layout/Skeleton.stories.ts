@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { Skeleton } from '@/components/ui/skeleton';
+import { wideDecorator } from '../decorators';
 
 const meta = {
   title: '04-Layout/Skeleton',
   component: Skeleton,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof Skeleton>;
 
 export default meta;

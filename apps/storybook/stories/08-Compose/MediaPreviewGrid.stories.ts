@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import type { MediaItem } from '@/components/compose/MediaPreviewGrid.vue';
 import MediaPreviewGrid from '@/components/compose/MediaPreviewGrid.vue';
+import { wideDecorator } from '../decorators';
 
 function makeMedia(overrides: Partial<MediaItem> & { seed: string }): MediaItem {
   return {
@@ -17,7 +18,7 @@ const meta = {
   title: '08-Compose/MediaPreviewGrid',
   component: MediaPreviewGrid,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 600px; padding: 24px"><story /></div>' })],
+  decorators: [wideDecorator],
 } satisfies Meta<typeof MediaPreviewGrid>;
 
 export default meta;

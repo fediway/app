@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import AccountCarousel from '@/components/account/AccountCarousel.vue';
 import { createMockAccount } from '../../mocks';
+import { mediumDecorator } from '../decorators';
 
 const meta = {
   title: '06-Account/AccountCarousel',
   component: AccountCarousel,
   tags: ['autodocs'],
-  decorators: [() => ({ template: '<div style="max-width: 420px"><story /></div>' })],
+  decorators: [mediumDecorator],
 } satisfies Meta<typeof AccountCarousel>;
 
 export default meta;

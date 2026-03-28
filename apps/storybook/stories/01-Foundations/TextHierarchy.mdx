@@ -1,0 +1,78 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="01-Foundations/Text Hierarchy" />
+
+# Text Hierarchy
+
+**3 levels. That's it.** Every piece of text in Fediway is one of these three. No exceptions. No `text-foreground/60`. No `text-gray-500 dark:text-gray-400`. Just three semantic classes that auto-switch between light and dark mode.
+
+## The System
+
+| Level | Class | Light Mode | Dark Mode | Use For |
+|-------|-------|------------|-----------|---------|
+| **Primary** | `text-foreground` | Navy `oklch(0.27 0.025 260)` | Cream `oklch(0.95 0.008 85)` | Content, names, headings, button labels |
+| **Secondary** | `text-muted-foreground` | Warm gray `oklch(0.64 0.008 10)` | Warm gray `oklch(0.74 0.010 30)` | Timestamps, handles, counts, labels, metadata, icons |
+| **Tertiary** | `text-muted-foreground/70` | Secondary at 70% opacity | Secondary at 70% opacity | Placeholders, hints, footer text, draft indicators |
+
+## How It Works
+
+`--muted-foreground` is a CSS custom property that resolves to `gray-500` in light mode and `gray-400` in dark mode. Tailwind's `text-muted-foreground` class reads this variable. One class, both modes handled automatically.
+
+The `/70` suffix applies 70% opacity to the resolved color — creating a lighter version for tertiary text without a separate token.
+
+## Where Each Level Is Used
+
+### Primary — `text-foreground`
+- Post content / status body text
+- Display names (`AccountDisplayName`)
+- Section headings, page titles
+- Dialog titles
+- Button labels
+- Tag names in tag lists (`#tagname`)
+
+### Secondary — `text-muted-foreground`
+- Timestamps (`RelativeTime`, `FullTimestamp`)
+- Account handles (`@user@instance.social`)
+- Dot separators (`·`)
+- Action button icons (heart, reply, boost, bookmark)
+- Stat labels ("Reblogs", "Likes")
+- Post counts in tag lists ("42 posts")
+- Section labels ("Trending Tags", "Who to follow")
+- "See more" links
+- News source/domain text
+- Follower/following count labels
+- Dialog descriptions
+- Dropdown menu icons
+- Page subtitles
+
+### Tertiary — `text-muted-foreground/70`
+- Input placeholders (`placeholder:text-muted-foreground/70`)
+- Search icon in search bars
+- Footer links and copyright
+- "Draft saved" indicator
+- Chat message timestamps
+- "X selected" counter text
+
+## Do's and Don'ts
+
+### Do
+- Use `text-foreground` for anything the user should read first
+- Use `text-muted-foreground` for supporting information
+- Use `text-muted-foreground/70` sparingly, only for truly de-emphasized content
+- Trust the token to handle dark mode — don't add `dark:` variants
+
+### Don't
+- ~~`text-foreground/60`~~ — use `text-muted-foreground` instead
+- ~~`text-foreground/80`~~ — use `text-muted-foreground` instead
+- ~~`text-foreground/40`~~ — use `text-muted-foreground/70` instead
+- ~~`text-gray-500 dark:text-gray-400`~~ — use `text-muted-foreground` instead
+- ~~`text-foreground/30`~~ — use `text-muted-foreground/70` instead
+- Don't invent new opacity levels — if 3 levels aren't enough, the design needs rethinking
+
+## Semantic Colors (Separate System)
+
+Action states use their own colors — they're NOT part of the text hierarchy:
+- **Rose** `text-rose-500` — liked heart (always rose, both modes)
+- **Green** `text-green` — boosted arrow
+- **Yellow** `text-yellow` — active bookmark
+- **Galaxy** `text-galaxy-500` / `dark:text-galaxy-400` — @mentions, #hashtags, links

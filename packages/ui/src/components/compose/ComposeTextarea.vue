@@ -12,6 +12,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, Extension, useEditor } from '@tiptap/vue-3';
 import { computed, onBeforeUnmount, watch } from 'vue';
 import { cn } from '../../lib/utils';
+import { countCharacters, countReplyCharacters, HASHTAG_RE, MENTION_RE } from './charcount';
 import EmojiList from './EmojiList.vue';
 import HashtagList from './HashtagList.vue';
 import MentionList from './MentionList.vue';
@@ -52,15 +53,6 @@ const emit = defineEmits<{
   /** Content changed (for draft saving — debounce in consumer) */
   update: [];
 }>();
-
-// URL detection for character counting (URLs count as 23 chars per Mastodon spec)
-const URL_RE = /https?:\/\/\S+/g;
-const URL_CHAR_COUNT = 23;
-
-function countCharacters(text: string): number {
-  // Replace each URL with a placeholder of 23 chars, then count
-  return text.replace(URL_RE, 'x'.repeat(URL_CHAR_COUNT)).length;
-}
 
 // Custom extension for Cmd/Ctrl+Enter submit and Tab focus-out
 const KeymapExtension = Extension.create({
@@ -120,8 +112,6 @@ const PasteExtension = Extension.create({
 
 // Decoration plugin: highlights #hashtags and @mentions in plain text
 // This handles the case where users type hashtags/mentions manually without autocomplete
-const HASHTAG_RE = /(?:^|\s)(#\w+)/g;
-const MENTION_RE = /(?:^|\s)(@[\w.]+(?:@[\w.-]+)?)/g;
 const highlightPluginKey = new PluginKey('fediwayHighlight');
 
 const HighlightExtension = Extension.create({
@@ -290,14 +280,10 @@ watch(() => props.disabled, (disabled) => {
 const characterCount = computed(() => {
   if (!editor.value)
     return 0;
-  let text = editor.value.getText({ blockSeparator: '\n' });
-  // Exclude the leading @mention that was auto-prepended for replies
-  if (props.replyToAcct) {
-    const prefix = `@${props.replyToAcct} `;
-    if (text.startsWith(prefix))
-      text = text.slice(prefix.length);
-  }
-  return countCharacters(text);
+  const text = editor.value.getText({ blockSeparator: '\n' });
+  return props.replyToAcct
+    ? countReplyCharacters(text, props.replyToAcct)
+    : countCharacters(text);
 });
 
 const isEmpty = computed(() => {

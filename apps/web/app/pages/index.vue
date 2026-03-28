@@ -170,7 +170,11 @@ onUnmounted(() => {
     </div>
 
     <ClientOnly>
-      <div>
+      <div
+        role="feed"
+        :aria-label="isAuthenticated ? 'Home timeline' : 'Trending posts'"
+        :aria-busy="isLoading && allStatuses.length === 0"
+      >
         <!-- Loading skeleton -->
         <div v-if="isLoading && allStatuses.length === 0" class="space-y-4 p-4">
           <div v-for="i in 3" :key="i" class="space-y-3">
@@ -204,7 +208,7 @@ onUnmounted(() => {
         />
 
         <!-- New posts banner (home timeline only) -->
-        <div v-if="timeline && timeline.newStatusCount.value > 0" class="flex justify-center py-2">
+        <div v-if="timeline && timeline.newStatusCount.value > 0" role="status" class="flex justify-center py-2">
           <Button
             variant="secondary"
             size="sm"
@@ -216,13 +220,14 @@ onUnmounted(() => {
 
         <!-- First 2 posts -->
         <StatusComponent
-          v-for="status in firstStatuses"
+          v-for="(status, index) in firstStatuses"
           :key="status.id"
           :status="status"
           :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
           :authenticated="isAuthed"
           :is-own-post="isOwnPost(status)"
+          :feed-position="index + 1"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
@@ -239,13 +244,14 @@ onUnmounted(() => {
 
         <!-- Remaining posts -->
         <StatusComponent
-          v-for="status in remainingStatuses"
+          v-for="(status, index) in remainingStatuses"
           :key="status.id"
           :status="status"
           :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
           :reply-parent="getReplyParent(status)"
           :authenticated="isAuthed"
           :is-own-post="isOwnPost(status)"
+          :feed-position="index + firstStatuses.length + 1"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
