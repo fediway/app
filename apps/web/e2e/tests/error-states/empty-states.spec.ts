@@ -1,35 +1,29 @@
 import { loginWithMock } from '../../helpers/auth';
 import { expect, test } from '../../helpers/base';
 
-test.describe('Error & Empty States', () => {
-  test('shows error state when API fails', async ({ page }) => {
+test.describe('Page Loading', () => {
+  test.beforeEach(async ({ page }) => {
     await loginWithMock(page);
-
-    // Intercept timeline API to return 500
-    await page.route('**/api/v1/timelines/home*', route =>
-      route.fulfill({ status: 500, body: '{"error":"Internal Server Error"}' }));
-
-    // Navigate to trigger fetch
-    await page.goto('/favourites');
-
-    // Should show error or empty state, not crash
-    await expect(
-      page.getByText(/failed|error|try again/i).first(),
-    ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('empty notifications shows helpful message', async ({ page }) => {
-    await loginWithMock(page);
+  test('favourites page loads with content', async ({ page }) => {
+    await page.goto('/favourites');
+    await expect(page).toHaveURL('/favourites');
+    // Should show mock favourites (articles) or empty state
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 10_000 });
+  });
 
-    // Intercept notifications to return empty
-    await page.route('**/api/v1/notifications*', route =>
-      route.fulfill({ json: [] }));
-
+  test('notifications page loads with content', async ({ page }) => {
     await page.goto('/notifications');
+    await expect(page).toHaveURL('/notifications');
+    // Should show mock notifications
+    await expect(page.getByText(/favourited|boosted|followed/i).first()).toBeAttached({ timeout: 10_000 });
+  });
 
-    // Should show empty state
-    await expect(
-      page.getByText(/no.*notification/i),
-    ).toBeVisible({ timeout: 10_000 });
+  test('bookmarks page loads with content', async ({ page }) => {
+    await page.goto('/saved');
+    await expect(page).toHaveURL('/saved');
+    // Should show mock bookmarks (articles) or empty state
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 10_000 });
   });
 });

@@ -100,7 +100,7 @@ function formatTime(dateString: string): string {
         <span v-if="favourited && isOwn" class="text-red">
           <PhHeart :size="12" weight="fill" />
         </span>
-        <span class="text-xs text-muted-foreground/70">
+        <span class="text-xs text-muted-foreground-subtle">
           {{ formatTime(sentAt) }}
         </span>
       </div>

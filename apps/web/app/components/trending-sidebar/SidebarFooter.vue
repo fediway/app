@@ -15,12 +15,12 @@ const footerLinks = [
         v-for="link in footerLinks"
         :key="link"
         href="#"
-        class="text-xs text-muted-foreground/70 no-underline hover:text-muted-foreground hover:underline"
+        class="text-xs text-muted-foreground-subtle no-underline hover:text-muted-foreground-subtle hover:underline"
       >
         {{ link }}
       </a>
     </nav>
-    <p class="mt-3 text-xs text-muted-foreground/70">
+    <p class="mt-3 text-xs text-muted-foreground-subtle">
       &copy; 2026 Fediway
     </p>
   </footer>

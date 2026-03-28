@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
-import { EmptyState, PageHeader, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
+import { EmptyState, PageHeader, Skeleton, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
 import { computed } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -20,7 +20,7 @@ const { open: openSendMessage } = useSendMessageModal();
 
 const statusId = computed(() => route.params.id as string);
 
-const { data: rawStatus } = getStatusById(statusId.value);
+const { data: rawStatus, isLoading: isStatusLoading } = getStatusById(statusId.value);
 const status = computed(() => getStoreStatus(rawStatus.value));
 const { data: context } = getStatusContext(statusId.value);
 
@@ -149,9 +149,22 @@ function getReplyParent(reply: Status, index?: number): Status | null {
     <PageHeader title="Post" show-back class="lg:hidden" @back="goBack" />
 
     <ClientOnly>
-      <!-- Not found state -->
+      <!-- Loading skeleton -->
+      <div v-if="isStatusLoading && !status" class="space-y-4 p-4">
+        <div class="flex items-center gap-3">
+          <Skeleton class="size-12 rounded-full" />
+          <div class="space-y-1.5">
+            <Skeleton class="h-4 w-32" />
+            <Skeleton class="h-3 w-20" />
+          </div>
+        </div>
+        <Skeleton class="h-24 w-full" />
+        <Skeleton class="h-8 w-48" />
+      </div>
+
+      <!-- Not found state (only after loading finishes) -->
       <EmptyState
-        v-if="!status"
+        v-else-if="!status"
         title="Post not found"
         description="This post may have been deleted or is not available."
         action-label="Go to Home"

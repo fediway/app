@@ -302,7 +302,14 @@ defineExpose({
   },
   /** Set content (for draft restoration, reply @mention). Call once on mount. */
   setContent(text: string) {
-    editor.value?.commands.setContent(`<p>${text.replace(/\n/g, '<br>')}</p>`);
+    // Escape HTML entities before inserting as HTML (defense against malicious content)
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/\n/g, '<br>');
+    editor.value?.commands.setContent(`<p>${escaped}</p>`);
   },
   /** Whether the editor has any content */
   get isEmpty() {

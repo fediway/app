@@ -109,7 +109,15 @@ export async function request<T>(url: string, opts: RequestOptions = {}): Promis
       return undefined as T;
     }
 
-    return response.json() as Promise<T>;
+    try {
+      return await response.json() as T;
+    }
+    catch {
+      throw new FediwayAPIError({
+        status: response.status,
+        message: 'Invalid JSON in response',
+      });
+    }
   }
 
   // All retries exhausted — throw the last network error

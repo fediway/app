@@ -36,8 +36,10 @@ onMounted(async () => {
     setMode('live');
 
     // Restore redirect destination saved before OAuth round-trip
-    const redirect = sessionStorage.getItem('fediway_login_redirect') || '/';
+    const raw = sessionStorage.getItem('fediway_login_redirect') || '/';
     sessionStorage.removeItem('fediway_login_redirect');
+    // Validate redirect is a safe relative path (prevent open redirect)
+    const redirect = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
     navigateTo(redirect);
   }
   catch (err) {

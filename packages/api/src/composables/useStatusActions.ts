@@ -25,10 +25,16 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
   const store = useStatusStore();
   const getClient = () => useClient();
 
+  // Prevent concurrent mutations on the same status (race condition guard)
+  const inFlight = new Set<string>();
+
   async function toggleFavourite(id: string): Promise<void> {
+    if (inFlight.has(`fav:${id}`))
+      return;
     const current = store.get(id);
     if (!current)
       return;
+    inFlight.add(`fav:${id}`);
 
     const snapshot = { ...current } as FediwayStatus;
     const wasFavourited = current.favourited;
@@ -55,12 +61,18 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
         error: err instanceof Error ? err : new Error('Failed to toggle favourite'),
       });
     }
+    finally {
+      inFlight.delete(`fav:${id}`);
+    }
   }
 
   async function toggleReblog(id: string): Promise<void> {
+    if (inFlight.has(`reblog:${id}`))
+      return;
     const current = store.get(id);
     if (!current)
       return;
+    inFlight.add(`reblog:${id}`);
 
     const snapshot = { ...current } as FediwayStatus;
     const wasReblogged = current.reblogged;
@@ -87,12 +99,18 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
         error: err instanceof Error ? err : new Error('Failed to toggle reblog'),
       });
     }
+    finally {
+      inFlight.delete(`reblog:${id}`);
+    }
   }
 
   async function toggleBookmark(id: string): Promise<void> {
+    if (inFlight.has(`bookmark:${id}`))
+      return;
     const current = store.get(id);
     if (!current)
       return;
+    inFlight.add(`bookmark:${id}`);
 
     const snapshot = { ...current } as FediwayStatus;
     const wasBookmarked = current.bookmarked;
@@ -115,6 +133,9 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
         statusId: id,
         error: err instanceof Error ? err : new Error('Failed to toggle bookmark'),
       });
+    }
+    finally {
+      inFlight.delete(`bookmark:${id}`);
     }
   }
 

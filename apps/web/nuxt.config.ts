@@ -46,6 +46,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      htmlAttrs: { lang: 'en' },
       title: 'Fediway',
       meta: [
         { charset: 'utf-8' },

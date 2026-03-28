@@ -33,7 +33,7 @@ function formatCount(n: number): string {
     :aria-label="ariaLabel"
     :aria-pressed="ariaPressed"
     :class="cn(
-      'inline-flex items-center gap-[6px]',
+      'inline-flex min-h-[44px] items-center gap-[6px]',
       'cursor-pointer text-muted-foreground transition-colors',
       'hover:text-foreground',
       'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',

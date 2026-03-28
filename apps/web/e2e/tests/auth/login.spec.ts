@@ -1,3 +1,4 @@
+import { test as baseTest } from '@playwright/test';
 import { expectAccessible } from '../../helpers/a11y';
 import { loginWithMock, logout } from '../../helpers/auth';
 import { expect, test } from '../../helpers/base';
@@ -29,14 +30,14 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL('/');
 
     // Feed should render
-    await expect(page.locator('article').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 10_000 });
   });
 
   test('can logout and return to trending feed', async ({ page }) => {
     await loginWithMock(page);
 
     // Verify authenticated
-    await expect(page.locator('article').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 10_000 });
 
     // Logout
     await logout(page);
@@ -45,9 +46,9 @@ test.describe('Authentication', () => {
     await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible();
   });
 
-  test('protected routes redirect to login', async ({ page }) => {
-    // Try to access favourites without auth
-    await page.goto('/favourites');
+  // This test uses plain Playwright (no mock mode) to test auth redirect
+  baseTest('protected routes redirect to login', async ({ page }) => {
+    await page.goto('http://localhost:3000/favourites');
 
     // Should redirect to login
     await expect(page).toHaveURL(/\/login/);

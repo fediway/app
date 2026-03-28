@@ -62,6 +62,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground-subtle: var(--muted-foreground-subtle);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
@@ -325,6 +326,7 @@
 
   --muted:                  oklch(0.963 0.014 88);     /* #F7F3E9 — design team */
   --muted-foreground:       oklch(0.54  0.010 345);    /* v6: gray-600 for contrast */
+  --muted-foreground-subtle: oklch(0.45 0.010 345);   /* v6: quieter than muted-fg, meets WCAG AA 4.5:1 */
 
   --accent:                 oklch(0.95  0.030 280);    /* v6: lavender tint (distinct from muted) */
   --accent-foreground:      oklch(0.287 0.025 258);
@@ -376,6 +378,7 @@
 
   --muted:                  oklch(0.341 0.038 274);    /* #32374C — design team */
   --muted-foreground:       oklch(0.74  0.010 30);     /* gray-400 */
+  --muted-foreground-subtle: oklch(0.64 0.010 30);
 
   --accent:                 oklch(0.36  0.045 280);    /* v6: dark lavender tint */
   --accent-foreground:      oklch(0.95  0.008 85);

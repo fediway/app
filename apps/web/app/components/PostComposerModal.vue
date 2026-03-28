@@ -468,7 +468,7 @@ function confirmDiscard() {
             Cancel
           </Button>
           <div class="flex items-center gap-3">
-            <span v-if="draftStatus === 'saved'" class="text-xs text-muted-foreground/70">Draft saved</span>
+            <span v-if="draftStatus === 'saved'" class="text-xs text-muted-foreground-subtle">Draft saved</span>
             <Button size="sm" :disabled="!canPost" @click="handlePost">
               {{ isSubmitting ? 'Posting...' : 'Post' }}
             </Button>

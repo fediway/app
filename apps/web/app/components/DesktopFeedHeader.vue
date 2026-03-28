@@ -65,7 +65,7 @@ function goBack() {
           <h1 class="text-base font-bold leading-tight">
             {{ navigation.pageTitle }}
           </h1>
-          <p v-if="navigation.pageSubtitle" class="text-xs leading-tight text-muted-foreground/70">
+          <p v-if="navigation.pageSubtitle" class="text-xs leading-tight text-muted-foreground-subtle">
             {{ navigation.pageSubtitle }}
           </p>
         </div>

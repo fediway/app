@@ -93,7 +93,7 @@ defineExpose({ reset });
       <div class="min-w-0 flex-1">
         <span class="text-sm font-semibold text-foreground">{{ status.account.displayName }}</span>
         <span class="ml-1 text-sm text-muted-foreground">·</span>
-        <RelativeTime :datetime="status.createdAt" class="ml-1 text-sm text-muted-foreground/70" />
+        <RelativeTime :datetime="status.createdAt" class="ml-1 text-sm text-muted-foreground-subtle" />
         <p class="truncate text-sm text-muted-foreground">
           {{ stripHtml(status.content) }}
         </p>
@@ -117,7 +117,7 @@ defineExpose({ reset });
           <PhX :size="14" class="text-white" />
         </div>
       </button>
-      <span class="ml-1 text-xs text-muted-foreground/70">{{ selectedRecipients.length }} selected</span>
+      <span class="ml-1 text-xs text-muted-foreground-subtle">{{ selectedRecipients.length }} selected</span>
     </div>
 
     <!-- Search -->

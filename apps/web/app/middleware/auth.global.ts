@@ -23,7 +23,9 @@ export default defineNuxtRouteMiddleware((to) => {
   // Authenticated user on login page → redirect to home (or saved redirect)
   if (isAuthenticated.value && to.path === '/login') {
     const redirect = to.query.redirect as string;
-    return navigateTo(redirect || '/', { replace: true });
+    // Validate redirect is a safe relative path (prevent open redirect to external sites)
+    const safeRedirect = redirect && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/';
+    return navigateTo(safeRedirect, { replace: true });
   }
 
   // Public routes — accessible without auth

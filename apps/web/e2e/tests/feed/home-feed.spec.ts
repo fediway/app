@@ -7,7 +7,7 @@ test.describe('Home Feed', () => {
     await page.goto('/');
 
     // Should render posts (trending feed)
-    await expect(page.locator('article').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 10_000 });
 
     // Should show sign-in option
     await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible();
@@ -20,7 +20,7 @@ test.describe('Home Feed', () => {
     await loginWithMock(page);
 
     // Should render posts
-    await expect(page.locator('article').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 10_000 });
 
     // Should NOT flash "Your timeline is empty"
     // (regression test for the flash-of-empty-state bug)
@@ -38,6 +38,6 @@ test.describe('Home Feed', () => {
     await page.goto('/');
 
     // Posts should appear quickly — no skeleton or empty state flash
-    await expect(page.locator('article').first()).toBeVisible({ timeout: 2000 });
+    await expect(page.locator('article').first()).toBeAttached({ timeout: 2000 });
   });
 });

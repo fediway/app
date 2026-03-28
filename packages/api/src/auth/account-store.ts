@@ -195,8 +195,8 @@ function handleAccountExpired(): void {
   error.value = new Error('Session expired — please log in again');
   clearAllAccountState();
 
-  // Fire and forget — async cleanup
-  removeAccount(key);
+  // Fire and forget — async cleanup (catch to prevent unhandled rejection)
+  removeAccount(key).catch(() => {});
 }
 
 async function logoutAll(): Promise<void> {
