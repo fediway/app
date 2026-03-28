@@ -23,7 +23,7 @@ import {
 } from '@repo/ui';
 import { useDropZone } from '@vueuse/core';
 import { VisuallyHidden } from 'reka-ui';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { useSettings } from '~/composables/useSettings';
 import { useNavigationStore } from '~/stores/navigation';
 
@@ -222,46 +222,52 @@ function handlePasteMedia(files: File[]) {
 
 // ── Autocomplete search (injected into ComposeTextarea) ──
 
-let mentionDebounce: ReturnType<typeof setTimeout>;
+let mentionAbort: AbortController | undefined;
 async function searchMentions(query: string) {
-  clearTimeout(mentionDebounce);
-  return new Promise<any[]>((resolve) => {
-    mentionDebounce = setTimeout(async () => {
-      try {
-        const client = useClient();
-        const results = await client.rest.v2.search.list({ q: query, type: 'accounts', limit: 8, resolve: true });
-        resolve(results.accounts.map(a => ({
-          id: a.acct,
-          acct: a.acct,
-          displayName: a.displayName || a.username,
-          avatar: a.avatar,
-        })));
-      }
-      catch {
-        resolve([]);
-      }
-    }, 250);
-  });
+  mentionAbort?.abort();
+  mentionAbort = new AbortController();
+  const signal = mentionAbort.signal;
+  await new Promise(r => setTimeout(r, 250));
+  if (signal.aborted)
+    return [];
+  try {
+    const client = useClient();
+    const results = await client.rest.v2.search.list({ q: query, type: 'accounts', limit: 8, resolve: true });
+    if (signal.aborted)
+      return [];
+    return results.accounts.map(a => ({
+      id: a.acct,
+      acct: a.acct,
+      displayName: a.displayName || a.username,
+      avatar: a.avatar,
+    }));
+  }
+  catch {
+    return [];
+  }
 }
 
-let hashtagDebounce: ReturnType<typeof setTimeout>;
+let hashtagAbort: AbortController | undefined;
 async function searchHashtags(query: string) {
-  clearTimeout(hashtagDebounce);
-  return new Promise<any[]>((resolve) => {
-    hashtagDebounce = setTimeout(async () => {
-      try {
-        const client = useClient();
-        const results = await client.rest.v2.search.list({ q: query, type: 'hashtags', limit: 8 });
-        resolve(results.hashtags.map(t => ({
-          name: t.name,
-          postCount: t.history?.[0]?.uses ? Number(t.history[0].uses) : undefined,
-        })));
-      }
-      catch {
-        resolve([]);
-      }
-    }, 250);
-  });
+  hashtagAbort?.abort();
+  hashtagAbort = new AbortController();
+  const signal = hashtagAbort.signal;
+  await new Promise(r => setTimeout(r, 250));
+  if (signal.aborted)
+    return [];
+  try {
+    const client = useClient();
+    const results = await client.rest.v2.search.list({ q: query, type: 'hashtags', limit: 8 });
+    if (signal.aborted)
+      return [];
+    return results.hashtags.map(t => ({
+      name: t.name,
+      postCount: t.history?.[0]?.uses ? Number(t.history[0].uses) : undefined,
+    }));
+  }
+  catch {
+    return [];
+  }
 }
 
 // Cache instance custom emoji (fetched once per session)
@@ -294,6 +300,11 @@ async function searchEmoji(query: string) {
     .filter(e => e.shortcode.toLowerCase().includes(q))
     .slice(0, 10);
 }
+
+onBeforeUnmount(() => {
+  mentionAbort?.abort();
+  hashtagAbort?.abort();
+});
 
 // All emoji for the browsable picker (loaded when picker opens)
 const allEmoji = ref<any[]>([]);

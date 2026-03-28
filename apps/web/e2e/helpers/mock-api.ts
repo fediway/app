@@ -106,6 +106,48 @@ export async function setupMockApi(page: Page) {
     if (url.match(/\/api\/v1\/statuses\/\d+$/))
       return route.fulfill({ json: mockStatuses[0] });
 
+    // ── Media upload ──
+    if (url.includes('/api/v2/media') || url.includes('/api/v1/media')) {
+      if (method === 'POST') {
+        return route.fulfill({
+          json: {
+            id: `media-${Date.now()}`,
+            type: 'image',
+            url: 'https://placehold.co/400x300/E4A5BF/232B37?text=Uploaded',
+            previewUrl: 'https://placehold.co/400x300/E4A5BF/232B37?text=Uploaded',
+            description: null,
+            meta: { original: { width: 400, height: 300 } },
+          },
+        });
+      }
+    }
+
+    // ── Status creation ──
+    if (url.match(/\/api\/v1\/statuses$/) && method === 'POST') {
+      return route.fulfill({
+        json: {
+          id: `status-${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          content: '<p>Posted from E2E test</p>',
+          account: mockAccount,
+          favourited: false,
+          reblogged: false,
+          bookmarked: false,
+          repliesCount: 0,
+          reblogsCount: 0,
+          favouritesCount: 0,
+          visibility: 'public',
+          spoilerText: '',
+          mediaAttachments: [],
+          mentions: [],
+          tags: [],
+          emojis: [],
+          url: 'https://mock.social/@jane/new',
+          uri: 'https://mock.social/users/jane/statuses/new',
+        },
+      });
+    }
+
     // ── Custom Emojis ──
     if (url.includes('/api/v1/custom_emojis'))
       return route.fulfill({ json: [] });

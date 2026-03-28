@@ -25,6 +25,19 @@ const pageTransition = computed(() => {
   transition: opacity 150ms ease;
 }
 
+/*
+ * Take leaving page OUT OF DOCUMENT FLOW during transition.
+ * Without this, the leaving page (at opacity 0) still occupies vertical space,
+ * pushing the entering page below it — causing "feed statuses below messages" ghost.
+ */
+.page-leave-active {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
 .page-enter-from,
 .page-leave-to {
   opacity: 0;
@@ -41,6 +54,17 @@ const pageTransition = computed(() => {
 .tab-switch-enter-active,
 .tab-switch-leave-active {
   transition: none;
+}
+
+/*
+ * Same fix for tab switches — leaving page must not occupy space.
+ * Even though transition is instant, there's a single frame where both exist.
+ */
+.tab-switch-leave-active {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .tab-switch-enter-from,

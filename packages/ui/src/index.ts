@@ -82,6 +82,7 @@ export { NotificationItem, NotificationList } from './components/notification';
 // Status components
 export {
   PollDisplay,
+  QuickReply,
   Status,
   StatusActions,
   StatusAncestor,

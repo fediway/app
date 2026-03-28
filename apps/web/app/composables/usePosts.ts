@@ -17,7 +17,9 @@ export function usePosts() {
       toast.success('Post published');
     },
     onError: (err) => {
-      console.error('[usePosts] Failed to create status:', err);
+      if (import.meta.dev) {
+        console.error('[usePosts] Failed to create status:', err);
+      }
       toast.error('Failed to post', 'Please try again.');
     },
     onAuthError: () => {

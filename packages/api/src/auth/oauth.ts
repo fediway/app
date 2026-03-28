@@ -109,6 +109,7 @@ export async function exchangeCode(
   const response = await fetch(`${instanceUrl}/oauth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(30_000),
     body: JSON.stringify({
       grant_type: 'authorization_code',
       client_id: registration.clientId,

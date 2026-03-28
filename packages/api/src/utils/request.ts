@@ -3,6 +3,7 @@ import { FediwayAPIError, FediwayNetworkError } from '../errors';
 const DEFAULT_TIMEOUT = 30_000;
 const DEFAULT_RETRIES = 2;
 const RETRY_BASE_DELAY = 500;
+const MAX_RATE_LIMIT_WAIT = 30_000; // Don't wait more than 30s for rate limits
 
 let on401Handler: (() => void) | null = null;
 
@@ -19,6 +20,8 @@ export interface RequestOptions {
   retries?: number;
   /** Base delay between retries in ms. Doubles each attempt (exponential backoff). Defaults to 500. */
   retryDelay?: number;
+  /** Number of 429 retries remaining (internal — don't set manually) */
+  rateLimitRetries?: number;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -91,6 +94,17 @@ export async function request<T>(url: string, opts: RequestOptions = {}): Promis
         // Response body wasn't JSON — use status text
       }
 
+      // Rate limited (429) — wait and retry transparently (separate from network retries)
+      const rateLimitRetries = opts.rateLimitRetries ?? 2;
+      if (response.status === 429 && rateLimitRetries > 0) {
+        const retryAfter = response.headers.get('Retry-After');
+        const waitMs = retryAfter
+          ? Math.min(Number.parseInt(retryAfter, 10) * 1000 || 5000, MAX_RATE_LIMIT_WAIT)
+          : 5000;
+        await sleep(waitMs);
+        return request<T>(url, { ...opts, retries: 0, rateLimitRetries: rateLimitRetries - 1 });
+      }
+
       const apiError = new FediwayAPIError({
         status: response.status,
         message: errorData.error_description ?? errorData.error ?? response.statusText,
@@ -100,7 +114,7 @@ export async function request<T>(url: string, opts: RequestOptions = {}): Promis
         on401Handler();
       }
 
-      // API errors are not retried — the server gave a definitive response
+      // Other API errors are not retried — the server gave a definitive response
       throw apiError;
     }
 

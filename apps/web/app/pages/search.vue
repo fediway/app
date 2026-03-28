@@ -50,20 +50,22 @@ const postResults = shallowRef<Status[]>([]);
 const accountResults = shallowRef<any[]>([]);
 const tagResults = shallowRef<any[]>([]);
 
-let currentQueryRefs: { posts: Ref<Status[]>; accounts: Ref<any[]>; tags: Ref<any[]> } | null = null;
+const isSearchLoading = ref(false);
+let currentQueryRefs: { posts: Ref<Status[]>; accounts: Ref<any[]>; tags: Ref<any[]>; postsLoading: Ref<boolean>; accountsLoading: Ref<boolean>; tagsLoading: Ref<boolean> } | null = null;
 
 watch(searchQuery, (query) => {
   if (!query.trim()) {
     postResults.value = [];
     accountResults.value = [];
     tagResults.value = [];
+    isSearchLoading.value = false;
     currentQueryRefs = null;
     return;
   }
   const posts = searchStatuses(query);
   const accounts = searchAccounts(query);
   const tags = searchTags(query);
-  currentQueryRefs = { posts: posts.data, accounts: accounts.data, tags: tags.data };
+  currentQueryRefs = { posts: posts.data, accounts: accounts.data, tags: tags.data, postsLoading: posts.isLoading, accountsLoading: accounts.isLoading, tagsLoading: tags.isLoading };
 }, { immediate: true });
 
 // Sync the query result refs into our local refs (reactive bridge)
@@ -72,6 +74,7 @@ watchEffect(() => {
     postResults.value = currentQueryRefs.posts.value;
     accountResults.value = currentQueryRefs.accounts.value;
     tagResults.value = currentQueryRefs.tags.value;
+    isSearchLoading.value = currentQueryRefs.postsLoading.value || currentQueryRefs.accountsLoading.value || currentQueryRefs.tagsLoading.value;
   }
 });
 
@@ -162,6 +165,13 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
           <AccountList :users="suggestions" />
         </Section>
       </template>
+
+      <!-- Loading -->
+      <div v-else-if="isSearchLoading && !hasResults" class="space-y-4 p-5">
+        <Skeleton class="h-12 w-full" />
+        <Skeleton class="h-12 w-full" />
+        <Skeleton class="h-12 w-full" />
+      </div>
 
       <!-- No Results -->
       <EmptyState

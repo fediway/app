@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuth } from '@repo/api';
-import { EmptyState, MessageBubble, MessageInput, Skeleton } from '@repo/ui';
+import { EmptyState, MessageBubble, MessageInput, Skeleton, useToast } from '@repo/ui';
 import { computed, nextTick, ref, watch } from 'vue';
 import { usePageHeader } from '~/composables/usePageHeader';
 
@@ -9,6 +9,8 @@ definePageMeta({ mobileFullscreen: true });
 const route = useRoute();
 const router = useRouter();
 const { getConversationDetail, sendDirectMessage, isOwnMessage, formatMessageContent } = useConversationData();
+
+const { toast } = useToast();
 
 const conversationId = computed(() => {
   const rawId = route.params.id;
@@ -61,6 +63,7 @@ async function handleSend() {
   catch {
     // Restore message on failure
     newMessage.value = content;
+    toast.error('Failed to send message');
   }
   finally {
     isSending.value = false;

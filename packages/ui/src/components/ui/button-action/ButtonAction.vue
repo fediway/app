@@ -15,14 +15,13 @@ const props = withDefaults(defineProps<Props>(), {
   ariaPressed: undefined,
 });
 
-const TRAILING_ZERO_RE = /\.0$/;
+const compactFormatter = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
 
 function formatCount(n: number): string {
-  if (n >= 1_000_000)
-    return `${(n / 1_000_000).toFixed(1).replace(TRAILING_ZERO_RE, '')}m`;
-  if (n >= 1_000)
-    return `${(n / 1_000).toFixed(1).replace(TRAILING_ZERO_RE, '')}k`;
-  return n.toString();
+  return compactFormatter.format(n);
 }
 </script>
 

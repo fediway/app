@@ -93,13 +93,16 @@ registerBackHandler(50, () => {
   return false;
 });
 
-function handlePost(data: { content: string; spoilerText: string; visibility: string }) {
+function handlePost(data: { content: string; spoilerText: string; visibility: string; poll?: any; mediaIds?: string[]; idempotencyKey?: string }) {
   addPost({
     content: data.content,
     spoilerText: data.spoilerText,
     visibility: data.visibility,
     inReplyToId: replyingTo.value?.id ?? null,
     inReplyToAccountId: replyingTo.value?.account.id ?? null,
+    poll: data.poll,
+    mediaIds: data.mediaIds,
+    idempotencyKey: data.idempotencyKey,
   });
 }
 
@@ -213,7 +216,7 @@ watch(isAuthenticated, (authenticated) => {
           @click="navigation.closeSidebar()"
         />
         <MobileHeader v-if="isAuthenticated" />
-        <main class="flex-1" :class="isMobileFullscreen ? '' : 'pb-20'">
+        <main class="relative flex-1" :class="isMobileFullscreen ? '' : 'pb-20'">
           <slot />
         </main>
       </div>
@@ -237,7 +240,7 @@ watch(isAuthenticated, (authenticated) => {
           <main
             id="main-content"
             ref="feedRef"
-            class="bg-card pb-20 lg:flex-1 lg:border-x lg:border-border"
+            class="relative bg-card pb-20 lg:flex-1 lg:border-x lg:border-border"
           >
             <slot />
           </main>

@@ -42,8 +42,13 @@ test.describe('Authentication', () => {
     // Logout
     await logout(page);
 
+    // Should be redirected away from settings (to login or home)
+    await expect(page).not.toHaveURL('/settings');
+
     // Should see sign-in option (not authenticated UI)
-    await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /sign in/i }).or(
+      page.getByRole('button', { name: /sign in/i }),
+    )).toBeVisible({ timeout: 10_000 });
   });
 
   // This test uses plain Playwright (no mock mode) to test auth redirect

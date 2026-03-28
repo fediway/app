@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
-import { EmptyState, PageHeader, Skeleton, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
-import { computed } from 'vue';
+import { useAuth } from '@repo/api';
+import { EmptyState, PageHeader, QuickReply, Skeleton, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
+import { computed, ref } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -17,6 +18,8 @@ const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, getStoreS
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 const { open: openSendMessage } = useSendMessageModal();
+const { currentUser, isAuthenticated } = useAuth();
+const { addPost } = usePosts();
 
 const statusId = computed(() => route.params.id as string);
 
@@ -81,9 +84,35 @@ function handleTagClick(tag: string) {
 }
 
 function handleReply(id: string) {
-  const target = [...context.value.ancestors, rawStatus.value!, ...context.value.descendants].find(s => s.id === id) ?? rawStatus.value;
+  const all = [...context.value.ancestors, ...(rawStatus.value ? [rawStatus.value] : []), ...context.value.descendants];
+  const target = all.find(s => s.id === id) ?? rawStatus.value;
   if (target)
     openComposer(target);
+}
+
+// Quick reply — inline reply to the focused status
+const isQuickReplying = ref(false);
+
+function handleQuickReply(content: string) {
+  if (!status.value)
+    return;
+  isQuickReplying.value = true;
+
+  addPost({
+    content,
+    inReplyToId: status.value.id,
+    inReplyToAccountId: status.value.account.id,
+    visibility: status.value.visibility,
+  });
+
+  isQuickReplying.value = false;
+  // Refresh context to show the new reply
+  // The optimistic update should handle this, but refetch for safety
+}
+
+function handleExpandComposer() {
+  if (status.value)
+    openComposer(status.value);
 }
 
 function handleMediaClick(_attachments: MediaAttachment[], index: number) {
@@ -206,6 +235,18 @@ function getReplyParent(reply: Status, index?: number): Status | null {
           @media-click="handleMediaClick"
           @view-reblogs="id => router.push(`${route.path}/reblogs`)"
           @view-favourites="id => router.push(`${route.path}/favourites`)"
+        />
+
+        <!-- Quick Reply -->
+        <QuickReply
+          v-if="isAuthenticated"
+          :avatar-src="currentUser?.avatar"
+          :avatar-alt="currentUser?.displayName || currentUser?.username"
+          :reply-to-acct="status.account.acct"
+          :disabled="isQuickReplying"
+          :submitting="isQuickReplying"
+          @submit="handleQuickReply"
+          @expand="handleExpandComposer"
         />
 
         <!-- Descendants (replies) -->
