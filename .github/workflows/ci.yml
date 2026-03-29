@@ -107,12 +107,14 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
+      - name: Build web app (mock mode)
+        run: VITE_API_MODE=mock npx turbo run build --filter=@repo/web
       - name: Install Playwright browsers
         run: npx playwright install --with-deps webkit
       - name: Run Mobile E2E tests
         run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project mobile
         env:
-          VITE_API_MODE: mock
+          CI: true
       - name: Upload test report
         uses: actions/upload-artifact@v4
         if: always()
