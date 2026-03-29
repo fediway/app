@@ -8,8 +8,8 @@
 
 Built with Vue 3, Nuxt 4, and Capacitor — web and mobile from a single codebase.
 
-**Web** — [fediway.com](https://fediway.com)
-**Mobile** — iOS and Android apps in active development
+- **Web** — [fediway.com](https://fediway.com)
+- **Mobile** — iOS and Android apps in active development
 
 <!-- TODO: Add screenshot/demo GIF here -->
 
