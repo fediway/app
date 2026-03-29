@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Status, Tag } from '@repo/types';
+import type { Status } from '@repo/types';
 import { PhArrowLeft } from '@phosphor-icons/vue';
 import { Button, Timeline } from '@repo/ui';
 import { computed, onMounted, ref, shallowRef, watch } from 'vue';
@@ -44,8 +44,8 @@ function handleProfileClick(acct: string) {
   router.push(getProfileUrl(acct));
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${encodeURIComponent(tag.name)}`);
+function handleTagClick(tagName: string) {
+  router.push(`/tags/${encodeURIComponent(tagName)}`);
 }
 
 watch(tagName, () => load());

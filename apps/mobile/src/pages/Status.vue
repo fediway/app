@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tag } from '@repo/types';
 import { PhWarningCircle } from '@phosphor-icons/vue';
 import { useStatus, useStatusActions } from '@repo/api';
 import { EmptyState, Skeleton, StatusAncestor, StatusDetailMain, StatusReply } from '@repo/ui';
@@ -54,8 +53,8 @@ async function handleBookmark(id: string) {
   load();
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${tag.name}`);
+function handleTagClick(tagName: string) {
+  router.push(`/tags/${encodeURIComponent(tagName)}`);
 }
 </script>
 

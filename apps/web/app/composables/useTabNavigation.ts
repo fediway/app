@@ -9,7 +9,7 @@ interface TabState {
   scrollY: number;
 }
 
-const TAB_ROOTS: Record<Exclude<TabId, 'new-post' | 'profile'>, string> = {
+const TAB_ROOTS: Record<Exclude<TabId, 'new-post' | 'profile' | null>, string> = {
   home: '/',
   search: '/search',
   messages: '/messages',

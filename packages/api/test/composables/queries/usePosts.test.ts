@@ -129,7 +129,7 @@ describe('usePosts (shared)', () => {
         spoilerText: 'CW',
         visibility: 'unlisted',
         inReplyToId: 'reply-to-42',
-      });
+      }, undefined);
     });
 
     it('passes poll data to API when provided', async () => {
@@ -154,7 +154,7 @@ describe('usePosts (shared)', () => {
           expiresIn: 86400,
           multiple: false,
         },
-      }));
+      }), undefined);
     });
 
     it('passes mediaIds to API when provided', async () => {
@@ -171,7 +171,7 @@ describe('usePosts (shared)', () => {
       expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
         status: 'Check out this photo',
         mediaIds: ['media-1', 'media-2'],
-      }));
+      }), undefined);
     });
 
     it('does not include poll or mediaIds when not provided', async () => {

@@ -44,12 +44,10 @@ describe('useTabNavigation', () => {
   });
 
   it('switchTab restores lastPath when switching back', () => {
-    // Navigate to search, then simulate visiting a detail page
+    // Navigate to search, then simulate visiting a detail page within search
     tab.switchTab('search', navigateMock);
     tab.onRouteChange('/search', '/');
-
-    // Simulate navigating to a detail page within search
-    tab.onRouteChange('/explore/posts', '/search');
+    tab.onRouteChange('/search/detail', '/search');
 
     // Switch to home
     tab.switchTab('home', navigateMock);
@@ -57,7 +55,7 @@ describe('useTabNavigation', () => {
     // Switch back to search — should go to last visited path
     navigateMock.mockClear();
     tab.switchTab('search', navigateMock);
-    expect(navigateMock).toHaveBeenCalledWith('/explore/posts');
+    expect(navigateMock).toHaveBeenCalledWith('/search/detail');
   });
 
   it('same-tab tap pops to root when on sub-page', () => {
@@ -66,7 +64,7 @@ describe('useTabNavigation', () => {
     tab.onRouteChange('/search', '/');
 
     // Simulate navigating to detail within search
-    tab.onRouteChange('/explore/posts', '/search');
+    tab.onRouteChange('/search/detail', '/search');
 
     // Tap search again
     navigateMock.mockClear();
@@ -144,12 +142,12 @@ describe('useTabNavigation', () => {
     expect(tab.activeTab.value).toBe('profile');
   });
 
-  it('non-tab routes do not change activeTab', () => {
+  it('non-tab routes clear activeTab', () => {
     tab.onRouteChange('/settings', '/');
-    expect(tab.activeTab.value).toBe('home');
+    expect(tab.activeTab.value).toBeNull();
 
     tab.onRouteChange('/favourites', '/settings');
-    expect(tab.activeTab.value).toBe('home');
+    expect(tab.activeTab.value).toBeNull();
   });
 
   it('onRouteChange detects profile tab root', () => {
@@ -163,7 +161,7 @@ describe('useTabNavigation', () => {
     tab.onRouteChange('/search', '/');
     Object.defineProperty(window, 'scrollY', { value: 300, configurable: true });
     tab.saveCurrentScroll();
-    tab.onRouteChange('/explore/posts', '/search');
+    tab.onRouteChange('/search/detail', '/search');
 
     // Tap search again — should pop to root with scroll 0
     scrollToMock.mockClear();

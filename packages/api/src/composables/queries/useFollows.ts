@@ -9,7 +9,7 @@ const toggleSeq = new Map<string, number>();
 
 export interface UseFollowsCallbacks {
   onToggle?: (accountId: string, following: boolean) => void;
-  onError?: (accountId: string, err: unknown) => void;
+  onError?: (accountId: string | string[], err: unknown) => void;
 }
 
 export function useFollows(callbacks?: UseFollowsCallbacks) {
@@ -111,7 +111,7 @@ export function useFollows(callbacks?: UseFollowsCallbacks) {
         }
       })
       .catch((err) => {
-        callbacks?.onError?.('', err);
+        callbacks?.onError?.(uncached, err);
       });
   }
 

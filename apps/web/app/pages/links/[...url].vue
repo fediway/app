@@ -77,7 +77,7 @@ function handleVisit() {
 function handleShareLink() {
   // Use the first status ID if available for share context, otherwise share the raw URL
   if (statuses.value.length > 0) {
-    handleShare(statuses.value[0].id);
+    handleShare(statuses.value[0]!.id);
   }
   else if (linkUrl.value) {
     if (navigator.share) {

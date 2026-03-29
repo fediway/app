@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tag } from '@repo/types';
 import { useTimeline } from '@repo/api';
 import { Timeline } from '@repo/ui';
 import { onMounted, onUnmounted, ref } from 'vue';
@@ -37,8 +36,8 @@ function handleProfileClick(acct: string) {
   router.push(getProfileUrl(acct));
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${encodeURIComponent(tag.name)}`);
+function handleTagClick(tagName: string) {
+  router.push(`/tags/${encodeURIComponent(tagName)}`);
 }
 </script>
 

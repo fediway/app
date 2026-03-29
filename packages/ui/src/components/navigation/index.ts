@@ -5,13 +5,6 @@ export { AppBar } from './app-bar';
 export { BottomNav, BottomNavItem } from './bottom-nav';
 export type { BottomNavItemType } from './bottom-nav';
 
-// Backwards-compat aliases (remove after app migration)
-export { BottomNav as MainNavigation } from './bottom-nav';
-
-export { BottomNavItem as MainNavigationItem } from './bottom-nav';
-
-export type { BottomNavItemType as NavItem } from './bottom-nav';
-
 // Navigation drawer
 export { NavDrawer, NavDrawerItem, NavDrawerProfile } from './nav-drawer';
 // Navigation icon

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FediwayStatus, Tag } from '@repo/types';
+import type { FediwayStatus } from '@repo/types';
 import { PhUser, PhWarningCircle } from '@phosphor-icons/vue';
 import { useAccount, useAuth, useStatusActions, useStatusStore } from '@repo/api';
 import { EmptyState, ProfileActions, ProfileHeader, ProfileInformation, Skeleton, Status } from '@repo/ui';
@@ -64,8 +64,8 @@ function handleProfileClick(profileAcct: string) {
   router.push(getProfileUrl(profileAcct));
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${encodeURIComponent(tag.name)}`);
+function handleTagClick(tagName: string) {
+  router.push(`/tags/${encodeURIComponent(tagName)}`);
 }
 
 async function handleFavourite(id: string) {

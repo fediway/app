@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Status, Tag } from '@repo/types';
+import type { Status } from '@repo/types';
 import { Timeline } from '@repo/ui';
 import { onMounted, ref, shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
@@ -38,8 +38,8 @@ function handleProfileClick(acct: string) {
   router.push(getProfileUrl(acct));
 }
 
-function handleTagClick(tag: Tag) {
-  router.push(`/tags/${encodeURIComponent(tag.name)}`);
+function handleTagClick(tagName: string) {
+  router.push(`/tags/${encodeURIComponent(tagName)}`);
 }
 
 onMounted(load);

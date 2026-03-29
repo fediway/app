@@ -163,7 +163,7 @@ describe('useAuthState — contract', () => {
 
   describe('mock mode isolation', () => {
     it('mock user is NEVER set when mode is live', () => {
-      const mode = 'live';
+      const mode: string = 'live';
       const isAuthenticated = false;
       const shouldSetMockUser = mode === 'mock' && !isAuthenticated;
       expect(shouldSetMockUser).toBe(false);

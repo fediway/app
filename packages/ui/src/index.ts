@@ -53,9 +53,6 @@ export {
   AppBar,
   BottomNav,
   BottomNavItem,
-  // Backwards-compat aliases (remove after app migration)
-  MainNavigation,
-  MainNavigationItem,
   NavDrawer,
   NavDrawerItem,
   NavDrawerProfile,
@@ -69,8 +66,6 @@ export {
 export type {
   BottomNavItemType,
   NavIconName,
-  // Backwards-compat alias
-  NavItem,
   NavMenuItem,
   NavUser,
   TabItem,

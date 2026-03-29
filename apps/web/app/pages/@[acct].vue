@@ -92,6 +92,13 @@ function handleMessage() {
   router.push('/messages');
 }
 
+function handleStatClick(stat: string) {
+  if (stat === 'posts')
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  else
+    router.push(`${getProfilePath(acct.value)}/${stat}`);
+}
+
 function goBack() {
   if (window.history.length > 1) {
     router.back();
@@ -132,7 +139,7 @@ function goBack() {
           :account="account"
           @profile-click="(acct) => router.push(getProfilePath(acct))"
           @tag-click="(tag) => router.push(`/tags/${tag}`)"
-          @stat-click="(stat) => stat === 'posts' ? window.scrollTo({ top: 0, behavior: 'smooth' }) : router.push(`${getProfilePath(acct)}/${stat}`)"
+          @stat-click="handleStatClick"
         />
 
         <!-- Actions row -->

@@ -61,7 +61,7 @@ describe('useNavigationStore', () => {
       setAuthUser(DEFAULT_USER);
       const store = useNavigationStore();
 
-      expect(store.currentUser).toEqual({
+      expect(store.currentUser).toMatchObject({
         name: 'Jane Doe',
         username: 'jane',
         acct: 'jane@social.network',

@@ -227,6 +227,18 @@ describe('useFollows (shared)', () => {
       expect(onError).toHaveBeenCalled();
     });
 
+    it('passes account IDs to onError callback on batch failure', async () => {
+      mockFetch.mockRejectedValue(new Error('Network down'));
+      const onError = vi.fn();
+      const { fetchRelationships } = useFollows({ onError });
+      fetchRelationships(['1', '2']);
+      await flushPromises();
+
+      // onError should receive the failed account IDs, not an empty string
+      const firstArg = onError.mock.calls[0][0];
+      expect(firstArg).not.toBe('');
+    });
+
     it('preserves existing follow state from optimistic toggle', async () => {
       const { toggleFollow, fetchRelationships, isFollowing } = useFollows();
       toggleFollow('1');

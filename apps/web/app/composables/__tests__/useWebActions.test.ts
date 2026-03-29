@@ -15,6 +15,7 @@ vi.mock('@repo/api', () => {
   return {
     useStatusStore: () => ({
       get: (id: string) => mockStore.get(id),
+      isDeleted: (_id: string) => false,
     }),
     useStatusActions: () => ({
       toggleFavourite,
