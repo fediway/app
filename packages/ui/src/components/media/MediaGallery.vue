@@ -100,8 +100,8 @@ const singleMediaAspect = computed(() => {
   const minAspect = isVideo ? VIDEO_MIN_ASPECT : IMAGE_MIN_ASPECT;
 
   // Try original first, then small — either may have aspect or width/height
-  const rawAspect = extractAspect(att.meta?.original as Record<string, unknown>)
-    ?? extractAspect(att.meta?.small as Record<string, unknown>);
+  const rawAspect = extractAspect(att.meta?.original as unknown as Record<string, unknown>)
+    ?? extractAspect(att.meta?.small as unknown as Record<string, unknown>);
 
   if (rawAspect) {
     return Math.max(minAspect, Math.min(MAX_ASPECT, rawAspect));
@@ -122,7 +122,7 @@ const singleImageStyle = computed(() => {
   const style: Record<string, string> = { aspectRatio: `${singleMediaAspect.value}` };
   // Cap height for portrait videos so they don't dominate the feed
   if (singleMediaIsVideo.value && singleMediaAspect.value < 1) {
-    style.maxHeight = 'min(80vh, 750px)';
+    style.maxHeight = 'min(70vh, 550px)';
   }
   return style;
 });

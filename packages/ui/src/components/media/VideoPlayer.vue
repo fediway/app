@@ -573,9 +573,10 @@ onBeforeUnmount(() => {
     <div
       class="absolute inset-0 flex flex-col justify-end transition-opacity duration-200"
       :class="controlsVisible || paused ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+      @click.self="togglePlay"
     >
       <!-- Gradient backdrop -->
-      <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
 
       <!-- Center play/pause (when paused) -->
       <div
