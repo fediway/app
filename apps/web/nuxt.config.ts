@@ -13,18 +13,6 @@ export default defineNuxtConfig({
     port: 3333,
   },
 
-  app: {
-    head: {
-      link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon/favicon.svg' },
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon/favicon.ico' },
-        { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon/favicon-96x96.png' },
-        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' },
-        { rel: 'manifest', href: '/favicon/site.webmanifest' },
-      ],
-    },
-  },
-
   css: [new URL('../../packages/ui/src/styles/globals.css', import.meta.url).pathname],
 
   // SPA mode — auth tokens live client-side, all content is API-driven.
@@ -73,8 +61,30 @@ export default defineNuxtConfig({
       title: 'Fediway',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'A short-form social platform for the fediverse' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+        { name: 'description', content: 'Your feed, your way' },
+        { name: 'theme-color', content: '#0a0a0a' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: 'Fediway' },
+        { property: 'og:title', content: 'Fediway' },
+        { property: 'og:description', content: 'Your feed, your way' },
+        { property: 'og:url', content: 'https://fediway.com' },
+        { property: 'og:image', content: 'https://fediway.com/og-image.png' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Fediway' },
+        { name: 'twitter:description', content: 'Your feed, your way' },
+        { name: 'twitter:image', content: 'https://fediway.com/og-image.png' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon/favicon.svg' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon/favicon-96x96.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/favicon/site.webmanifest' },
       ],
     },
   },
