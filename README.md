@@ -1,6 +1,10 @@
-# Fediway
+<p align="center">
+  <img src=".github/assets/logo.svg" alt="Fediway" width="80" />
+</p>
 
-An open-source client for Mastodon.
+<h1 align="center">Fediway</h1>
+
+<p align="center">An open-source client for Mastodon.</p>
 
 Built with Vue 3, Nuxt 4, and Capacitor — web and mobile from a single codebase.
 

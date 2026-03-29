@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { defineComponent, ref } from 'vue';
-import { CharacterCounter } from '@/components/compose/CharacterCounter.vue';
+import CharacterCounter from '@/components/compose/CharacterCounter.vue';
 import ComposeToolbar from '@/components/compose/ComposeToolbar.vue';
 import ContentWarningToggle from '@/components/compose/ContentWarningToggle.vue';
 import MediaPreviewGrid from '@/components/compose/MediaPreviewGrid.vue';
