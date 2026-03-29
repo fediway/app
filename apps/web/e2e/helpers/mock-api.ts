@@ -26,7 +26,6 @@ export async function setupMockApi(page: Page) {
     const url = route.request().url();
     const method = route.request().method();
 
-    // ── Trending ──
     if (url.includes('/api/v1/trends/statuses'))
       return route.fulfill({ json: mockStatuses });
     if (url.includes('/api/v1/trends/tags'))
@@ -34,7 +33,6 @@ export async function setupMockApi(page: Page) {
     if (url.includes('/api/v1/trends/links'))
       return route.fulfill({ json: mockTrendingLinks });
 
-    // ── Timelines ──
     if (url.includes('/api/v1/timelines/home'))
       return route.fulfill({ json: mockStatuses });
     if (url.includes('/api/v1/timelines/public'))
@@ -42,18 +40,15 @@ export async function setupMockApi(page: Page) {
     if (url.includes('/api/v1/timelines/tag/'))
       return route.fulfill({ json: mockStatuses.slice(0, 3) });
 
-    // ── Notifications ──
     if (url.includes('/api/v1/notifications'))
       return route.fulfill({ json: mockNotifications });
 
-    // ── Markers ──
     if (url.includes('/api/v1/markers')) {
       if (method === 'POST')
         return route.fulfill({ json: {} });
       return route.fulfill({ json: mockMarkers });
     }
 
-    // ── Accounts ──
     if (url.includes('/api/v1/accounts/update_credentials') && method === 'PATCH')
       return route.fulfill({ json: { ...mockCredentials, ...Object.fromEntries(new URLSearchParams(route.request().postData() || '')) } });
     if (url.includes('/api/v1/accounts/verify_credentials'))
@@ -74,17 +69,14 @@ export async function setupMockApi(page: Page) {
     if (url.match(/\/api\/v1\/accounts\/\d+\/following/))
       return route.fulfill({ json: [mockAccount] });
 
-    // ── Favourites & Bookmarks ──
     if (url.includes('/api/v1/favourites'))
       return route.fulfill({ json: mockStatuses.slice(0, 2).map(s => ({ ...s, favourited: true })) });
     if (url.includes('/api/v1/bookmarks'))
       return route.fulfill({ json: mockStatuses.slice(0, 2).map(s => ({ ...s, bookmarked: true })) });
 
-    // ── Conversations ──
     if (url.includes('/api/v1/conversations'))
       return route.fulfill({ json: mockConversations });
 
-    // ── Search ──
     if (url.includes('/api/v2/search')) {
       return route.fulfill({
         json: {
@@ -95,17 +87,14 @@ export async function setupMockApi(page: Page) {
       });
     }
 
-    // ── Suggestions ──
     if (url.includes('/api/v2/suggestions'))
       return route.fulfill({ json: mockSuggestions });
     if (url.includes('/api/v1/directory'))
       return route.fulfill({ json: [mockAccount, mockAccount2] });
 
-    // ── Instance ──
     if (url.includes('/api/v1/instance') || url.includes('/api/v2/instance'))
       return route.fulfill({ json: mockInstance });
 
-    // ── Status actions (favourite, reblog, bookmark) ──
     if (url.match(/\/api\/v1\/statuses\/\d+\/(favourite|unfavourite|reblog|unreblog|bookmark|unbookmark)/) && method === 'POST') {
       const isFav = url.includes('/favourite') && !url.includes('/unfavourite');
       const isReblog = url.includes('/reblog') && !url.includes('/unreblog');
@@ -120,18 +109,15 @@ export async function setupMockApi(page: Page) {
       });
     }
 
-    // ── Status delete ──
     if (url.match(/\/api\/v1\/statuses\/\d+$/) && method === 'DELETE') {
       return route.fulfill({ json: {} });
     }
 
-    // ── Status detail ──
     if (url.match(/\/api\/v1\/statuses\/\d+\/context/))
       return route.fulfill({ json: { ancestors: [], descendants: [mockStatuses[1]] } });
     if (url.match(/\/api\/v1\/statuses\/\d+$/))
       return route.fulfill({ json: mockStatuses[0] });
 
-    // ── Media upload ──
     if (url.includes('/api/v2/media') || url.includes('/api/v1/media')) {
       if (method === 'POST') {
         return route.fulfill({
@@ -147,7 +133,6 @@ export async function setupMockApi(page: Page) {
       }
     }
 
-    // ── Status creation ──
     if (url.match(/\/api\/v1\/statuses$/) && method === 'POST') {
       return route.fulfill({
         json: {
@@ -173,7 +158,6 @@ export async function setupMockApi(page: Page) {
       });
     }
 
-    // ── Moderation (mute, block, report) ──
     if (url.match(/\/api\/v1\/accounts\/\d+\/mute$/) && method === 'POST') {
       const accountId = url.match(/\/accounts\/(\d+)\/mute/)?.[1];
       return route.fulfill({ json: { ...mockRelationship, id: accountId, muting: true } });
@@ -197,7 +181,6 @@ export async function setupMockApi(page: Page) {
     if (url.includes('/api/v1/reports') && method === 'POST')
       return route.fulfill({ json: { id: 'report-1', action_taken: false, category: 'other' } });
 
-    // ── Account lookup by ID ──
     if (url.match(/\/api\/v1\/accounts\/3$/) && method === 'GET')
       return route.fulfill({ json: mockRemoteAccount });
     if (url.match(/\/api\/v1\/accounts\/2$/) && method === 'GET')
@@ -205,11 +188,9 @@ export async function setupMockApi(page: Page) {
     if (url.match(/\/api\/v1\/accounts\/1$/) && method === 'GET')
       return route.fulfill({ json: mockAccount });
 
-    // ── Custom Emojis ──
     if (url.includes('/api/v1/custom_emojis'))
       return route.fulfill({ json: [] });
 
-    // ── Fallback: return empty for GET, empty object for POST ──
     if (method === 'GET')
       return route.fulfill({ json: [] });
     return route.fulfill({ json: {} });

@@ -36,8 +36,6 @@ watch(mediaVisibility, () => {
   revealed.value = shouldReveal(props.sensitive);
 });
 
-// ── Computed ────────────────────────────────────────────
-
 const visualAttachments = computed(() =>
   props.attachments.filter(a => a.type !== 'audio'),
 );
@@ -69,7 +67,6 @@ const displayMode = computed<DisplayMode>(() => {
   return 'carousel';
 });
 
-// ── Single media aspect ratio ────────────────────────────
 // Use natural aspect ratio clamped to reasonable bounds.
 // Images: 4:5 to 16:9 (tighter portrait limit).
 // Videos: 9:16 to 16:9 (phone videos allowed taller) + max-height cap.
@@ -127,8 +124,6 @@ const singleImageStyle = computed(() => {
   return style;
 });
 
-// ── Grid layout classes ─────────────────────────────────
-
 const gridLayoutClass = computed(() => {
   const count = gridItems.value.length;
   if (count === 2)
@@ -146,8 +141,6 @@ const gridContainerStyle = computed(() => {
     return { height: '320px' };
   return {};
 });
-
-// ── Per-cell helpers ────────────────────────────────────
 
 function cellStyle(index: number): Record<string, string> {
   const count = gridItems.value.length;
@@ -180,8 +173,6 @@ function cornerClass(index: number): string {
   return 'rounded-br-xl';
 }
 
-// ── Focal point ─────────────────────────────────────────
-
 function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
   const focus = attachment.meta?.focus;
   if (!focus)
@@ -191,8 +182,6 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
   return { objectPosition: `${x.toFixed(1)}% ${y.toFixed(1)}%` };
 }
 
-// ── Image source with blurhash fallback ─────────────────
-
 function imageSrc(attachment: MediaAttachment): string {
   if (attachment.previewUrl)
     return attachment.previewUrl;
@@ -201,19 +190,15 @@ function imageSrc(attachment: MediaAttachment): string {
   return '';
 }
 
-// ── Sensitive toggle ────────────────────────────────────
-
 function toggleReveal() {
   revealed.value = !revealed.value;
 }
 </script>
 
 <template>
-  <!-- Empty -->
   <div v-if="displayMode === 'empty' && audioAttachments.length === 0" />
 
   <div v-else>
-    <!-- Carousel (5+) -->
     <MediaCarousel
       v-if="displayMode === 'carousel'"
       :attachments="visualAttachments"
@@ -221,7 +206,6 @@ function toggleReveal() {
       @media-click="(att, idx) => emit('mediaClick', att, idx)"
     />
 
-    <!-- Grid / Single (1-4) -->
     <div v-else-if="displayMode !== 'empty'" class="relative">
       <!-- Content overlay (sensitive or "hide all" preference) -->
       <button
@@ -238,14 +222,12 @@ function toggleReveal() {
         <span class="text-xs text-muted-foreground/60 mt-1">Click to reveal</span>
       </button>
 
-      <!-- Grid container -->
       <div
         class="grid gap-0.5 overflow-hidden rounded-xl"
         :class="[gridLayoutClass, { 'blur-xl': !revealed }]"
         :style="[gridContainerStyle, displayMode === 'single' ? singleImageStyle : {}]"
       >
         <template v-for="(attachment, index) in gridItems" :key="attachment.id">
-          <!-- Video: no lightbox, player handles its own clicks -->
           <div
             v-if="attachment.type === 'video'"
             class="relative overflow-hidden bg-muted h-full w-full"
@@ -263,7 +245,6 @@ function toggleReveal() {
             />
           </div>
 
-          <!-- GIF: no lightbox, loops silently like an image -->
           <div
             v-else-if="attachment.type === 'gifv'"
             class="relative overflow-hidden bg-muted h-full w-full"
@@ -279,7 +260,6 @@ function toggleReveal() {
             />
           </div>
 
-          <!-- Image: opens lightbox on click -->
           <button
             v-else
             type="button"
@@ -298,7 +278,6 @@ function toggleReveal() {
               decoding="async"
             >
 
-            <!-- ALT badge -->
             <div
               v-if="attachment.description"
               class="absolute bottom-2 left-2 px-1 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded"
@@ -306,7 +285,6 @@ function toggleReveal() {
               ALT
             </div>
 
-            <!-- "+N" overlay on last grid item -->
             <div
               v-if="remainingCount > 0 && index === gridItems.length - 1"
               class="absolute inset-0 bg-black/50 flex items-center justify-center"
@@ -317,7 +295,6 @@ function toggleReveal() {
         </template>
       </div>
 
-      <!-- Hide button when manually revealed -->
       <button
         v-if="!shouldReveal(sensitive) && revealed"
         type="button"
@@ -329,7 +306,6 @@ function toggleReveal() {
       </button>
     </div>
 
-    <!-- Audio attachments (rendered below grid) -->
     <div v-if="audioAttachments.length > 0" class="mt-2 space-y-2">
       <div
         v-for="audio in audioAttachments"

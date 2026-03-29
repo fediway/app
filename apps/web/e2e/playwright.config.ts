@@ -7,9 +7,9 @@ const appDir = fileURLToPath(new URL('..', import.meta.url));
 /**
  * Playwright config for Fediway E2E tests.
  *
- * IMPORTANT: Tests run against a PRODUCTION BUILD (nuxt preview),
- * not the dev server. This ensures fast hydration and catches
- * production-only issues (code-splitting, env vars, tree-shaking).
+ * Tests run against a production build (nuxt preview), not the dev
+ * server. This ensures fast hydration and catches production-only
+ * issues (code-splitting, env vars, tree-shaking).
  *
  * Local workflow:
  *   1. VITE_API_MODE=mock npx turbo run build --filter=@repo/web

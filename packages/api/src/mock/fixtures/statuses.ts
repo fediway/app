@@ -213,8 +213,6 @@ function createStatusWithQuote(
 // Use type alias for Account from imports (re-export from @repo/types)
 type Account = import('@repo/types').Account;
 
-// --- Main timeline ---
-
 export const mockStatuses: Status[] = [
   // Status with 6 images - carousel mode
   createStatusWithMedia(
@@ -484,8 +482,6 @@ if (status1) {
   status1.inReplyToAccountId = marcusAccount.id;
 }
 
-// --- Thread contexts ---
-
 export const mockContexts: Record<string, { ancestors: Status[]; descendants: Status[] }> = {
   1: {
     ancestors: [
@@ -589,8 +585,6 @@ export const mockContexts: Record<string, { ancestors: Status[]; descendants: St
     ],
   },
 };
-
-// --- Per-account statuses ---
 
 export const mockAccountStatuses: Record<string, Status[]> = {
   'jane@social.network': [
@@ -729,8 +723,6 @@ export const mockAccountStatuses: Record<string, Status[]> = {
   ],
 };
 
-// --- Favourited/Bookmarked ---
-
 export const favouritedStatuses: Status[] = [
   { ...mockStatuses[1]!, favourited: true },
   { ...mockStatuses[3]!, favourited: true },
@@ -743,8 +735,6 @@ export const bookmarkedStatuses: Status[] = [
   { ...mockStatuses[4]!, bookmarked: true },
   { ...mockStatuses[7]!, bookmarked: true },
 ];
-
-// --- Link statuses ---
 
 export const linkStatuses: Status[] = [
   createStatusWithCard(
@@ -838,8 +828,6 @@ export const linkStatuses: Status[] = [
     { replies: 23, reblogs: 12, favourites: 98 },
   ),
 ];
-
-// --- Tagged statuses ---
 
 export const taggedStatuses: Record<string, Status[]> = {
   photography: [

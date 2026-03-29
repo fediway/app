@@ -12,7 +12,6 @@ export default defineNuxtPlugin(async () => {
 
   await initDarkMode();
 
-  // ── Theme cookies (SSR) ──
   const themeCookie = useCookie('fediway_theme', { maxAge: 60 * 60 * 24 * 365 });
   if (themeCookie.value !== theme.value) {
     themeCookie.value = theme.value;
@@ -25,7 +24,6 @@ export default defineNuxtPlugin(async () => {
     resolvedCookie.value = dark ? 'dark' : 'light';
   });
 
-  // ── Session restore ──
   const isMockMode = mode.value === 'mock';
 
   if (isMockMode) {
@@ -72,7 +70,6 @@ export default defineNuxtPlugin(async () => {
     }
   }
 
-  // ── Auth state watcher — sync cookie + handle 401 ──
   const { toast } = useToast();
 
   watch(isAuthenticated, (authenticated) => {

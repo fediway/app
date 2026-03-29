@@ -57,8 +57,6 @@ export {
   createStreamingAPIClient,
 } from 'masto';
 
-// --- Fediway types ---
-
 export type ItemType = 'link' | 'book' | 'movie' | 'song';
 
 export interface Item {
@@ -99,8 +97,6 @@ export interface ItemAggregation {
   friendsTakes: FediwayStatus[];
   recentTakes: FediwayStatus[];
 }
-
-// --- Multi-account types ---
 
 export interface AppRegistration {
   clientId: string;

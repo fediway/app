@@ -114,8 +114,6 @@ const hasUnsavedContent = computed(() =>
   !editorIsEmpty.value || media.value.length > 0,
 );
 
-// ── Media Upload ──
-
 function addMediaFiles(files: File[] | FileList) {
   for (const file of Array.from(files)) {
     if (media.value.length >= MAX_MEDIA)
@@ -213,14 +211,10 @@ function handleAltSave(value: string) {
   altEditIndex.value = -1;
 }
 
-// ── Paste-to-upload (from ComposeTextarea) ──
-
 function handlePasteMedia(files: File[]) {
   if (canAddMedia.value)
     addMediaFiles(files);
 }
-
-// ── Autocomplete search (injected into ComposeTextarea) ──
 
 let mentionAbort: AbortController | undefined;
 async function searchMentions(query: string) {
@@ -315,8 +309,6 @@ watch(() => props.isOpen, async (isOpen) => {
   }
 }, { immediate: false });
 
-// ── Draft autosave ──
-
 function saveDraft() {
   if (!props.isOpen || !hasUnsavedContent.value)
     return;
@@ -341,8 +333,6 @@ function saveDraft() {
 }
 
 watch([spoilerText, visibility, pollOptions, pollDuration, pollMultiple, showPoll], saveDraft);
-
-// ── Reset form on open ──
 
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
@@ -395,8 +385,6 @@ watch(() => props.isOpen, async (isOpen) => {
     }
   }
 });
-
-// ── Submission (don't dismiss until API confirms) ──
 
 async function handlePost() {
   if (!canPost.value)

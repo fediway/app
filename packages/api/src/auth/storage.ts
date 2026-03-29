@@ -15,8 +15,6 @@ export function scopedStorageKey(accountKey: string, baseKey: string): string {
   return `fediway:${accountKey}:${baseKey}`;
 }
 
-// --- Account list ---
-
 export function loadAccountList(): StoredAccount[] {
   if (typeof localStorage === 'undefined')
     return [];
@@ -57,8 +55,6 @@ export function removeAccountFromList(key: string): void {
   saveAccountList(accounts);
 }
 
-// --- Active account ---
-
 export function loadActiveAccountKey(): string | null {
   if (typeof localStorage === 'undefined')
     return null;
@@ -76,8 +72,6 @@ export function saveActiveAccountKey(key: string | null): void {
   }
 }
 
-// --- Token storage (secure) ---
-
 export async function storeToken(domain: string, accountId: string, token: string): Promise<void> {
   const adapter = getPlatformAdapter();
   await adapter.secureSet(tokenKey(domain, accountId), token);
@@ -92,8 +86,6 @@ export async function removeToken(domain: string, accountId: string): Promise<vo
   const adapter = getPlatformAdapter();
   await adapter.secureRemove(tokenKey(domain, accountId));
 }
-
-// --- Compound operations ---
 
 /**
  * Remove an account completely: token, list entry, fix active key.

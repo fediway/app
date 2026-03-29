@@ -1,11 +1,22 @@
 {
-  "name": "monorepo",
-  "version": "0.0.0",
+  "name": "fediway",
+  "version": "0.1.0",
   "private": true,
   "packageManager": "npm@10.8.0",
-  "license": "MIT",
+  "description": "An open-source client for Mastodon",
+  "author": "Fediway Contributors",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://fediway.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fediway/app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fediway/app/issues"
+  },
+  "keywords": ["mastodon", "fediverse", "activitypub", "social", "vue", "nuxt"],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "build": "turbo run build",

@@ -1,4 +1,5 @@
 import type { FediwayStatus } from '@repo/types';
+import { getActiveAccountKeySync } from '../auth/account-store';
 import { useClient } from './useClient';
 import { useStatusStore } from './useStatusStore';
 
@@ -38,8 +39,9 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
 
     const snapshot = { ...current } as FediwayStatus;
     const wasFavourited = current.favourited;
+    const accountKey = getActiveAccountKeySync();
 
-    // Optimistic update
+    // Optimistic update — marks status as having a pending mutation
     store.patch(id, {
       favourited: !wasFavourited,
       favouritesCount: wasFavourited
@@ -48,18 +50,22 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
     });
 
     try {
-      const updated = wasFavourited
+      wasFavourited
         ? await getClient().rest.v1.statuses.$select(id).unfavourite()
         : await getClient().rest.v1.statuses.$select(id).favourite();
-      store.set(updated as FediwayStatus);
+      if (getActiveAccountKeySync() === accountKey)
+        store.commitMutation(id);
     }
     catch (err) {
-      store.set(snapshot);
-      options?.onError?.({
-        action: 'favourite',
-        statusId: id,
-        error: err instanceof Error ? err : new Error('Failed to toggle favourite'),
-      });
+      if (getActiveAccountKeySync() === accountKey) {
+        store.set(snapshot, { force: true });
+        store.commitMutation(id);
+        options?.onError?.({
+          action: 'favourite',
+          statusId: id,
+          error: err instanceof Error ? err : new Error('Failed to toggle favourite'),
+        });
+      }
     }
     finally {
       inFlight.delete(`fav:${id}`);
@@ -76,6 +82,7 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
 
     const snapshot = { ...current } as FediwayStatus;
     const wasReblogged = current.reblogged;
+    const accountKey = getActiveAccountKeySync();
 
     // Optimistic update
     store.patch(id, {
@@ -86,18 +93,24 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
     });
 
     try {
-      const updated = wasReblogged
+      wasReblogged
         ? await getClient().rest.v1.statuses.$select(id).unreblog()
         : await getClient().rest.v1.statuses.$select(id).reblog();
-      store.set(updated as FediwayStatus);
+      // Reblog API returns a wrapper status with a different ID — ignore it.
+      // The optimistic patch already set reblogged=true on the original.
+      if (getActiveAccountKeySync() === accountKey)
+        store.commitMutation(id);
     }
     catch (err) {
-      store.set(snapshot);
-      options?.onError?.({
-        action: 'reblog',
-        statusId: id,
-        error: err instanceof Error ? err : new Error('Failed to toggle reblog'),
-      });
+      if (getActiveAccountKeySync() === accountKey) {
+        store.set(snapshot, { force: true });
+        store.commitMutation(id);
+        options?.onError?.({
+          action: 'reblog',
+          statusId: id,
+          error: err instanceof Error ? err : new Error('Failed to toggle reblog'),
+        });
+      }
     }
     finally {
       inFlight.delete(`reblog:${id}`);
@@ -114,6 +127,7 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
 
     const snapshot = { ...current } as FediwayStatus;
     const wasBookmarked = current.bookmarked;
+    const accountKey = getActiveAccountKeySync();
 
     // Optimistic update
     store.patch(id, {
@@ -121,18 +135,22 @@ export function useStatusActions(options?: UseStatusActionsOptions): UseStatusAc
     });
 
     try {
-      const updated = wasBookmarked
+      wasBookmarked
         ? await getClient().rest.v1.statuses.$select(id).unbookmark()
         : await getClient().rest.v1.statuses.$select(id).bookmark();
-      store.set(updated as FediwayStatus);
+      if (getActiveAccountKeySync() === accountKey)
+        store.commitMutation(id);
     }
     catch (err) {
-      store.set(snapshot);
-      options?.onError?.({
-        action: 'bookmark',
-        statusId: id,
-        error: err instanceof Error ? err : new Error('Failed to toggle bookmark'),
-      });
+      if (getActiveAccountKeySync() === accountKey) {
+        store.set(snapshot, { force: true });
+        store.commitMutation(id);
+        options?.onError?.({
+          action: 'bookmark',
+          statusId: id,
+          error: err instanceof Error ? err : new Error('Failed to toggle bookmark'),
+        });
+      }
     }
     finally {
       inFlight.delete(`bookmark:${id}`);

@@ -45,6 +45,10 @@ apps/mobile/ios/App/App.xcworkspace/xcuserdata
 apps/mobile/ios/App/App.xcodeproj/xcuserdata
 *.xcuserstate
 
+# Working documents
+todo
+research
+
 # Misc
 *.tgz
 .cache

@@ -4,15 +4,35 @@ import { computed, reactive } from 'vue';
 
 const store = reactive(new Map<string, FediwayStatus>());
 const deleted = reactive(new Set<string>());
+const pendingMutations = reactive(new Set<string>());
+
+/**
+ * Interaction fields owned by user actions (favourite, reblog, bookmark).
+ * When a mutation is pending, these fields are protected from being
+ * overwritten by background refetches or stale API responses.
+ */
+const INTERACTION_FIELDS: readonly (keyof FediwayStatus)[] = [
+  'favourited',
+  'favouritesCount',
+  'reblogged',
+  'reblogsCount',
+  'bookmarked',
+];
+
+export interface SetOptions {
+  /** Bypass interaction field protection (used for error rollback) */
+  force?: boolean;
+}
 
 export interface UseStatusStoreReturn {
   get: (id: string) => FediwayStatus | undefined;
-  set: (status: FediwayStatus) => void;
-  setMany: (statuses: FediwayStatus[]) => void;
+  set: (status: FediwayStatus, opts?: SetOptions) => void;
+  setMany: (statuses: FediwayStatus[], opts?: SetOptions) => void;
   remove: (id: string) => boolean;
   restore: (id: string) => void;
   isDeleted: (id: string) => boolean;
   patch: (id: string, partial: Partial<FediwayStatus>) => FediwayStatus | undefined;
+  commitMutation: (id: string) => void;
   has: (id: string) => boolean;
   clear: () => void;
   readonly size: ComputedRef<number>;
@@ -23,13 +43,27 @@ export function useStatusStore(): UseStatusStoreReturn {
     return store.get(id);
   }
 
-  function set(status: FediwayStatus): void {
+  function set(status: FediwayStatus, opts?: SetOptions): void {
+    if (!opts?.force && pendingMutations.has(status.id)) {
+      // Mutation pending — protect interaction fields, accept everything else
+      const existing = store.get(status.id);
+      if (existing) {
+        const merged: FediwayStatus = { ...status };
+        for (const field of INTERACTION_FIELDS) {
+          if (field in existing) {
+            (merged as any)[field] = (existing as any)[field];
+          }
+        }
+        store.set(status.id, merged);
+        return;
+      }
+    }
     store.set(status.id, status);
   }
 
-  function setMany(statuses: FediwayStatus[]): void {
+  function setMany(statuses: FediwayStatus[], opts?: SetOptions): void {
     for (const status of statuses) {
-      store.set(status.id, status);
+      set(status, opts);
     }
   }
 
@@ -52,7 +86,12 @@ export function useStatusStore(): UseStatusStoreReturn {
       return undefined;
     const updated = { ...current, ...partial } as FediwayStatus;
     store.set(id, updated);
+    pendingMutations.add(id);
     return updated;
+  }
+
+  function commitMutation(id: string): void {
+    pendingMutations.delete(id);
   }
 
   function has(id: string): boolean {
@@ -62,6 +101,7 @@ export function useStatusStore(): UseStatusStoreReturn {
   function clear(): void {
     store.clear();
     deleted.clear();
+    pendingMutations.clear();
   }
 
   const size = computed(() => store.size);
@@ -74,6 +114,7 @@ export function useStatusStore(): UseStatusStoreReturn {
     restore,
     isDeleted,
     patch,
+    commitMutation,
     has,
     clear,
     size,
