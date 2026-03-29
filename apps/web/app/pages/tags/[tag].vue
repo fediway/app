@@ -13,8 +13,9 @@ const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, r
 const statuses = useWebActions().withStoreState(rawStatuses);
 
 usePageHeader({
-  title: computed(() => `#${tagName.value}`),
+  title: computed(() => tagName.value || ''),
   subtitle: computed(() => `${statuses.value.length} posts`),
+  icon: 'PhHash',
 });
 </script>
 

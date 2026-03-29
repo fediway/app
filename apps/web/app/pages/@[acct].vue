@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAuth } from '@repo/api';
 import {
   Badge,
   EmptyState,
@@ -23,8 +24,11 @@ const { toggleFollow, getRelationship, fetchRelationships } = useFollows();
 const acct = computed(() => route.params.acct as string);
 const isStatusDetail = computed(() => !!route.params.id);
 
+const { currentUser } = useAuth();
+const isEditProfileOpen = ref(false);
 const { data: account, isLoading: isAccountLoading } = getAccountByAcct(acct.value);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
+const isOwnProfile = computed(() => !!currentUser.value && !!account.value && currentUser.value.id === account.value.id);
 
 // Set desktop header — show profile info
 usePageHeader({
@@ -33,9 +37,9 @@ usePageHeader({
   image: computed(() => account.value?.avatar),
 });
 
-// Fetch relationship when account loads
+// Fetch relationship when account loads (skip for own profile)
 watch(account, (acc) => {
-  if (acc) {
+  if (acc && !(currentUser.value && currentUser.value.id === acc.id)) {
     fetchRelationships([acc.id]);
   }
 }, { immediate: true });
@@ -56,8 +60,6 @@ const tabs = [
   { label: 'Posts', value: 'posts' },
   { label: 'Replies', value: 'replies' },
   { label: 'Media', value: 'media' },
-  { label: 'Followers', value: 'followers' },
-  { label: 'Following', value: 'following' },
 ];
 
 const activeTab = computed(() => {
@@ -130,6 +132,7 @@ function goBack() {
           :account="account"
           @profile-click="(acct) => router.push(getProfilePath(acct))"
           @tag-click="(tag) => router.push(`/tags/${tag}`)"
+          @stat-click="(stat) => stat === 'posts' ? window.scrollTo({ top: 0, behavior: 'smooth' }) : router.push(`${getProfilePath(acct)}/${stat}`)"
         />
 
         <!-- Actions row -->
@@ -137,9 +140,11 @@ function goBack() {
           <ProfileActions
             :following="relationship?.following ?? false"
             :requested="relationship?.requested ?? false"
+            :is-own-profile="isOwnProfile"
             @follow="handleFollowToggle"
             @unfollow="handleFollowToggle"
             @message="handleMessage"
+            @edit-profile="isEditProfileOpen = true"
           />
         </div>
 
@@ -174,6 +179,15 @@ function goBack() {
         action-label="Go home"
         class="py-12"
         @action="router.push('/')"
+      />
+    </ClientOnly>
+
+    <!-- Profile Edit Modal -->
+    <ClientOnly>
+      <ProfileEditModal
+        v-if="isOwnProfile"
+        :is-open="isEditProfileOpen"
+        @close="isEditProfileOpen = false"
       />
     </ClientOnly>
   </div>

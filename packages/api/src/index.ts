@@ -14,6 +14,9 @@ export { createMastoClient, type MastoClient, type MastoClientConfig } from './c
 // Composables
 export * from './composables';
 
+// Stores
+export { useItemStore } from './composables/useItemStore';
+
 // Client factory (real vs mock)
 export { createClient, type CreateClientConfig } from './createClient';
 
@@ -41,3 +44,4 @@ export {
 // Utils
 export { escapeHtml, formatMessageContent, stripHtml } from './utils/html';
 export { getProfilePath, getStatusPath } from './utils/paths';
+export { previewCardToItem } from './utils/previewCardToItem';

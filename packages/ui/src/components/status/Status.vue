@@ -29,6 +29,8 @@ interface Props {
   showSeparator?: boolean;
   /** Hide the action bar */
   hideActions?: boolean;
+  /** Hide the link preview card (e.g. on an item page where the card is redundant) */
+  hideCard?: boolean;
   /** Whether the user is authenticated (mutes actions when false) */
   authenticated?: boolean;
   /** Whether the current user authored this post */
@@ -46,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
   hasReplyBelow: false,
   showSeparator: true,
   hideActions: false,
+  hideCard: false,
   authenticated: true,
   isOwnPost: false,
   feedPosition: undefined,
@@ -98,7 +101,7 @@ function getDomain(acct: string): string {
 
 function handleStatusClick(event: MouseEvent) {
   const target = event.target as HTMLElement;
-  if (target.closest('a, button, [role="button"]')) {
+  if (target.closest('a, button, video, [role="button"], [data-video-id], [data-slot="status-actions"], [data-slot="button-action"]')) {
     return;
   }
   emit('statusClick', displayStatus.value.id);
@@ -161,7 +164,7 @@ function handleStatusClick(event: MouseEvent) {
         <div class="flex w-11 shrink-0 justify-end">
           <PhArrowsClockwise :size="16" class="text-green" />
         </div>
-        <span class="truncate">{{ booster.displayName || booster.username }} boosted</span>
+        <span class="truncate">{{ booster.displayName || booster.username }} reposted</span>
       </div>
 
       <div class="flex gap-3 px-4 py-3" :class="{ 'pt-0': replyParent || hasReplyAbove, 'pt-1': isReblog && showReblogIndicator && booster }">
@@ -210,7 +213,7 @@ function handleStatusClick(event: MouseEvent) {
 
           <!-- Preview Card -->
           <StatusCard
-            v-if="displayStatus.card"
+            v-if="displayStatus.card && !hideCard"
             :card="displayStatus.card"
             class="mt-3"
           />

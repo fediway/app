@@ -56,10 +56,10 @@ const IconShowcase = defineComponent({
   setup() {
     return {
       icons: [
-        { name: 'PhHeart', component: PhHeart, usage: 'Favourite' },
+        { name: 'PhHeart', component: PhHeart, usage: 'Like' },
         { name: 'PhChat', component: PhChat, usage: 'Reply' },
-        { name: 'PhArrowsClockwise', component: PhArrowsClockwise, usage: 'Reblog' },
-        { name: 'PhBookmarkSimple', component: PhBookmarkSimple, usage: 'Bookmark' },
+        { name: 'PhArrowsClockwise', component: PhArrowsClockwise, usage: 'Repost' },
+        { name: 'PhBookmarkSimple', component: PhBookmarkSimple, usage: 'Save' },
         { name: 'PhDotsThree', component: PhDotsThree, usage: 'More' },
         { name: 'PhArrowLeft', component: PhArrowLeft, usage: 'Back' },
         { name: 'PhMagnifyingGlass', component: PhMagnifyingGlass, usage: 'Search' },

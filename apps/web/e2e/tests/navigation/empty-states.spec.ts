@@ -17,7 +17,7 @@ test.describe('Page Loading', () => {
     await page.goto('/notifications');
     await expect(page).toHaveURL('/notifications');
     // Should show mock notifications
-    await expect(page.getByText(/favourited|boosted|followed/i).first()).toBeAttached({ timeout: 10_000 });
+    await expect(page.getByText(/liked|reposted|followed/i).first()).toBeAttached({ timeout: 10_000 });
   });
 
   test('bookmarks page loads with content', async ({ page }) => {

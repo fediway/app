@@ -36,6 +36,7 @@ const pageTransition = computed(() => {
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
+  will-change: transform;
 }
 
 .page-enter-from,
@@ -65,6 +66,7 @@ const pageTransition = computed(() => {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+  will-change: transform;
 }
 
 .tab-switch-enter-from,

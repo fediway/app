@@ -158,10 +158,10 @@ describe('useExploreData', () => {
       await flushPromises();
 
       const info = getLinkInfo(url);
-      expect(info).toEqual({
+      expect(info).toMatchObject({
         url,
         title: `Title for ${url}`,
-        source: 'Example',
+        providerName: 'Example',
       });
     });
 
@@ -174,10 +174,10 @@ describe('useExploreData', () => {
       await flushPromises();
 
       const info = getLinkInfo(url);
-      expect(info).toEqual({
+      expect(info).toMatchObject({
         url,
         title: url,
-        source: 'example.com',
+        providerName: 'example.com',
       });
     });
   });

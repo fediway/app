@@ -5,6 +5,8 @@ const router = useRouter();
 const { getConversations } = useConversationData();
 const { data: conversations, isLoading, error, refetch } = getConversations();
 
+usePageHeader({ title: 'Messages' });
+
 function navigateToChat(conversationId: string) {
   router.push(`/messages/${conversationId}`);
 }

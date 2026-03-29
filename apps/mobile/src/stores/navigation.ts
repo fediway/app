@@ -28,8 +28,8 @@ const DRAWER_ITEMS: Omit<MenuItem, 'to'>[] = [
   { id: 'explore', label: 'Explore', icon: 'explore' },
   { id: 'notifications', label: 'Notifications', icon: 'notifications' },
   { id: 'messages', label: 'Messages', icon: 'chat' },
-  { id: 'favourites', label: 'Favourites', icon: 'favourites' },
-  { id: 'bookmarks', label: 'Bookmarks', icon: 'saved' },
+  { id: 'favourites', label: 'Likes', icon: 'favourites' },
+  { id: 'bookmarks', label: 'Saved', icon: 'saved' },
   { id: 'profile', label: 'Profile', icon: 'profile' },
   { id: 'settings', label: 'Settings', icon: 'settings' },
 ];

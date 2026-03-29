@@ -2,20 +2,20 @@
 import { PhBell } from '@phosphor-icons/vue';
 import { AppBar, Button } from '@repo/ui';
 import { useScrollDirection } from '~/composables/useScrollDirection';
-import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
-const { canGoBack } = useTabNavigation();
 const { hidden } = useScrollDirection();
 
-function handleLeftClick() {
-  if (canGoBack.value) {
+// Back button uses the same source of truth as desktop: navigation.showBack.
+// Behavior: go back in history if possible, otherwise navigate to parent route.
+function handleBack() {
+  if (window.history.length > 1) {
     router.back();
   }
   else {
-    navigation.openSidebar();
+    router.push('/');
   }
 }
 </script>
@@ -27,16 +27,16 @@ function handleLeftClick() {
   >
     <AppBar
       :title="!navigation.pageImage ? navigation.pageTitle : undefined"
-      :left-icon="canGoBack ? 'back' : undefined"
-      :left-label="canGoBack ? 'Go back' : 'Open menu'"
+      :left-icon="navigation.showBack ? 'back' : undefined"
+      :left-label="navigation.showBack ? 'Go back' : 'Open menu'"
       :bordered="false"
-      @left-click="handleLeftClick"
+      @left-click="navigation.showBack ? handleBack() : navigation.openSidebar()"
     >
-      <!-- Leading: user avatar (top-level) or back arrow (sub-page) -->
-      <template v-if="!canGoBack" #leading>
+      <!-- Leading: user avatar on top-level pages -->
+      <template v-if="!navigation.showBack" #leading>
         <button
           type="button"
-          class="cursor-pointer"
+          class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center"
           aria-label="Open menu"
           @click="navigation.openSidebar()"
         >
@@ -52,15 +52,15 @@ function handleLeftClick() {
         </button>
       </template>
 
-      <!-- Rich title with avatar (for conversation, profile, etc.) -->
+      <!-- Rich title with image (for conversations, profiles) -->
       <template v-if="navigation.pageImage" #title>
         <div class="flex min-w-0 items-center justify-center gap-2.5">
           <img :src="navigation.pageImage" :alt="navigation.pageTitle" class="size-9 shrink-0 rounded-full object-cover">
           <div class="min-w-0 text-left">
-            <div class="truncate text-sm font-semibold text-foreground leading-tight">
+            <div class="truncate text-sm font-semibold leading-tight text-foreground">
               {{ navigation.pageTitle }}
             </div>
-            <div v-if="navigation.pageSubtitle" class="truncate text-xs text-muted-foreground leading-tight">
+            <div v-if="navigation.pageSubtitle" class="truncate text-xs leading-tight text-muted-foreground">
               {{ navigation.pageSubtitle }}
             </div>
           </div>

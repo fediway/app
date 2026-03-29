@@ -144,17 +144,17 @@ describe('useWebActions', () => {
       const { handleBookmark } = useWebActions();
       handleBookmark('1');
 
-      expect(mockToastSuccess).toHaveBeenCalledWith('Saved');
+      expect(mockToastSuccess).toHaveBeenCalledWith('Saved', expect.anything());
     });
 
-    it('shows "Removed from bookmarks" toast when unbookmarking', () => {
+    it('shows "Unsaved" toast when unbookmarking', () => {
       const status = makeStatus('1', { bookmarked: true });
       mockStore.set('1', status as Partial<Status>);
 
       const { handleBookmark } = useWebActions();
       handleBookmark('1');
 
-      expect(mockToastSuccess).toHaveBeenCalledWith('Removed from bookmarks');
+      expect(mockToastSuccess).toHaveBeenCalledWith('Unsaved');
     });
   });
 });

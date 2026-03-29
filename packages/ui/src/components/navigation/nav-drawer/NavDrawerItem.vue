@@ -18,7 +18,7 @@ defineEmits<{ click: [] }>();
     class="flex w-full items-center gap-4 rounded-full border-none bg-transparent px-4 py-3.5 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     :class="[
       active
-        ? 'font-bold text-foreground'
+        ? 'bg-muted font-bold text-foreground'
         : 'text-foreground hover:bg-muted',
     ]"
     :aria-current="active ? 'page' : undefined"

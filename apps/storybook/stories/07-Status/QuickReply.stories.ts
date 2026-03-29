@@ -43,3 +43,12 @@ export const GenericPlaceholder: Story = {
     avatarAlt: 'Alex Chen',
   },
 };
+
+export const ExpandOnly: Story = {
+  args: {
+    avatarSrc: 'https://placehold.co/96x96/E4A5BF/232B37?text=JD',
+    avatarAlt: 'Jane Doe',
+    replyToAcct: 'nixCraft',
+    expandOnly: true,
+  },
+};

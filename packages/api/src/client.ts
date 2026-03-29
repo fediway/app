@@ -32,21 +32,27 @@ export function createMastoClient(config: MastoClientConfig): MastoClient {
     accessToken: config.accessToken,
   });
 
+  // Streaming client is lazy — only created when first accessed.
+  // Prevents WebSocket connection spam when streaming isn't used.
   let streaming: mastodon.streaming.Client | undefined;
+  let streamingInitialized = false;
 
-  // Only create streaming client if authenticated
-  if (config.accessToken) {
-    streaming = createStreamingAPIClient({
-      streamingApiUrl: `${config.url}/api/v1/streaming`,
-      accessToken: config.accessToken,
-    });
+  function getStreaming(): mastodon.streaming.Client | undefined {
+    if (!streamingInitialized && config.accessToken) {
+      streamingInitialized = true;
+      streaming = createStreamingAPIClient({
+        streamingApiUrl: `${config.url}/api/v1/streaming`,
+        accessToken: config.accessToken,
+      });
+    }
+    return streaming;
   }
 
   const fediway = createFediwayAPI(config.url, () => config.accessToken ?? null);
 
   return {
     rest,
-    streaming,
+    get streaming() { return getStreaming(); },
     fediway,
     config,
     isAuthenticated: !!config.accessToken,

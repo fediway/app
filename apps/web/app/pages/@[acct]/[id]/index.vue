@@ -2,6 +2,7 @@
 import type { MediaAttachment, Status } from '@repo/types';
 import { useAuth } from '@repo/api';
 import { EmptyState, PageHeader, QuickReply, Skeleton, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
+import { useMediaQuery } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -14,18 +15,34 @@ const router = useRouter();
 
 const { getStatusById, getStatusContext } = useStatusData();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, getStoreStatus } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleShare, handleDelete, getStoreStatus, store } = useWebActions();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 const { open: openSendMessage } = useSendMessageModal();
 const { currentUser, isAuthenticated } = useAuth();
 const { addPost } = usePosts();
+const isDesktop = useMediaQuery('(min-width: 1024px)');
 
 const statusId = computed(() => route.params.id as string);
 
 const { data: rawStatus, isLoading: isStatusLoading } = getStatusById(statusId.value);
 const status = computed(() => getStoreStatus(rawStatus.value));
 const { data: context } = getStatusContext(statusId.value);
+
+// Seed the store so action toggles work
+watch(rawStatus, (s) => {
+  if (s)
+    store.set(s as import('@repo/types').FediwayStatus);
+}, { immediate: true });
+watch(() => context.value.descendants, (descendants) => {
+  if (descendants.length) {
+    store.setMany(descendants as import('@repo/types').FediwayStatus[]);
+  }
+}, { immediate: true });
+
+const isOwnPost = computed(() =>
+  !!currentUser.value && !!status.value && currentUser.value.id === status.value.account.id,
+);
 
 // Set the desktop header — show post author info
 usePageHeader({
@@ -70,13 +87,6 @@ function handleReblog(id: string) {
 
 function handleFavourite(id: string) {
   toggleFavourite(id);
-}
-
-function handleShare(id: string) {
-  const statusUrl = getStatusPath(id);
-  if (navigator.share) {
-    navigator.share({ url: `${window.location.origin}${statusUrl}` });
-  }
 }
 
 function handleTagClick(tag: string) {
@@ -224,12 +234,15 @@ function getReplyParent(reply: Status, index?: number): Status | null {
         <!-- Main (focused) status -->
         <StatusDetailMain
           :status="status"
+          :is-own-post="isOwnPost"
           @reply="handleReply"
           @reblog="handleReblog"
           @favourite="handleFavourite"
           @bookmark="handleBookmark"
           @share="handleShare"
           @copy-link="handleCopyLink"
+          @send-message="handleSendMessage"
+          @delete="handleDelete"
           @tag-click="handleTagClick"
           @profile-click="navigateToProfile"
           @media-click="handleMediaClick"
@@ -245,6 +258,7 @@ function getReplyParent(reply: Status, index?: number): Status | null {
           :reply-to-acct="status.account.acct"
           :disabled="isQuickReplying"
           :submitting="isQuickReplying"
+          :expand-only="!isDesktop"
           @submit="handleQuickReply"
           @expand="handleExpandComposer"
         />

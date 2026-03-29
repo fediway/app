@@ -1,0 +1,47 @@
+# Dependencies (installed fresh in build)
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+.output
+.nuxt
+storybook-static
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+.claude
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment (build uses ARGs, not .env files)
+.env
+.env.local
+.env.*.local
+
+# Testing & dev
+coverage
+test-results
+apps/storybook
+apps/mobile/android
+apps/mobile/ios
+**/*.test.ts
+**/*.spec.ts
+**/e2e
+
+# Docs
+*.md
+!README.md
+LICENSE
+todo
+research
+palettes

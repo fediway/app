@@ -39,7 +39,7 @@ export const Reblog: Story = {
     status: createMockStatus({
       reblog: createMockStatus({
         account: createMockAccount({ displayName: 'Original Author', username: 'original' }),
-        content: '<p>This is the original post that was boosted.</p>',
+        content: '<p>This is the original post that was reposted.</p>',
       }),
       content: '',
     }),

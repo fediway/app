@@ -3,12 +3,15 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 const store = reactive(new Map<string, FediwayStatus>());
+const deleted = reactive(new Set<string>());
 
 export interface UseStatusStoreReturn {
   get: (id: string) => FediwayStatus | undefined;
   set: (status: FediwayStatus) => void;
   setMany: (statuses: FediwayStatus[]) => void;
   remove: (id: string) => boolean;
+  restore: (id: string) => void;
+  isDeleted: (id: string) => boolean;
   patch: (id: string, partial: Partial<FediwayStatus>) => FediwayStatus | undefined;
   has: (id: string) => boolean;
   clear: () => void;
@@ -31,7 +34,16 @@ export function useStatusStore(): UseStatusStoreReturn {
   }
 
   function remove(id: string): boolean {
+    deleted.add(id);
     return store.delete(id);
+  }
+
+  function restore(id: string): void {
+    deleted.delete(id);
+  }
+
+  function isDeleted(id: string): boolean {
+    return deleted.has(id);
   }
 
   function patch(id: string, partial: Partial<FediwayStatus>): FediwayStatus | undefined {
@@ -49,6 +61,7 @@ export function useStatusStore(): UseStatusStoreReturn {
 
   function clear(): void {
     store.clear();
+    deleted.clear();
   }
 
   const size = computed(() => store.size);
@@ -58,6 +71,8 @@ export function useStatusStore(): UseStatusStoreReturn {
     set,
     setMany,
     remove,
+    restore,
+    isDeleted,
     patch,
     has,
     clear,

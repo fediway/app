@@ -38,6 +38,7 @@ export default defineConfig({
     video: 'on-first-retry',
     contextOptions: {
       reducedMotion: 'reduce',
+      permissions: ['clipboard-read', 'clipboard-write'],
     },
   },
 

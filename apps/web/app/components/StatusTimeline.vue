@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
+import { useAuth } from '@repo/api';
 import { EmptyState, Timeline } from '@repo/ui';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -12,6 +13,7 @@ defineProps<{
   error?: Error | null;
   emptyTitle: string;
   emptyDescription: string;
+  hideCards?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -21,9 +23,10 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, store } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleShare, handleDelete, store } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
+const { currentUser } = useAuth();
 </script>
 
 <template>
@@ -50,9 +53,14 @@ const { open: openLightbox } = useMediaLightbox();
     :has-more="hasMore ?? false"
     :get-profile-url="(acct) => getProfilePath(acct)"
     :get-status="store.get"
+    :hide-cards="hideCards"
+    :current-user-id="currentUser?.id"
     @reblog="(id) => toggleReblog(id)"
     @favourite="(id) => toggleFavourite(id)"
     @bookmark="(id) => handleBookmark(id)"
+    @share="(id) => handleShare(id)"
+    @copy-link="(id) => handleCopyLink(id)"
+    @delete="(id) => handleDelete(id)"
     @send-message="(s) => openSendMessage(s)"
     @tag-click="(tag) => router.push(`/tags/${tag}`)"
     @status-click="(id) => router.push(getStatusPath(id))"

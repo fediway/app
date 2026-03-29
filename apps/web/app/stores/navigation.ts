@@ -13,6 +13,8 @@ export interface CurrentUser {
   username: string;
   acct: string;
   avatar: string;
+  followersCount: number;
+  followingCount: number;
 }
 
 const MENU_ITEMS: Omit<MenuItem, 'to'>[] = [
@@ -20,7 +22,7 @@ const MENU_ITEMS: Omit<MenuItem, 'to'>[] = [
   { id: 'explore', label: 'Explore', icon: 'explore' },
   { id: 'notifications', label: 'Notifications', icon: 'notifications' },
   { id: 'messages', label: 'Messages', icon: 'chat' },
-  { id: 'favourites', label: 'Favourites', icon: 'favourites' },
+  { id: 'favourites', label: 'Likes', icon: 'favourites' },
   { id: 'saved', label: 'Saved', icon: 'saved' },
   { id: 'profile', label: 'Profile', icon: 'profile' },
   { id: 'settings', label: 'Settings', icon: 'settings' },
@@ -56,6 +58,8 @@ export function useNavigationStore() {
         username: authUser.value.username,
         acct: authUser.value.acct,
         avatar: authUser.value.avatar,
+        followersCount: authUser.value.followersCount ?? 0,
+        followingCount: authUser.value.followingCount ?? 0,
       };
     }
     return null;
@@ -127,7 +131,7 @@ export function useNavigationStore() {
       const to = getRoute(item.id);
       if (to === '/' && path === '/')
         return true;
-      if (to !== '/' && (path === to || path.startsWith(`${to}/`)))
+      if (to !== '/' && path === to)
         return true;
     }
     return false;

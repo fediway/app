@@ -40,6 +40,18 @@ export const mockAccount2 = {
   url: 'https://mock.social/@alex',
 };
 
+/** Remote user — for testing "Block domain" visibility */
+export const mockRemoteAccount = {
+  ...mockAccount,
+  id: '3',
+  username: 'bob',
+  acct: 'bob@remote.social',
+  displayName: 'Bob Remote',
+  avatar: 'https://placehold.co/96x96/A5C7B0/232B37?text=BR',
+  avatarStatic: 'https://placehold.co/96x96/A5C7B0/232B37?text=BR',
+  url: 'https://remote.social/@bob',
+};
+
 // ── Statuses ──
 
 function makeStatus(id: string, content: string, account = mockAccount, extra = {}) {
@@ -72,12 +84,43 @@ function makeStatus(id: string, content: string, account = mockAccount, extra = 
   };
 }
 
+const mockImageAttachment = {
+  id: 'media-1',
+  type: 'image',
+  url: 'https://mock.social/media/photo.jpg',
+  previewUrl: 'https://mock.social/media/photo_thumb.jpg',
+  description: 'A scenic photo',
+  blurhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+  meta: { original: { width: 1200, height: 800, aspect: 1.5 } },
+};
+
+const mockGifAttachment = {
+  id: 'media-gif-1',
+  type: 'gifv',
+  url: 'https://mock.social/media/animation.mp4',
+  previewUrl: 'https://mock.social/media/animation_thumb.jpg',
+  description: 'An animated GIF',
+  blurhash: null,
+  meta: { original: { width: 400, height: 400, aspect: 1 } },
+};
+
 export const mockStatuses = [
   makeStatus('100', 'Just finished reading <strong>Piranesi</strong>. The world-building is extraordinary. <a href="#" class="hashtag">#books</a>'),
   makeStatus('99', 'Working on a new color system today. Every hue should earn its place.', mockAccount2),
-  makeStatus('98', 'The fediverse is growing. Love to see it. <a href="#" class="hashtag">#fediverse</a>'),
+  makeStatus('98', 'The fediverse is growing. Love to see it. <a href="#" class="hashtag">#fediverse</a>', mockAccount, {
+    mediaAttachments: [mockImageAttachment],
+  }),
   makeStatus('97', 'Coffee and code, the perfect morning.', mockAccount2),
   makeStatus('96', 'Has anyone tried the new Mastodon release? The performance improvements are noticeable.'),
+  makeStatus('95', 'Check out this GIF!', mockAccount2, {
+    mediaAttachments: [mockGifAttachment],
+  }),
+  makeStatus('94', 'NSFW content warning', mockAccount, {
+    sensitive: true,
+    spoilerText: 'Content warning',
+    mediaAttachments: [{ ...mockImageAttachment, id: 'media-sensitive' }],
+  }),
+  makeStatus('93', 'Hello from a remote instance!', mockRemoteAccount),
 ];
 
 // ── Notifications ──

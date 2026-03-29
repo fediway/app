@@ -18,6 +18,10 @@ interface Props {
   getProfileUrl?: (acct: string) => string;
   /** Function to resolve a status by ID (for reply parent context) */
   getStatus?: (id: string) => StatusType | undefined;
+  /** Hide link preview cards on statuses (e.g. on item pages where the card is redundant) */
+  hideCards?: boolean;
+  /** Current user's account ID — enables isOwnPost detection for delete */
+  currentUserId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,6 +30,8 @@ const props = withDefaults(defineProps<Props>(), {
   hasMore: true,
   getProfileUrl: undefined,
   getStatus: undefined,
+  hideCards: false,
+  currentUserId: undefined,
 });
 
 const emit = defineEmits<{
@@ -35,6 +41,8 @@ const emit = defineEmits<{
   bookmark: [statusId: string];
   share: [statusId: string];
   sendMessage: [status: StatusType];
+  copyLink: [statusId: string];
+  delete: [statusId: string];
   tagClick: [tagName: string];
   loadMore: [];
   statusClick: [statusId: string];
@@ -62,6 +70,13 @@ function getProfileUrlForStatus(status: StatusType): string | undefined {
     return props.getProfileUrl(displayStatus.account.acct);
   }
   return undefined;
+}
+
+function checkIsOwnPost(status: StatusType): boolean {
+  if (!props.currentUserId)
+    return false;
+  const authorId = (status.reblog ?? status).account.id;
+  return authorId === props.currentUserId;
 }
 
 function getReplyParent(status: StatusType): StatusType | null {
@@ -102,12 +117,16 @@ function getReplyParent(status: StatusType): StatusType | null {
           :status="statuses[item.index]!"
           :profile-url="getProfileUrlForStatus(statuses[item.index]!)"
           :reply-parent="getReplyParent(statuses[item.index]!)"
+          :hide-card="hideCards"
+          :is-own-post="checkIsOwnPost(statuses[item.index]!)"
           @reply="emit('reply', $event)"
           @reblog="emit('reblog', $event)"
           @favourite="emit('favourite', $event)"
           @bookmark="emit('bookmark', $event)"
           @share="emit('share', $event)"
           @send-message="emit('sendMessage', $event)"
+          @copy-link="emit('copyLink', $event)"
+          @delete="emit('delete', $event)"
           @tag-click="emit('tagClick', $event)"
           @status-click="emit('statusClick', $event)"
           @profile-click="emit('profileClick', $event)"

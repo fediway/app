@@ -110,12 +110,12 @@ describe('useAuthGate', () => {
       mockIsAuthenticated.value = false;
       const gate1 = useAuthGate();
       const gate2 = useAuthGate();
-      const gated = gate1.requireAuth(vi.fn(), 'boost this post');
+      const gated = gate1.requireAuth(vi.fn(), 'repost this');
 
       gated();
 
       expect(gate2.isPromptOpen.value).toBe(true);
-      expect(gate2.promptLabel.value).toBe('boost this post');
+      expect(gate2.promptLabel.value).toBe('repost this');
     });
   });
 });

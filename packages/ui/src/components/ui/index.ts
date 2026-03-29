@@ -1,3 +1,4 @@
+export { AnimatedCount } from './animated-count';
 export { Avatar } from './avatar';
 export { AvatarStack } from './avatar-stack';
 export type { AvatarStackItem } from './avatar-stack';

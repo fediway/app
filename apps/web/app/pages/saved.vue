@@ -6,11 +6,13 @@ definePageMeta({ keepalive: true });
 const { getBookmarkedStatusesPaginated } = useTimelineData();
 const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getBookmarkedStatusesPaginated();
 const statuses = useWebActions().withStoreState(rawStatuses);
+
+usePageHeader({ title: 'Saved' });
 </script>
 
 <template>
   <div class="w-full">
-    <PageHeader title="Bookmarks" />
+    <PageHeader title="Saved" />
 
     <ClientOnly>
       <StatusTimeline
@@ -19,7 +21,7 @@ const statuses = useWebActions().withStoreState(rawStatuses);
         :is-loading-more="isLoadingMore"
         :has-more="hasMore"
         :error="error"
-        empty-title="No bookmarks yet"
+        empty-title="No saved posts yet"
         empty-description="Save posts to read later"
         @load-more="loadMore()"
         @retry="refetch()"

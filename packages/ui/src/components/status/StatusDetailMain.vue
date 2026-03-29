@@ -15,8 +15,11 @@ const props = withDefaults(defineProps<{
   status: Status;
   /** Whether the user is authenticated (mutes actions when false) */
   authenticated?: boolean;
+  /** Whether the current user authored this post */
+  isOwnPost?: boolean;
 }>(), {
   authenticated: true,
+  isOwnPost: false,
 });
 
 const emit = defineEmits<{
@@ -25,6 +28,9 @@ const emit = defineEmits<{
   favourite: [statusId: string];
   bookmark: [statusId: string];
   share: [statusId: string];
+  copyLink: [statusId: string];
+  sendMessage: [status: Status];
+  delete: [statusId: string];
   tagClick: [tagName: string];
   profileClick: [acct: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
@@ -102,7 +108,7 @@ const cleanedContent = useCleanContent(
       </div>
 
       <!-- Actions -->
-      <div class="border-t border-border py-2">
+      <div class="border-t border-border py-2" data-testid="detail-actions">
         <StatusActions
           :replies-count="status.repliesCount"
           :reblogs-count="status.reblogsCount"
@@ -112,11 +118,15 @@ const cleanedContent = useCleanContent(
           :bookmarked="status.bookmarked ?? false"
           :visibility="status.visibility"
           :authenticated="authenticated"
+          :is-own-post="isOwnPost"
           @reply="$emit('reply', status.id)"
           @reblog="$emit('reblog', status.id)"
           @favourite="$emit('favourite', status.id)"
           @bookmark="$emit('bookmark', status.id)"
           @share="$emit('share', status.id)"
+          @copy-link="$emit('copyLink', status.id)"
+          @send-message="$emit('sendMessage', status)"
+          @delete="$emit('delete', status.id)"
         />
       </div>
     </div>

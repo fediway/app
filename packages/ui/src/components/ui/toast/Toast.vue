@@ -60,8 +60,20 @@ function dismiss() {
       class="size-2 shrink-0 rounded-full"
       :class="dotClass"
     />
-    <p class="text-sm font-medium text-primary-foreground">
-      {{ toast.title }}
-    </p>
+    <div class="flex flex-col">
+      <p class="text-sm font-medium text-primary-foreground">
+        {{ toast.title }}
+      </p>
+      <p v-if="toast.description" class="text-sm text-primary-foreground/70">
+        {{ toast.description }}
+      </p>
+    </div>
+    <button
+      v-if="toast.action"
+      class="ml-1 text-sm font-medium text-primary-foreground/90 underline underline-offset-2 hover:text-primary-foreground cursor-pointer"
+      @click.stop="toast.action.onClick(); dismiss()"
+    >
+      {{ toast.action.label }}
+    </button>
   </div>
 </template>

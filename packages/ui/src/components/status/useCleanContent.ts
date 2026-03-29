@@ -2,10 +2,11 @@ import type { Tag } from '@repo/types';
 import type { MaybeRefOrGetter } from 'vue';
 import { computed, toValue } from 'vue';
 
-const QUOTE_RE = /<p[^>]*>RE:\s*<a[^>]*>.*?<\/a>\s*<\/p>/i;
+const QUOTE_RE = /<p[^>]*>RE:\s*<a[^>]*>[^<]*<\/a>\s*<\/p>/i;
 
-// Matches a <p> that contains ONLY hashtag links and whitespace
-const TRAILING_HASHTAGS_RE = /<p>\s*(?:<a[^>]*class="[^"]*hashtag[^"]*"[^>]*>.*?<\/a>\s*)+<\/p>$/i;
+// Matches a trailing <p> that contains ONLY hashtag links and whitespace.
+// Uses [^<]* instead of .*? to prevent catastrophic backtracking.
+const TRAILING_HASHTAGS_RE = /<p>\s*(?:<a[^>]*class="[^"]*hashtag[^"]*"[^>]*>[^<]*<\/a>\s*)+<\/p>$/i;
 
 /**
  * Strips ActivityPub artifacts from status content:

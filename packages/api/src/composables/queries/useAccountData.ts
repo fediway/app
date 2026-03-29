@@ -130,7 +130,7 @@ export function useAccountData() {
   function getAllAccounts(): QueryResult<Account[]> {
     return createQuery('allAccounts', [] as Account[], async () => {
       return await client.rest.v1.directory.list({ limit: 40, order: 'active' });
-    });
+    }, { scope: 'public' });
   }
 
   function getProfilePath(acct: string): string {

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { AccountCard, EmptyState, FollowButton, Skeleton } from '@repo/ui';
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 
-const { exploreTabs } = useDiscoveryTabs();
 const { getAllAccounts, getProfilePath } = useAccountData();
 const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
 
@@ -14,15 +13,17 @@ watch(accounts, (accts) => {
     fetchRelationships(accts.map(a => a.id));
   }
 }, { immediate: true });
+
+// Only show the list when both accounts and at least one relationship is ready
+// Prevents flash where accounts render without Follow buttons, then re-render with them
+const isReady = computed(() =>
+  accounts.value.length > 0
+  && accounts.value.some(a => hasRelationship(a.id)),
+);
 </script>
 
 <template>
-  <div class="w-full">
-    <DiscoveryHeader
-      :tabs="exploreTabs"
-      @search="q => navigateTo({ path: '/search', query: { q } })"
-    />
-
+  <div>
     <ClientOnly>
       <EmptyState
         v-if="error"
@@ -39,7 +40,17 @@ watch(accounts, (accts) => {
         class="py-12"
       />
 
-      <div v-else class="divide-y divide-border">
+      <div v-else-if="!isReady" class="space-y-3 p-4">
+        <div v-for="i in 5" :key="i" class="flex items-center gap-3">
+          <Skeleton class="size-10 rounded-full" />
+          <div class="flex-1 space-y-2">
+            <Skeleton class="h-4 w-32" />
+            <Skeleton class="h-3 w-48" />
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="isReady" class="divide-y divide-border">
         <div
           v-for="account in accounts"
           :key="account.id"

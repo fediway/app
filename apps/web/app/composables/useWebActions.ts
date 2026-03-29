@@ -1,5 +1,5 @@
 import type { Status } from '@repo/types';
-import { useStatusActions, useStatusStore } from '@repo/api';
+import { useClient, useStatusActions, useStatusStore } from '@repo/api';
 import { useToast } from '@repo/ui';
 import { computed } from 'vue';
 import { useAuthGate } from './useAuthGate';
@@ -21,7 +21,7 @@ export function useWebActions() {
   // Track bookmark toast so we can dismiss it on error
   let bookmarkToastId: string | undefined;
 
-  const { toggleFavourite, toggleReblog, toggleBookmark, deleteStatus } = useStatusActions({
+  const { toggleFavourite, toggleReblog, toggleBookmark } = useStatusActions({
     onError: (err) => {
       // Dismiss optimistic bookmark toast before showing error
       if (err.action === 'bookmark' && bookmarkToastId) {
@@ -29,12 +29,20 @@ export function useWebActions() {
         bookmarkToastId = undefined;
       }
 
+      const actionMessages: Record<string, string> = {
+        favourite: 'Couldn\'t like this post',
+        reblog: 'Couldn\'t boost this post',
+        bookmark: 'Couldn\'t save this post',
+        delete: 'Couldn\'t delete this post',
+      };
+      const message = actionMessages[err.action] || 'Action failed';
+
       if (import.meta.dev) {
         console.error(`[useWebActions] ${err.action} failed for ${err.statusId}:`, err.error);
-        toast.error('Action failed', err.error.message);
+        toast.error(message, err.error.message);
       }
       else {
-        toast.error('Action failed', 'Please try again.');
+        toast.error(message, 'Please try again.');
       }
     },
   });
@@ -43,7 +51,49 @@ export function useWebActions() {
     const status = store.get(statusId);
     const wasBookmarked = status?.bookmarked;
     toggleBookmark(statusId);
-    bookmarkToastId = toast.success(wasBookmarked ? 'Removed from bookmarks' : 'Saved');
+    if (wasBookmarked) {
+      bookmarkToastId = toast.success('Unsaved');
+    }
+    else {
+      bookmarkToastId = toast.success('Saved', {
+        action: { label: 'View', onClick: () => navigateTo('/saved') },
+      });
+    }
+  }
+
+  /** Share status via Web Share API, with clipboard fallback */
+  async function handleShare(statusId: string) {
+    const { getStatusPath } = useAccountData();
+    const status = store.get(statusId);
+    const path = getStatusPath(statusId);
+    const url = `${window.location.origin}${path}`;
+
+    // Build share context
+    const title = status?.account?.displayName
+      ? `${status.account.displayName}: ${(status.content || '').replace(/<[^>]*>/g, '').slice(0, 80)}`
+      : undefined;
+    const text = status?.content
+      ? status.content.replace(/<[^>]*>/g, '').slice(0, 200)
+      : undefined;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ url, title, text });
+      }
+      catch {
+        // User cancelled share — not an error
+      }
+    }
+    else {
+      // Fallback: copy link
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied');
+      }
+      catch {
+        toast.error('Failed to copy');
+      }
+    }
   }
 
   /** Copy status URL to clipboard + toast */
@@ -60,10 +110,43 @@ export function useWebActions() {
     }
   }
 
-  /** Delete status with confirmation callback */
-  async function handleDelete(statusId: string) {
-    await deleteStatus(statusId);
-    toast.success('Post deleted');
+  /** Delete with undo-toast: optimistically removes, waits 5s, then commits */
+  function handleDelete(statusId: string) {
+    const snapshot = store.get(statusId);
+    if (!snapshot)
+      return;
+
+    // Mark as deleted — withStoreState filters it out
+    store.remove(statusId);
+
+    let undone = false;
+    const deleteToastId = toast.success('Post deleted', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          undone = true;
+          // Restore: clear deleted flag and put data back
+          store.restore(statusId);
+          store.set(snapshot);
+        },
+      },
+    });
+
+    // Wait 5 seconds, then execute if not undone
+    setTimeout(async () => {
+      if (undone)
+        return;
+      try {
+        await useClient().rest.v1.statuses.$select(statusId).remove();
+      }
+      catch {
+        // Restore on failure
+        store.restore(statusId);
+        store.set(snapshot);
+        removeToast(deleteToastId);
+        toast.error('Couldn\'t delete this post', 'Please try again.');
+      }
+    }, 5000);
   }
 
   /**
@@ -73,15 +156,20 @@ export function useWebActions() {
    */
   function withStoreState(source: { value: Status[] }) {
     return computed(() =>
-      source.value.map((s) => {
-        const id = s.reblog?.id ?? s.id;
-        const stored = store.get(id);
-        if (!stored)
-          return s;
-        if (s.reblog)
-          return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
-        return { ...s, ...stored } as Status;
-      }),
+      source.value
+        .filter((s) => {
+          const id = s.reblog?.id ?? s.id;
+          return !store.isDeleted(id);
+        })
+        .map((s) => {
+          const id = s.reblog?.id ?? s.id;
+          const stored = store.get(id);
+          if (!stored)
+            return s;
+          if (s.reblog)
+            return { ...s, reblog: { ...s.reblog, ...stored } } as Status;
+          return { ...s, ...stored } as Status;
+        }),
     );
   }
 
@@ -99,9 +187,10 @@ export function useWebActions() {
 
   return {
     toggleFavourite: requireAuth(toggleFavourite, 'like this post'),
-    toggleReblog: requireAuth(toggleReblog, 'boost this post'),
-    handleBookmark: requireAuth(handleBookmark, 'bookmark this post'),
+    toggleReblog: requireAuth(toggleReblog, 'repost this'),
+    handleBookmark: requireAuth(handleBookmark, 'save this post'),
     handleCopyLink,
+    handleShare,
     handleDelete: requireAuth(handleDelete, 'delete this post'),
     withStoreState,
     getStoreStatus,

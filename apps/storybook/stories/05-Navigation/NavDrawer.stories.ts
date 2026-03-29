@@ -7,7 +7,7 @@ const menuItems = [
   { id: 'explore', icon: 'explore', label: 'Explore' },
   { id: 'notifications', icon: 'notifications', label: 'Notifications' },
   { id: 'messages', icon: 'chat', label: 'Messages' },
-  { id: 'favourites', icon: 'favourites', label: 'Favourites' },
+  { id: 'favourites', icon: 'favourites', label: 'Likes' },
   { id: 'saved', icon: 'saved', label: 'Saved' },
   { id: 'profile', icon: 'profile', label: 'Profile' },
   { id: 'settings', icon: 'settings', label: 'Settings' },

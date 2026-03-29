@@ -73,9 +73,9 @@ const ColorPhilosophy = defineComponent({
   `,
   setup() {
     const roles = [
-      { name: 'Rose = Love', meaning: 'Hearts, favourites, notifications', icon: 'PhHeart', fill: true, bg: 'var(--rose-50)', border: 'var(--rose-100)', dot: 'var(--rose-500)', dotText: 'white', labelColor: 'var(--rose-700)', descColor: 'var(--rose-500)' },
-      { name: 'Emerald = Amplify', meaning: 'Boosts, reposts, sharing', icon: 'PhArrowsClockwise', fill: true, bg: 'var(--emerald-50)', border: 'var(--emerald-100)', dot: 'var(--emerald-500)', dotText: 'white', labelColor: 'var(--emerald-700)', descColor: 'var(--emerald-500)' },
-      { name: 'Gold = Judgment', meaning: 'Ratings, reviews, bookmarks', icon: 'PhStar', fill: true, bg: 'var(--gold-50)', border: 'var(--gold-100)', dot: 'var(--gold-400)', dotText: 'white', labelColor: 'var(--gold-600)', descColor: 'var(--gold-400)' },
+      { name: 'Rose = Love', meaning: 'Hearts, likes, notifications', icon: 'PhHeart', fill: true, bg: 'var(--rose-50)', border: 'var(--rose-100)', dot: 'var(--rose-500)', dotText: 'white', labelColor: 'var(--rose-700)', descColor: 'var(--rose-500)' },
+      { name: 'Emerald = Amplify', meaning: 'Reposts, sharing', icon: 'PhArrowsClockwise', fill: true, bg: 'var(--emerald-50)', border: 'var(--emerald-100)', dot: 'var(--emerald-500)', dotText: 'white', labelColor: 'var(--emerald-700)', descColor: 'var(--emerald-500)' },
+      { name: 'Gold = Judgment', meaning: 'Ratings, reviews, saved', icon: 'PhStar', fill: true, bg: 'var(--gold-50)', border: 'var(--gold-100)', dot: 'var(--gold-400)', dotText: 'white', labelColor: 'var(--gold-600)', descColor: 'var(--gold-400)' },
       { name: 'Galaxy = Discovery', meaning: '@mentions, #hashtags, links, info', icon: 'PhCompass', fill: false, bg: 'var(--galaxy-50)', border: 'var(--galaxy-100)', dot: 'var(--galaxy-500)', dotText: 'white', labelColor: 'var(--galaxy-700)', descColor: 'var(--galaxy-500)' },
       { name: 'Red = Caution', meaning: 'Errors, delete, destructive', icon: 'PhWarning', fill: false, bg: 'var(--red-50)', border: 'var(--red-100)', dot: 'var(--red-500)', dotText: 'white', labelColor: 'var(--red-700)', descColor: 'var(--red-500)' },
       { name: 'Indigo = Interactive', meaning: 'Secondary buttons, UI controls', icon: 'PhCursorClick', fill: false, bg: 'oklch(0.95 0.020 280 / 0.3)', border: 'oklch(0.90 0.025 280 / 0.3)', dot: 'var(--interactive)', dotText: 'var(--interactive-text)', labelColor: 'var(--interactive)', descColor: 'oklch(0.50 0.050 280)' },

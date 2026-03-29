@@ -418,6 +418,17 @@ export function createMockClient(): MastoClient {
           await delay();
           return currentUserAccount;
         },
+        async updateCredentials(params: { displayName?: string; note?: string; avatar?: any; source?: any }) {
+          await delay();
+          // Apply updates to the mock user and return the updated account
+          const updated: any = { ...currentUserAccount };
+          if (params.displayName !== undefined)
+            updated.displayName = params.displayName;
+          if (params.note !== undefined)
+            updated.note = `<p>${params.note}</p>`;
+          updated.source = { note: params.note ?? '', privacy: params.source?.privacy ?? 'public', sensitive: params.source?.sensitive ?? false, language: 'en', fields: [] };
+          return updated;
+        },
         relationships: {
           async fetch(params: { id: string[] }) {
             await delay();

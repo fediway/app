@@ -7,6 +7,8 @@ definePageMeta({ keepalive: true });
 
 const { markAsRead } = useNotificationMarker();
 
+usePageHeader({ title: 'Notifications' });
+
 // Mark all notifications as read when the user opens this page
 onMounted(() => {
   markAsRead();

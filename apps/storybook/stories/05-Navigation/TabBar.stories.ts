@@ -51,7 +51,7 @@ export const Overflow: Story = {
         { label: 'Likes', value: 'likes' },
         { label: 'Media', value: 'media' },
         { label: 'Mentions', value: 'mentions' },
-        { label: 'Bookmarks', value: 'bookmarks' },
+        { label: 'Saved', value: 'bookmarks' },
         { label: 'Reposts', value: 'reposts' },
       ];
       return { active, tabs };

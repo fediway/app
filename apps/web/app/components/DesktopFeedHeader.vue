@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
-import { PhArrowLeft, PhHash, PhLink } from '@phosphor-icons/vue';
+import { PhArrowLeft, PhBell, PhBookmarkSimple, PhChatCircle, PhHash, PhHeart, PhLink } from '@phosphor-icons/vue';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
@@ -9,6 +9,19 @@ const navigation = useNavigationStore();
 const iconMap: Record<string, Component> = {
   PhHash,
   PhLink,
+  PhHeart,
+  PhBookmarkSimple,
+  PhBell,
+  PhChatCircle,
+};
+
+const iconColorMap: Record<string, string> = {
+  PhHash: 'text-galaxy-500 dark:text-galaxy-400',
+  PhLink: 'text-galaxy-500 dark:text-galaxy-400',
+  PhHeart: 'text-rose-500',
+  PhBookmarkSimple: 'text-yellow',
+  PhBell: 'text-foreground',
+  PhChatCircle: 'text-galaxy-500 dark:text-galaxy-400',
 };
 
 function goBack() {
@@ -47,9 +60,9 @@ function goBack() {
         <!-- Icon — if set by page -->
         <div
           v-else-if="navigation.pageIcon && iconMap[navigation.pageIcon]"
-          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted"
+          class="flex shrink-0 items-center justify-center"
         >
-          <component :is="iconMap[navigation.pageIcon]" :size="18" class="text-muted-foreground" />
+          <component :is="iconMap[navigation.pageIcon]" :size="30" weight="bold" :class="iconColorMap[navigation.pageIcon] || 'text-galaxy-500 dark:text-galaxy-400'" />
         </div>
         <!-- App icon only — on top-level pages (Home, Explore) -->
         <template v-else-if="['home', 'explore'].includes(navigation.activeItemId)">
@@ -60,8 +73,8 @@ function goBack() {
           >
         </template>
 
-        <!-- Title + subtitle — on all other pages -->
-        <div v-if="!['home', 'explore'].includes(navigation.activeItemId)" class="text-center" :class="{ 'text-left': navigation.pageImage || navigation.pageIcon }">
+        <!-- Title + subtitle — show when page sets a header override, or on non-tab pages -->
+        <div v-if="navigation.pageHeaderOverride || !['home', 'explore'].includes(navigation.activeItemId)" class="text-center" :class="{ 'text-left': navigation.pageImage || navigation.pageIcon }">
           <h1 class="text-base font-bold leading-tight">
             {{ navigation.pageTitle }}
           </h1>

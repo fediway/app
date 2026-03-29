@@ -6,11 +6,13 @@ definePageMeta({ keepalive: true });
 const { getFavouritedStatusesPaginated } = useTimelineData();
 const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getFavouritedStatusesPaginated();
 const statuses = useWebActions().withStoreState(rawStatuses);
+
+usePageHeader({ title: 'Likes' });
 </script>
 
 <template>
   <div class="w-full">
-    <PageHeader title="Favourites" />
+    <PageHeader title="Likes" />
 
     <ClientOnly>
       <StatusTimeline
@@ -19,7 +21,7 @@ const statuses = useWebActions().withStoreState(rawStatuses);
         :is-loading-more="isLoadingMore"
         :has-more="hasMore"
         :error="error"
-        empty-title="No favourites yet"
+        empty-title="No likes yet"
         empty-description="Posts you like will appear here"
         @load-more="loadMore()"
         @retry="refetch()"

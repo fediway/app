@@ -65,7 +65,7 @@ function clearSearch() {
 </script>
 
 <template>
-  <div class="sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:top-[3.25rem]">
+  <div class="sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:top-14">
     <!-- Search Input -->
     <div class="relative">
       <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
@@ -79,7 +79,7 @@ function clearSearch() {
       <button
         v-if="search"
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
+        class="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-muted-foreground/70 hover:text-muted-foreground"
         @click="clearSearch"
       >
         <PhX :size="20" />
@@ -93,7 +93,8 @@ function clearSearch() {
         v-for="t in tabs"
         :key="isRouteTab(t) ? t.to : t.value"
         :to="isRouteTab(t) ? t.to : undefined"
-        class="rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors"
+        :type="isRouteTab(t) ? undefined : 'button'"
+        class="cursor-pointer rounded-full px-4 py-2 text-sm font-medium no-underline transition-colors"
         :class="[
           isActiveTab(t)
             ? 'bg-foreground text-background'

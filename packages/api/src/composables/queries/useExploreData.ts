@@ -8,6 +8,18 @@ import { useStatusStore } from '../useStatusStore';
 
 const LEADING_HASH_RE = /^#/;
 
+export interface LinkInfo {
+  url: string;
+  title: string;
+  description?: string;
+  image?: string | null;
+  providerName?: string | null;
+  blurhash?: string | null;
+  language?: string | null;
+  authorName?: string | null;
+  authors?: { name: string }[];
+}
+
 export function useExploreData() {
   const client = useClient();
   const store = useStatusStore();
@@ -72,16 +84,23 @@ export function useExploreData() {
     });
   }
 
-  function getLinkInfo(linkUrl: string): { url: string; title: string; source: string } | undefined {
+  function getLinkInfo(linkUrl: string): LinkInfo | undefined {
     const decodedUrl = decodeURIComponent(linkUrl);
     const result = getStatusesByLink(decodedUrl);
 
     for (const status of result.data.value) {
       if (status.card?.url === decodedUrl) {
+        const card = status.card;
         return {
-          url: status.card.url,
-          title: status.card.title,
-          source: status.card.providerName || new URL(decodedUrl).hostname,
+          url: card.url,
+          title: card.title,
+          description: card.description || undefined,
+          image: card.image,
+          providerName: card.providerName,
+          blurhash: card.blurhash,
+          language: (card as unknown as Record<string, unknown>).language as string | undefined,
+          authorName: (card as unknown as Record<string, unknown>).authorName as string | undefined,
+          authors: (card as unknown as Record<string, unknown>).authors as { name: string }[] | undefined,
         };
       }
     }
@@ -91,7 +110,7 @@ export function useExploreData() {
       return {
         url: decodedUrl,
         title: decodedUrl,
-        source: url.hostname.replace('www.', ''),
+        providerName: url.hostname.replace('www.', ''),
       };
     }
     catch {

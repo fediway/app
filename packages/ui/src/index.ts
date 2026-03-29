@@ -43,10 +43,10 @@ export {
 export type { MediaItem } from './components/compose';
 
 // Item components
-export { ItemCard, ItemHeader, Take } from './components/item';
+export { ItemCard, ItemHeader, ItemPage, ItemPageActions, ItemPageHeaderLink, Take } from './components/item';
 
 // Media components
-export { MediaCarousel, MediaGallery, MediaLightbox } from './components/media';
+export { GifvPlayer, MediaCarousel, MediaGallery, MediaLightbox, VideoPlayer } from './components/media';
 
 // Navigation components
 export {
@@ -104,7 +104,7 @@ export { Timeline } from './components/timeline';
 export { TagList, TagListItem } from './components/trending';
 
 // UI primitives
-export { Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonText, Divider, Headline, RelativeTime, RichText, SearchInput, Section } from './components/ui';
+export { AnimatedCount, Avatar, AvatarStack, AverageRating, Badge, ButtonAction, ButtonText, Divider, Headline, RelativeTime, RichText, SearchInput, Section } from './components/ui';
 export type { AvatarStackItem } from './components/ui';
 export type { HeadlineVariants } from './components/ui';
 export { Button, buttonVariants } from './components/ui/button';
@@ -163,6 +163,8 @@ export { Toggle } from './components/ui/toggle';
 
 // Composables
 export { useInfiniteScroll } from './composables/useInfiniteScroll';
+export { useMediaPreferences } from './composables/useMediaPreferences';
+export type { MediaVisibility } from './composables/useMediaPreferences';
 export { usePullToRefresh } from './composables/usePullToRefresh';
 
 // Directives

@@ -1,18 +1,18 @@
 import type { ThemePreference } from '@repo/api';
+import type { MediaVisibility } from '@repo/ui';
 import { useDarkMode } from '@repo/api';
+import { useMediaPreferences } from '@repo/ui';
 import { reactive, watch } from 'vue';
 
 export interface AppSettings {
-  notifications: {
-    mentions: boolean;
-    follows: boolean;
-    favourites: boolean;
-    reblogs: boolean;
-    polls: boolean;
-  };
   privacy: {
     defaultVisibility: 'public' | 'unlisted' | 'private';
     sensitiveMedia: boolean;
+  };
+  media: {
+    mediaVisibility: MediaVisibility;
+    autoplayGifs: boolean;
+    reduceMotion: boolean;
   };
 }
 
@@ -20,16 +20,14 @@ const STORAGE_KEY = 'fediway-settings';
 
 function getDefaults(): AppSettings {
   return {
-    notifications: {
-      mentions: true,
-      follows: true,
-      favourites: true,
-      reblogs: true,
-      polls: true,
-    },
     privacy: {
       defaultVisibility: 'public',
       sensitiveMedia: false,
+    },
+    media: {
+      mediaVisibility: 'default',
+      autoplayGifs: true,
+      reduceMotion: false,
     },
   };
 }
@@ -39,8 +37,15 @@ function loadFromStorage(): AppSettings {
     return getDefaults();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw)
-      return { ...getDefaults(), ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const defaults = getDefaults();
+      // Deep merge to preserve nested defaults when new keys are added
+      return {
+        privacy: { ...defaults.privacy, ...parsed.privacy },
+        media: { ...defaults.media, ...parsed.media },
+      };
+    }
   }
   catch { /* ignore */ }
   return getDefaults();
@@ -49,6 +54,17 @@ function loadFromStorage(): AppSettings {
 // Module-level state — deferred initialization
 const settings = reactive<AppSettings>(getDefaults());
 let initialized = false;
+
+/**
+ * Sync persisted settings → global UI composable refs.
+ * Called once on init and whenever media settings change.
+ */
+function syncMediaPreferences() {
+  const prefs = useMediaPreferences();
+  prefs.setMediaVisibility(settings.media.mediaVisibility);
+  prefs.setAutoplayGifs(settings.media.autoplayGifs);
+  prefs.setReduceMotion(settings.media.reduceMotion);
+}
 
 export function useSettings() {
   if (!initialized) {
@@ -59,6 +75,9 @@ export function useSettings() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(val));
       }, { deep: true });
     }
+
+    // Sync media preferences to UI composable on init
+    syncMediaPreferences();
 
     initialized = true;
   }
@@ -77,12 +96,23 @@ export function useSettings() {
     settings.privacy.defaultVisibility = visibility;
   }
 
-  function toggleNotification(key: keyof AppSettings['notifications']) {
-    settings.notifications[key] = !settings.notifications[key];
-  }
-
   function toggleSensitiveMedia() {
     settings.privacy.sensitiveMedia = !settings.privacy.sensitiveMedia;
+  }
+
+  function setMediaVisibility(value: MediaVisibility) {
+    settings.media.mediaVisibility = value;
+    syncMediaPreferences();
+  }
+
+  function toggleAutoplayGifs() {
+    settings.media.autoplayGifs = !settings.media.autoplayGifs;
+    syncMediaPreferences();
+  }
+
+  function toggleReduceMotion() {
+    settings.media.reduceMotion = !settings.media.reduceMotion;
+    syncMediaPreferences();
   }
 
   return {
@@ -90,8 +120,10 @@ export function useSettings() {
     theme,
     setTheme,
     setDefaultVisibility,
-    toggleNotification,
     toggleSensitiveMedia,
+    setMediaVisibility,
+    toggleAutoplayGifs,
+    toggleReduceMotion,
   };
 }
 

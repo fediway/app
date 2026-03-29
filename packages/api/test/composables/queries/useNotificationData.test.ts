@@ -82,8 +82,8 @@ describe('useNotificationData', () => {
       expect(NOTIFICATION_FILTERS).toEqual({
         mentions: { label: 'Mentions', types: ['mention'] },
         follows: { label: 'Follows', types: ['follow'] },
-        favourites: { label: 'Favourites', types: ['favourite'] },
-        reblogs: { label: 'Boosts', types: ['reblog'] },
+        favourites: { label: 'Likes', types: ['favourite'] },
+        reblogs: { label: 'Reposts', types: ['reblog'] },
       });
     });
   });

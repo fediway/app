@@ -4,6 +4,7 @@ export interface Toast {
   id: string;
   title: string;
   description?: string;
+  action?: { label: string; onClick: () => void };
   variant: 'default' | 'success' | 'error';
   duration: number;
 }
@@ -31,11 +32,15 @@ export function useToast() {
     });
   }
 
-  toast.success = (title: string, description?: string) =>
-    addToast({ title, description, variant: 'success', duration: 4000 });
+  toast.success = (title: string, optionsOrDesc?: string | { description?: string; action?: { label: string; onClick: () => void } }) => {
+    const opts = typeof optionsOrDesc === 'string' ? { description: optionsOrDesc } : optionsOrDesc;
+    return addToast({ title, description: opts?.description, action: opts?.action, variant: 'success', duration: 4000 });
+  };
 
-  toast.error = (title: string, description?: string) =>
-    addToast({ title, description, variant: 'error', duration: 6000 });
+  toast.error = (title: string, optionsOrDesc?: string | { description?: string; action?: { label: string; onClick: () => void } }) => {
+    const opts = typeof optionsOrDesc === 'string' ? { description: optionsOrDesc } : optionsOrDesc;
+    return addToast({ title, description: opts?.description, action: opts?.action, variant: 'error', duration: 6000 });
+  };
 
   return { toast, toasts, removeToast };
 }

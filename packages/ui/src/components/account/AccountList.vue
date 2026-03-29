@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<Props>(), {});
 
 defineEmits<{
   follow: [handle: string];
+  userClick: [handle: string];
 }>();
 </script>
 
@@ -31,7 +32,8 @@ defineEmits<{
     <li
       v-for="user in users"
       :key="user.handle"
-      class="flex items-center gap-3 px-5 py-3"
+      class="flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+      @click="$emit('userClick', user.handle)"
     >
       <Avatar
         :src="user.avatarSrc"
@@ -53,7 +55,7 @@ defineEmits<{
         variant="secondary"
         size="sm"
         class="shrink-0 text-base"
-        @click="$emit('follow', user.handle)"
+        @click.stop="$emit('follow', user.handle)"
       >
         Follow
       </Button>

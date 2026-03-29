@@ -4,10 +4,25 @@ import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
+const { getProfilePath } = useAccountData();
 
 function handleItemClick(item: { to: string }) {
   navigation.closeSidebar();
   router.push(item.to);
+}
+
+function handleProfileClick() {
+  navigation.closeSidebar();
+  if (navigation.currentUser) {
+    router.push(getProfilePath(navigation.currentUser.acct));
+  }
+}
+
+function handleStatClick(stat: 'followers' | 'following') {
+  navigation.closeSidebar();
+  if (navigation.currentUser) {
+    router.push(`${getProfilePath(navigation.currentUser.acct)}/${stat}`);
+  }
 }
 
 function handleOpenChange(open: boolean) {
@@ -25,9 +40,13 @@ function handleOpenChange(open: boolean) {
           :avatar="navigation.currentUser.avatar"
           :name="navigation.currentUser.name"
           :handle="`@${navigation.currentUser.username}`"
+          :followers-count="navigation.currentUser.followersCount"
+          :following-count="navigation.currentUser.followingCount"
+          @profile-click="handleProfileClick"
+          @stat-click="handleStatClick"
         />
         <template #fallback>
-          <div class="flex items-center gap-3 px-4 py-3">
+          <div class="flex items-center gap-3 px-5 py-3">
             <Skeleton class="size-10 rounded-full" />
             <div class="space-y-1.5">
               <Skeleton class="h-4 w-24" />

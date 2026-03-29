@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
+import { ref, watch } from 'vue';
 import { cn } from '../../../lib/utils';
+import { AnimatedCount } from '../animated-count';
 
 interface Props {
   count?: number | null;
   ariaLabel?: string;
   ariaPressed?: boolean;
+  animation?: 'pop' | 'spin' | 'settle';
   class?: HTMLAttributes['class'];
 }
 
@@ -13,15 +16,25 @@ const props = withDefaults(defineProps<Props>(), {
   count: null,
   ariaLabel: undefined,
   ariaPressed: undefined,
+  animation: undefined,
 });
 
-const compactFormatter = new Intl.NumberFormat('en', {
-  notation: 'compact',
-  maximumFractionDigits: 1,
+const isAnimating = ref(false);
+
+const animationClassMap = {
+  pop: 'animate-action-pop',
+  spin: 'animate-action-spin',
+  settle: 'animate-action-settle',
+} as const;
+
+watch(() => props.ariaPressed, (newVal, oldVal) => {
+  if (oldVal === false && newVal === true && props.animation) {
+    isAnimating.value = true;
+  }
 });
 
-function formatCount(n: number): string {
-  return compactFormatter.format(n);
+function onAnimationEnd() {
+  isAnimating.value = false;
 }
 </script>
 
@@ -40,14 +53,15 @@ function formatCount(n: number): string {
       props.class,
     )"
   >
-    <span class="inline-flex size-5 shrink-0 items-center justify-center">
+    <span
+      :class="cn(
+        'inline-flex size-5 shrink-0 items-center justify-center',
+        isAnimating && animation && animationClassMap[animation],
+      )"
+      @animationend="onAnimationEnd"
+    >
       <slot />
     </span>
-    <span
-      v-if="count != null"
-      class="text-sm tabular-nums"
-    >
-      {{ formatCount(count) }}
-    </span>
+    <AnimatedCount v-if="count != null" :count="count" class="text-sm" />
   </button>
 </template>

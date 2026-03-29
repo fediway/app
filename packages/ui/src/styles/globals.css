@@ -435,3 +435,65 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 200px;
 }
+
+/* ── Action button micro-interactions ── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes action-pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25); }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes action-spin {
+    0%   { transform: scale(1) rotate(0deg); }
+    40%  { transform: scale(1.2) rotate(180deg); }
+    70%  { transform: scale(0.95) rotate(180deg); }
+    100% { transform: scale(1) rotate(180deg); }
+  }
+
+  @keyframes action-settle {
+    0%   { transform: scale(1) translateY(0); }
+    40%  { transform: scale(1.15) translateY(2px); }
+    70%  { transform: scale(0.95) translateY(0); }
+    100% { transform: scale(1) translateY(0); }
+  }
+
+  .animate-action-pop { animation: action-pop 250ms ease-out; }
+  .animate-action-spin { animation: action-spin 250ms ease-out; }
+  .animate-action-settle { animation: action-settle 200ms ease-out; }
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 25%,
+    color-mix(in oklch, var(--color-muted), transparent 40%) 50%,
+    var(--color-muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer {
+    animation: none;
+    background: var(--color-muted);
+  }
+}
+
+/* ── Skeleton-to-content crossfade ── */
+.fade-content-enter-active,
+.fade-content-leave-active {
+  transition: opacity 150ms ease;
+}
+.fade-content-enter-from,
+.fade-content-leave-to {
+  opacity: 0;
+}

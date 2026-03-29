@@ -35,14 +35,23 @@ const {
 } = useMediaLightbox();
 
 // Tab navigation — router guards
-const { onRouteChange, saveCurrentScroll, canGoBack } = useTabNavigation();
+const { onRouteChange, saveCurrentScroll, canGoBack, isTabSwitching } = useTabNavigation();
 
 router.beforeEach(() => {
   saveCurrentScroll();
 });
 
 router.afterEach((to, from) => {
+  const wasTabSwitch = isTabSwitching.value;
   onRouteChange(to.path, from.path);
+
+  // Scroll to top on forward navigation (not tab switches, not back)
+  // Tab switches handle their own scroll restoration via useTabNavigation
+  const isBack = router.options.history.state?.back === to.fullPath;
+  if (!wasTabSwitch && !isBack && to.path !== from.path) {
+    const { scrollTo: feedScrollTo } = useFeedScroll();
+    nextTick(() => feedScrollTo(0));
+  }
 
   // Focus management: move focus to main content after navigation
   // Critical for keyboard-only users who'd be lost after route change
@@ -216,7 +225,7 @@ watch(isAuthenticated, (authenticated) => {
           @click="navigation.closeSidebar()"
         />
         <MobileHeader v-if="isAuthenticated" />
-        <main class="relative flex-1" :class="isMobileFullscreen ? '' : 'pb-20'">
+        <main class="relative flex-1 overflow-clip" :class="isMobileFullscreen ? '' : 'pb-20'">
           <slot />
         </main>
       </div>
@@ -240,7 +249,7 @@ watch(isAuthenticated, (authenticated) => {
           <main
             id="main-content"
             ref="feedRef"
-            class="relative bg-card pb-20 lg:flex-1 lg:border-x lg:border-border"
+            class="relative overflow-clip bg-card pb-20 lg:flex-1 lg:border-x lg:border-border"
           >
             <slot />
           </main>

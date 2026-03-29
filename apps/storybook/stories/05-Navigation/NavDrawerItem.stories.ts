@@ -37,7 +37,7 @@ export const AllItems: Story = {
         { icon: 'explore', label: 'Explore' },
         { icon: 'notifications', label: 'Notifications', badge: 5 },
         { icon: 'chat', label: 'Messages', badge: 2 },
-        { icon: 'favourites', label: 'Favourites' },
+        { icon: 'favourites', label: 'Likes' },
         { icon: 'saved', label: 'Saved' },
         { icon: 'profile', label: 'Profile' },
         { icon: 'settings', label: 'Settings' },

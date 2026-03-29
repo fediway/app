@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { MediaAttachment } from '@repo/types';
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
+import { useMediaPreferences } from '../../composables/useMediaPreferences';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { blurhashStyle } from '../../utils/blurhash';
+import GifvPlayer from './GifvPlayer.vue';
+import VideoPlayer from './VideoPlayer.vue';
 
 const props = withDefaults(defineProps<Props>(), {
   sensitive: false,
@@ -25,7 +28,13 @@ interface Props {
   forceCarousel?: boolean;
 }
 
-const revealed = ref(!props.sensitive);
+const { shouldReveal, mediaVisibility } = useMediaPreferences();
+const revealed = ref(shouldReveal(props.sensitive));
+
+// Reset reveal state when the preference changes
+watch(mediaVisibility, () => {
+  revealed.value = shouldReveal(props.sensitive);
+});
 
 // ── Computed ────────────────────────────────────────────
 
@@ -60,21 +69,62 @@ const displayMode = computed<DisplayMode>(() => {
   return 'carousel';
 });
 
-// ── Single image aspect ratio ───────────────────────────
+// ── Single media aspect ratio ────────────────────────────
+// Use natural aspect ratio clamped to reasonable bounds.
+// Images: 4:5 to 16:9 (tighter portrait limit).
+// Videos: 9:16 to 16:9 (phone videos allowed taller) + max-height cap.
+// The max-height prevents very tall videos from dominating the feed.
 
-const MIN_ASPECT = 0.8; // 4:5 portrait
+const IMAGE_MIN_ASPECT = 0.8; // 4:5 portrait
+const VIDEO_MIN_ASPECT = 0.5625; // 9:16 portrait (phone video)
 const MAX_ASPECT = 1.78; // 16:9 landscape
+
+function extractAspect(meta: Record<string, unknown> | undefined): number | null {
+  if (!meta)
+    return null;
+  if ('aspect' in meta && typeof meta.aspect === 'number')
+    return meta.aspect;
+  if ('width' in meta && 'height' in meta
+    && typeof meta.width === 'number' && typeof meta.height === 'number'
+    && meta.height > 0) {
+    return meta.width / meta.height;
+  }
+  return null;
+}
+
+const singleMediaAspect = computed(() => {
+  if (visualAttachments.value.length !== 1)
+    return 16 / 9;
+  const att = visualAttachments.value[0]!;
+  const isVideo = att.type === 'video' || att.type === 'gifv';
+  const minAspect = isVideo ? VIDEO_MIN_ASPECT : IMAGE_MIN_ASPECT;
+
+  // Try original first, then small — either may have aspect or width/height
+  const rawAspect = extractAspect(att.meta?.original as Record<string, unknown>)
+    ?? extractAspect(att.meta?.small as Record<string, unknown>);
+
+  if (rawAspect) {
+    return Math.max(minAspect, Math.min(MAX_ASPECT, rawAspect));
+  }
+  return 16 / 9;
+});
+
+const singleMediaIsVideo = computed(() => {
+  if (visualAttachments.value.length !== 1)
+    return false;
+  const type = visualAttachments.value[0]!.type;
+  return type === 'video' || type === 'gifv';
+});
 
 const singleImageStyle = computed(() => {
   if (visualAttachments.value.length !== 1)
     return {};
-  const att = visualAttachments.value[0]!;
-  const meta = att.meta?.original ?? att.meta?.small;
-  let aspect = 16 / 9;
-  if (meta && 'aspect' in meta && typeof meta.aspect === 'number') {
-    aspect = Math.max(MIN_ASPECT, Math.min(MAX_ASPECT, meta.aspect));
+  const style: Record<string, string> = { aspectRatio: `${singleMediaAspect.value}` };
+  // Cap height for portrait videos so they don't dominate the feed
+  if (singleMediaIsVideo.value && singleMediaAspect.value < 1) {
+    style.maxHeight = 'min(80vh, 750px)';
   }
-  return { aspectRatio: `${aspect}` };
+  return style;
 });
 
 // ── Grid layout classes ─────────────────────────────────
@@ -173,111 +223,103 @@ function toggleReveal() {
 
     <!-- Grid / Single (1-4) -->
     <div v-else-if="displayMode !== 'empty'" class="relative">
-      <!-- Sensitive content overlay -->
+      <!-- Content overlay (sensitive or "hide all" preference) -->
       <button
-        v-if="sensitive && !revealed"
+        v-if="!revealed"
         type="button"
-        aria-label="Reveal sensitive content"
+        aria-label="Reveal media"
         class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-muted cursor-pointer"
         @click="toggleReveal"
       >
         <svg aria-hidden="true" class="w-8 h-8 text-muted-foreground/60 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
         </svg>
-        <span class="text-sm text-muted-foreground font-medium">Sensitive content</span>
+        <span class="text-sm text-muted-foreground font-medium">{{ sensitive ? 'Sensitive content' : 'Media hidden' }}</span>
         <span class="text-xs text-muted-foreground/60 mt-1">Click to reveal</span>
       </button>
 
       <!-- Grid container -->
       <div
         class="grid gap-0.5 overflow-hidden rounded-xl"
-        :class="[gridLayoutClass, { 'blur-xl': sensitive && !revealed }]"
+        :class="[gridLayoutClass, { 'blur-xl': !revealed }]"
         :style="[gridContainerStyle, displayMode === 'single' ? singleImageStyle : {}]"
       >
-        <button
-          v-for="(attachment, index) in gridItems"
-          :key="attachment.id"
-          type="button"
-          class="relative overflow-hidden bg-muted cursor-pointer h-full w-full"
-          :class="[cornerClass(index)]"
-          :style="{ ...cellStyle(index), ...blurhashStyle(attachment.blurhash) }"
-          @click="emit('mediaClick', attachment, index)"
-        >
-          <!-- Image -->
-          <img
-            v-if="attachment.type === 'image'"
-            v-fade-on-load
-            :src="imageSrc(attachment)"
-            :alt="attachment.description || 'Image'"
-            class="w-full h-full object-cover"
-            :style="focalPointStyle(attachment)"
-            loading="lazy"
-            decoding="async"
-          >
-
-          <!-- Video thumbnail -->
+        <template v-for="(attachment, index) in gridItems" :key="attachment.id">
+          <!-- Video: no lightbox, player handles its own clicks -->
           <div
-            v-else-if="attachment.type === 'video'"
-            class="w-full h-full relative"
+            v-if="attachment.type === 'video'"
+            class="relative overflow-hidden bg-muted h-full w-full"
+            :class="[cornerClass(index)]"
+            :style="{ ...cellStyle(index), ...blurhashStyle(attachment.blurhash) }"
           >
-            <img
-              v-fade-on-load
-              :src="imageSrc(attachment)"
-              :alt="attachment.description || 'Video'"
-              class="w-full h-full object-cover"
-              :style="focalPointStyle(attachment)"
-              loading="lazy"
-              decoding="async"
-            >
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-            </div>
+            <VideoPlayer
+              :src="attachment.url ?? ''"
+              :poster="attachment.previewUrl ?? undefined"
+              :aspect-ratio="displayMode === 'single' ? singleMediaAspect : undefined"
+              :alt="attachment.description || ''"
+              :video-id="attachment.id"
+              :caption="attachment.description || ''"
+              class="size-full"
+            />
           </div>
 
-          <!-- GifV thumbnail -->
+          <!-- GIF: no lightbox, loops silently like an image -->
           <div
             v-else-if="attachment.type === 'gifv'"
-            class="w-full h-full relative"
+            class="relative overflow-hidden bg-muted h-full w-full"
+            :class="[cornerClass(index)]"
+            :style="{ ...cellStyle(index), ...blurhashStyle(attachment.blurhash) }"
+          >
+            <GifvPlayer
+              :src="attachment.url ?? ''"
+              :poster="attachment.previewUrl ?? undefined"
+              :alt="attachment.description || ''"
+              :video-id="attachment.id"
+              class="size-full"
+            />
+          </div>
+
+          <!-- Image: opens lightbox on click -->
+          <button
+            v-else
+            type="button"
+            class="relative overflow-hidden bg-muted cursor-pointer h-full w-full"
+            :class="[cornerClass(index)]"
+            :style="{ ...cellStyle(index), ...blurhashStyle(attachment.blurhash) }"
+            @click="emit('mediaClick', attachment, index)"
           >
             <img
               v-fade-on-load
               :src="imageSrc(attachment)"
-              :alt="attachment.description || 'GIF'"
+              :alt="attachment.description || 'Image'"
               class="w-full h-full object-cover"
               :style="focalPointStyle(attachment)"
               loading="lazy"
               decoding="async"
             >
-            <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded">
-              GIF
+
+            <!-- ALT badge -->
+            <div
+              v-if="attachment.description"
+              class="absolute bottom-2 left-2 px-1 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded"
+            >
+              ALT
             </div>
-          </div>
 
-          <!-- ALT badge -->
-          <div
-            v-if="attachment.description"
-            class="absolute bottom-2 left-2 px-1 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded"
-          >
-            ALT
-          </div>
-
-          <!-- "+N" overlay on last grid item -->
-          <div
-            v-if="remainingCount > 0 && index === gridItems.length - 1"
-            class="absolute inset-0 bg-black/50 flex items-center justify-center"
-          >
-            <span class="text-white text-2xl font-bold">+{{ remainingCount }}</span>
-          </div>
-        </button>
+            <!-- "+N" overlay on last grid item -->
+            <div
+              v-if="remainingCount > 0 && index === gridItems.length - 1"
+              class="absolute inset-0 bg-black/50 flex items-center justify-center"
+            >
+              <span class="text-white text-2xl font-bold">+{{ remainingCount }}</span>
+            </div>
+          </button>
+        </template>
       </div>
 
-      <!-- Hide button when sensitive and revealed -->
+      <!-- Hide button when manually revealed -->
       <button
-        v-if="sensitive && revealed"
+        v-if="!shouldReveal(sensitive) && revealed"
         type="button"
         aria-label="Hide sensitive content"
         class="absolute top-2 right-2 z-10 px-2 py-1 bg-black/50 text-white text-xs rounded-full hover:bg-black/70 transition-colors cursor-pointer"

@@ -44,6 +44,17 @@ export default defineNuxtConfig({
     dirs: ['composables/**'],
   },
 
+  // Disable payload extraction (not needed for SPA)
+  experimental: {
+    payloadExtraction: false,
+    defaults: {
+      nuxtLink: {
+        // Prefetch on interaction (hover/focus) instead of visibility — reduces idle network
+        prefetchOn: { interaction: true, visibility: false },
+      },
+    },
+  },
+
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
@@ -52,10 +63,6 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'A short-form social platform for the fediverse' },
-        {
-          'http-equiv': 'Content-Security-Policy',
-          'content': `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; connect-src 'self' https: wss:; font-src 'self' data:; frame-src 'none'`,
-        },
       ],
     },
   },
@@ -81,8 +88,30 @@ export default defineNuxtConfig({
         '@tanstack/vue-virtual',
         '@vueuse/core',
         'blurhash',
-        'isomorphic-dompurify',
+        'dompurify',
       ],
+    },
+    build: {
+      // Target modern browsers — smaller output, no unnecessary polyfills
+      target: 'es2022',
+      // Skip compressed size reporting — speeds up builds
+      reportCompressedSize: false,
+      rollupOptions: {
+        output: {
+          // Split heavy vendor deps into separate chunks for better caching.
+          // These change rarely → long-lived browser cache.
+          manualChunks(id) {
+            if (id.includes('node_modules/@tiptap') || id.includes('node_modules/prosemirror'))
+              return 'vendor-tiptap';
+            if (id.includes('node_modules/reka-ui'))
+              return 'vendor-reka';
+            if (id.includes('node_modules/swiper'))
+              return 'vendor-swiper';
+            if (id.includes('node_modules/@phosphor-icons'))
+              return 'vendor-icons';
+          },
+        },
+      },
     },
     resolve: {
       alias: {

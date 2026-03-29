@@ -32,8 +32,8 @@ function getIcon(type: string) {
 
 function getText(type: string): string {
   switch (type) {
-    case 'favourite': return 'favourited your post';
-    case 'reblog': return 'boosted your post';
+    case 'favourite': return 'liked your post';
+    case 'reblog': return 'reposted your post';
     case 'follow': return 'followed you';
     case 'mention': return 'mentioned you';
     case 'poll': return 'poll has ended';

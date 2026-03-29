@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { PhArrowLeft } from '@phosphor-icons/vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { Avatar } from '../ui/avatar';
 import { Badge } from '../ui/badge';
@@ -17,8 +16,6 @@ withDefaults(defineProps<Props>(), {
   avatarAlt: 'Avatar',
   followsYou: false,
 });
-
-defineEmits<{ back: [] }>();
 </script>
 
 <template>
@@ -37,15 +34,6 @@ defineEmits<{ back: [] }>();
         class="w-full h-full object-cover"
       >
     </div>
-
-    <!-- Back Button -->
-    <button
-      class="absolute top-[45px] left-5 flex items-center justify-center w-[44px] h-[44px] rounded-full bg-muted cursor-pointer hover:bg-muted/80 transition-colors lg:hidden"
-      aria-label="Go back"
-      @click="$emit('back')"
-    >
-      <PhArrowLeft :size="24" />
-    </button>
 
     <!-- Content below banner -->
     <div class="flex items-start justify-between px-5">

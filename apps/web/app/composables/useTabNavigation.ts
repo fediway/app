@@ -2,7 +2,7 @@ import { computed, nextTick, ref } from 'vue';
 import { useFeedScroll } from '~/composables/useFeedScroll';
 import { useNavigationStore } from '~/stores/navigation';
 
-export type TabId = 'home' | 'search' | 'new-post' | 'messages' | 'notifications' | 'profile';
+export type TabId = 'home' | 'search' | 'new-post' | 'messages' | 'notifications' | 'profile' | null;
 
 interface TabState {
   lastPath: string;
@@ -40,6 +40,8 @@ export function useTabNavigation() {
   }
 
   const isAtTabRoot = computed(() => {
+    if (!activeTab.value)
+      return true;
     const state = getTabState(activeTab.value);
     return state.lastPath === getTabRoot(activeTab.value);
   });
@@ -47,6 +49,8 @@ export function useTabNavigation() {
   const canGoBack = computed(() => !isAtTabRoot.value);
 
   function saveCurrentScroll() {
+    if (!activeTab.value)
+      return;
     const state = getTabState(activeTab.value);
     state.scrollY = getScrollPosition();
   }
@@ -90,6 +94,16 @@ export function useTabNavigation() {
     restoreScroll(tabId);
   }
 
+  function isChildOfTab(path: string, tabId: TabId): boolean {
+    const root = getTabRoot(tabId);
+    if (root === '/') {
+      // Home tab: only track paths that are post details (/@user/id)
+      // or the root itself — NOT /favourites, /saved, /settings, etc.
+      return path === '/' || path.startsWith('/@');
+    }
+    return path === root || path.startsWith(`${root}/`);
+  }
+
   function onRouteChange(toPath: string, _fromPath: string) {
     if (isTabSwitching.value) {
       isTabSwitching.value = false;
@@ -105,10 +119,15 @@ export function useTabNavigation() {
       const state = getTabState(matchedTab);
       state.lastPath = toPath;
     }
-    else {
-      // Detail page within current tab
+    else if (activeTab.value && isChildOfTab(toPath, activeTab.value)) {
+      // Detail page within current tab (e.g., /messages/123 within messages tab)
       const state = getTabState(activeTab.value);
       state.lastPath = toPath;
+    }
+    else {
+      // Non-tab pages (/favourites, /saved, /settings, /explore, /tags)
+      // Clear active tab so no bottom nav item is highlighted
+      activeTab.value = null;
     }
   }
 

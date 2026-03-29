@@ -35,6 +35,7 @@ const navItems = computed<BottomNavItemType[]>(() =>
     id: item.id,
     icon: iconMap[item.icon] ?? iconMap[item.id] ?? PhHouse,
     label: item.id === 'new-post' ? undefined : item.label,
+    ariaLabel: item.id === 'new-post' ? 'New Post' : undefined,
     main: item.id === 'new-post',
     active: activeTab.value === item.id,
     dot: item.dot,

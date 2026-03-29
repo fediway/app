@@ -4,10 +4,10 @@ import {
   PhArrowsClockwise,
   PhBookmarkSimple,
   PhChat,
+  PhCopy,
   PhDotsThree,
   PhFlag,
   PhHeart,
-  PhLink,
   PhPaperPlaneRight,
   PhProhibit,
   PhSpeakerSlash,
@@ -81,8 +81,9 @@ const canReblog = computed(() =>
     <div class="flex items-center gap-2">
       <ButtonAction
         :count="favouritesCount || null"
-        :aria-label="`${favourited ? 'Unfavourite' : 'Favourite'}${favouritesCount ? `, ${favouritesCount} ${favouritesCount === 1 ? 'like' : 'likes'}` : ''}`"
+        :aria-label="`${favourited ? 'Unlike' : 'Like'}${favouritesCount ? `, ${favouritesCount} ${favouritesCount === 1 ? 'like' : 'likes'}` : ''}`"
         :aria-pressed="favourited"
+        animation="pop"
         class="w-[60px]"
         :class="{ 'text-rose-500 dark:text-rose-500 hover:text-rose-500': favourited }"
         @click="emit('favourite')"
@@ -101,8 +102,9 @@ const canReblog = computed(() =>
 
       <ButtonAction
         :count="reblogsCount || null"
-        :aria-label="`${reblogged ? 'Undo boost' : 'Boost'}${reblogsCount ? `, ${reblogsCount} ${reblogsCount === 1 ? 'boost' : 'boosts'}` : ''}`"
+        :aria-label="`${reblogged ? 'Undo repost' : 'Repost'}${reblogsCount ? `, ${reblogsCount} ${reblogsCount === 1 ? 'repost' : 'reposts'}` : ''}`"
         :aria-pressed="reblogged"
+        animation="spin"
         class="w-[60px]"
         :class="{ 'text-green dark:text-green hover:text-green': reblogged, 'disabled:opacity-40': !canReblog }"
         :disabled="!canReblog"
@@ -115,8 +117,9 @@ const canReblog = computed(() =>
     <!-- Right cluster: bookmark, more -->
     <div class="flex items-center gap-[6px]">
       <ButtonAction
-        :aria-label="bookmarked ? 'Remove bookmark' : 'Bookmark'"
+        :aria-label="bookmarked ? 'Unsave' : 'Save'"
         :aria-pressed="bookmarked"
+        animation="settle"
         :class="{ 'text-yellow dark:text-yellow hover:text-yellow': bookmarked }"
         @click="emit('bookmark')"
       >
@@ -133,7 +136,7 @@ const canReblog = computed(() =>
 
         <DropdownMenuContent side="top" align="end" :side-offset="8">
           <DropdownMenuItem @select="emit('copyLink')">
-            <PhLink :size="16" class="text-muted-foreground" />
+            <PhCopy :size="16" class="text-muted-foreground" />
             Copy link
           </DropdownMenuItem>
           <DropdownMenuItem @select="emit('sendMessage')">
