@@ -38,7 +38,6 @@ export default defineConfig({
     video: 'on-first-retry',
     contextOptions: {
       reducedMotion: 'reduce',
-      permissions: ['clipboard-read', 'clipboard-write'],
     },
   },
 
@@ -54,7 +53,10 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: devices['Desktop Chrome'],
+      use: {
+        ...devices['Desktop Chrome'],
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
     },
     {
       name: 'mobile',
