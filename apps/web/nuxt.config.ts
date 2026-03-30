@@ -89,6 +89,17 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/_nuxt/**': {
+      headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
+    },
+  },
+
+  nitro: {
+    preset: 'node-server',
+    compressPublicAssets: true,
+  },
+
   vite: {
     plugins: [tailwindcss() as any],
     envDir: new URL('.', import.meta.url).pathname,
