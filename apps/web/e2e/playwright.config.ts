@@ -23,8 +23,8 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
-  workers: isCI ? 1 : undefined,
+  retries: isCI ? 1 : 0,
+  workers: isCI ? 4 : undefined,
   timeout: 30_000,
 
   reporter: isCI
