@@ -35,12 +35,14 @@ jobs:
           path: .turbo
           key: turbo-${{ runner.os }}-${{ github.sha }}
           restore-keys: turbo-${{ runner.os }}-
-      - run: npx turbo run lint type-check build
+      - run: npx turbo run lint type-check
+      - run: npx turbo run build --filter=@repo/web
       - uses: actions/upload-artifact@v4
         with:
           name: web-build
           path: apps/web/.output
           retention-days: 1
+      - run: npx turbo run build
 
   unit-tests:
     name: Unit & Integration Tests
