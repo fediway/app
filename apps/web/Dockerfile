@@ -1,13 +1,13 @@
 # =============================================================================
 # Fediway Web — Multi-stage Docker build
 #
-# Produces a minimal nginx image (~25MB) serving the static SPA.
-# No Node.js runtime needed — all rendering happens client-side.
+# Produces a minimal Node.js image running the Nuxt server.
+# Supports SSR when enabled in nuxt.config.ts (currently SPA mode).
 #
 # Build:  docker build -f apps/web/Dockerfile -t fediway/web .
-# Run:    docker run -p 8080:8080 fediway/web
+# Run:    docker run -p 3000:3000 fediway/web
 #
-# Runtime env vars (optional):
+# Runtime env vars:
 #   NUXT_PUBLIC_DEFAULT_INSTANCE  — Mastodon instance domain (default: fediway.com)
 # =============================================================================
 
@@ -26,44 +26,35 @@ COPY packages/api/package.json packages/api/
 COPY packages/types/package.json packages/types/
 COPY packages/config/package.json packages/config/
 
-# Install dependencies (ci = deterministic, no devDeps surprises)
 RUN npm ci
 
-# Copy source
 COPY . .
 
-# Build-time configuration (overridable via --build-arg)
 ARG NUXT_PUBLIC_DEFAULT_INSTANCE=fediway.com
 ENV NUXT_PUBLIC_DEFAULT_INSTANCE=${NUXT_PUBLIC_DEFAULT_INSTANCE}
 
-# Generate static files (SPA mode — pure HTML/JS/CSS, no Node server)
-RUN npx nuxt generate --cwd apps/web
-
-# Pre-compress static assets for nginx gzip_static
-RUN apk add --no-cache gzip \
-    && find apps/web/.output/public/_nuxt -type f \
-       \( -name "*.js" -o -name "*.css" -o -name "*.svg" -o -name "*.json" \) \
-       -exec gzip -9 -k {} \;
+RUN npx turbo run build --filter=@repo/web
 
 # ---------------------
-# Stage 2: Serve
+# Stage 2: Run
 # ---------------------
-FROM nginx:1.27-alpine
+FROM node:22-alpine
 
-# Replace default config with SPA-optimized config
-RUN rm /etc/nginx/conf.d/default.conf
-COPY apps/web/docker/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-# Copy static files from build stage
-COPY --from=build /app/apps/web/.output/public /usr/share/nginx/html
+RUN addgroup -S fediway && adduser -S fediway -G fediway
 
-# Runtime env injection script (runs before nginx starts)
-COPY apps/web/docker/entrypoint.sh /docker-entrypoint.d/40-inject-env.sh
-RUN chmod +x /docker-entrypoint.d/40-inject-env.sh
+COPY --from=build --chown=fediway:fediway /app/apps/web/.output .output
 
-EXPOSE 8080
+USER fediway
+
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD wget -qO- http://localhost:8080/healthz || exit 1
+  CMD wget -qO- http://localhost:3000/_health || exit 1
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", ".output/server/index.mjs"]
