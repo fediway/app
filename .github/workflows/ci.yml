@@ -17,7 +17,6 @@ env:
   NODE_VERSION: 22
 
 jobs:
-  # ── Quality Gate (fast, parallel) ──────────────────────────
   quality:
     name: Lint, Type-check & Build
     permissions:
@@ -37,8 +36,12 @@ jobs:
           key: turbo-${{ runner.os }}-${{ github.sha }}
           restore-keys: turbo-${{ runner.os }}-
       - run: npx turbo run lint type-check build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/.output
+          retention-days: 1
 
-  # ── Unit & Integration Tests (parallel with quality) ───────
   unit-tests:
     name: Unit & Integration Tests
     permissions:
@@ -60,14 +63,13 @@ jobs:
       - run: npx nuxt prepare --cwd apps/web
       - run: npx turbo run test
 
-  # ── E2E Tests (after unit tests pass) ──────────────────────
   e2e:
     name: E2E Tests (Chromium)
     permissions:
       contents: read
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [unit-tests]
+    timeout-minutes: 20
+    needs: [quality]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -75,30 +77,38 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
-      - name: Build web app (mock mode)
-        run: VITE_API_MODE=mock npx turbo run build --filter=@repo/web
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/.output
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
-      - name: Run E2E tests
-        run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project chromium
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project chromium
         env:
           CI: true
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 14
 
-  # ── E2E Mobile (merge to main only) ────────────────────────
   e2e-mobile:
     name: E2E Tests (Mobile)
     permissions:
       contents: read
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [unit-tests]
+    timeout-minutes: 20
+    needs: [quality]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
@@ -107,27 +117,35 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
-      - name: Build web app (mock mode)
-        run: VITE_API_MODE=mock npx turbo run build --filter=@repo/web
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/.output
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-webkit-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps webkit
-      - name: Run Mobile E2E tests
-        run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project mobile
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps webkit
+      - run: cd apps/web && npx playwright test --config e2e/playwright.config.ts --project mobile
         env:
           CI: true
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report-mobile
           path: apps/web/playwright-report/
           retention-days: 14
 
-  # ── Docker Build & Push (main only, after all tests pass) ──
   docker:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     needs: [quality, unit-tests, e2e]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
