@@ -109,6 +109,43 @@ export const WithReplyBelow: Story = {
   },
 };
 
+export const WithReplyAbove: Story = {
+  args: {
+    status: createMockStatus({
+      content: '<p>This is the last reply in a chain. It has a connector line above linking to the previous post.</p>',
+    }),
+    hasReplyAbove: true,
+  },
+};
+
+export const MiddleOfChain: Story = {
+  render: () => ({
+    components: { Status },
+    setup() {
+      const first = createMockStatus({
+        account: createMockAccount({ displayName: 'Sarah Chen', username: 'sarah' }),
+        content: '<p>First post in the chain — has a line below.</p>',
+      });
+      const middle = createMockStatus({
+        account: createMockAccount({ displayName: 'Alex Kim', username: 'alex' }),
+        content: '<p>Middle post — connected above AND below. This is the trickiest visual case for thread connectors.</p>',
+      });
+      const last = createMockStatus({
+        account: createMockAccount({ displayName: 'Jordan Lee', username: 'jordan' }),
+        content: '<p>Last post in the chain — only connected above.</p>',
+      });
+      return { first, middle, last };
+    },
+    template: `
+      <div style="max-width: 600px">
+        <Status :status="first" :has-reply-below="true" :show-separator="false" />
+        <Status :status="middle" :has-reply-above="true" :has-reply-below="true" :show-separator="false" />
+        <Status :status="last" :has-reply-above="true" />
+      </div>
+    `,
+  }),
+};
+
 export const HideActions: Story = {
   args: {
     status: createMockStatus({
