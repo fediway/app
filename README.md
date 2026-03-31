@@ -1,8 +1,10 @@
 <p align="center">
-  <img src=".github/assets/logo.svg" alt="Fediway" width="80" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/logo-light.svg" />
+    <img src=".github/assets/logo-light.svg" alt="Fediway" height="48" />
+  </picture>
 </p>
-
-<h1 align="center">Fediway</h1>
 
 <p align="center">An open-source client for Mastodon.</p>
 
