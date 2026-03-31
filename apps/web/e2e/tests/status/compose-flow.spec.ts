@@ -53,7 +53,7 @@ test.describe('Compose Flow', () => {
     await page.getByRole('button', { name: /post/i }).click();
 
     // Dialog should close
-    await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[role="dialog"][data-state="open"]')).toHaveCount(0, { timeout: 5000 });
   });
 
   test('cancel with content shows discard confirmation', async ({ page }) => {
@@ -71,6 +71,6 @@ test.describe('Compose Flow', () => {
     await page.getByRole('button', { name: /discard/i }).click();
 
     // All dialogs should close
-    await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[role="dialog"][data-state="open"]')).toHaveCount(0, { timeout: 5000 });
   });
 });

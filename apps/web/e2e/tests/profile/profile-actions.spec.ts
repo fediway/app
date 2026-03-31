@@ -12,7 +12,7 @@ test.describe('Profile Actions', () => {
       await expect(page.getByText('Edit Profile').last()).toBeVisible({ timeout: 5000 });
 
       // More button should NOT exist for own profile
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await expect(profileActions.getByLabel('More actions')).not.toBeVisible();
     });
   });
@@ -25,7 +25,7 @@ test.describe('Profile Actions', () => {
     });
 
     test('more dropdown shows share, copy link, mute, block, report', async ({ page }) => {
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       const moreBtn = profileActions.getByLabel('More actions');
       await expect(moreBtn).toBeVisible({ timeout: 5000 });
       await moreBtn.click();
@@ -37,7 +37,7 @@ test.describe('Profile Actions', () => {
     });
 
     test('local user does not show block domain', async ({ page }) => {
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
 
       await expect(page.getByText('Mute user')).toBeVisible({ timeout: 3000 });
@@ -45,7 +45,7 @@ test.describe('Profile Actions', () => {
     });
 
     test('copy profile link shows Copied toast', async ({ page }) => {
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
       await page.getByText('Copy profile link').click();
 
@@ -55,7 +55,7 @@ test.describe('Profile Actions', () => {
     });
 
     test('mute from profile shows toast', async ({ page }) => {
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
       await page.getByText('Mute user').click();
 
@@ -73,7 +73,7 @@ test.describe('Profile Actions', () => {
         });
       });
 
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
       await page.getByText('Mute user').click();
 
@@ -82,7 +82,7 @@ test.describe('Profile Actions', () => {
     });
 
     test('block from profile shows toast', async ({ page }) => {
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
       await page.getByText('Block user').click();
 
@@ -92,7 +92,7 @@ test.describe('Profile Actions', () => {
     });
 
     test('report from profile shows toast', async ({ page }) => {
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
       await page.getByText('Report').click();
 
@@ -108,7 +108,7 @@ test.describe('Profile Actions', () => {
       await page.goto('/@bob@remote.social');
       await expect(page.getByText('Bob Remote').first()).toBeAttached({ timeout: 10_000 });
 
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
 
       await expect(page.getByText('Block domain')).toBeVisible({ timeout: 3000 });
@@ -121,7 +121,7 @@ test.describe('Profile Actions', () => {
       await page.goto('/@bob@remote.social');
       await expect(page.getByText('Bob Remote').first()).toBeAttached({ timeout: 10_000 });
 
-      const profileActions = page.locator('[data-slot="profile-actions"]');
+      const profileActions = page.locator('#main-content [data-slot="profile-actions"]');
       await profileActions.getByLabel('More actions').click();
 
       // "Open original page" should be a link to the remote instance

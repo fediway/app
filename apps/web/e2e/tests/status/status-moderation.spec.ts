@@ -63,7 +63,7 @@ test.describe('Status Moderation', () => {
     test('mute user from dropdown shows toast', async ({ page }) => {
       const feed = page.locator('#main-content');
       const alexPost = feed.locator('article').nth(1);
-      await alexPost.getByLabel('More actions').dispatchEvent('click');
+      await alexPost.getByLabel('More actions').click();
 
       await page.getByText('Mute user').click();
 
@@ -83,7 +83,7 @@ test.describe('Status Moderation', () => {
 
       const feed = page.locator('#main-content');
       const alexPost = feed.locator('article').nth(1);
-      await alexPost.getByLabel('More actions').dispatchEvent('click');
+      await alexPost.getByLabel('More actions').click();
       await page.getByText('Mute user').click();
 
       await page.waitForTimeout(1000);
@@ -100,7 +100,7 @@ test.describe('Status Moderation', () => {
     test('block user from dropdown shows toast', async ({ page }) => {
       const feed = page.locator('#main-content');
       const alexPost = feed.locator('article').nth(1);
-      await alexPost.getByLabel('More actions').dispatchEvent('click');
+      await alexPost.getByLabel('More actions').click();
 
       await page.getByText('Block user').click();
 
@@ -120,7 +120,7 @@ test.describe('Status Moderation', () => {
 
       const feed = page.locator('#main-content');
       const alexPost = feed.locator('article').nth(1);
-      await alexPost.getByLabel('More actions').dispatchEvent('click');
+      await alexPost.getByLabel('More actions').click();
       await page.getByText('Block user').click();
 
       await page.waitForTimeout(1000);
@@ -135,7 +135,7 @@ test.describe('Status Moderation', () => {
 
       const feed = page.locator('#main-content');
       const remotePost = feed.locator('article').last();
-      await remotePost.getByLabel('More actions').dispatchEvent('click');
+      await remotePost.getByLabel('More actions').click();
 
       await page.getByText('Block domain').click();
 
@@ -152,7 +152,7 @@ test.describe('Status Moderation', () => {
 
       const feed = page.locator('#main-content');
       const alexPost = feed.locator('article').nth(1);
-      await alexPost.getByLabel('More actions').dispatchEvent('click');
+      await alexPost.getByLabel('More actions').click();
 
       await page.getByText('Report').click();
 
@@ -175,7 +175,7 @@ test.describe('Status Moderation', () => {
 
       const feed = page.locator('#main-content');
       const alexPost = feed.locator('article').nth(1);
-      await alexPost.getByLabel('More actions').dispatchEvent('click');
+      await alexPost.getByLabel('More actions').click();
       await page.getByText('Report').click();
 
       await page.waitForTimeout(1000);

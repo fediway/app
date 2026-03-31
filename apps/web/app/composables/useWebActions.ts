@@ -149,6 +149,46 @@ export function useWebActions() {
     }, 5000);
   }
 
+  async function handleMute(accountId: string) {
+    try {
+      await useClient().rest.v1.accounts.$select(accountId).mute();
+      toast.success('User muted');
+    }
+    catch {
+      toast.error('Couldn\'t mute user', 'Please try again.');
+    }
+  }
+
+  async function handleBlock(accountId: string) {
+    try {
+      await useClient().rest.v1.accounts.$select(accountId).block();
+      toast.success('User blocked');
+    }
+    catch {
+      toast.error('Couldn\'t block user', 'Please try again.');
+    }
+  }
+
+  async function handleBlockDomain(domain: string) {
+    try {
+      await useClient().rest.v1.domainBlocks.create({ domain });
+      toast.success('Domain blocked');
+    }
+    catch {
+      toast.error('Couldn\'t block domain', 'Please try again.');
+    }
+  }
+
+  async function handleReport(accountId: string) {
+    try {
+      await useClient().rest.v1.reports.create({ accountId, category: 'other' });
+      toast.success('Report submitted');
+    }
+    catch {
+      toast.error('Couldn\'t submit report', 'Please try again.');
+    }
+  }
+
   /**
    * Map statuses through the store for display.
    * Returns a computed that reflects optimistic updates from useStatusActions.
@@ -192,6 +232,10 @@ export function useWebActions() {
     handleCopyLink,
     handleShare,
     handleDelete: requireAuth(handleDelete, 'delete this post'),
+    handleMute: requireAuth(handleMute, 'mute this user'),
+    handleBlock: requireAuth(handleBlock, 'block this user'),
+    handleBlockDomain: requireAuth(handleBlockDomain, 'block this domain'),
+    handleReport: requireAuth(handleReport, 'report this user'),
     withStoreState,
     getStoreStatus,
     store,

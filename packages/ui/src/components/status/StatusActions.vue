@@ -37,6 +37,8 @@ interface Props {
   authenticated?: boolean;
   /** Whether the current user authored this post */
   isOwnPost?: boolean;
+  /** Whether the post author is from a remote instance */
+  isRemoteUser?: boolean;
   class?: HTMLAttributes['class'];
 }
 
@@ -50,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
   visibility: 'public',
   authenticated: true,
   isOwnPost: false,
+  isRemoteUser: false,
 });
 
 const emit = defineEmits<{
@@ -164,7 +167,7 @@ const canReblog = computed(() =>
               <PhProhibit :size="16" class="text-muted-foreground" />
               Block user
             </DropdownMenuItem>
-            <DropdownMenuItem @select="emit('blockDomain')">
+            <DropdownMenuItem v-if="isRemoteUser" @select="emit('blockDomain')">
               <PhProhibit :size="16" class="text-muted-foreground" />
               Block domain
             </DropdownMenuItem>

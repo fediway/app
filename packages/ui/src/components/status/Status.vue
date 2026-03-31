@@ -94,6 +94,8 @@ const cleanedContent = useCleanContent(
   () => !!quotedStatus.value,
 );
 
+const isRemoteUser = computed(() => displayStatus.value.account.acct.includes('@'));
+
 function getDomain(acct: string): string {
   const parts = acct.split('@');
   return parts.length > 1 ? parts[1]! : '';
@@ -249,6 +251,7 @@ function handleStatusClick(event: MouseEvent) {
             :visibility="displayStatus.visibility"
             :authenticated="authenticated"
             :is-own-post="isOwnPost"
+            :is-remote-user="isRemoteUser"
             @reply="emit('reply', displayStatus.id)"
             @reblog="emit('reblog', displayStatus.id)"
             @favourite="emit('favourite', displayStatus.id)"

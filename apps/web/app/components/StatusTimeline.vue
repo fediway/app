@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleShare, handleDelete, store } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleShare, handleDelete, handleMute, handleBlock, handleBlockDomain, handleReport, store } = useWebActions();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 const { currentUser } = useAuth();
@@ -61,6 +61,10 @@ const { currentUser } = useAuth();
     @share="(id) => handleShare(id)"
     @copy-link="(id) => handleCopyLink(id)"
     @delete="(id) => handleDelete(id)"
+    @mute="(id) => handleMute(id)"
+    @block="(id) => handleBlock(id)"
+    @block-domain="(domain) => handleBlockDomain(domain)"
+    @report="(id) => handleReport(id)"
     @send-message="(s) => openSendMessage(s)"
     @tag-click="(tag) => router.push(`/tags/${tag}`)"
     @status-click="(id) => router.push(getStatusPath(id))"

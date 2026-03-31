@@ -43,6 +43,10 @@ const emit = defineEmits<{
   sendMessage: [status: StatusType];
   copyLink: [statusId: string];
   delete: [statusId: string];
+  mute: [accountId: string];
+  block: [accountId: string];
+  blockDomain: [domain: string];
+  report: [accountId: string];
   tagClick: [tagName: string];
   loadMore: [];
   statusClick: [statusId: string];
@@ -127,6 +131,10 @@ function getReplyParent(status: StatusType): StatusType | null {
           @send-message="emit('sendMessage', $event)"
           @copy-link="emit('copyLink', $event)"
           @delete="emit('delete', $event)"
+          @mute="(id) => emit('mute', id)"
+          @block="(id) => emit('block', id)"
+          @block-domain="(domain) => emit('blockDomain', domain)"
+          @report="(id) => emit('report', id)"
           @tag-click="emit('tagClick', $event)"
           @status-click="emit('statusClick', $event)"
           @profile-click="emit('profileClick', $event)"

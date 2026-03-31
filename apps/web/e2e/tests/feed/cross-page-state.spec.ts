@@ -33,9 +33,13 @@ test.describe('Cross-Page State', () => {
     await detailActions.getByLabel(/reply/i).click();
     await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5000 });
 
-    // Close composer
+    // Close composer — cancel triggers discard confirmation since reply pre-fills @mention
     await page.getByRole('button', { name: /cancel/i }).click();
-    await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 3000 });
+    const discardBtn = page.getByRole('button', { name: /discard/i });
+    if (await discardBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await discardBtn.click();
+    }
+    await expect(page.locator('[role="dialog"][data-state="open"]')).toHaveCount(0, { timeout: 3000 });
 
     // Go back to feed
     await page.goBack();

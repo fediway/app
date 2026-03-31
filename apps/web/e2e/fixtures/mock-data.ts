@@ -9,7 +9,7 @@ const hour = (h: number) => new Date(Date.now() - h * 3600_000).toISOString();
 export const mockAccount = {
   id: '1',
   username: 'jane',
-  acct: 'jane@mock.social',
+  acct: 'jane',
   displayName: 'Jane Doe',
   avatar: 'https://placehold.co/96x96/E4A5BF/232B37?text=JD',
   avatarStatic: 'https://placehold.co/96x96/E4A5BF/232B37?text=JD',
@@ -31,7 +31,7 @@ export const mockAccount2 = {
   ...mockAccount,
   id: '2',
   username: 'alex',
-  acct: 'alex@mock.social',
+  acct: 'alex',
   displayName: 'Alex Chen',
   avatar: 'https://placehold.co/96x96/94AAC7/232B37?text=AC',
   avatarStatic: 'https://placehold.co/96x96/94AAC7/232B37?text=AC',

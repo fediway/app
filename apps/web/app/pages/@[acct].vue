@@ -8,9 +8,12 @@ import {
   ProfileInformation,
   Skeleton,
   TabBar,
+  useToast,
 } from '@repo/ui';
 import { useFollows } from '~/composables/useFollows';
 
+const { handleMute, handleBlock, handleBlockDomain, handleReport } = useWebActions();
+const { toast } = useToast();
 const HTML_TAG_RE = /<[^>]*>/g;
 
 definePageMeta({});
@@ -29,6 +32,11 @@ const isEditProfileOpen = ref(false);
 const { data: account, isLoading: isAccountLoading } = getAccountByAcct(acct.value);
 const relationship = computed(() => account.value ? getRelationship(account.value.id) : null);
 const isOwnProfile = computed(() => !!currentUser.value && !!account.value && currentUser.value.id === account.value.id);
+const isRemoteUser = computed(() => {
+  if (!account.value)
+    return false;
+  return account.value.acct.includes('@');
+});
 
 // Set desktop header — show profile info
 usePageHeader({
@@ -99,6 +107,40 @@ function handleStatClick(stat: string) {
     router.push(`${getProfilePath(acct.value)}/${stat}`);
 }
 
+async function handleCopyProfileLink() {
+  const url = `${window.location.origin}${getProfilePath(acct.value)}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast.success('Copied');
+  }
+  catch {
+    toast.error('Failed to copy');
+  }
+}
+
+function handleMuteUser() {
+  if (account.value)
+    handleMute(account.value.id);
+}
+
+function handleBlockUser() {
+  if (account.value)
+    handleBlock(account.value.id);
+}
+
+function handleBlockDomainAction() {
+  if (account.value && isRemoteUser.value) {
+    const domain = account.value.acct.split('@')[1];
+    if (domain)
+      handleBlockDomain(domain);
+  }
+}
+
+function handleReportUser() {
+  if (account.value)
+    handleReport(account.value.id);
+}
+
 function goBack() {
   if (window.history.length > 1) {
     router.back();
@@ -148,10 +190,17 @@ function goBack() {
             :following="relationship?.following ?? false"
             :requested="relationship?.requested ?? false"
             :is-own-profile="isOwnProfile"
+            :is-remote-user="isRemoteUser"
+            :remote-profile-url="account?.url"
             @follow="handleFollowToggle"
             @unfollow="handleFollowToggle"
             @message="handleMessage"
             @edit-profile="isEditProfileOpen = true"
+            @copy-link="handleCopyProfileLink"
+            @mute="handleMuteUser"
+            @block="handleBlockUser"
+            @block-domain="handleBlockDomainAction"
+            @report="handleReportUser"
           />
         </div>
 
