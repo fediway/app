@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuth, useClient } from '@repo/api';
 import { Avatar, Button, PageHeader, SegmentedControl, Toggle, VisibilitySelector } from '@repo/ui';
+import { useFeedbackModal } from '~/composables/useFeedbackModal';
 import { useSettings } from '~/composables/useSettings';
 import { useNavigationStore } from '~/stores/navigation';
 
@@ -10,6 +11,7 @@ const { settings, theme, setTheme, setDefaultVisibility, toggleSensitiveMedia, s
 const themeCookie = useCookie('fediway_theme');
 const activeTheme = computed(() => themeCookie.value ?? theme.value);
 const { isAuthenticated, instanceUrl, logout: apiLogout } = useAuth();
+const { open: openFeedback } = useFeedbackModal();
 const isEditProfileOpen = ref(false);
 
 usePageHeader({ title: 'Settings' });
@@ -193,6 +195,35 @@ function handleLogout() {
       </div>
     </section>
 
+    <!-- Early Access / Help & Feedback -->
+    <section class="border-b border-border px-4 py-4">
+      <h2 class="mb-1 text-xs font-semibold uppercase tracking-wider text-galaxy-500 dark:text-galaxy-400">
+        Early Access
+      </h2>
+      <p class="mb-3 text-xs text-muted-foreground">
+        You're among the first to use Fediway. Your feedback shapes what we build next.
+      </p>
+
+      <div class="-mx-2 space-y-1">
+        <button
+          class="flex w-full items-center justify-between rounded-full px-3 py-2.5 transition-colors hover:bg-muted"
+          @click="openFeedback()"
+        >
+          <span class="text-sm text-foreground">Send feedback</span>
+          <span class="text-sm text-muted-foreground">&rsaquo;</span>
+        </button>
+        <a
+          href="https://github.com/fediway/app/discussions"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex w-full items-center justify-between rounded-full px-3 py-2.5 transition-colors hover:bg-muted"
+        >
+          <span class="text-sm text-foreground">Feature requests</span>
+          <span class="text-sm text-muted-foreground">&rsaquo;</span>
+        </a>
+      </div>
+    </section>
+
     <!-- About -->
     <section class="border-b border-border px-4 py-4">
       <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -207,10 +238,6 @@ function handleLogout() {
         <div class="flex justify-between">
           <span class="text-muted-foreground">Source code</span>
           <a href="https://github.com/fediway/app" target="_blank" rel="noopener noreferrer" class="text-galaxy-500 dark:text-galaxy-400 hover:underline">GitHub</a>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-muted-foreground">Report an issue</span>
-          <a href="https://github.com/fediway/app/issues" target="_blank" rel="noopener noreferrer" class="text-galaxy-500 dark:text-galaxy-400 hover:underline">Open issue</a>
         </div>
       </div>
     </section>

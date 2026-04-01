@@ -1,0 +1,43 @@
+services:
+  kaneo-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kaneo
+      POSTGRES_USER: kaneo
+      POSTGRES_PASSWORD: kaneo-feedback-2026
+    volumes:
+      - kaneo_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U kaneo -d kaneo]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  kaneo-api:
+    image: ghcr.io/usekaneo/api:latest
+    ports:
+      - 4100:1337
+    environment:
+      DATABASE_URL: postgres://kaneo:kaneo-feedback-2026@kaneo-db:5432/kaneo
+      AUTH_SECRET: kaneo-fediway-feedback-secret-key-2026
+      KANEO_CLIENT_URL: http://localhost:4101
+      KANEO_API_URL: http://localhost:4100
+    depends_on:
+      kaneo-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  kaneo-web:
+    image: ghcr.io/usekaneo/web:latest
+    ports:
+      - 4101:5173
+    environment:
+      KANEO_API_URL: http://localhost:4100
+      KANEO_CLIENT_URL: http://localhost:4101
+    depends_on:
+      - kaneo-api
+    restart: unless-stopped
+
+volumes:
+  kaneo_data:

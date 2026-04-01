@@ -2,12 +2,14 @@
 import { PhPlus } from '@phosphor-icons/vue';
 import { Button, SideNav, SideNavItem, SideNavProfile } from '@repo/ui';
 import { useAuthState } from '~/composables/useAuthState';
+import { useFeedbackModal } from '~/composables/useFeedbackModal';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useNavigationStore } from '~/stores/navigation';
 
 const { isAuthenticated } = useAuthState();
 const navigation = useNavigationStore();
 const { open: openComposer } = usePostComposer();
+const { open: openFeedback } = useFeedbackModal();
 </script>
 
 <template>
@@ -59,5 +61,21 @@ const { open: openComposer } = usePostComposer();
       :dot="item.dot"
       @click="navigateTo(item.to)"
     />
+
+    <template #footer>
+      <div class="px-3 pb-6 pt-3">
+        <button
+          class="group flex w-full items-center gap-3 rounded-xl border border-galaxy-500/20 bg-galaxy-500/5 px-3.5 pb-4 pt-2.5 text-left transition-colors hover:bg-galaxy-500/10"
+          @click="openFeedback()"
+        >
+          <span class="text-sm text-galaxy-500 dark:text-galaxy-400">&#10022;</span>
+          <div class="min-w-0 flex-1">
+            <span class="text-xs font-semibold leading-tight text-galaxy-500 dark:text-galaxy-400">Early Access</span>
+            <span class="block text-xs leading-tight text-muted-foreground">Your feedback shapes what's next</span>
+          </div>
+          <span class="text-sm text-galaxy-500/60 transition-colors group-hover:text-galaxy-500">&rsaquo;</span>
+        </button>
+      </div>
+    </template>
   </SideNav>
 </template>

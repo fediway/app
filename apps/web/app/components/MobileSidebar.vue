@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { NavDrawer, NavDrawerItem, NavDrawerProfile, Skeleton } from '@repo/ui';
+import { useFeedbackModal } from '~/composables/useFeedbackModal';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
 const { getProfilePath } = useAccountData();
+const { open: openFeedback } = useFeedbackModal();
+
+function handleFeedbackClick() {
+  navigation.closeSidebar();
+  nextTick(() => openFeedback());
+}
 
 function handleItemClick(item: { to: string }) {
   navigation.closeSidebar();
@@ -68,6 +75,21 @@ function handleOpenChange(open: boolean) {
         :dot="item.dot"
         @click="handleItemClick(item)"
       />
+
+      <!-- Early Access feedback — below Settings, same as desktop sidebar -->
+      <div class="px-1 pb-4 pt-3">
+        <button
+          class="group flex w-full items-center gap-3 rounded-xl border border-galaxy-500/20 bg-galaxy-500/5 px-3.5 py-3 text-left transition-colors hover:bg-galaxy-500/10"
+          @click="handleFeedbackClick"
+        >
+          <span class="text-base text-galaxy-500 dark:text-galaxy-400">&#10022;</span>
+          <div class="min-w-0 flex-1">
+            <span class="text-xs font-semibold text-galaxy-500 dark:text-galaxy-400">Early Access</span>
+            <span class="block text-xs text-muted-foreground">Your feedback shapes what's next</span>
+          </div>
+          <span class="text-sm text-galaxy-500/60 transition-colors group-hover:text-galaxy-500">&rsaquo;</span>
+        </button>
+      </div>
     </nav>
   </NavDrawer>
 </template>

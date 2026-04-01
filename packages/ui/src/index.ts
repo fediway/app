@@ -42,6 +42,9 @@ export {
 } from './components/compose';
 export type { MediaItem } from './components/compose';
 
+// Feedback components
+export { FeedbackModal } from './components/feedback';
+
 // Item components
 export { ItemCard, ItemHeader, ItemPage, ItemPageActions, ItemPageHeaderLink, Take } from './components/item';
 

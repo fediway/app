@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
-import { useAuth, useNotificationMarker } from '@repo/api';
-import { MediaLightbox, ToastContainer, useToast } from '@repo/ui';
+import { useAuth, useFeedbackContext, useFeedbackReport, useNotificationMarker } from '@repo/api';
+import { FeedbackModal, MediaLightbox, ToastContainer, useToast } from '@repo/ui';
 import { useBackButton } from '~/composables/useBackButton';
 import { useConversationData } from '~/composables/useConversationData';
+import { useFeedbackModal } from '~/composables/useFeedbackModal';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useNetworkStatus } from '~/composables/useNetworkStatus';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -11,6 +12,7 @@ import { usePosts } from '~/composables/usePosts';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
+import { initErrorBuffer } from '~/utils/errorBuffer';
 
 const route = useRoute();
 const router = useRouter();
@@ -33,6 +35,17 @@ const {
   initialIndex: lightboxIndex,
   close: closeLightbox,
 } = useMediaLightbox();
+
+// Feedback system
+const {
+  isOpen: isFeedbackOpen,
+  initialCategory: feedbackInitialCategory,
+  errorContext: feedbackErrorContext,
+  open: openFeedback,
+  close: closeFeedback,
+} = useFeedbackModal();
+const { collectContext } = useFeedbackContext();
+const { submitReport } = useFeedbackReport();
 
 // Tab navigation — router guards
 const { onRouteChange, saveCurrentScroll, canGoBack, isTabSwitching } = useTabNavigation();
@@ -75,6 +88,10 @@ registerBackHandler(100, () => {
   }
   if (isSendMessageOpen.value) {
     closeSendMessage();
+    return true;
+  }
+  if (isFeedbackOpen.value) {
+    closeFeedback();
     return true;
   }
   if (isLightboxOpen.value) {
@@ -135,11 +152,45 @@ async function handleSendMessage(data: { recipients: Account[]; message: string;
   }
 }
 
+// Feedback submission
+async function handleFeedbackSubmit(data: { category: 'bug' | 'suggestion' | 'other'; description: string; expectedBehavior?: string; frequency?: string; screenshot: File | null }) {
+  const context = collectContext(route);
+  const success = await submitReport({
+    category: data.category,
+    description: data.description,
+    expectedBehavior: data.expectedBehavior,
+    frequency: data.frequency as 'always' | 'sometimes' | 'once' | undefined,
+    screenshot: data.screenshot,
+    context,
+  });
+
+  if (success) {
+    toast.success('Thanks for sharing', { description: 'We read every one.' });
+    closeFeedback();
+  }
+  else {
+    toast.error('Failed to send feedback', { description: 'Please try again.' });
+  }
+}
+
+// Post-error toast with feedback action
+onErrorCaptured((err) => {
+  const errorInfo = { message: err.message || String(err), timestamp: Date.now() };
+  toast.error('Something went wrong', {
+    action: {
+      label: 'Report this',
+      onClick: () => openFeedback('bug', errorInfo),
+    },
+  });
+  return true;
+});
+
 // Notification polling — check for new notifications every 60s
 const { isAuthenticated } = useAuth();
 const { fetchMarker, startPolling: startNotifPolling, stopPolling: stopNotifPolling } = useNotificationMarker();
 
 onMounted(() => {
+  initErrorBuffer();
   initCapacitorBackButton();
   if (isAuthenticated.value) {
     fetchMarker();
@@ -193,6 +244,15 @@ watch(isAuthenticated, (authenticated) => {
         />
       </template>
 
+      <!-- Feedback modal (available for all users) -->
+      <FeedbackModal
+        :is-open="isFeedbackOpen"
+        :initial-category="feedbackInitialCategory"
+        :error-context="feedbackErrorContext"
+        @close="closeFeedback"
+        @submit="handleFeedbackSubmit"
+      />
+
       <!-- Auth prompt (shown when logged-out user tries to interact) -->
       <AuthPromptModal />
 
@@ -238,7 +298,7 @@ watch(isAuthenticated, (authenticated) => {
       <div class="w-full max-w-[1200px] lg:grid lg:grid-cols-[240px_minmax(0,650px)_280px] lg:gap-8 lg:px-4">
         <!-- Left Column: Menu Sidebar (desktop only) -->
         <nav aria-label="Main navigation" class="hidden lg:block">
-          <div class="lg:sticky lg:top-0 lg:pt-14">
+          <div class="lg:sticky lg:top-0 lg:h-dvh lg:pt-14">
             <DesktopSidebar />
           </div>
         </nav>

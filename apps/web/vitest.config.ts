@@ -5,8 +5,11 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 export default mergeConfig(baseConfig, defineConfig({
   test: {
     root: path.resolve(__dirname),
-    include: ['app/composables/**/*.test.ts', 'app/stores/**/*.test.ts'],
+    include: ['app/composables/**/*.test.ts', 'app/stores/**/*.test.ts', 'server/**/__tests__/**/*.test.ts'],
     environment: 'happy-dom',
+    environmentMatchGlobs: [
+      ['server/**', 'node'],
+    ],
   },
   esbuild: {
     tsconfigRaw: '{}',

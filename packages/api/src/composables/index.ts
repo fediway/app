@@ -11,6 +11,8 @@ export { useClient } from './useClient';
 export { type ThemePreference, useDarkMode, type UseDarkModeReturn } from './useDarkMode';
 export { type DeepLinkRoute, useDeepLinks, type UseDeepLinksReturn } from './useDeepLinks';
 export { useDraft, type UseDraftReturn } from './useDraft';
+export { type FeedbackContext, useFeedbackContext } from './useFeedbackContext';
+export { type FeedbackCategory, type FeedbackReport, useFeedbackReport, type UseFeedbackReportOptions, type UseFeedbackReportReturn } from './useFeedbackReport';
 export { type CreateFilterParams, type FilterError, type UpdateFilterParams, useFilters, type UseFiltersOptions, type UseFiltersReturn } from './useFilters';
 export { type ModerationError, type MuteAccountParams, useModeration, type UseModerationOptions, type UseModerationReturn } from './useModeration';
 export { resetNotificationMarkerState, useNotificationMarker, type UseNotificationMarkerReturn } from './useNotificationMarker';
