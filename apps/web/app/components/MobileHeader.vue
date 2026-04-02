@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FeedType } from '~/composables/useFeedType';
-import { PhBell, PhCaretDown, PhList } from '@phosphor-icons/vue';
+import { PhArrowLeft, PhBell, PhCaretDown, PhList } from '@phosphor-icons/vue';
 import { AppBar, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@repo/ui';
 import { useFeedType } from '~/composables/useFeedType';
 import { useScrollDirection } from '~/composables/useScrollDirection';
@@ -42,11 +42,25 @@ function handleBack() {
     class="sticky top-0 left-0 right-0 z-[100] transition-transform duration-300 ease-out"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
-    <!-- Own profile: transparent header, floating burger only (negative margin so it overlays content) -->
-    <div v-if="navigation.isProfilePage" class="flex h-14 -mb-14 items-center justify-end px-4">
+    <!-- Profile pages: transparent header overlaying banner -->
+    <div v-if="navigation.isAnyProfilePage" class="flex h-14 -mb-14 items-center justify-between px-4">
+      <!-- Other profile: back button on the left -->
       <button
+        v-if="!navigation.isProfilePage"
         type="button"
-        class="flex size-10 items-center justify-center rounded-full bg-card/80 backdrop-blur-lg shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] cursor-pointer text-foreground"
+        class="flex size-11 items-center justify-center rounded-full bg-card/80 backdrop-blur-lg shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] cursor-pointer text-foreground"
+        aria-label="Go back"
+        @click="handleBack"
+      >
+        <PhArrowLeft :size="20" weight="bold" />
+      </button>
+      <div v-else />
+
+      <!-- Own profile: burger on the right -->
+      <button
+        v-if="navigation.isProfilePage"
+        type="button"
+        class="flex size-11 items-center justify-center rounded-full bg-card/80 backdrop-blur-lg shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] cursor-pointer text-foreground"
         aria-label="Open menu"
         @click="navigation.openSidebar()"
       >

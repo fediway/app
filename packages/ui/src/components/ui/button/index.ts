@@ -14,6 +14,8 @@ export const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         muted:
           'bg-muted text-foreground hover:bg-muted/80',
+        ghost:
+          'text-foreground hover:bg-muted/60',
       },
       size: {
         default: 'h-11 px-5 text-base has-[>svg]:px-4',

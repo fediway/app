@@ -37,7 +37,7 @@ defineEmits<{
       <slot name="leading">
         <Button
           v-if="leftIcon"
-          variant="muted"
+          variant="ghost"
           size="icon"
           :aria-label="leftLabel"
           @click="$emit('leftClick')"

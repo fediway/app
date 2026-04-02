@@ -145,6 +145,8 @@ export function useNavigationStore() {
     return route.path === profileUrl.value;
   });
 
+  const isAnyProfilePage = computed(() => /^\/@[^/]+$/.test(route.path));
+
   const pageTitle = computed(() => {
     if (pageHeaderOverride.value)
       return pageHeaderOverride.value.title;
@@ -179,6 +181,7 @@ export function useNavigationStore() {
     pageHeaderOverride,
     showBack,
     isProfilePage,
+    isAnyProfilePage,
     menuItems,
     mobileFooterItems,
     currentUser,

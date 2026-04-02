@@ -2,6 +2,7 @@ import type { mastodon } from 'masto';
 import type { FediwayAPI } from './fediway-api';
 import { createRestAPIClient, createStreamingAPIClient } from 'masto';
 import { createFediwayAPI } from './fediway-api';
+import { patchRelativeLinkHeaders } from './utils/patch-masto-paginator';
 
 export interface MastoClientConfig {
   /** Instance URL (e.g., 'https://mastodon.social') */
@@ -26,6 +27,8 @@ export interface MastoClient {
 /**
  * Creates a Mastodon API client with Fediway extensions
  */
+patchRelativeLinkHeaders();
+
 export function createMastoClient(config: MastoClientConfig): MastoClient {
   const rest = createRestAPIClient({
     url: config.url,
