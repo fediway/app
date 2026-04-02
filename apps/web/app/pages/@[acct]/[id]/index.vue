@@ -258,8 +258,6 @@ function getReplyParent(reply: Status, index?: number): Status | null {
           @tag-click="handleTagClick"
           @profile-click="navigateToProfile"
           @media-click="handleMediaClick"
-          @view-reblogs="id => router.push(`${route.path}/reblogs`)"
-          @view-favourites="id => router.push(`${route.path}/favourites`)"
         />
 
         <!-- Quick Reply (desktop only — mobile uses the bottom nav reply bar) -->

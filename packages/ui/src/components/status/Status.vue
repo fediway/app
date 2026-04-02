@@ -135,7 +135,7 @@ function handleStatusClick(event: MouseEvent) {
             </button>
             <RelativeTime :datetime="replyParent.createdAt" class="ml-auto shrink-0 text-muted-foreground" />
           </div>
-          <div class="mt-0.5">
+          <div>
             <StatusContent
               :content="replyParent.content"
               :spoiler-text="replyParent.spoilerText"
@@ -182,7 +182,7 @@ function handleStatusClick(event: MouseEvent) {
         <!-- Right: header + content + actions -->
         <div class="min-w-0 flex-1">
           <!-- Header row -->
-          <div class="flex items-baseline gap-1 text-base">
+          <div class="flex items-baseline gap-1 mb-1 text-base">
             <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
               {{ displayStatus.account.displayName || displayStatus.account.username }}
             </button>
@@ -193,7 +193,7 @@ function handleStatusClick(event: MouseEvent) {
           </div>
 
           <!-- Content -->
-          <div class="mt-0.5">
+          <div>
             <StatusContent
               :content="cleanedContent"
               :spoiler-text="displayStatus.spoilerText"

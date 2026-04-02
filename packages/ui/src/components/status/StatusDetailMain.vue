@@ -7,7 +7,6 @@ import FullTimestamp from '../ui/full-timestamp/FullTimestamp.vue';
 import RichText from '../ui/rich-text/RichText.vue';
 import StatusActions from './StatusActions.vue';
 import StatusMedia from './StatusMedia.vue';
-import StatusStats from './StatusStats.vue';
 import StatusTags from './StatusTags.vue';
 import { useCleanContent } from './useCleanContent';
 
@@ -34,8 +33,6 @@ const emit = defineEmits<{
   tagClick: [tagName: string];
   profileClick: [acct: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
-  viewReblogs: [statusId: string];
-  viewFavourites: [statusId: string];
 }>();
 
 const cleanedContent = useCleanContent(
@@ -91,24 +88,14 @@ const cleanedContent = useCleanContent(
       </div>
 
       <!-- Timestamp + Visibility -->
-      <div class="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
+      <div class="flex items-center gap-1.5 text-sm text-muted-foreground">
         <FullTimestamp :datetime="status.createdAt" />
         <span>·</span>
         <span class="capitalize">{{ status.visibility }}</span>
       </div>
 
-      <!-- Stats bar -->
-      <div v-if="status.reblogsCount > 0 || status.favouritesCount > 0" class="border-t border-border py-2">
-        <StatusStats
-          :reblogs-count="status.reblogsCount"
-          :favourites-count="status.favouritesCount"
-          @reblogs="$emit('viewReblogs', status.id)"
-          @favourites="$emit('viewFavourites', status.id)"
-        />
-      </div>
-
       <!-- Actions -->
-      <div class="border-t border-border py-2" data-testid="detail-actions">
+      <div class="border-t border-border mt-2 pt-2" data-testid="detail-actions">
         <StatusActions
           :replies-count="status.repliesCount"
           :reblogs-count="status.reblogsCount"
