@@ -1,15 +1,32 @@
 <script setup lang="ts">
-import { PhBell } from '@phosphor-icons/vue';
-import { AppBar, Button } from '@repo/ui';
+import type { FeedType } from '~/composables/useFeedType';
+import { PhBell, PhCaretDown, PhList } from '@phosphor-icons/vue';
+import { AppBar, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@repo/ui';
+import { useFeedType } from '~/composables/useFeedType';
 import { useScrollDirection } from '~/composables/useScrollDirection';
+
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
 const { hidden } = useScrollDirection();
+const { feedType, set: setFeedType } = useFeedType();
 
-// Back button uses the same source of truth as desktop: navigation.showBack.
-// Behavior: go back in history if possible, otherwise navigate to parent route.
+const isHome = computed(() => navigation.activeItemId === 'home' && !navigation.showBack);
+
+const feedLabels: Record<FeedType, string> = {
+  home: 'Home',
+  explore: 'Explore',
+  trending: 'Trending',
+};
+
+const feedLabel = computed(() => feedLabels[feedType.value]);
+
+const feedOptions: { type: FeedType; label: string }[] = [
+  { type: 'home', label: 'Home' },
+  { type: 'trending', label: 'Trending' },
+];
+
 function handleBack() {
   if (window.history.length > 1) {
     router.back();
@@ -26,49 +43,64 @@ function handleBack() {
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
     <AppBar
-      :title="!navigation.pageImage ? navigation.pageTitle : undefined"
+      :title="!isHome && !navigation.pageSubtitle ? navigation.pageTitle : undefined"
       :left-icon="navigation.showBack ? 'back' : undefined"
-      :left-label="navigation.showBack ? 'Go back' : 'Open menu'"
+      :left-label="navigation.showBack ? 'Go back' : undefined"
       :bordered="false"
-      @left-click="navigation.showBack ? handleBack() : navigation.openSidebar()"
+      @left-click="navigation.showBack ? handleBack() : undefined"
     >
-      <!-- Leading: user avatar on top-level pages -->
-      <template v-if="!navigation.showBack" #leading>
-        <button
-          type="button"
-          class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center"
-          aria-label="Open menu"
-          @click="navigation.openSidebar()"
-        >
-          <img
-            v-if="navigation.currentUser?.avatar"
-            :src="navigation.currentUser.avatar"
-            :alt="navigation.currentUser.name"
-            class="size-8 rounded-full object-cover"
-          >
-          <span v-else class="flex size-8 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
-            ?
-          </span>
-        </button>
+      <!-- Home: feed selector dropdown on the left -->
+      <template v-if="isHome" #leading>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 cursor-pointer text-base font-semibold text-foreground"
+            >
+              {{ feedLabel }}
+              <PhCaretDown :size="14" weight="bold" class="text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" :side-offset="8">
+            <DropdownMenuItem
+              v-for="option in feedOptions"
+              :key="option.type"
+              :class="{ 'font-semibold': feedType === option.type }"
+              @select="setFeedType(option.type)"
+            >
+              {{ option.label }}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </template>
 
-      <!-- Rich title with image (for conversations, profiles) -->
-      <template v-if="navigation.pageImage" #title>
-        <div class="flex min-w-0 items-center justify-center gap-2.5">
-          <img :src="navigation.pageImage" :alt="navigation.pageTitle" class="size-9 shrink-0 rounded-full object-cover">
-          <div class="min-w-0 text-left">
-            <div class="truncate text-sm font-semibold leading-tight text-foreground">
-              {{ navigation.pageTitle }}
-            </div>
-            <div v-if="navigation.pageSubtitle" class="truncate text-xs leading-tight text-muted-foreground">
-              {{ navigation.pageSubtitle }}
-            </div>
+      <!-- Rich title with subtitle (for conversations, profiles) -->
+      <template v-else-if="navigation.pageSubtitle" #title>
+        <div class="min-w-0 text-center">
+          <div class="truncate text-sm font-semibold leading-tight text-foreground">
+            {{ navigation.pageTitle }}
+          </div>
+          <div class="truncate text-xs leading-tight text-muted-foreground">
+            {{ navigation.pageSubtitle }}
           </div>
         </div>
       </template>
 
       <template #trailing>
+        <!-- Own profile: burger menu on the right -->
         <Button
+          v-if="navigation.isProfilePage"
+          variant="muted"
+          size="icon"
+          aria-label="Open menu"
+          @click="navigation.openSidebar()"
+        >
+          <PhList :size="24" />
+        </Button>
+
+        <!-- All other pages: notification bell -->
+        <Button
+          v-else
           variant="muted"
           size="icon"
           aria-label="Notifications"

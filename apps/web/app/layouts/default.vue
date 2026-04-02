@@ -267,16 +267,16 @@ watch(isAuthenticated, (authenticated) => {
 
     <!-- Mobile: push-style sidebar layout -->
     <div class="lg:hidden relative min-h-screen" style="overflow-x: clip;">
-      <!-- Sidebar (off-screen left, revealed by push) -->
+      <!-- Sidebar (off-screen right, revealed by push) -->
       <MobileSidebar
-        class="fixed top-0 left-0 bottom-0 w-[280px] max-w-[80vw] transition-transform duration-250 ease-out"
-        :class="navigation.isSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed top-0 right-0 bottom-0 w-[280px] max-w-[80vw] transition-transform duration-250 ease-out"
+        :class="navigation.isSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
       />
 
-      <!-- Mobile content wrapper (pushed right when sidebar opens) -->
+      <!-- Mobile content wrapper (pushed left when sidebar opens) -->
       <div
         class="flex flex-col min-h-screen transition-transform duration-250 ease-out bg-card"
-        :class="navigation.isSidebarOpen ? 'translate-x-[280px]' : 'translate-x-0'"
+        :class="navigation.isSidebarOpen ? '-translate-x-[280px]' : 'translate-x-0'"
       >
         <!-- Overlay to close sidebar when tapping pushed content -->
         <div

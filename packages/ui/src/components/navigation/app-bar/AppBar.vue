@@ -28,7 +28,7 @@ defineEmits<{
   <div
     data-slot="app-bar"
     :class="cn(
-      'flex h-14 items-center justify-between px-2 bg-card/80 backdrop-blur-lg border-b border-border/50',
+      'flex h-14 items-center justify-between px-4 bg-card/80 backdrop-blur-lg border-b border-border/50',
       props.class,
     )"
   >

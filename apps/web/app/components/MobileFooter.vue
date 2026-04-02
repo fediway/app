@@ -9,7 +9,8 @@ import {
   PhUser,
 } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
-import { Avatar, BottomNav, Button } from '@repo/ui';
+import { Avatar, BottomNav, Button, MessageInput } from '@repo/ui';
+import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { useMobileReplyTarget } from '~/composables/useMobileReplyTarget';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useTabNavigation } from '~/composables/useTabNavigation';
@@ -21,6 +22,7 @@ const { open: openComposer } = usePostComposer();
 const { activeTab, switchTab } = useTabNavigation();
 const { isAuthenticated, currentUser } = useAuth();
 const { replyTarget } = useMobileReplyTarget();
+const { chatTarget, chatMessage } = useMobileChatInput();
 const config = useRuntimeConfig();
 const defaultInstance = config.public.defaultInstance as string;
 
@@ -64,6 +66,12 @@ function handleReplyClick() {
   if (replyTarget.value)
     openComposer(replyTarget.value);
 }
+
+function handleChatSend() {
+  if (chatTarget.value && chatMessage.value.trim()) {
+    chatTarget.value.onSend(chatMessage.value);
+  }
+}
 </script>
 
 <template>
@@ -87,7 +95,19 @@ function handleReplyClick() {
       </Button>
     </div>
 
-    <!-- Logged in: reply bar on status detail, nav everywhere else -->
+    <!-- Chat input on conversation detail -->
+    <div
+      v-else-if="chatTarget"
+      class="rounded-full bg-card px-3 py-2 shadow-[0_2px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.4)]"
+    >
+      <MessageInput
+        v-model="chatMessage"
+        placeholder="Write a message..."
+        @send="handleChatSend"
+      />
+    </div>
+
+    <!-- Reply bar on status detail -->
     <button
       v-else-if="replyTarget"
       type="button"

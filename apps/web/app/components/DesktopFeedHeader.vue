@@ -50,16 +50,9 @@ function goBack() {
 
       <!-- Center group: optional image/icon + title/subtitle -->
       <div class="flex items-center gap-2.5">
-        <!-- Image (avatar, favicon) -->
-        <img
-          v-if="navigation.pageImage"
-          :src="navigation.pageImage"
-          alt=""
-          class="size-9 shrink-0 rounded-full object-cover"
-        >
         <!-- Icon — if set by page -->
         <div
-          v-else-if="navigation.pageIcon && iconMap[navigation.pageIcon]"
+          v-if="navigation.pageIcon && iconMap[navigation.pageIcon]"
           class="flex shrink-0 items-center justify-center"
         >
           <component :is="iconMap[navigation.pageIcon]" :size="30" weight="bold" :class="iconColorMap[navigation.pageIcon] || 'text-galaxy-500 dark:text-galaxy-400'" />

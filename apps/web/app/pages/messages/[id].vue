@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useAuth } from '@repo/api';
-import { EmptyState, MessageBubble, MessageInput, Skeleton, useToast } from '@repo/ui';
-import { computed, nextTick, ref, watch } from 'vue';
+import { EmptyState, MessageBubble, Skeleton, useToast } from '@repo/ui';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
+import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
-
-definePageMeta({ mobileFullscreen: true });
 
 const route = useRoute();
 const router = useRouter();
@@ -43,32 +42,44 @@ const allParticipantAccts = computed(() => {
   return accts;
 });
 
-const newMessage = ref('');
 const messagesContainer = ref<HTMLElement>();
 const isSending = ref(false);
+const { chatMessage, set: setChatTarget, clear: clearChatTarget } = useMobileChatInput();
 
-async function handleSend() {
-  const content = newMessage.value.trim();
-  if (!content || !participant.value)
+async function handleSend(content: string) {
+  if (!content.trim() || !participant.value)
     return;
 
   isSending.value = true;
-  newMessage.value = '';
+  const savedContent = content;
+  chatMessage.value = '';
 
   try {
     const lastMessageId = threadStatuses.value.at(-1)?.id;
-    await sendDirectMessage(participant.value.acct, content, lastMessageId);
+    await sendDirectMessage(participant.value.acct, content.trim(), lastMessageId);
     refetch();
   }
   catch {
-    // Restore message on failure
-    newMessage.value = content;
+    chatMessage.value = savedContent;
     toast.error('Failed to send message');
   }
   finally {
     isSending.value = false;
   }
 }
+
+watch(participant, (p) => {
+  if (p) {
+    setChatTarget({
+      participantAcct: p.acct,
+      onSend: handleSend,
+    });
+  }
+}, { immediate: true });
+
+onUnmounted(() => {
+  clearChatTarget();
+});
 
 function goBack() {
   router.push('/messages');
@@ -93,7 +104,7 @@ watch(() => threadStatuses.value.length, () => {
 </script>
 
 <template>
-  <div class="flex min-h-[calc(100dvh-3.5rem)] flex-col lg:min-h-[calc(100vh-32px)]">
+  <div class="flex min-h-0 flex-1 flex-col">
     <ClientOnly>
       <!-- Loading -->
       <div v-if="isLoading" class="flex-1 space-y-3 p-4">
@@ -120,16 +131,6 @@ watch(() => threadStatuses.value.length, () => {
             :content="formatMessageContent(status.content, allParticipantAccts)"
             :is-own="isOwnMessage(status)"
             :sent-at="status.createdAt"
-          />
-        </div>
-
-        <!-- Message Input — sticky at bottom -->
-        <div class="sticky bottom-0 border-t border-border bg-card px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:pb-3">
-          <MessageInput
-            v-model="newMessage"
-            placeholder="Write a message..."
-            :disabled="isSending"
-            @send="handleSend"
           />
         </div>
       </template>

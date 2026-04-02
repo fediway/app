@@ -139,6 +139,12 @@ export function useNavigationStore() {
 
   const showBack = computed(() => !isMenuPage.value);
 
+  const isProfilePage = computed(() => {
+    if (!currentUser.value)
+      return false;
+    return route.path === profileUrl.value;
+  });
+
   const pageTitle = computed(() => {
     if (pageHeaderOverride.value)
       return pageHeaderOverride.value.title;
@@ -172,6 +178,7 @@ export function useNavigationStore() {
     pageIcon,
     pageHeaderOverride,
     showBack,
+    isProfilePage,
     menuItems,
     mobileFooterItems,
     currentUser,

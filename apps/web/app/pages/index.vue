@@ -3,6 +3,7 @@ import type { MediaAttachment, Status } from '@repo/types';
 import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useAuth, useTimeline } from '@repo/api';
 import { Button, EmptyState, Skeleton, Status as StatusComponent, useInfiniteScroll, usePullToRefresh } from '@repo/ui';
+import { useFeedType } from '~/composables/useFeedType';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
@@ -24,14 +25,27 @@ function isOwnPost(status: Status): boolean {
   return !!currentUser.value && currentUser.value.id === acct;
 }
 
-// Authenticated → home timeline, unauthenticated → trending statuses
-const timeline = isAuthenticated.value ? useTimeline({ type: 'home', cache: true }) : null;
+// Feed type switching (authenticated users can pick; unauthenticated get trending only)
+const { feedType } = useFeedType();
+
+const homeTimeline = isAuthenticated.value ? useTimeline({ type: 'home', cache: true }) : null;
+const publicTimeline = isAuthenticated.value ? useTimeline({ type: 'public' }) : null;
 const { getTrendingStatuses } = useExploreData();
-const trending = !isAuthenticated.value ? getTrendingStatuses() : null;
+const trending = getTrendingStatuses();
+
+const activeTimeline = computed(() => {
+  if (!isAuthenticated.value)
+    return null;
+  if (feedType.value === 'home')
+    return homeTimeline;
+  if (feedType.value === 'explore')
+    return publicTimeline;
+  return null;
+});
 
 // Unified status list
-const isLoading = computed(() => timeline?.isLoading.value ?? trending?.isLoading.value ?? false);
-const errorValue = computed(() => timeline?.error.value ?? trending?.error.value ?? null);
+const isLoading = computed(() => activeTimeline.value?.isLoading.value ?? trending.isLoading.value ?? false);
+const errorValue = computed(() => activeTimeline.value?.error.value ?? trending.error.value ?? null);
 
 // Delayed skeleton gate — only show skeleton after 300ms to avoid flash
 const showSkeleton = ref(false);
@@ -57,9 +71,9 @@ function getReplyParent(status: Status): Status | null {
 }
 
 const rawStatuses = computed(() => {
-  if (timeline)
-    return timeline.statuses.value ?? [];
-  return trending?.data.value ?? [];
+  if (activeTimeline.value)
+    return activeTimeline.value.statuses.value ?? [];
+  return trending.data.value ?? [];
 });
 
 // Seed the store so action toggles (favourite, reblog, bookmark) work on first click
@@ -109,15 +123,16 @@ function handleTagClick(tag: string) {
 const isLoadingMore = ref(false);
 
 async function handleLoadMore() {
-  if (!timeline || isLoadingMore.value)
+  const tl = activeTimeline.value;
+  if (!tl || isLoadingMore.value)
     return;
   isLoadingMore.value = true;
-  await timeline.loadMore();
+  await tl.loadMore();
   isLoadingMore.value = false;
 }
 
 const { sentinelRef } = useInfiniteScroll({
-  enabled: computed(() => (timeline?.hasMore.value ?? false) && !isLoadingMore.value && !isLoading.value && !errorValue.value && allStatuses.value.length > 0),
+  enabled: computed(() => (activeTimeline.value?.hasMore.value ?? false) && !isLoadingMore.value && !isLoading.value && !errorValue.value && allStatuses.value.length > 0),
   onLoadMore: handleLoadMore,
 });
 
@@ -126,53 +141,62 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
 }
 
 function handleRetry() {
-  if (timeline) {
-    timeline.fetch();
+  if (activeTimeline.value) {
+    activeTimeline.value.fetch();
   }
   else {
-    trending?.refetch();
+    trending.refetch();
   }
 }
 
-// Fetch eagerly in setup — sets isLoading=true synchronously,
-// preventing flash-of-empty-state before first render
-if (timeline) {
-  timeline.fetch();
+// Fetch the active feed and switch on feed type change
+function fetchActiveFeed() {
+  const tl = activeTimeline.value;
+  if (tl) {
+    tl.fetch();
+    tl.startPolling(30_000);
+  }
 }
+
+// Fetch eagerly in setup
+fetchActiveFeed();
+
+// Re-fetch when feed type changes
+watch(feedType, () => {
+  homeTimeline?.stopPolling();
+  publicTimeline?.stopPolling();
+  fetchActiveFeed();
+});
 
 // Pull-to-refresh — only on touch devices, only for authenticated timeline
 const pullContainerRef = ref<HTMLElement>();
 const { isRefreshing, pullDistance, threshold, bind: bindPull } = usePullToRefresh(async () => {
-  if (timeline) {
-    await timeline.refresh();
+  if (activeTimeline.value) {
+    await activeTimeline.value.refresh();
   }
   else {
-    trending?.refetch();
+    trending.refetch();
   }
 });
 
 onMounted(() => {
-  if (timeline) {
-    timeline.startPolling(30_000);
-  }
   if (pullContainerRef.value) {
     bindPull(pullContainerRef.value);
   }
 });
 
-// KeepAlive lifecycle — pause/resume polling when tab switches
 onActivated(() => {
-  if (timeline) {
-    timeline.startPolling(30_000);
-  }
+  activeTimeline.value?.startPolling(30_000);
 });
 
 onDeactivated(() => {
-  timeline?.stopPolling();
+  homeTimeline?.stopPolling();
+  publicTimeline?.stopPolling();
 });
 
 onUnmounted(() => {
-  timeline?.stopPolling();
+  homeTimeline?.stopPolling();
+  publicTimeline?.stopPolling();
 });
 </script>
 
@@ -196,7 +220,7 @@ onUnmounted(() => {
     <ClientOnly>
       <div
         role="feed"
-        :aria-label="isAuthenticated ? 'Home timeline' : 'Trending posts'"
+        :aria-label="feedType === 'home' ? 'Home timeline' : feedType === 'explore' ? 'Explore' : 'Trending posts'"
         :aria-busy="showSkeleton && allStatuses.length === 0"
       >
         <Transition name="fade-content" mode="out-in">
@@ -237,13 +261,13 @@ onUnmounted(() => {
           <!-- Feed content -->
           <div v-else key="content">
             <!-- New posts banner (home timeline only) -->
-            <div v-if="timeline && timeline.newStatusCount.value > 0" role="status" class="flex justify-center py-2">
+            <div v-if="activeTimeline?.newStatusCount.value" role="status" class="flex justify-center py-2">
               <Button
                 variant="secondary"
                 size="sm"
-                @click="timeline.showNew()"
+                @click="activeTimeline!.showNew()"
               >
-                {{ timeline.newStatusCount.value }} new {{ timeline.newStatusCount.value === 1 ? 'post' : 'posts' }}
+                {{ activeTimeline!.newStatusCount.value }} new {{ activeTimeline!.newStatusCount.value === 1 ? 'post' : 'posts' }}
               </Button>
             </div>
 

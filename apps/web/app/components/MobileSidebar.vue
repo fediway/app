@@ -39,7 +39,7 @@ function handleOpenChange(open: boolean) {
 </script>
 
 <template>
-  <NavDrawer :open="navigation.isSidebarOpen" @update:open="handleOpenChange">
+  <NavDrawer :open="navigation.isSidebarOpen" side="right" @update:open="handleOpenChange">
     <template #header>
       <ClientOnly>
         <NavDrawerProfile
