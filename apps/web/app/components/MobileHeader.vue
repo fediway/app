@@ -90,7 +90,7 @@ function handleBack() {
         <!-- Own profile: burger menu on the right -->
         <Button
           v-if="navigation.isProfilePage"
-          variant="muted"
+          variant="ghost"
           size="icon"
           aria-label="Open menu"
           @click="navigation.openSidebar()"
@@ -101,7 +101,7 @@ function handleBack() {
         <!-- All other pages: notification bell -->
         <Button
           v-else
-          variant="muted"
+          variant="ghost"
           size="icon"
           aria-label="Notifications"
           @click="router.push('/notifications')"
