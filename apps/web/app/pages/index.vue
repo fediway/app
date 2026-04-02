@@ -136,12 +136,12 @@ async function handleLoadMore() {
   if (!tl || isLoadingMore.value || loadMoreCooldown.value)
     return;
   isLoadingMore.value = true;
-  const prevCount = tl.statuses.value.length;
+  const prevCount = tl.statuses.value?.length ?? 0;
   await tl.loadMore();
   isLoadingMore.value = false;
 
   // Cooldown prevents rapid re-triggering when sentinel stays visible
-  if (tl.statuses.value.length === prevCount) {
+  if ((tl.statuses.value?.length ?? 0) === prevCount) {
     loadMoreCooldown.value = true;
     setTimeout(() => {
       loadMoreCooldown.value = false;

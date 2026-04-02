@@ -35,6 +35,6 @@ export default defineNuxtRouteMiddleware((to) => {
   // Not authenticated → redirect to login
   if (!isAuthenticated.value) {
     const redirect = to.path !== '/' ? `?redirect=${encodeURIComponent(to.fullPath)}` : '';
-    return navigateTo(`/login${redirect}`);
+    return navigateTo(`/login${redirect}`, { replace: true });
   }
 });

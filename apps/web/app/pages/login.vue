@@ -90,7 +90,7 @@ async function handleDevLogin() {
   try {
     await login(normalizedUrl.value, accessToken.value.trim());
     setMode('live');
-    navigateTo(redirectTo.value);
+    navigateTo(redirectTo.value, { replace: true });
   }
   catch (err) {
     errorMessage.value = err instanceof Error ? err.message : 'Failed to authenticate';
@@ -102,7 +102,7 @@ async function handleDevLogin() {
 
 function handleMockMode() {
   setMode('mock');
-  navigateTo('/');
+  navigateTo('/', { replace: true });
 }
 
 function handleSubmit() {

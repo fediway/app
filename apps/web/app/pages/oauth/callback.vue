@@ -40,7 +40,7 @@ onMounted(async () => {
     sessionStorage.removeItem('fediway_login_redirect');
     // Validate redirect is a safe relative path (prevent open redirect)
     const redirect = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
-    navigateTo(redirect);
+    navigateTo(redirect, { replace: true });
   }
   catch (err) {
     errorMessage.value = err instanceof Error ? err.message : 'Authentication failed';
