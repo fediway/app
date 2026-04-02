@@ -117,15 +117,15 @@ function handleSubmit() {
   <Dialog :open="isOpen" @update:open="handleOpenChange">
     <DialogContent size="md" full-screen-mobile show-close>
       <DialogHeader class="px-6 pt-6 pb-4">
-        <DialogTitle>Feedback</DialogTitle>
-        <DialogDescription class="sr-only">
-          Share your thoughts with us
+        <DialogTitle>Early Access Feedback</DialogTitle>
+        <DialogDescription class="text-sm text-muted-foreground">
+          You're shaping what comes next.
         </DialogDescription>
       </DialogHeader>
 
       <form class="flex flex-col gap-5 px-6 pb-6" @submit.prevent="handleSubmit">
         <!-- Category pills -->
-        <div class="flex gap-2 mt-1">
+        <div class="flex gap-2 mt-4">
           <button
             v-for="cat in categories"
             :key="cat.value"

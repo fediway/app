@@ -237,9 +237,10 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
    * Load more (older) statuses.
    */
   async function loadMore() {
-    if (!hasMore.value || isLoading.value || error.value)
+    if (!hasMore.value || isLoading.value)
       return;
 
+    error.value = null;
     isLoading.value = true;
 
     try {

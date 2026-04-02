@@ -119,6 +119,12 @@ export const mockStatuses = [
   makeStatus('93', 'Hello from a remote instance!', mockRemoteAccount),
 ];
 
+export const mockStatusesPage2 = [
+  makeStatus('92', 'Page two starts here. Infinite scroll works!'),
+  makeStatus('91', 'Another post from page two.', mockAccount2),
+  makeStatus('90', 'Third post on page two. Keep scrolling.'),
+];
+
 export const mockNotifications = [
   { id: 'notif-1', type: 'favourite', createdAt: hour(1), account: mockAccount2, status: mockStatuses[0], groupKey: 'fav-1' },
   { id: 'notif-2', type: 'reblog', createdAt: hour(2), account: mockAccount2, status: mockStatuses[2], groupKey: 'reb-1' },

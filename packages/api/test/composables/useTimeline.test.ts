@@ -286,6 +286,117 @@ describe('useTimeline', () => {
     });
   });
 
+  describe('loadMore() with pagination', () => {
+    it('appends page 2 statuses when API returns enough for hasMore', async () => {
+      const { makeStatus } = await import('@repo/config/vitest/helpers');
+
+      // Page 1: exactly 20 statuses (triggers hasMore=true)
+      const page1 = Array.from({ length: 20 }, (_, i) => makeStatus(`p1-${i}`));
+      // Page 2: 5 statuses (triggers hasMore=false)
+      const page2 = Array.from({ length: 5 }, (_, i) => makeStatus(`p2-${i}`));
+
+      let callCount = 0;
+      mockClient.rest.v1.timelines.home.list = vi.fn(async () => {
+        callCount++;
+        return callCount === 1 ? page1 : page2;
+      }) as any;
+
+      const [timeline] = withSetup(() => useTimeline({ type: 'home' }));
+
+      // Fetch page 1
+      await timeline.fetch();
+      expect(timeline.statuses.value).toHaveLength(20);
+      expect(timeline.hasMore.value).toBe(true);
+      expect(timeline.error.value).toBeNull();
+
+      // Load page 2
+      await timeline.loadMore();
+      expect(timeline.statuses.value).toHaveLength(25);
+      expect(timeline.hasMore.value).toBe(false);
+      expect(timeline.error.value).toBeNull();
+
+      // Verify page 2 IDs are appended at the end
+      expect(timeline.statuses.value[20]!.id).toBe('p2-0');
+      expect(timeline.statuses.value[24]!.id).toBe('p2-4');
+    });
+
+    it('passes maxId to fetchTimeline for page 2', async () => {
+      const { makeStatus } = await import('@repo/config/vitest/helpers');
+
+      const page1 = Array.from({ length: 20 }, (_, i) => makeStatus(`s-${19 - i}`));
+      const listFn = vi.fn(async () => page1);
+      mockClient.rest.v1.timelines.home.list = listFn as any;
+
+      const [timeline] = withSetup(() => useTimeline({ type: 'home' }));
+      await timeline.fetch();
+
+      // Force hasMore and call loadMore
+      timeline.hasMore.value = true;
+      await timeline.loadMore();
+
+      // Second call should have maxId = last status ID from page 1
+      expect(listFn).toHaveBeenCalledTimes(2);
+      const secondCallParams = listFn.mock.calls[1]![0];
+      expect(secondCallParams.maxId).toBe('s-0');
+    });
+
+    it('dedup removes statuses already seen on page 1', async () => {
+      const { makeStatus } = await import('@repo/config/vitest/helpers');
+
+      const page1 = Array.from({ length: 20 }, (_, i) => makeStatus(`s-${i}`));
+      // Page 2 has 3 new + 2 duplicates from page 1
+      const page2 = [
+        makeStatus('new-1'),
+        makeStatus('s-18'), // dupe
+        makeStatus('new-2'),
+        makeStatus('s-19'), // dupe
+        makeStatus('new-3'),
+      ];
+
+      let callCount = 0;
+      mockClient.rest.v1.timelines.home.list = vi.fn(async () => {
+        callCount++;
+        return callCount === 1 ? page1 : page2;
+      }) as any;
+
+      const [timeline] = withSetup(() => useTimeline({ type: 'home' }));
+      await timeline.fetch();
+      await timeline.loadMore();
+
+      // 20 from page 1 + 3 new from page 2 (2 dupes filtered)
+      expect(timeline.statuses.value).toHaveLength(23);
+    });
+
+    it('loadMore sets error on fetch failure but allows retry', async () => {
+      const { makeStatus } = await import('@repo/config/vitest/helpers');
+
+      const page1 = Array.from({ length: 20 }, (_, i) => makeStatus(`s-${i}`));
+      let callCount = 0;
+      mockClient.rest.v1.timelines.home.list = vi.fn(async () => {
+        callCount++;
+        if (callCount === 1)
+          return page1;
+        if (callCount === 2)
+          throw new Error('Network error');
+        return [makeStatus('retry-1')];
+      }) as any;
+
+      const [timeline] = withSetup(() => useTimeline({ type: 'home' }));
+      await timeline.fetch();
+      expect(timeline.hasMore.value).toBe(true);
+
+      // First loadMore fails
+      await timeline.loadMore();
+      expect(timeline.error.value).toBeInstanceOf(Error);
+      expect(timeline.statuses.value).toHaveLength(20);
+
+      // Retry should work (error cleared)
+      await timeline.loadMore();
+      expect(timeline.error.value).toBeNull();
+      expect(timeline.statuses.value).toHaveLength(21);
+    });
+  });
+
   it('initialization does not throw when useClient would throw (SSR safety)', () => {
     // Simulate SSR: useClient throws because no client is initialized
     const origClient = mockClient;

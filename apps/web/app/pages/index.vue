@@ -70,10 +70,18 @@ function getReplyParent(status: Status): Status | null {
   return store.get(displayStatus.inReplyToId) ?? null;
 }
 
+const homeStatuses = computed(() => homeTimeline?.statuses.value ?? []);
+const publicStatuses = computed(() => publicTimeline?.statuses.value ?? []);
+const trendingStatuses = computed(() => trending.data.value ?? []);
+
 const rawStatuses = computed(() => {
-  if (activeTimeline.value)
-    return activeTimeline.value.statuses.value ?? [];
-  return trending.data.value ?? [];
+  if (!isAuthenticated.value)
+    return trendingStatuses.value;
+  if (feedType.value === 'home')
+    return homeStatuses.value;
+  if (feedType.value === 'explore')
+    return publicStatuses.value;
+  return trendingStatuses.value;
 });
 
 // Seed the store so action toggles (favourite, reblog, bookmark) work on first click
@@ -121,18 +129,28 @@ function handleTagClick(tag: string) {
 }
 
 const isLoadingMore = ref(false);
+const loadMoreCooldown = ref(false);
 
 async function handleLoadMore() {
   const tl = activeTimeline.value;
-  if (!tl || isLoadingMore.value)
+  if (!tl || isLoadingMore.value || loadMoreCooldown.value)
     return;
   isLoadingMore.value = true;
+  const prevCount = tl.statuses.value.length;
   await tl.loadMore();
   isLoadingMore.value = false;
+
+  // Cooldown prevents rapid re-triggering when sentinel stays visible
+  if (tl.statuses.value.length === prevCount) {
+    loadMoreCooldown.value = true;
+    setTimeout(() => {
+      loadMoreCooldown.value = false;
+    }, 2000);
+  }
 }
 
 const { sentinelRef } = useInfiniteScroll({
-  enabled: computed(() => (activeTimeline.value?.hasMore.value ?? false) && !isLoadingMore.value && !isLoading.value && !errorValue.value && allStatuses.value.length > 0),
+  enabled: computed(() => (activeTimeline.value?.hasMore.value ?? false) && !isLoadingMore.value && !loadMoreCooldown.value && !isLoading.value && !errorValue.value && allStatuses.value.length > 0),
   onLoadMore: handleLoadMore,
 });
 
@@ -261,7 +279,7 @@ onUnmounted(() => {
           <!-- Feed content -->
           <div v-else key="content">
             <!-- New posts banner (home timeline only) -->
-            <div v-if="activeTimeline?.newStatusCount.value" role="status" class="flex justify-center py-2">
+            <div v-if="activeTimeline?.newStatusCount.value" role="status" class="sticky top-14 z-10 flex justify-center py-2">
               <Button
                 variant="secondary"
                 size="sm"

@@ -17,7 +17,7 @@ const route = useRoute();
 const router = useRouter();
 const config = useRuntimeConfig();
 const { login, loginWithOAuth } = useAuth();
-const { setMode } = useDataMode();
+const { mode, setMode } = useDataMode();
 
 // The redirect destination after successful login (preserved from middleware)
 const redirectTo = computed(() => (route.query.redirect as string) || '/');
@@ -210,7 +210,6 @@ function handleSubmit() {
             />
           </InputGroup>
 
-          <!-- Sign in (primary navy) -->
           <Button
             type="submit"
             :disabled="!canSignIn"
@@ -220,8 +219,9 @@ function handleSubmit() {
             {{ isLoading ? 'Signing in…' : 'Sign in' }}
           </Button>
 
-          <!-- Mock data (secondary lavender) -->
+          <!-- Mock data — only visible in dev/mock mode -->
           <Button
+            v-if="mode === 'mock'"
             type="button"
             variant="secondary"
             class="mt-3 w-full"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhHeart, PhPlus } from '@phosphor-icons/vue';
+import { PhHeart, PhPlus, PhSparkle } from '@phosphor-icons/vue';
 import { Button, SideNav, SideNavItem, SideNavProfile } from '@repo/ui';
 import { useAuthState } from '~/composables/useAuthState';
 import { useFeedbackModal } from '~/composables/useFeedbackModal';
@@ -17,9 +17,13 @@ const defaultInstance = config.public.defaultInstance as string;
 <template>
   <!-- Logged out — just icon, tagline, sign in -->
   <div v-if="!isAuthenticated" class="flex flex-col px-4">
-    <p class="mb-6 text-2xl font-bold text-foreground">
+    <p class="mb-2 text-2xl font-bold text-foreground">
       Your feed, your way <PhHeart :size="22" weight="fill" class="inline-block align-text-bottom text-rose-400" />
     </p>
+    <span class="mt-2 mb-6 inline-flex items-center gap-1.5 text-xs font-medium text-galaxy-500 dark:text-galaxy-400">
+      <PhSparkle :size="12" weight="fill" />
+      Early Access
+    </span>
     <div class="flex gap-2 w-full">
       <Button as-child size="sm" class="flex-1">
         <a :href="`https://${defaultInstance}/auth/sign_up`" target="_blank" rel="noopener noreferrer">
@@ -51,6 +55,10 @@ const defaultInstance = config.public.defaultInstance as string;
           </div>
         </template>
       </ClientOnly>
+      <span class="inline-flex items-center gap-1.5 px-4 pb-1 text-xs font-medium text-galaxy-500 dark:text-galaxy-400">
+        <PhSparkle :size="12" weight="fill" />
+        Early Access
+      </span>
     </template>
 
     <template #action>

@@ -10,6 +10,7 @@ import {
   mockRelationship,
   mockRemoteAccount,
   mockStatuses,
+  mockStatusesPage2,
   mockSuggestions,
   mockTrendingLinks,
   mockTrendingTags,
@@ -33,10 +34,14 @@ export async function setupMockApi(page: Page) {
     if (url.includes('/api/v1/trends/links'))
       return route.fulfill({ json: mockTrendingLinks });
 
-    if (url.includes('/api/v1/timelines/home'))
-      return route.fulfill({ json: mockStatuses });
-    if (url.includes('/api/v1/timelines/public'))
-      return route.fulfill({ json: mockStatuses });
+    if (url.includes('/api/v1/timelines/home')) {
+      const hasMaxId = url.includes('max_id=') || url.includes('maxId=');
+      return route.fulfill({ json: hasMaxId ? mockStatusesPage2 : mockStatuses });
+    }
+    if (url.includes('/api/v1/timelines/public')) {
+      const hasMaxId = url.includes('max_id=') || url.includes('maxId=');
+      return route.fulfill({ json: hasMaxId ? mockStatusesPage2 : mockStatuses });
+    }
     if (url.includes('/api/v1/timelines/tag/'))
       return route.fulfill({ json: mockStatuses.slice(0, 3) });
 
