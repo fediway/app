@@ -141,6 +141,7 @@ function handleStatusClick(event: MouseEvent) {
               :spoiler-text="replyParent.spoilerText"
               :emojis="replyParent.emojis"
               :mentions="replyParent.mentions"
+              :max-lines="4"
               @mention-click="emit('profileClick', $event)"
               @hashtag-click="emit('tagClick', $event)"
             />
@@ -199,6 +200,7 @@ function handleStatusClick(event: MouseEvent) {
               :spoiler-text="displayStatus.spoilerText"
               :emojis="displayStatus.emojis"
               :mentions="displayStatus.mentions"
+              :max-lines="8"
               @mention-click="emit('profileClick', $event)"
               @hashtag-click="emit('tagClick', $event)"
             />

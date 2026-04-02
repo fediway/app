@@ -19,7 +19,7 @@
     </nav>
 
     <!-- Footer -->
-    <div v-if="$slots.footer" class="mt-auto">
+    <div v-if="$slots.footer" class="mt-auto px-2">
       <slot name="footer" />
     </div>
   </div>

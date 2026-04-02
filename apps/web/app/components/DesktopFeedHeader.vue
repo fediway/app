@@ -57,17 +57,9 @@ function goBack() {
         >
           <component :is="iconMap[navigation.pageIcon]" :size="30" weight="bold" :class="iconColorMap[navigation.pageIcon] || 'text-galaxy-500 dark:text-galaxy-400'" />
         </div>
-        <!-- App icon on top-level pages (Home, Explore) -->
-        <template v-else-if="['home', 'explore'].includes(navigation.activeItemId)">
-          <img
-            src="/images/app-icon-transparent.svg"
-            alt="Fediway"
-            class="size-10 shrink-0"
-          >
-        </template>
 
         <!-- Title + subtitle — show when page sets a header override, or on non-tab pages -->
-        <div v-if="navigation.pageHeaderOverride || !['home', 'explore'].includes(navigation.activeItemId)" class="text-center" :class="{ 'text-left': navigation.pageImage || navigation.pageIcon }">
+        <div class="text-center" :class="{ 'text-left': navigation.pageIcon }">
           <h1 class="text-base font-bold leading-tight">
             {{ navigation.pageTitle }}
           </h1>

@@ -15,6 +15,8 @@ interface Props {
   mentions?: StatusMention[];
   /** Whether content is collapsed behind CW */
   collapsed?: boolean;
+  /** Max lines before "Show more" truncation (0 = no limit) */
+  maxLines?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   emojis: () => [],
   mentions: () => [],
   collapsed: false,
+  maxLines: 0,
 });
 
 const emit = defineEmits<{
@@ -32,6 +35,18 @@ const emit = defineEmits<{
 
 const hasSpoiler = computed(() => props.spoilerText.length > 0);
 const isCollapsed = ref(props.collapsed || hasSpoiler.value);
+const isTruncated = ref(props.maxLines > 0);
+const contentRef = ref<HTMLElement>();
+
+// Detect if content actually overflows the line clamp
+function checkOverflow() {
+  const el = contentRef.value;
+  if (!el || !props.maxLines)
+    return;
+  isTruncated.value = el.scrollHeight > el.clientHeight;
+}
+
+const isExpanded = ref(false);
 
 watch(() => props.collapsed, (val) => {
   isCollapsed.value = val;
@@ -69,14 +84,28 @@ function toggleCollapse() {
       v-show="!hasSpoiler || !isCollapsed"
       :class="{ 'mt-2': hasSpoiler }"
     >
-      <RichText
-        :content="content"
-        :emojis="emojis"
-        :mentions="mentions"
-        class="text-foreground"
-        @mention-click="emit('mentionClick', $event)"
-        @hashtag-click="emit('hashtagClick', $event)"
-      />
+      <div
+        ref="contentRef"
+        :style="maxLines && !isExpanded ? { display: '-webkit-box', WebkitLineClamp: maxLines, WebkitBoxOrient: 'vertical', overflow: 'hidden' } : undefined"
+      >
+        <RichText
+          :content="content"
+          :emojis="emojis"
+          :mentions="mentions"
+          class="text-foreground"
+          @mention-click="emit('mentionClick', $event)"
+          @hashtag-click="emit('hashtagClick', $event)"
+          @vue:mounted="checkOverflow"
+        />
+      </div>
+      <button
+        v-if="maxLines && isTruncated && !isExpanded"
+        type="button"
+        class="mt-1 text-sm font-semibold text-galaxy-500 dark:text-galaxy-400 cursor-pointer"
+        @click.stop="isExpanded = true"
+      >
+        Show more
+      </button>
     </div>
   </div>
 </template>

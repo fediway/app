@@ -15,6 +15,7 @@ import {
   PhPencilSimple,
   PhPlusSquare,
   PhShareNetwork,
+  PhSparkle,
   PhUser,
   PhX,
 } from '@phosphor-icons/vue';
@@ -49,6 +50,7 @@ const iconMap: Record<string, any> = {
   'compose': PhPencilSimple,
   'share': PhShareNetwork,
   'filter': PhFunnel,
+  'feedback': PhSparkle,
 };
 
 const icon = computed(() => iconMap[props.name]);

@@ -17,7 +17,8 @@ export type NavIconName
     | 'more'
     | 'compose'
     | 'share'
-    | 'filter';
+    | 'filter'
+    | 'feedback';
 
 export interface NavMenuItem {
   id: string;
