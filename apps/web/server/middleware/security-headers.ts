@@ -1,21 +1,11 @@
-// eslint-disable-next-line node/prefer-global/process
-const extraMediaHosts = (process.env.EXTRA_MEDIA_HOSTS || '')
-  .split(',')
-  .map(h => h.trim())
-  .filter(Boolean);
-
-const imgSrc = ['\'self\'', 'https:', 'data:', 'blob:', ...extraMediaHosts].join(' ');
-const mediaSrc = ['\'self\'', 'https:', 'data:', ...extraMediaHosts].join(' ');
-const connectSrc = ['\'self\'', 'https:', 'wss:'].join(' ');
-
 const csp = [
   'default-src \'none\'',
   'script-src \'self\' \'wasm-unsafe-eval\'',
   'style-src \'self\' \'unsafe-inline\'',
-  `img-src ${imgSrc}`,
-  `media-src ${mediaSrc}`,
+  'img-src \'self\' https: data: blob:',
+  'media-src \'self\' https: data:',
   'font-src \'self\'',
-  `connect-src ${connectSrc}`,
+  'connect-src \'self\' https: wss:',
   'manifest-src \'self\'',
   'base-uri \'self\'',
   'form-action \'self\'',
