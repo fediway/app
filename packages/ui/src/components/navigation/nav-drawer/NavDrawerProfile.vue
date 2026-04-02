@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatCount } from '../../../utils/format';
 import Avatar from '../../ui/avatar/Avatar.vue';
 
 defineProps<{
@@ -47,7 +48,7 @@ defineEmits<{
           class="flex cursor-pointer items-baseline gap-1 text-sm transition-colors hover:text-foreground"
           @click="$emit('statClick', 'followers')"
         >
-          <span class="font-bold text-foreground">{{ followersCount.toLocaleString() }}</span>
+          <span class="font-bold text-foreground">{{ formatCount(followersCount) }}</span>
           <span class="text-muted-foreground">Followers</span>
         </button>
         <button
@@ -56,7 +57,7 @@ defineEmits<{
           class="flex cursor-pointer items-baseline gap-1 text-sm transition-colors hover:text-foreground"
           @click="$emit('statClick', 'following')"
         >
-          <span class="font-bold text-foreground">{{ followingCount.toLocaleString() }}</span>
+          <span class="font-bold text-foreground">{{ formatCount(followingCount) }}</span>
           <span class="text-muted-foreground">Following</span>
         </button>
       </div>

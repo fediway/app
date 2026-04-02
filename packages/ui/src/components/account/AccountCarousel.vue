@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { formatCount } from '../../utils/format';
 import Avatar from '../ui/avatar/Avatar.vue';
 import AccountDisplayName from './AccountDisplayName.vue';
 import AccountHandle from './AccountHandle.vue';
@@ -46,7 +47,7 @@ defineEmits<{
               class="block w-full truncate text-xs"
             />
             <div class="mb-3 mt-1 text-xs text-muted-foreground/60">
-              {{ account.followersCount?.toLocaleString() }} followers
+              {{ account.followersCount != null ? formatCount(account.followersCount) : 0 }} followers
             </div>
             <!-- Action slot for follow button -->
             <slot name="action" :account="account" />

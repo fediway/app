@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { formatCount } from '../../../utils/format';
 
 const props = defineProps<{
   count: number;
@@ -9,13 +10,8 @@ const props = defineProps<{
 const direction = ref<'up' | 'down'>('up');
 const displayCount = ref(props.count);
 
-const defaultFormatter = new Intl.NumberFormat('en', {
-  notation: 'compact',
-  maximumFractionDigits: 1,
-});
-
 function format(n: number): string {
-  return props.formatter ? props.formatter(n) : defaultFormatter.format(n);
+  return props.formatter ? props.formatter(n) : formatCount(n);
 }
 
 watch(() => props.count, (newVal, oldVal) => {

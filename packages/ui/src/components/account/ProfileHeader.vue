@@ -38,7 +38,7 @@ withDefaults(defineProps<Props>(), {
     <!-- Content below banner -->
     <div class="flex items-start justify-between px-5">
       <!-- Profile Avatar -->
-      <div class="-mt-[50px] relative z-10">
+      <div class="-mt-[50px] -ml-1.5 relative z-10">
         <Avatar
           :src="avatarSrc"
           :alt="avatarAlt"

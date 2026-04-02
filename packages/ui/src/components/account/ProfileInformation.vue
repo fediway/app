@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { computed } from 'vue';
+import { formatCount } from '../../utils/format';
 import { Badge } from '../ui/badge';
 import { RichText } from '../ui/rich-text';
 
@@ -56,9 +57,9 @@ function extractText(html: string): string {
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 px-5">
+  <div class="flex flex-col gap-3 px-5 pt-1">
     <!-- Display Name + Handle -->
-    <div class="flex flex-col gap-0.5">
+    <div class="flex flex-col">
       <p class="text-xl font-bold leading-normal text-foreground">
         {{ account.displayName || account.username }}
       </p>
@@ -76,8 +77,8 @@ function extractText(html: string): string {
         class="flex cursor-pointer items-baseline gap-[3px] rounded-sm transition-colors hover:text-foreground"
         @click="emit('statClick', stat.key)"
       >
-        <span class="text-base font-bold text-foreground">{{ stat.count.toLocaleString() }}</span>
-        <span class="text-sm text-muted-foreground">{{ stat.label }}</span>
+        <span class="text-base font-bold text-foreground">{{ formatCount(stat.count) }}</span>
+        <span class="text-base text-muted-foreground">{{ stat.label }}</span>
       </button>
     </div>
 
