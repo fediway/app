@@ -52,7 +52,7 @@ const cleanedContent = useCleanContent(
         @click="emit('profileClick', status.account.acct)"
       >
         <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="md" />
-        <div class="text-left">
+        <div class="text-left leading-tight">
           <AccountDisplayName
             :name="status.account.displayName || status.account.username"
             :emojis="status.account.emojis"
