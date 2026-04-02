@@ -42,7 +42,21 @@ function handleBack() {
     class="sticky top-0 left-0 right-0 z-[100] transition-transform duration-300 ease-out"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
+    <!-- Own profile: transparent header, floating burger only (negative margin so it overlays content) -->
+    <div v-if="navigation.isProfilePage" class="flex h-14 -mb-14 items-center justify-end px-4">
+      <button
+        type="button"
+        class="flex size-10 items-center justify-center rounded-full bg-card/80 backdrop-blur-lg shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] cursor-pointer text-foreground"
+        aria-label="Open menu"
+        @click="navigation.openSidebar()"
+      >
+        <PhList :size="22" />
+      </button>
+    </div>
+
+    <!-- All other pages: standard AppBar -->
     <AppBar
+      v-else
       :title="!isHome && !navigation.pageSubtitle ? navigation.pageTitle : undefined"
       :left-icon="navigation.showBack ? 'back' : undefined"
       :left-label="navigation.showBack ? 'Go back' : undefined"
@@ -87,20 +101,7 @@ function handleBack() {
       </template>
 
       <template #trailing>
-        <!-- Own profile: burger menu on the right -->
         <Button
-          v-if="navigation.isProfilePage"
-          variant="ghost"
-          size="icon"
-          aria-label="Open menu"
-          @click="navigation.openSidebar()"
-        >
-          <PhList :size="24" />
-        </Button>
-
-        <!-- All other pages: notification bell -->
-        <Button
-          v-else
           variant="ghost"
           size="icon"
           aria-label="Notifications"
