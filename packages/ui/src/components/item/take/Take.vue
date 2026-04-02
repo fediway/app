@@ -80,7 +80,7 @@ const emit = defineEmits<{
         </p>
 
         <!-- Content -->
-        <p v-if="content" class="mt-1 text-base text-foreground leading-[22px]">
+        <p v-if="content" class="mt-1 font-content text-base text-foreground leading-[22px]">
           {{ content }}
         </p>
 

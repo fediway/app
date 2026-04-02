@@ -224,7 +224,7 @@ function removeImage() {
               ref="textareaEl"
               v-model="content"
               :placeholder="showContentWarning ? 'Write the content behind the warning...' : 'What\'s on your mind?'"
-              class="w-full flex-1 resize-none border-none bg-transparent text-[17px] leading-relaxed text-gray-900 outline-hidden placeholder-gray-400 dark:text-gray-100"
+              class="w-full flex-1 resize-none border-none bg-transparent font-content text-[17px] leading-relaxed text-gray-900 outline-hidden placeholder-gray-400 dark:text-gray-100"
               style="min-height: 150px"
               aria-label="Post content"
               aria-describedby="char-count"

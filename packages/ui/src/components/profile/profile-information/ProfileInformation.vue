@@ -32,7 +32,7 @@ withDefaults(defineProps<Props>(), {
     <!-- Bio -->
     <p
       v-if="bio"
-      class="text-base text-foreground leading-[22px]"
+      class="font-content text-base text-foreground leading-[22px]"
     >
       {{ bio }}
     </p>

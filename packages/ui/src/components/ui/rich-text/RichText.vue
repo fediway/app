@@ -88,7 +88,7 @@ function handleContentClick(e: MouseEvent) {
 
 <template>
   <div
-    class="rich-text leading-snug break-words"
+    class="rich-text font-content leading-snug break-words"
     @click="handleContentClick"
     v-html="processedContent"
   />

@@ -258,7 +258,7 @@ const editor = useEditor({
   ],
   editorProps: {
     attributes: {
-      'class': 'min-h-[150px] w-full text-lg leading-relaxed text-foreground outline-none',
+      'class': 'min-h-[150px] w-full font-content text-lg leading-relaxed text-foreground outline-none',
       'role': 'textbox',
       'aria-multiline': 'true',
       'aria-label': props.placeholder,

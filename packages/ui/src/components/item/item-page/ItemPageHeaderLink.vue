@@ -70,7 +70,7 @@ const domain = computed(() => {
     </h1>
 
     <!-- Description -->
-    <p v-if="item.description" class="px-4 mt-1.5 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+    <p v-if="item.description" class="px-4 mt-1.5 font-content text-sm leading-relaxed text-muted-foreground line-clamp-3">
       {{ item.description }}
     </p>
 
