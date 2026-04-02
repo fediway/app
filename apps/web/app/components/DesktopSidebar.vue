@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhPlus } from '@phosphor-icons/vue';
+import { PhHeart, PhPlus } from '@phosphor-icons/vue';
 import { Button, SideNav, SideNavItem, SideNavProfile } from '@repo/ui';
 import { useAuthState } from '~/composables/useAuthState';
 import { useFeedbackModal } from '~/composables/useFeedbackModal';
@@ -10,20 +10,28 @@ const { isAuthenticated } = useAuthState();
 const navigation = useNavigationStore();
 const { open: openComposer } = usePostComposer();
 const { open: openFeedback } = useFeedbackModal();
+const config = useRuntimeConfig();
+const defaultInstance = config.public.defaultInstance as string;
 </script>
 
 <template>
   <!-- Logged out — just icon, tagline, sign in -->
-  <div v-if="!isAuthenticated" class="flex flex-col items-start px-4 pt-14">
-    <img src="/images/app-icon-transparent.svg" alt="Fediway" class="size-10 mb-4">
-    <p class="text-sm text-muted-foreground mb-6">
-      Social media as it should be
+  <div v-if="!isAuthenticated" class="flex flex-col px-4">
+    <p class="mb-6 text-2xl font-bold text-foreground">
+      Your feed, your way <PhHeart :size="22" weight="fill" class="inline-block align-text-bottom text-rose-400" />
     </p>
-    <Button as-child class="w-full py-3 text-base">
-      <NuxtLink to="/login">
-        Sign in
-      </NuxtLink>
-    </Button>
+    <div class="flex gap-2 w-full">
+      <Button as-child size="sm" class="flex-1">
+        <a :href="`https://${defaultInstance}/auth/sign_up`" target="_blank" rel="noopener noreferrer">
+          Create account
+        </a>
+      </Button>
+      <Button as-child variant="secondary" size="sm" class="flex-1">
+        <NuxtLink to="/login">
+          Sign in
+        </NuxtLink>
+      </Button>
+    </div>
   </div>
 
   <!-- Logged in — full navigation -->

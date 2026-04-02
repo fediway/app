@@ -57,7 +57,7 @@ function goBack() {
         >
           <component :is="iconMap[navigation.pageIcon]" :size="30" weight="bold" :class="iconColorMap[navigation.pageIcon] || 'text-galaxy-500 dark:text-galaxy-400'" />
         </div>
-        <!-- App icon only — on top-level pages (Home, Explore) -->
+        <!-- App icon on top-level pages (Home, Explore) -->
         <template v-else-if="['home', 'explore'].includes(navigation.activeItemId)">
           <img
             src="/images/app-icon-transparent.svg"
