@@ -3,8 +3,9 @@ import type { MediaAttachment, Status } from '@repo/types';
 import { useAuth } from '@repo/api';
 import { EmptyState, PageHeader, QuickReply, Skeleton, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
+import { useMobileReplyTarget } from '~/composables/useMobileReplyTarget';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
@@ -22,6 +23,7 @@ const { open: openSendMessage } = useSendMessageModal();
 const { currentUser, isAuthenticated } = useAuth();
 const { addPost } = usePosts();
 const isDesktop = useMediaQuery('(min-width: 1024px)');
+const { set: setReplyTarget, clear: clearReplyTarget } = useMobileReplyTarget();
 
 const statusId = computed(() => route.params.id as string);
 
@@ -43,6 +45,16 @@ watch(() => context.value.descendants, (descendants) => {
 const isOwnPost = computed(() =>
   !!currentUser.value && !!status.value && currentUser.value.id === status.value.account.id,
 );
+
+// Set mobile footer reply target when the focused status is available
+watch(status, (s) => {
+  if (s)
+    setReplyTarget(s as Status);
+}, { immediate: true });
+
+onUnmounted(() => {
+  clearReplyTarget();
+});
 
 // Set the desktop header — show post author info
 usePageHeader({
@@ -250,15 +262,14 @@ function getReplyParent(reply: Status, index?: number): Status | null {
           @view-favourites="id => router.push(`${route.path}/favourites`)"
         />
 
-        <!-- Quick Reply -->
+        <!-- Quick Reply (desktop only — mobile uses the bottom nav reply bar) -->
         <QuickReply
-          v-if="isAuthenticated"
+          v-if="isAuthenticated && isDesktop"
           :avatar-src="currentUser?.avatar"
           :avatar-alt="currentUser?.displayName || currentUser?.username"
           :reply-to-acct="status.account.acct"
           :disabled="isQuickReplying"
           :submitting="isQuickReplying"
-          :expand-only="!isDesktop"
           @submit="handleQuickReply"
           @expand="handleExpandComposer"
         />

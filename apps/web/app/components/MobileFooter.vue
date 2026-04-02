@@ -9,7 +9,8 @@ import {
   PhUser,
 } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
-import { BottomNav, Button } from '@repo/ui';
+import { Avatar, BottomNav, Button } from '@repo/ui';
+import { useMobileReplyTarget } from '~/composables/useMobileReplyTarget';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useTabNavigation } from '~/composables/useTabNavigation';
 import { useNavigationStore } from '~/stores/navigation';
@@ -18,7 +19,8 @@ const router = useRouter();
 const navigation = useNavigationStore();
 const { open: openComposer } = usePostComposer();
 const { activeTab, switchTab } = useTabNavigation();
-const { isAuthenticated } = useAuth();
+const { isAuthenticated, currentUser } = useAuth();
+const { replyTarget } = useMobileReplyTarget();
 const config = useRuntimeConfig();
 const defaultInstance = config.public.defaultInstance as string;
 
@@ -51,6 +53,17 @@ function handleItemClick(item: BottomNavItemType) {
     switchTab(item.id as any, path => router.push(path));
   }
 }
+
+const replyPlaceholder = computed(() =>
+  replyTarget.value
+    ? `Reply to @${replyTarget.value.account.acct}...`
+    : 'Write a reply...',
+);
+
+function handleReplyClick() {
+  if (replyTarget.value)
+    openComposer(replyTarget.value);
+}
 </script>
 
 <template>
@@ -74,7 +87,22 @@ function handleItemClick(item: BottomNavItemType) {
       </Button>
     </div>
 
-    <!-- Logged in: full navigation -->
+    <!-- Logged in: reply bar on status detail, nav everywhere else -->
+    <button
+      v-else-if="replyTarget"
+      type="button"
+      class="flex w-full items-center gap-3 rounded-full bg-card px-4 py-3 shadow-[0_2px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.4)] cursor-text"
+      @click="handleReplyClick"
+    >
+      <Avatar
+        :src="currentUser?.avatar"
+        :alt="currentUser?.displayName || currentUser?.username"
+        size="sm"
+        class="shrink-0"
+      />
+      <span class="flex-1 text-left text-base text-muted-foreground truncate">{{ replyPlaceholder }}</span>
+    </button>
+
     <nav v-else aria-label="Tab navigation">
       <BottomNav
         :items="navItems"
