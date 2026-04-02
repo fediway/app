@@ -1,6 +1,6 @@
 const csp = [
   'default-src \'none\'',
-  'script-src \'self\' \'wasm-unsafe-eval\'',
+  'script-src \'self\' \'unsafe-inline\' \'wasm-unsafe-eval\'',
   'style-src \'self\' \'unsafe-inline\'',
   'img-src \'self\' https: data: blob:',
   'media-src \'self\' https: data:',
