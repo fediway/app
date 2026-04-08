@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BottomNavItemType } from '@repo/ui';
 import type { Component } from 'vue';
+import type { TabId } from '~/composables/useTabNavigation';
 import {
   PhChatCircle,
   PhHouse,
@@ -52,7 +53,7 @@ function handleItemClick(item: BottomNavItemType) {
     return;
   }
   if (item.id) {
-    switchTab(item.id as any, path => router.push(path));
+    switchTab(item.id as TabId, path => router.push(path));
   }
 }
 

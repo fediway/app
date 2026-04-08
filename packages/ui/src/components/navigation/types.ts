@@ -23,7 +23,7 @@ export type NavIconName
 export interface NavMenuItem {
   id: string;
   label: string;
-  icon: string;
+  icon: NavIconName;
   to: string;
 }
 

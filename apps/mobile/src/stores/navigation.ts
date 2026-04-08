@@ -1,3 +1,4 @@
+import type { NavIconName } from '@repo/ui';
 import { useAuth } from '@repo/api';
 import { computed, onScopeDispose, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -5,7 +6,7 @@ import { useRoute } from 'vue-router';
 export interface MenuItem {
   id: string;
   label: string;
-  icon: string;
+  icon: NavIconName;
   to: string;
 }
 

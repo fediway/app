@@ -51,11 +51,11 @@ function isValidPayload(body: unknown): boolean {
 
   const b = body as Record<string, unknown>;
 
-  if (!VALID_CATEGORIES.includes(b.category as any))
+  if (typeof b.category !== 'string' || !VALID_CATEGORIES.includes(b.category as typeof VALID_CATEGORIES[number]))
     return false;
   if (typeof b.description !== 'string' || !b.description.trim() || b.description.length > MAX_DESCRIPTION_LENGTH)
     return false;
-  if (b.frequency !== undefined && !VALID_FREQUENCIES.includes(b.frequency as any))
+  if (b.frequency !== undefined && (typeof b.frequency !== 'string' || !VALID_FREQUENCIES.includes(b.frequency as typeof VALID_FREQUENCIES[number])))
     return false;
   if (!b.context || typeof b.context !== 'object')
     return false;
@@ -156,7 +156,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Missing data field' });
   }
 
-  let body: any;
+  let body: Record<string, unknown>;
   try {
     body = JSON.parse(dataStr);
   }
@@ -168,9 +168,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid feedback payload' });
   }
 
-  const title = formatTitle(body);
-  let description = formatDescription(body);
-  const { priority } = getCategoryMeta(body.category);
+  const validated = body as Record<string, any>;
+  const title = formatTitle(validated);
+  let description = formatDescription(validated);
+  const { priority } = getCategoryMeta(validated.category);
 
   // Process screenshot: downscale and embed as base64
   if (screenshot && screenshot instanceof File && screenshot.size > 0) {
@@ -182,7 +183,7 @@ export default defineEventHandler(async (event) => {
   const url = `${config.feedbackKaneoBaseUrl}/api/task/${config.feedbackKaneoProjectId}`;
 
   try {
-    const response = await $fetch(url, {
+    const response = await $fetch<{ id?: string }>(url, {
       method: 'POST',
       headers: {
         'x-api-key': config.feedbackKaneoApiKey,
@@ -191,11 +192,11 @@ export default defineEventHandler(async (event) => {
       body: { title, description, priority, status: 'to-do' },
     });
 
-    const id = (response as any)?.id ?? null;
-    return { success: true, id };
+    return { success: true, id: response?.id ?? null };
   }
-  catch (err: any) {
-    console.error('[feedback] Kaneo error:', err.message || err);
+  catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[feedback] Kaneo error:', message);
     throw createError({ statusCode: 502, statusMessage: 'Failed to store feedback' });
   }
 });

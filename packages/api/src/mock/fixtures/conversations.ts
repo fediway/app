@@ -1,4 +1,4 @@
-import type { Conversation } from '@repo/types';
+import type { Conversation, Status } from '@repo/types';
 import { emilyAccount, janeAccount, marcusAccount, sarahAccount } from './accounts';
 
 function createConversation(
@@ -9,38 +9,36 @@ function createConversation(
   unread: boolean,
   lastStatusAuthor?: typeof janeAccount,
 ): Conversation {
-  const author = lastStatusAuthor ?? accounts[0];
-  return {
-    id,
-    accounts,
-    unread,
-    lastStatus: {
-      id: `dm-status-${id}`,
-      createdAt: lastStatusDate,
-      content: `<p>${lastStatusContent}</p>`,
-      visibility: 'direct',
-      sensitive: false,
-      spoilerText: '',
-      uri: `https://social.network/statuses/dm-${id}`,
-      url: `https://social.network/@${author?.username}/dm-${id}`,
-      repliesCount: 0,
-      reblogsCount: 0,
-      favouritesCount: 0,
-      favourited: false,
-      reblogged: false,
-      bookmarked: false,
-      muted: false,
-      pinned: false,
-      account: author,
-      mediaAttachments: [],
-      mentions: [],
-      tags: [],
-      emojis: [],
-      application: null,
-      language: 'en',
-      editedAt: null,
-    } as any,
+  const author = lastStatusAuthor ?? accounts[0]!;
+  const lastStatus: Status = {
+    id: `dm-status-${id}`,
+    createdAt: lastStatusDate,
+    editedAt: null,
+    content: `<p>${lastStatusContent}</p>`,
+    visibility: 'direct',
+    sensitive: false,
+    spoilerText: '',
+    uri: `https://social.network/statuses/dm-${id}`,
+    url: `https://social.network/@${author?.username}/dm-${id}`,
+    repliesCount: 0,
+    reblogsCount: 0,
+    favouritesCount: 0,
+    quotesCount: 0,
+    quoteApproval: { automatic: [], manual: [], currentUser: 'unknown' },
+    favourited: false,
+    reblogged: false,
+    bookmarked: false,
+    muted: false,
+    pinned: false,
+    account: author,
+    application: { name: 'Fediway' },
+    mediaAttachments: [],
+    mentions: [],
+    tags: [],
+    emojis: [],
+    language: 'en',
   };
+  return { id, accounts, unread, lastStatus };
 }
 
 export const mockConversations: Conversation[] = [

@@ -295,7 +295,7 @@ export function useTimeline(options: TimelineOptions): UseTimelineReturn {
       }
     }
     catch {
-      // Poll errors are silent — don't set error ref
+      // Transient poll failures (network blips, CORS) are expected — don't surface to user
     }
   }
 

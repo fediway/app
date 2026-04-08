@@ -1,9 +1,10 @@
+import type { NavIconName } from '@repo/ui';
 import { useAuth, useNotificationMarker } from '@repo/api';
 
 export interface MenuItem {
   id: string;
   label: string;
-  icon: string;
+  icon: NavIconName;
   to: string;
   dot?: boolean;
 }

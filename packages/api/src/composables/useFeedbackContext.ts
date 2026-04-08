@@ -46,6 +46,14 @@ declare global {
   interface Window {
     __FEDIWAY_LAST_ERRORS__?: Array<{ message: string; timestamp: number }>;
   }
+
+  interface NavigatorNetworkInformation {
+    readonly effectiveType?: string;
+  }
+
+  interface Navigator {
+    readonly connection?: NavigatorNetworkInformation;
+  }
 }
 
 export function useFeedbackContext() {
@@ -55,7 +63,7 @@ export function useFeedbackContext() {
   function collectContext(route: RouteInfo, options?: CollectContextOptions): FeedbackContext {
     const isBrowser = typeof window !== 'undefined';
 
-    const connection = isBrowser ? (navigator as any).connection : undefined;
+    const connection = isBrowser ? navigator.connection : undefined;
 
     return {
       app: {

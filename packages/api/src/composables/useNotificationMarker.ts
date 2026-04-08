@@ -1,3 +1,4 @@
+import type { mastodon } from 'masto';
 import type { ComputedRef, Ref } from 'vue';
 import { computed, ref } from 'vue';
 import { getActiveAccountKeySync } from '../auth/account-store';
@@ -79,9 +80,7 @@ export function useNotificationMarker(): UseNotificationMarkerReturn {
       ]);
 
       if (markerResult?.notifications) {
-        state.lastReadId.value = (markerResult.notifications as any).lastReadId
-          ?? (markerResult.notifications as any).last_read_id
-          ?? null;
+        state.lastReadId.value = markerResult.notifications.lastReadId ?? null;
       }
 
       if (notifications.length > 0) {
@@ -122,9 +121,10 @@ export function useNotificationMarker(): UseNotificationMarkerReturn {
 
     try {
       const client = useClient();
-      await client.rest.v1.markers.create({
+      const params: mastodon.rest.v1.CreateMarkersParams = {
         notifications: { lastReadId: newest },
-      } as any);
+      };
+      await client.rest.v1.markers.create(params);
     }
     catch {
       // Marker update failed. Local state is still updated (optimistic).

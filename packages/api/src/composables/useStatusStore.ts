@@ -19,6 +19,10 @@ const INTERACTION_FIELDS: readonly (keyof FediwayStatus)[] = [
   'bookmarked',
 ];
 
+function copyField<K extends keyof FediwayStatus>(target: FediwayStatus, source: FediwayStatus, key: K): void {
+  target[key] = source[key];
+}
+
 export interface SetOptions {
   /** Bypass interaction field protection (used for error rollback) */
   force?: boolean;
@@ -51,7 +55,7 @@ export function useStatusStore(): UseStatusStoreReturn {
         const merged: FediwayStatus = { ...status };
         for (const field of INTERACTION_FIELDS) {
           if (field in existing) {
-            (merged as any)[field] = (existing as any)[field];
+            copyField(merged, existing, field);
           }
         }
         store.set(status.id, merged);

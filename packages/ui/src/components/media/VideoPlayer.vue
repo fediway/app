@@ -69,7 +69,7 @@ const progress = computed(() =>
 const canPiP = computed(() =>
   typeof document !== 'undefined'
   && 'pictureInPictureEnabled' in document
-  && (document as any).pictureInPictureEnabled
+  && document.pictureInPictureEnabled
   && videoDuration.value > 30,
 );
 
@@ -250,7 +250,7 @@ watch(volume, (v) => {
 }, { immediate: true });
 
 function cycleSpeed() {
-  const currentIndex = SPEED_OPTIONS.indexOf(playbackSpeed.value as any);
+  const currentIndex = (SPEED_OPTIONS as readonly number[]).indexOf(playbackSpeed.value);
   const nextIndex = (currentIndex + 1) % SPEED_OPTIONS.length;
   playbackSpeed.value = SPEED_OPTIONS[nextIndex]!;
   if (videoRef.value)
@@ -299,7 +299,7 @@ function seekBy(seconds: number) {
     return;
   videoRef.value.currentTime = Math.max(0, Math.min(videoDuration.value, videoRef.value.currentTime + seconds));
 
-  seekIndicator.value = `${seconds > 0 ? '+' : ''}${seconds}` as any;
+  seekIndicator.value = `${seconds > 0 ? '+' : ''}${seconds}` as typeof seekIndicator.value;
   clearTimeout(seekIndicatorTimer);
   seekIndicatorTimer = setTimeout(() => {
     seekIndicator.value = null;
@@ -376,8 +376,8 @@ function onFullscreenChange() {
 async function togglePiP() {
   if (!videoRef.value)
     return;
-  if ((document as any).pictureInPictureElement)
-    await (document as any).exitPictureInPicture();
+  if (document.pictureInPictureElement)
+    await document.exitPictureInPicture();
   else
     await videoRef.value.requestPictureInPicture();
 }

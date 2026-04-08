@@ -42,7 +42,7 @@ const FIELD_LIMIT = 255;
 watch(() => props.isOpen, (open) => {
   if (open && currentUser.value) {
     displayName.value = currentUser.value.displayName || '';
-    bio.value = (currentUser.value as any).source?.note || currentUser.value.note?.replace(/<[^>]*>/g, '') || '';
+    bio.value = currentUser.value.source?.note || currentUser.value.note?.replace(/<[^>]*>/g, '') || '';
     avatarPreview.value = currentUser.value.avatar || '';
     avatarFile.value = null;
     headerPreview.value = currentUser.value.header || '';
@@ -50,11 +50,10 @@ watch(() => props.isOpen, (open) => {
     isSaving.value = false;
     errorMessage.value = '';
 
-    // Load profile fields
-    const sourceFields = (currentUser.value as any).source?.fields
+    const sourceFields = currentUser.value.source?.fields
       ?? currentUser.value.fields
       ?? [];
-    fields.value = sourceFields.map((f: any) => ({ name: f.name || '', value: f.value?.replace(/<[^>]*>/g, '') || '' }));
+    fields.value = sourceFields.map(f => ({ name: f.name || '', value: f.value?.replace(/<[^>]*>/g, '') || '' }));
   }
 });
 

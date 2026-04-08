@@ -104,7 +104,8 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    plugins: [tailwindcss() as any],
+    // @ts-expect-error @tailwindcss/vite returns Plugin[] from a different Vite type resolution than Nuxt's bundled types
+    plugins: tailwindcss(),
     envDir: new URL('.', import.meta.url).pathname,
     esbuild: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],

@@ -1,4 +1,4 @@
-import type { Account, Status } from '@repo/types';
+import type { Account, mastodon, Status } from '@repo/types';
 import { reactive } from 'vue';
 import { escapeHtml } from '../../utils/html';
 import { invalidateAllPaginatedQueries } from '../createPaginatedQuery';
@@ -95,22 +95,18 @@ export function usePosts(callbacks?: UsePostsCallbacks) {
 
     (async () => {
       try {
-        const createParams: Record<string, unknown> = {
-          status: opts.content,
+        const base: mastodon.rest.v1.CreateStatusParamsBase = {
           spoilerText: opts.spoilerText || undefined,
-          visibility: (opts.visibility ?? 'public') as 'public' | 'unlisted' | 'private' | 'direct',
+          visibility: (opts.visibility ?? 'public') as mastodon.v1.StatusVisibility,
           inReplyToId: opts.inReplyToId || undefined,
         };
-        if (opts.poll) {
-          createParams.poll = opts.poll;
-        }
-        if (opts.mediaIds) {
-          createParams.mediaIds = opts.mediaIds;
-        }
+        const createParams: mastodon.rest.v1.CreateStatusParams = opts.mediaIds
+          ? { ...base, status: opts.content, mediaIds: opts.mediaIds }
+          : { ...base, status: opts.content, ...(opts.poll && { poll: opts.poll }) };
         const meta = opts.idempotencyKey
           ? { requestInit: { headers: { 'Idempotency-Key': opts.idempotencyKey } } }
           : undefined;
-        const created = await client.rest.v1.statuses.create(createParams as any, meta);
+        const created = await client.rest.v1.statuses.create(createParams, meta);
         const idx = userPosts.findIndex(s => s.id === tempId);
         if (idx !== -1) {
           userPosts.splice(idx, 1, created);

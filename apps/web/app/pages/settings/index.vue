@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { StatusVisibility } from '@repo/types';
+import type { MediaVisibility } from '@repo/ui';
 import { useAuth, useClient } from '@repo/api';
 import { Avatar, Button, PageHeader, SegmentedControl, Toggle, VisibilitySelector } from '@repo/ui';
 import { useFeedbackModal } from '~/composables/useFeedbackModal';
@@ -22,7 +24,7 @@ async function handleVisibilityChange(value: string) {
   if (isAuthenticated.value) {
     try {
       const client = useClient();
-      await client.rest.v1.accounts.updateCredentials({ source: { privacy: value } as any });
+      await client.rest.v1.accounts.updateCredentials({ source: { privacy: value as StatusVisibility } });
     }
     catch {
       // Server sync failed — local preference still saved
@@ -35,7 +37,7 @@ async function handleSensitiveToggle() {
   if (isAuthenticated.value) {
     try {
       const client = useClient();
-      await client.rest.v1.accounts.updateCredentials({ source: { sensitive: settings.privacy.sensitiveMedia } as any });
+      await client.rest.v1.accounts.updateCredentials({ source: { sensitive: settings.privacy.sensitiveMedia } });
     }
     catch {
       // Server sync failed — local preference still saved
@@ -128,7 +130,7 @@ function handleLogout() {
               { value: 'show_all', label: 'Show all' },
               { value: 'hide_all', label: 'Hide all' },
             ]"
-            @update:model-value="setMediaVisibility($event as any)"
+            @update:model-value="setMediaVisibility($event as MediaVisibility)"
           />
           <p class="mt-1 text-xs text-muted-foreground">
             Default hides media only when marked sensitive

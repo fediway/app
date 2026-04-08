@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { NavIconName } from '../types';
 import NavIcon from '../NavIcon.vue';
 
 defineProps<{
-  icon: string;
+  icon: NavIconName;
   label: string;
   active?: boolean;
   badge?: number | string;
@@ -24,7 +25,7 @@ defineEmits<{ click: [] }>();
     :aria-current="active ? 'page' : undefined"
     @click="$emit('click')"
   >
-    <NavIcon :name="(icon as any)" :size="22" :weight="active ? 'fill' : 'regular'" />
+    <NavIcon :name="icon" :size="22" :weight="active ? 'fill' : 'regular'" />
     <span class="flex-1 text-base">{{ label }}</span>
     <span
       v-if="badge"

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
+import type { NavIconName } from '../types';
 import { cn } from '../../../lib/utils';
 import Button from '../../ui/button/Button.vue';
 import NavIcon from '../NavIcon.vue';
 
 interface Props {
   title?: string;
-  leftIcon?: string;
+  leftIcon?: NavIconName;
   leftLabel?: string;
-  rightIcon?: string;
+  rightIcon?: NavIconName;
   rightLabel?: string;
   bordered?: boolean;
   class?: HTMLAttributes['class'];
@@ -42,7 +43,7 @@ defineEmits<{
           :aria-label="leftLabel"
           @click="$emit('leftClick')"
         >
-          <NavIcon :name="(leftIcon as any)" :size="24" />
+          <NavIcon :name="leftIcon" :size="24" />
         </Button>
       </slot>
     </div>
@@ -66,7 +67,7 @@ defineEmits<{
           :aria-label="rightLabel"
           @click="$emit('rightClick')"
         >
-          <NavIcon :name="(rightIcon as any)" :size="24" />
+          <NavIcon :name="rightIcon" :size="24" />
         </Button>
       </slot>
     </div>
