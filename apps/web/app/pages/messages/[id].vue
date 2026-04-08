@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { MediaAttachment } from '@repo/types';
 import { useAuth } from '@repo/api';
-import { EmptyState, MediaLightbox, MessageBubble, Skeleton, useToast } from '@repo/ui';
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
+import { EmptyState, MediaLightbox, MessageBubble, MessageInput, Skeleton, useToast } from '@repo/ui';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
 
@@ -148,21 +148,26 @@ usePageHeader({
   image: computed(() => participant.value?.avatar),
 });
 
-// Scroll to bottom on new messages + track count for send animation
-watch(() => threadStatuses.value.length, (newLen) => {
-  const isNewMessage = previousMessageCount.value > 0 && newLen > previousMessageCount.value;
-  previousMessageCount.value = newLen;
+function scrollToBottom(smooth = false) {
   nextTick(() => {
     messagesContainer.value?.scrollTo({
       top: messagesContainer.value.scrollHeight,
-      behavior: isNewMessage ? 'smooth' : 'instant',
+      behavior: smooth ? 'smooth' : 'instant',
     });
   });
+}
+
+onMounted(() => scrollToBottom());
+
+watch(() => threadStatuses.value.length, (newLen) => {
+  const isNewMessage = previousMessageCount.value > 0 && newLen > previousMessageCount.value;
+  previousMessageCount.value = newLen;
+  scrollToBottom(isNewMessage);
 });
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col">
+  <div class="-mb-20 flex h-[calc(100dvh-3.5rem)] flex-col overflow-hidden">
     <ClientOnly>
       <!-- Loading -->
       <div v-if="isLoading" class="flex-1 space-y-3 p-4">
@@ -212,6 +217,19 @@ watch(() => threadStatuses.value.length, (newLen) => {
           </TransitionGroup>
         </div>
       </template>
+
+      <!-- Desktop input (mobile uses bottom nav via useMobileChatInput) -->
+      <div v-if="conversation" class="hidden border-t border-border p-3 lg:block">
+        <form class="flex items-end gap-2" @submit.prevent="handleSend(chatMessage)">
+          <MessageInput
+            v-model="chatMessage"
+            :disabled="isSending"
+            placeholder="Write a message..."
+            class="flex-1"
+            @send="handleSend(chatMessage)"
+          />
+        </form>
+      </div>
     </ClientOnly>
 
     <MediaLightbox

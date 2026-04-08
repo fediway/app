@@ -23,7 +23,7 @@ useNetworkStatus();
 const navigation = useNavigationStore();
 const { isOpen, replyingTo, close } = usePostComposer();
 const { addPost } = usePosts();
-const { shareStatus } = useConversationData();
+const { shareStatus, findConversationByAcct } = useConversationData();
 const {
   isOpen: isSendMessageOpen,
   statusToShare,
@@ -145,7 +145,8 @@ async function handleSendMessage(data: { recipients: Account[]; message: string;
   try {
     await shareStatus(recipient.acct, data.message, data.status);
     toast.success('Message sent');
-    router.push('/messages');
+    const conversationId = await findConversationByAcct(recipient.acct);
+    router.push(conversationId ? `/messages/${conversationId}` : '/messages');
   }
   catch {
     toast.error('Failed to send message');

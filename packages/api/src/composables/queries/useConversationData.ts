@@ -67,6 +67,14 @@ export function useConversationData() {
     return await sendDirectMessage(recipientAcct, parts.join('\n\n'));
   }
 
+  async function findConversationByAcct(acct: string): Promise<string | null> {
+    const conversations = await client.rest.v1.conversations.list({ limit: 80 });
+    const match = conversations.find(c =>
+      c.accounts.some(a => a.acct === acct || a.acct.split('@')[0] === acct),
+    );
+    return match?.id ?? null;
+  }
+
   function isOwnMessage(status: Status): boolean {
     return status.account.acct === currentUser.value?.acct;
   }
@@ -76,6 +84,7 @@ export function useConversationData() {
     getConversationDetail,
     sendDirectMessage,
     shareStatus,
+    findConversationByAcct,
     isOwnMessage,
     formatMessageContent,
   };

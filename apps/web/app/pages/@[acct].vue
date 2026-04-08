@@ -95,9 +95,17 @@ function handleFollowToggle() {
   }
 }
 
-function handleMessage() {
-  // TODO: Pre-select this account as DM recipient when navigating to messages
-  router.push('/messages');
+async function handleMessage() {
+  if (!account.value)
+    return;
+  const { findConversationByAcct } = useConversationData();
+  const conversationId = await findConversationByAcct(account.value.acct);
+  if (conversationId) {
+    router.push(`/messages/${conversationId}`);
+  }
+  else {
+    router.push(`/messages/new?acct=${encodeURIComponent(account.value.acct)}`);
+  }
 }
 
 function handleStatClick(stat: string) {
