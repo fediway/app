@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Account, Status } from '@repo/types';
+import { useAuth, useClient } from '@repo/api';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, ShareStatusForm } from '@repo/ui';
 import { VisuallyHidden } from 'reka-ui';
 import { ref, watch } from 'vue';
@@ -16,14 +17,30 @@ const emit = defineEmits<{
   send: [data: { recipients: Account[]; message: string; status: Status }];
 }>();
 
-const { getAllAccounts } = useAccountData();
-const { data: allAccounts } = getAllAccounts();
+const { currentUser } = useAuth();
+const client = useClient();
+const { getAccountFollowing } = useAccountData();
+
+const followingAcct = computed(() => currentUser.value?.acct ?? '');
+const { data: following } = getAccountFollowing(followingAcct.value);
+
+const searchResults = ref<Account[]>([]);
+
+async function handleSearch(query: string) {
+  if (!query.trim()) {
+    searchResults.value = [];
+    return;
+  }
+  const result = await client.rest.v2.search.list({ q: query, type: 'accounts', limit: 20 });
+  searchResults.value = result.accounts;
+}
+
 const formRef = ref<InstanceType<typeof ShareStatusForm>>();
 
-// Reset form when modal opens
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     formRef.value?.reset();
+    searchResults.value = [];
   }
 });
 
@@ -52,9 +69,11 @@ function handleOpenChange(open: boolean) {
         v-if="status"
         ref="formRef"
         :status="status"
-        :accounts="allAccounts"
+        :accounts="following"
+        :search-results="searchResults"
         @send="handleSend"
         @cancel="emit('close')"
+        @search="handleSearch"
       />
     </DialogContent>
   </Dialog>

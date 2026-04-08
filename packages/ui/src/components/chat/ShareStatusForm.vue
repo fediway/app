@@ -9,11 +9,13 @@ import RelativeTime from '../ui/relative-time/RelativeTime.vue';
 const props = defineProps<{
   status: Status;
   accounts: Account[];
+  searchResults?: Account[];
 }>();
 
 const emit = defineEmits<{
   send: [data: { recipients: Account[]; message: string }];
   cancel: [];
+  search: [query: string];
 }>();
 
 const HTML_TAG_RE = /<[^>]*>/g;
@@ -24,19 +26,23 @@ const message = ref('');
 const showMessage = ref(false);
 const isSubmitting = ref(false);
 
+const isSearching = computed(() => searchQuery.value.trim().length > 0);
+
 const filteredAccounts = computed(() => {
   const selected = new Set(selectedRecipients.value.map(r => r.id));
-  let results = props.accounts.filter(a => !selected.has(a.id));
+  const source = isSearching.value && props.searchResults
+    ? props.searchResults
+    : props.accounts;
+  return source.filter(a => !selected.has(a.id)).slice(0, 8);
+});
 
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase();
-    results = results.filter(a =>
-      a.displayName.toLowerCase().includes(query)
-      || a.acct.toLowerCase().includes(query),
-    );
+let searchTimeout: ReturnType<typeof setTimeout> | undefined;
+watch(searchQuery, (query) => {
+  clearTimeout(searchTimeout);
+  const trimmed = query.trim();
+  if (trimmed) {
+    searchTimeout = setTimeout(() => emit('search', trimmed), 250);
   }
-
-  return results.slice(0, 8);
 });
 
 const canSend = computed(() =>
