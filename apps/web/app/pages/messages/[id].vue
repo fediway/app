@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { MediaAttachment } from '@repo/types';
 import { useAuth } from '@repo/api';
-import { EmptyState, MessageBubble, Skeleton, useToast } from '@repo/ui';
+import { EmptyState, MediaLightbox, MessageBubble, Skeleton, useToast } from '@repo/ui';
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
@@ -42,8 +43,63 @@ const allParticipantAccts = computed(() => {
   return accts;
 });
 
+const isGroupChat = computed(() => (conversation.value?.accounts.length ?? 0) > 1);
+const previousMessageCount = ref(0);
+
+function dateSeparator(index: number): string | null {
+  const status = threadStatuses.value[index];
+  if (!status)
+    return null;
+  const date = new Date(status.createdAt);
+  if (index === 0)
+    return formatDateLabel(date);
+  const prev = threadStatuses.value[index - 1];
+  if (!prev)
+    return null;
+  const prevDate = new Date(prev.createdAt);
+  if (date.toDateString() !== prevDate.toDateString())
+    return formatDateLabel(date);
+  return null;
+}
+
+function formatDateLabel(date: Date): string {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const diff = today.getTime() - target.getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days === 0)
+    return 'Today';
+  if (days === 1)
+    return 'Yesterday';
+  if (days < 7)
+    return date.toLocaleDateString(undefined, { weekday: 'long' });
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+}
+
+function showSender(index: number): boolean {
+  if (!isGroupChat.value)
+    return false;
+  const status = threadStatuses.value[index];
+  if (!status || isOwnMessage(status))
+    return false;
+  if (index === 0)
+    return true;
+  const prev = threadStatuses.value[index - 1];
+  return !prev || prev.account.acct !== status.account.acct;
+}
+
 const messagesContainer = ref<HTMLElement>();
 const isSending = ref(false);
+const lightboxOpen = ref(false);
+const lightboxAttachments = ref<MediaAttachment[]>([]);
+const lightboxIndex = ref(0);
+
+function openLightbox(attachments: MediaAttachment[], index: number) {
+  lightboxAttachments.value = attachments;
+  lightboxIndex.value = index;
+  lightboxOpen.value = true;
+}
 const { chatMessage, set: setChatTarget, clear: clearChatTarget } = useMobileChatInput();
 
 async function handleSend(content: string) {
@@ -92,12 +148,14 @@ usePageHeader({
   image: computed(() => participant.value?.avatar),
 });
 
-// Scroll to bottom on new messages
-watch(() => threadStatuses.value.length, () => {
+// Scroll to bottom on new messages + track count for send animation
+watch(() => threadStatuses.value.length, (newLen) => {
+  const isNewMessage = previousMessageCount.value > 0 && newLen > previousMessageCount.value;
+  previousMessageCount.value = newLen;
   nextTick(() => {
     messagesContainer.value?.scrollTo({
       top: messagesContainer.value.scrollHeight,
-      behavior: 'smooth',
+      behavior: isNewMessage ? 'smooth' : 'instant',
     });
   });
 });
@@ -124,16 +182,58 @@ watch(() => threadStatuses.value.length, () => {
 
       <template v-else>
         <!-- Messages -->
-        <div ref="messagesContainer" class="flex-1 space-y-3 overflow-y-auto px-4 py-4">
-          <MessageBubble
-            v-for="status in threadStatuses"
-            :key="status.id"
-            :content="formatMessageContent(status.content, allParticipantAccts)"
-            :is-own="isOwnMessage(status)"
-            :sent-at="status.createdAt"
-          />
+        <div ref="messagesContainer" class="flex-1 overflow-y-auto px-4 py-4">
+          <TransitionGroup name="message" tag="div" class="space-y-3">
+            <template v-for="(status, index) in threadStatuses" :key="status.id">
+              <!-- Date separator -->
+              <div
+                v-if="dateSeparator(index)"
+                :key="`sep-${status.id}`"
+                class="flex items-center justify-center py-2"
+              >
+                <span class="text-xs font-medium text-muted-foreground">
+                  {{ dateSeparator(index) }}
+                </span>
+              </div>
+
+              <MessageBubble
+                :content="formatMessageContent(status.content, allParticipantAccts)"
+                :is-own="isOwnMessage(status)"
+                :sent-at="status.createdAt"
+                :media-attachments="status.mediaAttachments"
+                :card="status.card"
+                :sender-name="status.account.displayName"
+                :sender-avatar="status.account.avatar"
+                :show-sender="showSender(index)"
+                @media-click="(_, idx) => openLightbox(status.mediaAttachments, idx)"
+                @sender-click="navigateTo(`/@${status.account.acct}`)"
+              />
+            </template>
+          </TransitionGroup>
         </div>
       </template>
     </ClientOnly>
+
+    <MediaLightbox
+      :attachments="lightboxAttachments"
+      :initial-index="lightboxIndex"
+      :is-open="lightboxOpen"
+      @close="lightboxOpen = false"
+    />
   </div>
 </template>
+
+<style scoped>
+.message-enter-active {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.message-enter-from {
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+}
+
+.message-move {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+</style>
