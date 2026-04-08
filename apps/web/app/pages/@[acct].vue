@@ -16,7 +16,9 @@ const { handleMute, handleBlock, handleBlockDomain, handleReport } = useWebActio
 const { toast } = useToast();
 const HTML_TAG_RE = /<[^>]*>/g;
 
-definePageMeta({});
+definePageMeta({
+  key: route => route.path,
+});
 
 const route = useRoute();
 const router = useRouter();

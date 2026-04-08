@@ -286,7 +286,7 @@ watch(isAuthenticated, (authenticated) => {
           @click="navigation.closeSidebar()"
         />
         <MobileHeader v-if="isAuthenticated" />
-        <main class="relative flex-1 overflow-clip" :class="isMobileFullscreen ? '' : 'pb-20'">
+        <main class="relative grid flex-1 overflow-clip [&>*]:col-start-1 [&>*]:row-start-1" :class="isMobileFullscreen ? '' : 'pb-20'">
           <slot />
         </main>
       </div>
@@ -310,7 +310,7 @@ watch(isAuthenticated, (authenticated) => {
           <main
             id="main-content"
             ref="feedRef"
-            class="relative overflow-clip bg-card pb-20 lg:flex-1 lg:border-x lg:border-border"
+            class="relative grid overflow-clip bg-card pb-20 lg:flex-1 lg:border-x lg:border-border [&>*]:col-start-1 [&>*]:row-start-1"
           >
             <slot />
           </main>

@@ -6,6 +6,10 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
 
+definePageMeta({
+  key: route => route.path,
+});
+
 const route = useRoute();
 const router = useRouter();
 const { getConversationDetail, sendDirectMessage, isOwnMessage, formatMessageContent } = useConversationData();
