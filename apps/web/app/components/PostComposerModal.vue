@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { Status } from '@repo/types';
-import type { MediaItem } from '@repo/ui';
 import { PhX } from '@phosphor-icons/vue';
-import { useClient, useDraft } from '@repo/api';
 import {
   AltTextModal,
   Button,
@@ -23,9 +21,10 @@ import {
 } from '@repo/ui';
 import { useDropZone } from '@vueuse/core';
 import { VisuallyHidden } from 'reka-ui';
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
-import { useSettings } from '~/composables/useSettings';
-import { useNavigationStore } from '~/stores/navigation';
+import { computed, ref } from 'vue';
+import { useComposerDraft } from '~/composables/useComposerDraft';
+import { useComposerMedia } from '~/composables/useComposerMedia';
+import { useComposerSearch } from '~/composables/useComposerSearch';
 
 interface Props {
   isOpen: boolean;
@@ -47,44 +46,42 @@ const emit = defineEmits<{
   post: [data: { content: string; spoilerText: string; visibility: string; poll?: PollData; mediaIds?: string[]; idempotencyKey?: string }];
 }>();
 
-const { settings: appSettings } = useSettings();
-const navigation = useNavigationStore();
-
-// Draft persistence — keyed by account + reply context
-const draftKey = computed(() => {
-  const acct = navigation.currentUser?.acct ?? 'anon';
-  return props.replyTo ? `${acct}:reply:${props.replyTo.id}` : acct;
-});
-const draft = useDraft(draftKey.value);
-
-// Editor ref (imperative API — no v-model)
 const editorRef = ref<InstanceType<typeof ComposeTextarea>>();
 
-// Post content
 const spoilerText = ref('');
 const showContentWarning = ref(false);
 const visibility = ref<'public' | 'unlisted' | 'private' | 'direct'>('public');
 const isSubmitting = ref(false);
-const draftStatus = ref<'idle' | 'saving' | 'saved'>('idle');
 const errorMessage = ref('');
 
-// Poll state
 const showPoll = ref(false);
 const pollOptions = ref(['', '']);
 const pollMultiple = ref(false);
 const pollDuration = ref(86400);
 
-// Media state
-const media = ref<MediaItem[]>([]);
-const altEditIndex = ref(-1);
-const MAX_MEDIA = 4;
-
-// Discard confirmation
 const showDiscardConfirm = ref(false);
 
 const CHARACTER_LIMIT = 500;
 
-// Drag-and-drop zone on entire modal
+const {
+  media,
+  altEditIndex,
+  MAX_MEDIA,
+  addMediaFiles,
+  handleAddMedia,
+  handleRemoveMedia,
+  handleRetryMedia,
+  handleEditAlt,
+  handleAltSave,
+  handlePasteMedia,
+  revokeAllPreviews,
+  reset: resetMedia,
+} = useComposerMedia();
+
+const { allEmoji, searchMentions, searchHashtags, searchEmoji } = useComposerSearch(
+  () => props.isOpen,
+);
+
 const dropZoneRef = ref<HTMLElement>();
 const { isOverDropZone } = useDropZone(dropZoneRef, {
   dataTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'],
@@ -94,7 +91,6 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   },
 });
 
-// Media + poll mutual exclusion
 const canAddMedia = computed(() => !showPoll.value && media.value.length < MAX_MEDIA);
 const canTogglePoll = computed(() => media.value.length === 0);
 
@@ -114,276 +110,22 @@ const hasUnsavedContent = computed(() =>
   !editorIsEmpty.value || media.value.length > 0,
 );
 
-function addMediaFiles(files: File[] | FileList) {
-  for (const file of Array.from(files)) {
-    if (media.value.length >= MAX_MEDIA)
-      break;
-
-    const previewUrl = URL.createObjectURL(file);
-    const item: MediaItem = {
-      file,
-      previewUrl,
-      altText: '',
-      progress: 0,
-      status: 'uploading',
-      type: file.type.startsWith('video') ? 'video' : 'image',
-    };
-    media.value.push(item);
-    uploadMedia(item);
-  }
-}
-
-async function uploadMedia(item: MediaItem) {
-  try {
-    const client = useClient();
-    item.progress = 50; // Indeterminate progress (masto lib doesn't expose upload progress)
-
-    const attachment = await client.rest.v2.media.create({
-      file: item.file!,
-      skipPolling: true,
-    });
-
-    item.id = attachment.id;
-    item.progress = 100;
-    item.status = 'complete';
-  }
-  catch (err) {
-    console.error('[Compose] Media upload failed:', err);
-    item.status = 'error';
-    item.progress = 0;
-  }
-}
-
-function handleAddMedia() {
-  if (!canAddMedia.value)
-    return;
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*,video/mp4,video/webm';
-  input.multiple = true;
-  input.onchange = () => {
-    if (input.files)
-      addMediaFiles(input.files);
-  };
-  input.click();
-}
-
-function handleRemoveMedia(index: number) {
-  const item = media.value[index];
-  if (item?.previewUrl) {
-    URL.revokeObjectURL(item.previewUrl);
-  }
-  media.value.splice(index, 1);
-}
-
-function handleRetryMedia(index: number) {
-  const item = media.value[index];
-  if (item?.file) {
-    item.status = 'uploading';
-    item.progress = 0;
-    uploadMedia(item);
-  }
-}
-
-function handleEditAlt(index: number) {
-  altEditIndex.value = index;
-}
-
-function handleAltSave(value: string) {
-  const item = media.value[altEditIndex.value];
-  if (item) {
-    item.altText = value;
-    // Update alt text on server if already uploaded
-    if (item.id) {
-      const client = useClient();
-      fetch(`${client.config.url}/api/v1/media/${item.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${client.config.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ description: value }),
-      }).catch(() => {
-        // Alt text update failed — not critical, don't block
-      });
-    }
-  }
-  altEditIndex.value = -1;
-}
-
-function handlePasteMedia(files: File[]) {
-  if (canAddMedia.value)
-    addMediaFiles(files);
-}
-
-let mentionAbort: AbortController | undefined;
-async function searchMentions(query: string) {
-  mentionAbort?.abort();
-  mentionAbort = new AbortController();
-  const signal = mentionAbort.signal;
-  await new Promise(r => setTimeout(r, 250));
-  if (signal.aborted)
-    return [];
-  try {
-    const client = useClient();
-    const results = await client.rest.v2.search.list({ q: query, type: 'accounts', limit: 8, resolve: true });
-    if (signal.aborted)
-      return [];
-    return results.accounts.map(a => ({
-      id: a.acct,
-      acct: a.acct,
-      displayName: a.displayName || a.username,
-      avatar: a.avatar,
-    }));
-  }
-  catch {
-    return [];
-  }
-}
-
-let hashtagAbort: AbortController | undefined;
-async function searchHashtags(query: string) {
-  hashtagAbort?.abort();
-  hashtagAbort = new AbortController();
-  const signal = hashtagAbort.signal;
-  await new Promise(r => setTimeout(r, 250));
-  if (signal.aborted)
-    return [];
-  try {
-    const client = useClient();
-    const results = await client.rest.v2.search.list({ q: query, type: 'hashtags', limit: 8 });
-    if (signal.aborted)
-      return [];
-    return results.hashtags.map(t => ({
-      name: t.name,
-      postCount: t.history?.[0]?.uses ? Number(t.history[0].uses) : undefined,
-    }));
-  }
-  catch {
-    return [];
-  }
-}
-
-// Cache instance custom emoji (fetched once per session)
-let cachedCustomEmoji: any[] | null = null;
-
-async function loadCustomEmoji() {
-  if (cachedCustomEmoji)
-    return cachedCustomEmoji;
-  try {
-    const client = useClient();
-    const emoji = await client.rest.v1.customEmojis.list();
-    cachedCustomEmoji = emoji
-      .filter(e => e.visibleInPicker)
-      .map(e => ({
-        shortcode: e.shortcode,
-        url: e.staticUrl || e.url,
-        category: e.category || 'Custom',
-      }));
-    return cachedCustomEmoji;
-  }
-  catch {
-    return [];
-  }
-}
-
-async function searchEmoji(query: string) {
-  const custom = await loadCustomEmoji();
-  const q = query.toLowerCase();
-  return custom
-    .filter(e => e.shortcode.toLowerCase().includes(q))
-    .slice(0, 10);
-}
-
-onBeforeUnmount(() => {
-  mentionAbort?.abort();
-  hashtagAbort?.abort();
-});
-
-// All emoji for the browsable picker (loaded when picker opens)
-const allEmoji = ref<any[]>([]);
-
-watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen && allEmoji.value.length === 0) {
-    allEmoji.value = await loadCustomEmoji();
-  }
-}, { immediate: false });
-
-function saveDraft() {
-  if (!props.isOpen || !hasUnsavedContent.value)
-    return;
-  draftStatus.value = 'saving';
-  draft.save({
-    content: editorRef.value?.getPlainText() ?? '',
-    spoilerText: spoilerText.value,
-    visibility: visibility.value,
-    inReplyToId: props.replyTo?.id,
-    ...(showPoll.value
-      ? {
-          pollOptions: pollOptions.value,
-          pollDuration: pollDuration.value,
-          pollMultiple: pollMultiple.value,
-        }
-      : {}),
-  });
-  setTimeout(() => {
-    if (draftStatus.value === 'saving')
-      draftStatus.value = 'saved';
-  }, 1200);
-}
-
-watch([spoilerText, visibility, pollOptions, pollDuration, pollMultiple, showPoll], saveDraft);
-
-watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen) {
-    spoilerText.value = '';
-    showContentWarning.value = false;
-    visibility.value = appSettings.privacy.defaultVisibility;
-    isSubmitting.value = false;
-    showPoll.value = false;
-    pollOptions.value = ['', ''];
-    pollMultiple.value = false;
-    pollDuration.value = 86400;
-    showDiscardConfirm.value = false;
-    draftStatus.value = 'idle';
-    errorMessage.value = '';
-    media.value = [];
-    altEditIndex.value = -1;
-
-    // Wait for editor to mount, then restore content
-    await nextTick();
-
-    const saved = await draft.load();
-    if (saved && saved.content.trim()) {
-      editorRef.value?.setContent(saved.content);
-      spoilerText.value = saved.spoilerText;
-      showContentWarning.value = saved.spoilerText.length > 0;
-      visibility.value = saved.visibility;
-      if (saved.pollOptions && saved.pollOptions.length >= 2) {
-        showPoll.value = true;
-        pollOptions.value = saved.pollOptions;
-        pollDuration.value = saved.pollDuration ?? 86400;
-        pollMultiple.value = saved.pollMultiple ?? false;
-      }
-      draftStatus.value = 'saved';
-    }
-    else if (props.replyTo) {
-      editorRef.value?.setContent(`@${props.replyTo.account.acct} `);
-    }
-    else {
-      editorRef.value?.clear();
-    }
-
-    // Focus the editor
-    editorRef.value?.focus();
-  }
-  else {
-    // Clean up object URLs on close
-    for (const item of media.value) {
-      if (item.previewUrl)
-        URL.revokeObjectURL(item.previewUrl);
-    }
-  }
+const { draftStatus, saveDraft, flushDraft, discardDraft } = useComposerDraft({
+  isOpen: () => props.isOpen,
+  replyTo: () => props.replyTo,
+  editorRef,
+  spoilerText,
+  showContentWarning,
+  visibility,
+  showPoll,
+  pollOptions,
+  pollDuration,
+  pollMultiple,
+  hasUnsavedContent: () => hasUnsavedContent.value,
+  onResetMedia() {
+    revokeAllPreviews();
+    resetMedia();
+  },
 });
 
 async function handlePost() {
@@ -393,8 +135,7 @@ async function handlePost() {
   isSubmitting.value = true;
   errorMessage.value = '';
 
-  // Safety net: save draft before submission
-  await draft.flush();
+  await flushDraft();
 
   const postData: { content: string; spoilerText: string; visibility: string; poll?: PollData; mediaIds?: string[]; idempotencyKey?: string } = {
     content: editorRef.value?.getPlainText() ?? '',
@@ -421,7 +162,7 @@ async function handlePost() {
 
   try {
     emit('post', postData);
-    await draft.discard();
+    await discardDraft();
     emit('close');
   }
   catch (err) {
@@ -445,7 +186,7 @@ function handleOpenChange(open: boolean) {
 }
 
 function confirmDiscard() {
-  draft.discard();
+  discardDraft();
   showDiscardConfirm.value = false;
   emit('close');
 }

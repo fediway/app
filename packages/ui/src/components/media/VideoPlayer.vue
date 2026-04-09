@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import {
-  PhArrowsIn,
-  PhArrowsOut,
-  PhClosedCaptioning,
   PhPause,
-  PhPictureInPicture,
   PhPlay,
-  PhSpeakerHigh,
-  PhSpeakerLow,
-  PhSpeakerSlash,
 } from '@phosphor-icons/vue';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useMediaPlayerState } from '../../composables/useMediaPlayerState';
 import { useMediaPreferences } from '../../composables/useMediaPreferences';
 import { useVideoAutoplay } from '../../composables/useVideoAutoplay';
+import { useVideoPlayerKeys } from '../../composables/useVideoPlayerKeys';
+import VideoPlayerControls from './VideoPlayerControls.vue';
 
 interface Props {
   src: string;
@@ -38,7 +33,6 @@ const { isMuted, volume, unmute, mute, setVolume } = useMediaPlayerState();
 const { shouldAutoplayVideos } = useMediaPreferences();
 const videoRef = ref<HTMLVideoElement>();
 const playerRef = ref<HTMLElement>();
-const seekBarRef = ref<HTMLElement>();
 
 useVideoAutoplay(videoRef, props.videoId, { enabled: shouldAutoplayVideos });
 
@@ -53,7 +47,6 @@ const playbackSpeed = ref(1);
 const showCaptions = ref(false);
 const actionFlash = ref<'play' | 'pause' | null>(null);
 const seekIndicator = ref<'+5' | '-5' | '+10' | '-10' | null>(null);
-const showVolumeSlider = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | undefined;
 let seekIndicatorTimer: ReturnType<typeof setTimeout> | undefined;
 let actionFlashTimer: ReturnType<typeof setTimeout> | undefined;
@@ -75,14 +68,6 @@ const canPiP = computed(() =>
 
 const hasCaptions = computed(() => !!props.caption);
 
-const volumeIcon = computed(() => {
-  if (isMuted.value || volume.value === 0)
-    return PhSpeakerSlash;
-  if (volume.value < 0.5)
-    return PhSpeakerLow;
-  return PhSpeakerHigh;
-});
-
 function formatTime(seconds: number): string {
   const s = Math.floor(seconds);
   const h = Math.floor(s / 3600);
@@ -93,17 +78,12 @@ function formatTime(seconds: number): string {
   return h > 0 ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
 }
 
-function formatSpeed(speed: number): string {
-  return speed === 1 ? '1x' : `${speed}x`;
-}
-
 function showControls() {
   controlsVisible.value = true;
   clearTimeout(hideTimer);
   if (!paused.value) {
     hideTimer = setTimeout(() => {
       controlsVisible.value = false;
-      showVolumeSlider.value = false;
     }, 3000);
   }
 }
@@ -113,7 +93,6 @@ function hideControls() {
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
       controlsVisible.value = false;
-      showVolumeSlider.value = false;
     }, 1000);
   }
 }
@@ -152,102 +131,19 @@ watch(isMuted, (muted) => {
     videoRef.value.muted = muted;
 }, { immediate: true });
 
-const isDraggingVolume = ref(false);
-const volumeSliderRef = ref<HTMLElement>();
-
-// Quadratic curve: slider position → actual volume (perceptually linear)
-function sliderToVolume(ratio: number): number {
-  return ratio * ratio;
-}
-function volumeToSlider(vol: number): number {
-  return Math.sqrt(vol);
-}
-
-const volumeSliderPercent = computed(() =>
-  isMuted.value ? 0 : volumeToSlider(volume.value) * 100,
-);
-
-function applyVolumeFromPointer(e: PointerEvent) {
-  const el = volumeSliderRef.value;
-  if (!el)
-    return;
-  const rect = el.getBoundingClientRect();
-  // Vertical: bottom = 0, top = 1
-  const ratio = Math.max(0, Math.min(1, (rect.bottom - e.clientY) / rect.height));
-  const vol = sliderToVolume(ratio);
-  setVolume(vol);
-  if (videoRef.value)
-    videoRef.value.volume = vol;
-  if (isMuted.value && vol > 0)
-    unmute();
-}
-
-function onVolumePointerDown(e: PointerEvent) {
-  e.preventDefault();
-  e.stopPropagation();
-  isDraggingVolume.value = true;
-  (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  applyVolumeFromPointer(e);
-}
-
-function onVolumePointerMove(e: PointerEvent) {
-  if (!isDraggingVolume.value)
-    return;
-  applyVolumeFromPointer(e);
-}
-
-function onVolumePointerUp(e: PointerEvent) {
-  if (!isDraggingVolume.value)
-    return;
-  isDraggingVolume.value = false;
-  (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-}
-
-function handleVolumeKeyDown(e: KeyboardEvent) {
-  const step = 0.05;
-  const bigStep = 0.15;
-  let newVol = volume.value;
-  switch (e.key) {
-    case 'ArrowUp':
-    case 'ArrowRight':
-      e.preventDefault();
-      newVol = Math.min(1, volume.value + step);
-      break;
-    case 'ArrowDown':
-    case 'ArrowLeft':
-      e.preventDefault();
-      newVol = Math.max(0, volume.value - step);
-      break;
-    case 'PageUp':
-      e.preventDefault();
-      newVol = Math.min(1, volume.value + bigStep);
-      break;
-    case 'PageDown':
-      e.preventDefault();
-      newVol = Math.max(0, volume.value - bigStep);
-      break;
-    case 'Home':
-      e.preventDefault();
-      newVol = 0;
-      break;
-    case 'End':
-      e.preventDefault();
-      newVol = 1;
-      break;
-    default:
-      return;
-  }
-  setVolume(newVol);
-  if (videoRef.value)
-    videoRef.value.volume = newVol;
-  if (isMuted.value && newVol > 0)
-    unmute();
-}
-
 watch(volume, (v) => {
   if (videoRef.value)
     videoRef.value.volume = v;
 }, { immediate: true });
+
+function handleSetVolume(v: number) {
+  const clamped = Math.max(0, Math.min(1, v));
+  setVolume(clamped);
+  if (videoRef.value)
+    videoRef.value.volume = clamped;
+  if (isMuted.value && clamped > 0)
+    unmute();
+}
 
 function cycleSpeed() {
   const currentIndex = (SPEED_OPTIONS as readonly number[]).indexOf(playbackSpeed.value);
@@ -262,10 +158,10 @@ function toggleCaptions() {
   showCaptions.value = !showCaptions.value;
 }
 
-function seekTo(event: MouseEvent | TouchEvent) {
-  if (!videoRef.value || !seekBarRef.value)
+function seekTo(event: MouseEvent | TouchEvent, seekBarEl: HTMLElement) {
+  if (!videoRef.value)
     return;
-  const rect = seekBarRef.value.getBoundingClientRect();
+  const rect = seekBarEl.getBoundingClientRect();
   const clientX = 'touches' in event ? event.touches[0]!.clientX : event.clientX;
   const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
   videoRef.value.currentTime = videoDuration.value * ratio;
@@ -273,16 +169,17 @@ function seekTo(event: MouseEvent | TouchEvent) {
   showControls();
 }
 
-function startSeek(event: MouseEvent | TouchEvent) {
+function handleSeekStart(event: MouseEvent | TouchEvent) {
+  const seekBarEl = (event.currentTarget || event.target) as HTMLElement;
   isSeeking.value = true;
-  seekTo(event);
+  seekTo(event, seekBarEl);
 
   const isTouch = 'touches' in event;
   const moveEvent = isTouch ? 'touchmove' : 'mousemove';
   const endEvent = isTouch ? 'touchend' : 'mouseup';
 
   function onMove(e: Event) {
-    seekTo(e as MouseEvent | TouchEvent);
+    seekTo(e as MouseEvent | TouchEvent, seekBarEl);
   }
   function onEnd() {
     isSeeking.value = false;
@@ -308,27 +205,22 @@ function seekBy(seconds: number) {
   showControls();
 }
 
-// Desktop: immediate play/pause. Mobile: single tap = play/pause, double-tap = seek.
 const isTouchDevice = typeof window !== 'undefined' && 'ontouchstart' in window;
 
 function handleVideoClick(e: MouseEvent) {
   e.stopPropagation();
-
-  // On touch devices, use the touch handler instead
   if (isTouchDevice)
     return;
-
   togglePlay();
 }
 
 function handleVideoTouch(e: TouchEvent) {
-  // Let the touchend handler manage taps
   e.stopPropagation();
 }
 
 function handleVideoTouchEnd(e: TouchEvent) {
   e.stopPropagation();
-  e.preventDefault(); // Prevent ghost click
+  e.preventDefault();
 
   const now = Date.now();
   const touch = e.changedTouches[0];
@@ -409,54 +301,19 @@ function onProgress() {
   buffered.value = (videoRef.value.buffered.end(videoRef.value.buffered.length - 1) / videoDuration.value) * 100;
 }
 
-function handleKeyDown(e: KeyboardEvent) {
-  if (!videoRef.value)
-    return;
-  switch (e.key) {
-    case ' ':
-    case 'k':
-      e.preventDefault();
-      togglePlay();
-      break;
-    case 'm':
-      e.preventDefault();
-      toggleMute();
-      break;
-    case 'f':
-      e.preventDefault();
-      toggleFullscreen();
-      break;
-    case 'c':
-      e.preventDefault();
-      if (hasCaptions.value)
-        toggleCaptions();
-      break;
-    case 'ArrowLeft':
-    case 'j':
-      e.preventDefault();
-      seekBy(e.key === 'j' ? -10 : -5);
-      break;
-    case 'ArrowRight':
-    case 'l':
-      e.preventDefault();
-      seekBy(e.key === 'l' ? 10 : 5);
-      break;
-    case 'ArrowUp':
-      e.preventDefault();
-      setVolume(Math.min(1, volume.value + 0.1));
-      break;
-    case 'ArrowDown':
-      e.preventDefault();
-      setVolume(Math.max(0, volume.value - 0.1));
-      break;
-    case '0': case '1': case '2': case '3': case '4':
-    case '5': case '6': case '7': case '8': case '9':
-      e.preventDefault();
-      videoRef.value.currentTime = videoDuration.value * (Number.parseInt(e.key) / 10);
-      showControls();
-      break;
-  }
-}
+const { handleKeyDown } = useVideoPlayerKeys({
+  videoRef,
+  volume,
+  videoDuration,
+  hasCaptions,
+  togglePlay,
+  toggleMute,
+  toggleFullscreen,
+  toggleCaptions,
+  seekBy,
+  setVolume: handleSetVolume,
+  showControls,
+});
 
 if (typeof document !== 'undefined')
   document.addEventListener('fullscreenchange', onFullscreenChange);
@@ -552,145 +409,30 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div class="relative z-10 space-y-2 px-3 pb-3" @click.stop @touchend.stop>
-        <div
-          ref="seekBarRef"
-          class="group/seek relative h-1 cursor-pointer rounded-full bg-white/30 transition-[height] duration-150 hover:h-2"
-          :class="{ 'h-2': isSeeking }"
-          role="slider"
-          :aria-label="`Seek: ${formatTime(currentTime)} of ${formatTime(videoDuration)}`"
-          :aria-valuenow="Math.round(currentTime)"
-          :aria-valuemin="0"
-          :aria-valuemax="Math.round(videoDuration)"
-          :aria-valuetext="`${formatTime(currentTime)} of ${formatTime(videoDuration)}`"
-          @mousedown.prevent="startSeek"
-          @touchstart.prevent="startSeek"
-        >
-          <div class="absolute inset-y-0 left-0 rounded-full bg-white/30" :style="{ width: `${buffered}%` }" />
-          <div class="absolute inset-y-0 left-0 rounded-full bg-white" :style="{ width: `${progress}%` }" />
-          <div
-            class="absolute top-1/2 size-3.5 rounded-full bg-white opacity-0 shadow-md transition-opacity group-hover/seek:opacity-100"
-            :class="{ '!opacity-100': isSeeking }"
-            :style="{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }"
-          />
-        </div>
-
-        <div class="flex items-center gap-1 text-white">
-          <button
-            type="button"
-            class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center transition-transform active:scale-90"
-            :aria-label="paused ? 'Play' : 'Pause'"
-            @click.stop="togglePlay"
-          >
-            <PhPlay v-if="paused" :size="20" weight="fill" />
-            <PhPause v-else :size="20" weight="fill" />
-          </button>
-
-          <div
-            class="relative"
-            @mouseenter="showVolumeSlider = true"
-            @mouseleave="!isDraggingVolume && (showVolumeSlider = false)"
-          >
-            <button
-              type="button"
-              class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center transition-transform active:scale-90"
-              :aria-label="isMuted ? 'Unmute' : 'Mute'"
-              @click.stop="toggleMute"
-            >
-              <component :is="volumeIcon" :size="20" />
-            </button>
-
-            <Transition name="volume-slider">
-              <div
-                v-if="showVolumeSlider || isDraggingVolume"
-                class="absolute bottom-full left-1/2 hidden pb-2 lg:block"
-                style="transform: translateX(-50%)"
-                @click.stop
-              >
-                <div class="rounded-lg bg-black/75 px-1 py-3 backdrop-blur-sm">
-                  <!-- Slider track container: 36px wide hit area, 100px tall -->
-                  <div
-                    ref="volumeSliderRef"
-                    class="group/vol relative mx-auto flex h-[88px] w-9 cursor-pointer items-center justify-center select-none"
-                    style="touch-action: none"
-                    role="slider"
-                    aria-label="Volume"
-                    aria-orientation="vertical"
-                    :aria-valuenow="Math.round(volume * 100)"
-                    :aria-valuemin="0"
-                    :aria-valuemax="100"
-                    :aria-valuetext="`${Math.round(volume * 100)}% volume`"
-                    tabindex="0"
-                    @pointerdown="onVolumePointerDown"
-                    @pointermove="onVolumePointerMove"
-                    @pointerup="onVolumePointerUp"
-                    @keydown.stop="handleVolumeKeyDown"
-                  >
-                    <div class="relative h-full w-[3px] rounded-full bg-white/30">
-                      <div
-                        class="absolute inset-x-0 bottom-0 rounded-full bg-white"
-                        :style="{ height: `${volumeSliderPercent}%` }"
-                      />
-                      <div
-                        class="absolute size-3 rounded-full bg-white shadow-md transition-[bottom,scale]"
-                        :style="{ bottom: `calc(${volumeSliderPercent}% - 6px)`, left: '-4.5px' }"
-                        :class="isDraggingVolume ? 'scale-125' : 'group-hover/vol:scale-110'"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Transition>
-          </div>
-
-          <span class="text-xs tabular-nums text-white/80" aria-hidden="true">
-            {{ formatTime(currentTime) }} / {{ formatTime(videoDuration) }}
-          </span>
-
-          <div class="flex-1" />
-
-          <button
-            type="button"
-            class="flex h-7 cursor-pointer items-center justify-center rounded-full bg-white/20 px-2 text-xs font-semibold tabular-nums transition-all hover:bg-white/30 active:scale-90"
-            aria-label="Playback speed"
-            @click.stop="cycleSpeed"
-          >
-            {{ formatSpeed(playbackSpeed) }}
-          </button>
-
-          <button
-            v-if="hasCaptions"
-            type="button"
-            class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center transition-transform active:scale-90"
-            :class="{ 'text-galaxy-400': showCaptions }"
-            :aria-label="showCaptions ? 'Hide captions' : 'Show captions'"
-            :aria-pressed="showCaptions"
-            @click.stop="toggleCaptions"
-          >
-            <PhClosedCaptioning :size="20" :weight="showCaptions ? 'fill' : 'regular'" />
-          </button>
-
-          <button
-            v-if="canPiP"
-            type="button"
-            class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center transition-transform active:scale-90"
-            aria-label="Picture in picture"
-            @click.stop="togglePiP"
-          >
-            <PhPictureInPicture :size="20" />
-          </button>
-
-          <button
-            type="button"
-            class="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center transition-transform active:scale-90"
-            :aria-label="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
-            @click.stop="toggleFullscreen"
-          >
-            <PhArrowsIn v-if="isFullscreen" :size="20" />
-            <PhArrowsOut v-else :size="20" />
-          </button>
-        </div>
-      </div>
+      <VideoPlayerControls
+        :paused="paused"
+        :current-time="currentTime"
+        :duration="videoDuration"
+        :buffered="buffered"
+        :progress="progress"
+        :is-seeking="isSeeking"
+        :is-fullscreen="isFullscreen"
+        :is-muted="isMuted"
+        :volume="volume"
+        :playback-speed="playbackSpeed"
+        :show-captions="showCaptions"
+        :has-captions="hasCaptions"
+        :can-pi-p="canPiP"
+        :controls-visible="controlsVisible"
+        @toggle-play="togglePlay"
+        @toggle-mute="toggleMute"
+        @toggle-fullscreen="toggleFullscreen"
+        @toggle-pip="togglePiP"
+        @toggle-captions="toggleCaptions"
+        @cycle-speed="cycleSpeed"
+        @seek-start="handleSeekStart"
+        @set-volume="handleSetVolume"
+      />
     </div>
 
     <div

@@ -78,20 +78,20 @@ const isReblog = computed(() => props.status.reblog !== null);
 const displayStatus = computed(() => props.status.reblog ?? props.status);
 const booster = computed(() => isReblog.value ? props.status.account : null);
 
-// Get quoted status if available (Quote has quotedStatus, ShallowQuote doesn't)
+const quote = computed(() => displayStatus.value.quote);
+
 const quotedStatus = computed(() => {
-  const quote = displayStatus.value.quote;
-  if (quote && 'quotedStatus' in quote && quote.quotedStatus) {
-    return quote.quotedStatus;
+  const q = quote.value;
+  if (q && 'quotedStatus' in q && q.quotedStatus) {
+    return q.quotedStatus;
   }
   return null;
 });
 
-// Clean content: strip ActivityPub artifacts
 const cleanedContent = useCleanContent(
   () => displayStatus.value.content,
   () => displayStatus.value.tags,
-  () => !!quotedStatus.value,
+  () => !!quote.value,
 );
 
 const isRemoteUser = computed(() => displayStatus.value.account.acct.includes('@'));

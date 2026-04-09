@@ -2,7 +2,7 @@ import type { Tag } from '@repo/types';
 import type { MaybeRefOrGetter } from 'vue';
 import { computed, toValue } from 'vue';
 
-const QUOTE_RE = /<p[^>]*>RE:\s*<a[^>]*>[^<]*<\/a>\s*<\/p>/i;
+const QUOTE_RE = /<p[^>]*>\s*RE:\s*(?:<a[^>]*>[^<]*<\/a>|https?:\/\/\S+)\s*<\/p>/i;
 
 // Matches a trailing <p> that contains ONLY hashtag links and whitespace.
 // Uses [^<]* instead of .*? to prevent catastrophic backtracking.

@@ -18,6 +18,16 @@ describe('useCleanContent', () => {
       expect(clean(html, [], false)).toBe(html);
     });
 
+    it('strips RE: with plain text URL (no anchor tag)', () => {
+      const html = '<p>RE: https://berlin.social/@user/12345</p><p>My reply</p>';
+      expect(clean(html, [], true)).toBe('<p>My reply</p>');
+    });
+
+    it('strips RE: with quote-inline class', () => {
+      const html = '<p class="quote-inline">RE: <a href="https://example.com/post">https://example.com/post</a></p><p>My reply</p>';
+      expect(clean(html, [], true)).toBe('<p>My reply</p>');
+    });
+
     it('handles content with no RE: paragraph', () => {
       const html = '<p>Just a normal post</p>';
       expect(clean(html, [], true)).toBe(html);

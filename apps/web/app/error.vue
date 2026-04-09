@@ -12,6 +12,12 @@ const props = defineProps<{
 const code = computed(() => props.error.statusCode || 500);
 const isDev = import.meta.dev;
 
+if (import.meta.client && code.value === 401) {
+  const currentPath = window.location.pathname;
+  const redirect = currentPath !== '/login' ? `?redirect=${encodeURIComponent(currentPath)}` : '';
+  clearError({ redirect: `/login${redirect}` });
+}
+
 const errorConfig = computed(() => {
   switch (code.value) {
     case 401:

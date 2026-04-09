@@ -38,7 +38,7 @@ const emit = defineEmits<{
 const cleanedContent = useCleanContent(
   () => props.status.content,
   () => props.status.tags,
-  () => !!(props.status.quote && 'quotedStatus' in props.status.quote && props.status.quote.quotedStatus),
+  () => !!props.status.quote,
 );
 </script>
 
