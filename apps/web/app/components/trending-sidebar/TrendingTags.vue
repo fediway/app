@@ -7,7 +7,7 @@ const { getTrendingTags } = useExploreData();
 const { data: tags, error } = getTrendingTags();
 
 const trendingTags = computed(() =>
-  tags.value.slice(0, 7).map(tag => ({
+  tags.value.slice(0, 5).map(tag => ({
     name: tag.name,
     postCount: tag.history?.[0]?.uses ? `${tag.history[0].uses} posts` : undefined,
   })),

@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 const { getTrendingLinks } = useExploreData();
 const { data: links, error } = getTrendingLinks();
 
-const topLinks = computed(() => links.value.slice(0, 4));
+const topLinks = computed(() => links.value.slice(0, 3));
 
 function getLinkPageUrl(url: string): string {
   return `/links/${encodeURIComponent(url)}`;
