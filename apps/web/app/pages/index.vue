@@ -131,6 +131,11 @@ function handleTagClick(tag: string) {
 const isLoadingMore = ref(false);
 const loadMoreCooldown = ref(false);
 
+function handleShowNew() {
+  activeTimeline.value?.showNew();
+  globalThis.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function handleLoadMore() {
   const tl = activeTimeline.value;
   if (!tl || isLoadingMore.value || loadMoreCooldown.value)
@@ -283,7 +288,7 @@ onUnmounted(() => {
               <Button
                 variant="secondary"
                 size="sm"
-                @click="activeTimeline!.showNew()"
+                @click="handleShowNew"
               >
                 {{ activeTimeline!.newStatusCount.value }} new {{ activeTimeline!.newStatusCount.value === 1 ? 'post' : 'posts' }}
               </Button>
