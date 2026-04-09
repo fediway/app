@@ -101,7 +101,7 @@ function toggleCollapse() {
       <button
         v-if="maxLines && isTruncated && !isExpanded"
         type="button"
-        class="mt-2 cursor-pointer rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+        class="mt-1 cursor-pointer text-base font-semibold text-galaxy-500 dark:text-galaxy-400"
         @click.stop="isExpanded = true"
       >
         Show more

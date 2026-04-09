@@ -5,6 +5,8 @@ import { useAuthState } from '~/composables/useAuthState';
 import { useDataMode } from '~/composables/useDataMode';
 
 export default defineNuxtPlugin(async () => {
+  useSettings();
+
   const { restoreSession, isAuthenticated } = useAuth();
   const { setAuthenticated, clearAuthenticated } = useAuthState();
   const { mode, setMode } = useDataMode();
