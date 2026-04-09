@@ -127,9 +127,10 @@ export const mockStatusesPage2 = [
 
 export const mockNotifications = [
   { id: 'notif-1', type: 'favourite', createdAt: hour(1), account: mockAccount2, status: mockStatuses[0], groupKey: 'fav-1' },
-  { id: 'notif-2', type: 'reblog', createdAt: hour(2), account: mockAccount2, status: mockStatuses[2], groupKey: 'reb-1' },
-  { id: 'notif-3', type: 'follow', createdAt: hour(3), account: mockAccount2, status: undefined, groupKey: 'fol-1' },
-  { id: 'notif-4', type: 'mention', createdAt: hour(4), account: mockAccount2, status: mockStatuses[1], groupKey: 'men-1' },
+  { id: 'notif-2', type: 'favourite', createdAt: hour(1), account: mockRemoteAccount, status: mockStatuses[0], groupKey: 'fav-1' },
+  { id: 'notif-3', type: 'reblog', createdAt: hour(2), account: mockAccount2, status: mockStatuses[2], groupKey: 'reb-1' },
+  { id: 'notif-4', type: 'follow', createdAt: hour(3), account: mockRemoteAccount, status: undefined, groupKey: 'fol-1' },
+  { id: 'notif-5', type: 'mention', createdAt: hour(4), account: mockAccount2, status: mockStatuses[1], groupKey: 'men-1' },
 ];
 
 export const mockTrendingTags = [
