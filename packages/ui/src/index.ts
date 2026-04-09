@@ -42,6 +42,9 @@ export {
 } from './components/compose';
 export type { MediaItem } from './components/compose';
 
+// Feed components
+export { NewPostsPill } from './components/feed';
+
 // Feedback components
 export { FeedbackModal } from './components/feedback';
 

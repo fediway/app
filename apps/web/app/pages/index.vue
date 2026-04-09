@@ -2,7 +2,7 @@
 import type { MediaAttachment, Status } from '@repo/types';
 import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useAuth, useTimeline } from '@repo/api';
-import { Button, EmptyState, Skeleton, Status as StatusComponent, useInfiniteScroll, usePullToRefresh } from '@repo/ui';
+import { EmptyState, NewPostsPill, Skeleton, Status as StatusComponent, useInfiniteScroll, usePullToRefresh } from '@repo/ui';
 import { useFeedType } from '~/composables/useFeedType';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -130,6 +130,22 @@ function handleTagClick(tag: string) {
 
 const isLoadingMore = ref(false);
 const loadMoreCooldown = ref(false);
+
+const newPostAvatars = computed(() => {
+  const pending = activeTimeline.value?.pendingStatuses.value ?? [];
+  const seen = new Set<string>();
+  const avatars: string[] = [];
+  for (const s of pending) {
+    const acct = s.account.acct;
+    if (!seen.has(acct)) {
+      seen.add(acct);
+      avatars.push(s.account.avatar);
+      if (avatars.length >= 3)
+        break;
+    }
+  }
+  return avatars;
+});
 
 function handleShowNew() {
   activeTimeline.value?.showNew();
@@ -285,13 +301,11 @@ onUnmounted(() => {
           <div v-else key="content">
             <!-- New posts banner (home timeline only) -->
             <div v-if="activeTimeline?.newStatusCount.value" role="status" class="sticky top-14 z-10 flex justify-center py-2">
-              <Button
-                variant="secondary"
-                size="sm"
+              <NewPostsPill
+                :count="activeTimeline!.newStatusCount.value"
+                :avatars="newPostAvatars"
                 @click="handleShowNew"
-              >
-                {{ activeTimeline!.newStatusCount.value }} new {{ activeTimeline!.newStatusCount.value === 1 ? 'post' : 'posts' }}
-              </Button>
+              />
             </div>
 
             <!-- First 2 posts -->
