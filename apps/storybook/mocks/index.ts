@@ -9,6 +9,6 @@ export {
   createPortraitAttachment,
   createVideoAttachment,
 } from './media';
-export { createMockNotification } from './notification';
+export { createMockNotification, createMockNotificationGroup } from './notification';
 export { createMockPreviewCard } from './preview-card';
 export { createMockStatus } from './status';

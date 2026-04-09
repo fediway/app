@@ -75,7 +75,8 @@ export type {
 } from './components/navigation';
 
 // Notification components
-export { NotificationItem, NotificationList } from './components/notification';
+export { NotificationGroup, NotificationList } from './components/notification';
+export type { NotificationGroupType } from './components/notification';
 
 // Status components
 export {

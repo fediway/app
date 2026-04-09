@@ -2,25 +2,63 @@
 import type { Notification } from '@repo/types';
 import { useNotificationMarker } from '@repo/api';
 import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
+import { computed, watch } from 'vue';
+import { useFollows } from '~/composables/useFollows';
 
 const router = useRouter();
 const { getNotifications } = useNotificationData();
 const { getProfilePath, getStatusPath } = useAccountData();
 const { lastReadId } = useNotificationMarker();
+const { toggleFollow, getRelationship, fetchRelationships } = useFollows();
 
 const { data: notifications, isLoading, error, refetch } = getNotifications();
+
+const followNotificationAccts = computed(() => {
+  return notifications.value
+    .filter(n => n.type === 'follow')
+    .map(n => ({ id: n.account.id, acct: n.account.acct }));
+});
+
+watch(followNotificationAccts, (accts) => {
+  const ids = accts.map(a => a.id);
+  if (ids.length > 0) {
+    fetchRelationships(ids);
+  }
+}, { immediate: true });
+
+const followBackAccts = computed(() => {
+  const set = new Set<string>();
+  for (const { id, acct } of followNotificationAccts.value) {
+    const rel = getRelationship(id);
+    if (!rel.following) {
+      set.add(acct);
+    }
+  }
+  return set;
+});
 
 function handleNotificationClick(notification: Notification) {
   if (notification.status) {
     router.push(getStatusPath(notification.status.id, notification.status.account.acct));
   }
-  else if (notification.type === 'follow') {
+  else if (notification.type === 'follow' || notification.type === 'follow_request') {
     router.push(getProfilePath(notification.account.acct));
   }
 }
 
-function navigateToProfile(acct: string) {
-  router.push(getProfilePath(acct));
+function handleFollowBack(acct: string) {
+  const account = notifications.value.find(n => n.account.acct === acct)?.account;
+  if (account) {
+    toggleFollow(account.id);
+  }
+}
+
+function handleAcceptRequest(_accountId: string) {
+  // TODO(#follow-requests): wire to client.rest.v1.followRequests.$select(accountId).authorize()
+}
+
+function handleRejectRequest(_accountId: string) {
+  // TODO(#follow-requests): wire to client.rest.v1.followRequests.$select(accountId).reject()
 }
 </script>
 
@@ -47,9 +85,13 @@ function navigateToProfile(acct: string) {
         :notifications="notifications"
         :loading="isLoading && notifications.length === 0"
         :last-read-id="lastReadId ?? undefined"
+        :follow-back-accts="followBackAccts"
         @click="handleNotificationClick"
-        @profile-click="navigateToProfile"
-        @tag-click="(tag) => router.push(`/tags/${tag}`)"
+        @profile-click="acct => router.push(getProfilePath(acct))"
+        @tag-click="tag => router.push(`/tags/${tag}`)"
+        @follow-back="handleFollowBack"
+        @accept-request="handleAcceptRequest"
+        @reject-request="handleRejectRequest"
       />
 
       <template #fallback>

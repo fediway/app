@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
+import type { NotificationGroup } from './groupNotifications';
 import { PhCircleNotch } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { useInfiniteScroll } from '../../composables/useInfiniteScroll';
 import { EmptyState } from '../ui/empty-state';
 import { Skeleton } from '../ui/skeleton';
-import NotificationItem from './NotificationItem.vue';
+import { groupNotifications } from './groupNotifications';
+import NotificationGroupItem from './NotificationGroup.vue';
 
 const props = defineProps<{
   notifications: Notification[];
@@ -14,24 +16,39 @@ const props = defineProps<{
   hasMore?: boolean;
   lastReadId?: string;
   error?: string;
+  followBackAccts?: Set<string>;
 }>();
 
 const emit = defineEmits<{
   click: [notification: Notification];
+  groupClick: [group: NotificationGroup];
   profileClick: [acct: string];
   tagClick: [tag: string];
+  followBack: [acct: string];
+  acceptRequest: [accountId: string];
+  rejectRequest: [accountId: string];
   loadMore: [];
   retry: [];
 }>();
 
-function isUnread(id: string): boolean {
+const groups = computed(() => groupNotifications(props.notifications));
+
+function isUnread(mostRecentId: string): boolean {
   if (!props.lastReadId)
     return false;
   try {
-    return BigInt(id) > BigInt(props.lastReadId);
+    return BigInt(mostRecentId) > BigInt(props.lastReadId);
   }
   catch {
-    return id > props.lastReadId;
+    return mostRecentId > props.lastReadId;
+  }
+}
+
+function handleGroupClick(group: NotificationGroup) {
+  emit('groupClick', group);
+  const firstNotification = props.notifications.find(n => n.id === group.mostRecentId);
+  if (firstNotification) {
+    emit('click', firstNotification);
   }
 }
 
@@ -44,14 +61,14 @@ const { sentinelRef } = useInfiniteScroll({
 <template>
   <!-- Loading skeleton -->
   <div v-if="loading && notifications.length === 0" class="divide-y divide-border">
-    <div v-for="i in 4" :key="i" class="flex gap-3 px-4 py-3">
-      <Skeleton class="mt-0.5 size-5 rounded" />
-      <div class="flex-1 space-y-2">
-        <div class="flex items-center gap-2">
-          <Skeleton class="size-8 rounded-full" />
-          <Skeleton class="h-4 w-1/3" />
+    <div v-for="i in 5" :key="i" class="flex gap-3 px-4 py-3.5">
+      <Skeleton class="mt-0.5 size-6 rounded" />
+      <div class="flex-1 space-y-2.5">
+        <div class="flex -space-x-1">
+          <Skeleton v-for="j in 2" :key="j" class="size-8 rounded-full ring-2 ring-card" />
         </div>
-        <Skeleton class="h-3 w-2/3" />
+        <Skeleton class="h-4 w-2/3" />
+        <Skeleton class="h-3 w-1/2" />
       </div>
     </div>
   </div>
@@ -64,16 +81,19 @@ const { sentinelRef } = useInfiniteScroll({
     @action="$emit('retry')"
   />
 
-  <!-- Notification list -->
-  <div v-else-if="notifications.length > 0" class="divide-y divide-border">
-    <NotificationItem
-      v-for="notification in notifications"
-      :key="notification.id"
-      :notification="notification"
-      :unread="isUnread(notification.id)"
-      @click="n => $emit('click', n)"
+  <!-- Grouped notification list -->
+  <div v-else-if="groups.length > 0" class="divide-y divide-border">
+    <NotificationGroupItem
+      v-for="group in groups"
+      :key="group.id"
+      :group="group"
+      :unread="isUnread(group.mostRecentId)"
+      :show-follow-back="group.type === 'follow' && !!followBackAccts?.has(group.accounts[0]?.acct ?? '')"
+      @click="handleGroupClick"
       @profile-click="acct => $emit('profileClick', acct)"
-      @tag-click="tag => $emit('tagClick', tag)"
+      @follow-back="acct => $emit('followBack', acct)"
+      @accept-request="id => $emit('acceptRequest', id)"
+      @reject-request="id => $emit('rejectRequest', id)"
     />
   </div>
 
