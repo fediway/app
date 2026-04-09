@@ -17,6 +17,7 @@ const linkUrl = computed(() => {
 
 const linkInfo = computed(() => getLinkInfo(linkUrl.value || ''));
 const { data: rawStatuses, isLoading } = getStatusesByLink(linkUrl.value || '');
+const { data: trendingLinks } = useExploreData().getTrendingLinks();
 
 const allStatuses = useWebActions().withStoreState(rawStatuses);
 
@@ -39,15 +40,26 @@ const statuses = computed(() =>
 // Item: read from store first (instant if seeded by explore/search),
 // fall back to API-derived data, then skeleton if nothing available
 const item = computed<Item | null>(() => {
-  // 1. Store has it (seeded by explore/news or search)
-  const cached = itemStore.get(linkUrl.value || '');
+  const url = linkUrl.value || '';
+
+  // 1. Store has it (seeded by explore/news, sidebar, or search)
+  const cached = itemStore.get(url);
   if (cached)
     return cached;
 
-  // 2. API response has it (after statusesByLink fetch)
+  // 2. Search results have a matching card
   if (linkInfo.value) {
     const fresh = previewCardToItem(linkInfo.value);
-    itemStore.set(fresh); // seed for future navigations
+    itemStore.set(fresh);
+    return fresh;
+  }
+
+  // 3. Trending links have it (direct page load / reload)
+  const decoded = decodeURIComponent(url);
+  const trendingMatch = trendingLinks.value.find(l => l.url === decoded);
+  if (trendingMatch) {
+    const fresh = previewCardToItem(trendingMatch);
+    itemStore.set(fresh);
     return fresh;
   }
 

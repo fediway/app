@@ -1,10 +1,18 @@
 <script setup lang="ts">
+import { previewCardToItem, useItemStore } from '@repo/api';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 
 const { getTrendingLinks } = useExploreData();
 const { data: links, error } = getTrendingLinks();
+const itemStore = useItemStore();
 
 const topLinks = computed(() => links.value.slice(0, 3));
+
+watch(links, (newLinks) => {
+  if (newLinks.length > 0) {
+    itemStore.setMany(newLinks.map(link => previewCardToItem(link)));
+  }
+}, { immediate: true });
 
 function getLinkPageUrl(url: string): string {
   return `/links/${encodeURIComponent(url)}`;
