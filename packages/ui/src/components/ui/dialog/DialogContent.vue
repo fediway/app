@@ -42,9 +42,9 @@ const sizeClasses: Record<string, string> = {
         // Mobile full-screen mode
         fullScreenMobile
           ? [
-            'inset-0 rounded-none',
+            'top-0 left-0 right-0 h-dvh rounded-none',
             'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
-            'lg:inset-auto lg:left-1/2 lg:top-[10vh] lg:-translate-x-1/2 lg:rounded-2xl',
+            'lg:inset-auto lg:h-auto lg:left-1/2 lg:top-[10vh] lg:-translate-x-1/2 lg:rounded-2xl',
             'lg:data-[state=closed]:zoom-out-95 lg:data-[state=open]:zoom-in-95',
             'lg:data-[state=closed]:slide-out-to-top-2 lg:data-[state=open]:slide-in-from-top-2',
           ]

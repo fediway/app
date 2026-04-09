@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#ede6d6] dark:bg-[#373442] overflow-hidden">
+  <div class="min-h-dvh bg-[#ede6d6] dark:bg-[#373442] overflow-hidden">
     <slot />
   </div>
 </template>
