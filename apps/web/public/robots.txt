@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /@
+Allow: /explore
+Allow: /tags/
+
+Disallow: /settings
+Disallow: /favourites
+Disallow: /saved
+Disallow: /messages
+Disallow: /notifications
+Disallow: /oauth
+
+Sitemap: https://fediway.com/sitemap.xml

@@ -21,6 +21,7 @@ export default defineNuxtConfig({
   ssr: false,
 
   runtimeConfig: {
+    mastodonApiUrl: process.env.NUXT_MASTODON_API_URL || '',
     feedbackKaneoBaseUrl: process.env.FEEDBACK_KANEO_BASE_URL || '',
     feedbackKaneoApiKey: process.env.FEEDBACK_KANEO_API_KEY || '',
     feedbackKaneoProjectId: process.env.FEEDBACK_KANEO_PROJECT_ID || '',

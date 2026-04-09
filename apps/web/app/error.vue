@@ -9,41 +9,84 @@ const props = defineProps<{
   };
 }>();
 
-const is404 = computed(() => props.error.statusCode === 404);
+const code = computed(() => props.error.statusCode || 500);
 const isDev = import.meta.dev;
 
+const errorConfig = computed(() => {
+  switch (code.value) {
+    case 401:
+      return {
+        title: 'Session expired',
+        description: 'Please sign in again to continue.',
+        action: 'Sign in',
+        redirect: '/login',
+      };
+    case 403:
+      return {
+        title: 'Access denied',
+        description: 'You don\'t have permission to view this page.',
+        action: 'Go home',
+        redirect: '/',
+      };
+    case 404:
+      return {
+        title: 'Page not found',
+        description: 'The page you\'re looking for doesn\'t exist or has been moved.',
+        action: 'Go home',
+        redirect: '/',
+      };
+    case 429:
+      return {
+        title: 'Slow down',
+        description: 'You\'re making too many requests. Please wait a moment and try again.',
+        action: 'Try again',
+        redirect: null,
+      };
+    default:
+      return {
+        title: code.value >= 500 ? 'Server error' : 'Something went wrong',
+        description: code.value >= 500
+          ? 'The server encountered an error. This is usually temporary.'
+          : 'An unexpected error occurred.',
+        action: 'Try again',
+        redirect: null,
+      };
+  }
+});
+
 function handleAction() {
-  clearError({ redirect: '/' });
+  if (errorConfig.value.redirect) {
+    clearError({ redirect: errorConfig.value.redirect });
+  }
+  else {
+    clearError();
+    window.location.reload();
+  }
 }
 </script>
 
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center bg-card px-4">
     <div class="text-center">
-      <!-- Status code -->
       <p class="text-6xl font-bold text-accent">
-        {{ error.statusCode || 500 }}
+        {{ code }}
       </p>
 
-      <!-- Title -->
       <h1 class="mt-4 text-xl font-semibold text-foreground">
-        {{ is404 ? 'Page not found' : 'Something went wrong' }}
+        {{ errorConfig.title }}
       </h1>
 
-      <!-- Description -->
       <p class="mt-2 text-muted-foreground">
-        {{ is404 ? 'The page you\'re looking for doesn\'t exist.' : 'An unexpected error occurred.' }}
+        {{ errorConfig.description }}
       </p>
 
-      <!-- Dev error detail -->
       <p v-if="isDev && error.message" class="mt-4 max-w-md rounded bg-muted p-3 text-left text-xs text-muted-foreground">
         {{ error.message }}
       </p>
 
-      <!-- Action -->
       <div class="mt-8">
         <Button @click="handleAction">
-          {{ is404 ? 'Go home' : 'Reload' }}
+          {{ errorConfig.action }}
         </Button>
       </div>
     </div>
