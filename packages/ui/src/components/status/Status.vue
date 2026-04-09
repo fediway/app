@@ -77,6 +77,7 @@ const emit = defineEmits<{
 const isReblog = computed(() => props.status.reblog !== null);
 const displayStatus = computed(() => props.status.reblog ?? props.status);
 const booster = computed(() => isReblog.value ? props.status.account : null);
+const hasAnimatedMedia = computed(() => displayStatus.value.mediaAttachments.some(a => a.type === 'gifv' || a.type === 'video'));
 
 const quote = computed(() => displayStatus.value.quote);
 
@@ -152,7 +153,11 @@ function handleStatusClick(event: MouseEvent) {
 
     <!-- Main status -->
     <article
-      :class="cn('contain-layout-style-paint content-visibility-auto cursor-pointer transition-colors hover:bg-foreground/[0.03]', props.class)"
+      :class="cn(
+        'cursor-pointer transition-colors hover:bg-foreground/[0.03]',
+        !hasAnimatedMedia && 'contain-layout-style-paint content-visibility-auto',
+        props.class,
+      )"
       :tabindex="feedPosition ? 0 : undefined"
       :aria-posinset="feedPosition"
       :aria-setsize="feedPosition ? -1 : undefined"

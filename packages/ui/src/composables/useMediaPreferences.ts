@@ -26,8 +26,8 @@ export function useMediaPreferences() {
   /** Whether a video should autoplay (respects reduce motion) */
   const shouldAutoplayVideos = computed(() => !effectiveReduceMotion.value);
 
-  /** Whether GIFs should autoplay (respects both settings) */
-  const shouldAutoplayGifs = computed(() => autoplayGifs.value && !effectiveReduceMotion.value);
+  /** Whether GIFs should autoplay — explicit user setting overrides OS reduce motion */
+  const shouldAutoplayGifs = computed(() => autoplayGifs.value && !reduceMotion.value);
 
   /** Whether media should start revealed for a given sensitive flag */
   function shouldReveal(sensitive: boolean): boolean {

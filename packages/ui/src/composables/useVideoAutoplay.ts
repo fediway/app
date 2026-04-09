@@ -2,12 +2,6 @@ import type { Ref } from 'vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { useMediaPlayerState } from './useMediaPlayerState';
 
-/**
- * Autoplay a video when it enters the viewport, pause when it leaves.
- * Only one video plays at a time — entering a new one pauses the previous.
- *
- * Disabled when `enabled` ref is false (e.g. reduce motion, autoplay prefs).
- */
 export function useVideoAutoplay(
   videoRef: Ref<HTMLVideoElement | undefined>,
   videoId: string,
@@ -18,6 +12,29 @@ export function useVideoAutoplay(
 
   let observer: IntersectionObserver | null = null;
 
+  function tryPlay() {
+    if (!videoRef.value || !isVisible.value)
+      return;
+    if (options.enabled?.value === false)
+      return;
+
+    if (activeVideoId.value && activeVideoId.value !== videoId) {
+      const prev = document.querySelector(
+        `[data-video-id="${activeVideoId.value}"] video`,
+      ) as HTMLVideoElement | null;
+      prev?.pause();
+    }
+    setActiveVideo(videoId);
+    videoRef.value.play().catch(() => {});
+  }
+
+  function tryPause() {
+    if (activeVideoId.value === videoId) {
+      videoRef.value?.pause();
+      setActiveVideo(null);
+    }
+  }
+
   function setup() {
     if (!videoRef.value || typeof IntersectionObserver === 'undefined')
       return;
@@ -27,32 +44,11 @@ export function useVideoAutoplay(
         for (const entry of entries) {
           isVisible.value = entry.intersectionRatio >= 0.5;
 
-          // Don't autoplay if disabled
-          if (options.enabled?.value === false) {
-            if (activeVideoId.value === videoId) {
-              videoRef.value?.pause();
-              setActiveVideo(null);
-            }
-            return;
-          }
-
-          if (entry.intersectionRatio >= 0.5) {
-            // Entering viewport — play this, pause any other
-            if (activeVideoId.value && activeVideoId.value !== videoId) {
-              const prev = document.querySelector(
-                `[data-video-id="${activeVideoId.value}"] video`,
-              ) as HTMLVideoElement | null;
-              prev?.pause();
-            }
-            setActiveVideo(videoId);
-            videoRef.value?.play().catch(() => {});
+          if (isVisible.value) {
+            tryPlay();
           }
           else {
-            // Leaving viewport — pause
-            if (activeVideoId.value === videoId) {
-              videoRef.value?.pause();
-              setActiveVideo(null);
-            }
+            tryPause();
           }
         }
       },
@@ -62,19 +58,19 @@ export function useVideoAutoplay(
     observer.observe(videoRef.value);
   }
 
-  // Setup when video element is available
   watch(videoRef, (el) => {
     observer?.disconnect();
     if (el)
       setup();
   }, { immediate: true });
 
-  // When enabled changes, pause if disabled
   if (options.enabled) {
     watch(options.enabled, (enabled) => {
-      if (!enabled && activeVideoId.value === videoId) {
-        videoRef.value?.pause();
-        setActiveVideo(null);
+      if (enabled) {
+        tryPlay();
+      }
+      else {
+        tryPause();
       }
     });
   }

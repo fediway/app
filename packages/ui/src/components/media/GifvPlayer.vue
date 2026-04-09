@@ -33,6 +33,12 @@ const manuallyPlaying = ref(false);
 
 useVideoAutoplay(videoRef, props.videoId, { enabled: shouldAutoplayGifs });
 
+function onCanPlay() {
+  if (shouldAutoplayGifs.value && videoRef.value?.paused) {
+    videoRef.value.play().catch(() => {});
+  }
+}
+
 function handleClick(e: MouseEvent) {
   if (!shouldAutoplayGifs.value) {
     // Manual play/pause when autoplay is off
@@ -66,8 +72,10 @@ function handleClick(e: MouseEvent) {
       muted
       loop
       playsinline
-      preload="none"
+      :autoplay="shouldAutoplayGifs"
+      :preload="shouldAutoplayGifs ? 'auto' : 'none'"
       class="size-full object-cover"
+      @canplay="onCanPlay"
     />
 
     <!-- Play overlay when autoplay is off and not playing -->
