@@ -286,7 +286,7 @@ watch(isAuthenticated, (authenticated) => {
           @click="navigation.closeSidebar()"
         />
         <MobileHeader v-if="isAuthenticated" />
-        <main class="relative grid flex-1 overflow-clip [&>*]:col-start-1 [&>*]:row-start-1" :class="isMobileFullscreen ? '' : 'pb-20'">
+        <main class="relative grid min-w-0 flex-1 overflow-clip [&>*]:col-start-1 [&>*]:row-start-1 [&>*]:min-w-0" :class="isMobileFullscreen ? '' : 'pb-20'">
           <slot />
         </main>
       </div>
