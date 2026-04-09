@@ -46,6 +46,16 @@ function getPublicClient(): MastoClient {
 }
 
 /**
+ * Returns a public (unauthenticated) client for the default instance.
+ * Use for instance-level data (trending, explore) that doesn't vary by user.
+ */
+export function usePublicClient(): MastoClient {
+  if (isMockMode())
+    return getMockClient();
+  return getPublicClient();
+}
+
+/**
  * Returns the current MastoClient. Always returns a working client:
  * 1. Authenticated client (full read + write access)
  * 2. Mock client (when VITE_API_MODE=mock)

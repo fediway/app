@@ -8,26 +8,29 @@ const mockListTrendingTags = vi.fn();
 const mockListTagTimeline = vi.fn();
 const mockListSearch = vi.fn();
 
-vi.mock('../../../src/composables/useClient', () => ({
-  useClient: () => ({
-    rest: {
-      v1: {
-        trends: {
-          tags: { list: mockListTrendingTags },
-        },
-        timelines: {
-          tag: {
-            $select: (_tag: string) => ({
-              list: mockListTagTimeline,
-            }),
-          },
-        },
+const mockClient = {
+  rest: {
+    v1: {
+      trends: {
+        tags: { list: mockListTrendingTags },
       },
-      v2: {
-        search: { list: mockListSearch },
+      timelines: {
+        tag: {
+          $select: (_tag: string) => ({
+            list: mockListTagTimeline,
+          }),
+        },
       },
     },
-  }),
+    v2: {
+      search: { list: mockListSearch },
+    },
+  },
+};
+
+vi.mock('../../../src/composables/useClient', () => ({
+  useClient: () => mockClient,
+  usePublicClient: () => mockClient,
 }));
 
 vi.mock('../../../src/composables/useStatusStore', () => ({

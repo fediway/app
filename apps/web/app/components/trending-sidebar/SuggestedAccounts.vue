@@ -17,7 +17,7 @@ watch(suggestedAccounts, (accounts) => {
 
 <template>
   <Card v-if="!error && suggestedAccounts.length > 0" class="rounded-2xl border-border shadow-none">
-    <CardHeader class="p-4 pb-0">
+    <CardHeader class="p-4 pb-2">
       <CardTitle class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Who to follow
       </CardTitle>

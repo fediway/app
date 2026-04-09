@@ -3,7 +3,7 @@ import type { PaginatedQueryResult } from '../createPaginatedQuery';
 import type { QueryResult } from '../createQuery';
 import { createPaginatedQuery } from '../createPaginatedQuery';
 import { createQuery } from '../createQuery';
-import { useClient } from '../useClient';
+import { useClient, usePublicClient } from '../useClient';
 import { useStatusStore } from '../useStatusStore';
 
 const LEADING_HASH_RE = /^#/;
@@ -22,17 +22,18 @@ export interface LinkInfo {
 
 export function useExploreData() {
   const client = useClient();
+  const publicClient = usePublicClient();
   const store = useStatusStore();
 
   function getTrendingTags(): QueryResult<Tag[]> {
     return createQuery('trendingTags', [] as Tag[], async () => {
-      return await client.rest.v1.trends.tags.list();
+      return await publicClient.rest.v1.trends.tags.list();
     }, { scope: 'public' });
   }
 
   function getTrendingStatuses(): QueryResult<Status[]> {
     return createQuery('trendingStatuses', [] as Status[], async () => {
-      const result = await client.rest.v1.trends.statuses.list({ limit: 40 });
+      const result = await publicClient.rest.v1.trends.statuses.list({ limit: 40 });
       store.setMany(result as FediwayStatus[]);
       return result;
     }, { scope: 'public' });
@@ -40,7 +41,7 @@ export function useExploreData() {
 
   function getTrendingLinks(): QueryResult<TrendLink[]> {
     return createQuery('trendingLinks', [] as TrendLink[], async () => {
-      return await client.rest.v1.trends.links.list();
+      return await publicClient.rest.v1.trends.links.list();
     }, { scope: 'public' });
   }
 
