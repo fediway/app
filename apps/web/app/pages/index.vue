@@ -10,6 +10,8 @@ import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
 definePageMeta({ keepalive: true });
 
+const { hidden: mobileHeaderHidden } = useScrollDirection();
+
 const router = useRouter();
 const { getProfilePath, getStatusPath } = useAccountData();
 const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleDelete, handleMute, handleBlock, handleBlockDomain, handleReport, withStoreState, store, isAuthenticated: isAuthed } = useWebActions();
@@ -300,7 +302,7 @@ onUnmounted(() => {
           <!-- Feed content -->
           <div v-else key="content">
             <!-- New posts banner (home timeline only) -->
-            <div v-if="activeTimeline?.newStatusCount.value" role="status" class="sticky top-14 z-10 flex justify-center py-2">
+            <div v-if="activeTimeline?.newStatusCount.value" role="status" class="sticky z-10 flex justify-center py-2 transition-[top] duration-300 lg:top-14" :class="mobileHeaderHidden ? 'top-0' : 'top-14'">
               <NewPostsPill
                 :count="activeTimeline!.newStatusCount.value"
                 :avatars="newPostAvatars"
