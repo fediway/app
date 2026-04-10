@@ -2,7 +2,7 @@
 import type { MediaAttachment, Status } from '@repo/types';
 import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useAuth, useTimeline } from '@repo/api';
-import { EmptyState, NewPostsPill, Skeleton, Status as StatusComponent, useInfiniteScroll, usePullToRefresh } from '@repo/ui';
+import { EmptyState, NewPostsPill, Skeleton, Status as StatusComponent, useInfiniteScroll } from '@repo/ui';
 import { useFeedType } from '~/composables/useFeedType';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -209,23 +209,6 @@ watch(feedType, () => {
   fetchActiveFeed();
 });
 
-// Pull-to-refresh — only on touch devices, only for authenticated timeline
-const pullContainerRef = ref<HTMLElement>();
-const { isRefreshing, pullDistance, threshold, bind: bindPull } = usePullToRefresh(async () => {
-  if (activeTimeline.value) {
-    await activeTimeline.value.refresh();
-  }
-  else {
-    trending.refetch();
-  }
-});
-
-onMounted(() => {
-  if (pullContainerRef.value) {
-    bindPull(pullContainerRef.value);
-  }
-});
-
 onActivated(() => {
   activeTimeline.value?.startPolling(30_000);
 });
@@ -242,22 +225,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section ref="pullContainerRef" class="w-full">
-    <!-- Pull-to-refresh indicator -->
-    <div
-      v-if="pullDistance > 0 || isRefreshing"
-      class="flex items-center justify-center overflow-hidden text-sm text-muted-foreground transition-[height]"
-      :style="{ height: isRefreshing ? '48px' : `${pullDistance}px` }"
-    >
-      <span v-if="isRefreshing" class="flex items-center gap-2">
-        <PhCircleNotch :size="16" class="animate-spin" />
-        Refreshing
-      </span>
-      <span v-else>
-        {{ pullDistance >= threshold ? 'Release to refresh' : 'Pull to refresh' }}
-      </span>
-    </div>
-
+  <section class="w-full">
     <ClientOnly>
       <div
         role="feed"
