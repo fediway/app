@@ -72,7 +72,12 @@ function clearSearch() {
       <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
       <input
         v-model="search"
-        type="text"
+        type="search"
+        inputmode="search"
+        autocomplete="off"
+        autocapitalize="none"
+        autocorrect="off"
+        enterkeyhint="search"
         :placeholder="searchPlaceholder"
         class="w-full rounded-full bg-muted py-2 pl-10 pr-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted-foreground/70 focus:bg-card focus:ring-2 focus:ring-ring"
         @keydown="handleKeydown"

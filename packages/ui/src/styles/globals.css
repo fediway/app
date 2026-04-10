@@ -432,6 +432,34 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}
+
+button,
+a,
+[role="button"],
+[role="tab"],
+[role="checkbox"],
+[role="switch"],
+label {
+  touch-action: manipulation;
+}
+
+nav,
+header,
+footer,
+[role="navigation"],
+[role="toolbar"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea,
+select {
+  font-size: max(16px, 1rem);
 }
 
 /* Performance: skip rendering for off-screen feed items */

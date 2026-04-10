@@ -20,6 +20,10 @@ defineEmits<{
       type="text"
       :placeholder="placeholder ?? 'Write a message...'"
       :disabled="disabled"
+      autocomplete="off"
+      autocapitalize="sentences"
+      autocorrect="on"
+      enterkeyhint="send"
       class="flex-1 rounded-full bg-muted px-4 py-2 text-base outline-hidden transition-colors focus:bg-card focus:ring-2 focus:ring-ring"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     >

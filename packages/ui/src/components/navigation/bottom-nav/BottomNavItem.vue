@@ -22,8 +22,8 @@ defineEmits<{
     :is="href ? 'a' : 'button'"
     :href="href"
     :aria-label="ariaLabel ?? label"
-    class="relative flex w-10 shrink-0 cursor-pointer flex-col items-center"
-    :class="main ? 'h-10 justify-center rounded-full bg-secondary' : 'gap-0.5'"
+    class="relative flex w-11 shrink-0 cursor-pointer flex-col items-center"
+    :class="main ? 'h-11 justify-center rounded-full bg-secondary' : 'gap-0.5'"
     @click="$emit('click')"
   >
     <span class="relative">

@@ -39,7 +39,7 @@ function handleBack() {
 
 <template>
   <header
-    class="sticky top-0 left-0 right-0 z-[100] transition-transform duration-300 ease-out"
+    class="sticky top-0 left-0 right-0 z-[100] pt-[env(safe-area-inset-top)] transition-transform duration-300 ease-out"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
     <!-- Profile pages: transparent header overlaying banner -->
