@@ -33,6 +33,7 @@ export {
   ComposeTextarea,
   ComposeToolbar,
   ContentWarningToggle,
+  CustomEmojiPicker,
   EmojiPickerButton,
   MediaPreviewGrid,
   MediaPreviewItem,

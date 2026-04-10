@@ -3,6 +3,7 @@ export { default as CharacterCounter } from './CharacterCounter.vue';
 export { default as ComposeTextarea } from './ComposeTextarea.vue';
 export { default as ComposeToolbar } from './ComposeToolbar.vue';
 export { default as ContentWarningToggle } from './ContentWarningToggle.vue';
+export { default as CustomEmojiPicker } from './CustomEmojiPicker.vue';
 export { default as EmojiList } from './EmojiList.vue';
 export type { EmojiSuggestion } from './EmojiList.vue';
 export { default as EmojiPickerButton } from './EmojiPickerButton.vue';

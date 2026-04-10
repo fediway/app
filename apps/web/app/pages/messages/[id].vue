@@ -171,7 +171,7 @@ watch(() => threadStatuses.value.length, (newLen) => {
 </script>
 
 <template>
-  <div class="-mb-20 flex h-[calc(100dvh-3.5rem)] flex-col overflow-hidden">
+  <div class="-mb-20 flex h-[calc(100dvh-3.5rem-5rem)] flex-col overflow-hidden lg:h-[calc(100dvh-3.5rem)]">
     <ClientOnly>
       <!-- Loading -->
       <div v-if="isLoading" class="flex-1 space-y-3 p-4">

@@ -7,12 +7,12 @@ import {
   CharacterCounter,
   ComposeTextarea,
   ComposeToolbar,
+  CustomEmojiPicker,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogTitle,
-  EmojiPickerButton,
   Input,
   MediaPreviewGrid,
   PollEditor,
@@ -302,7 +302,7 @@ function confirmDiscard() {
                 @toggle-poll="canTogglePoll && (showPoll = !showPoll)"
                 @add-media="handleAddMedia"
               />
-              <EmojiPickerButton
+              <CustomEmojiPicker
                 :emoji="allEmoji"
                 :disabled="isSubmitting"
                 @select="editorRef?.insertText($event)"
