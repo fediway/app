@@ -13,7 +13,7 @@ import {
   Skeleton,
   Timeline,
 } from '@repo/ui';
-import { ref, shallowRef, watch, watchEffect } from 'vue';
+import { onActivated, ref, shallowRef, watch, watchEffect } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
@@ -39,9 +39,16 @@ const searchTabs = [
   { label: 'Links', value: 'links' },
 ];
 
-// Watch for query param changes
+// Sync query param → searchQuery (normal navigation + KeepAlive reactivation)
 watch(() => route.query.q, (newQuery) => {
   searchQuery.value = (newQuery as string) || '';
+});
+
+onActivated(() => {
+  const q = (route.query.q as string) || '';
+  if (q !== searchQuery.value) {
+    searchQuery.value = q;
+  }
 });
 
 // Search results — createQuery returns stable refs for the same key,
@@ -50,9 +57,16 @@ watch(() => route.query.q, (newQuery) => {
 const postResults = shallowRef<Status[]>([]);
 const accountResults = shallowRef<any[]>([]);
 const tagResults = shallowRef<any[]>([]);
-
 const isSearchLoading = ref(false);
-let currentQueryRefs: { posts: Ref<Status[]>; accounts: Ref<any[]>; tags: Ref<any[]>; postsLoading: Ref<boolean>; accountsLoading: Ref<boolean>; tagsLoading: Ref<boolean> } | null = null;
+
+const queryRefs = shallowRef<{
+  posts: Ref<Status[]>;
+  accounts: Ref<any[]>;
+  tags: Ref<any[]>;
+  postsLoading: Ref<boolean>;
+  accountsLoading: Ref<boolean>;
+  tagsLoading: Ref<boolean>;
+} | null>(null);
 
 watch(searchQuery, (query) => {
   if (!query.trim()) {
@@ -60,23 +74,23 @@ watch(searchQuery, (query) => {
     accountResults.value = [];
     tagResults.value = [];
     isSearchLoading.value = false;
-    currentQueryRefs = null;
+    queryRefs.value = null;
     activeTab.value = 'everything';
     return;
   }
   const posts = searchStatuses(query);
   const accounts = searchAccounts(query);
   const tags = searchTags(query);
-  currentQueryRefs = { posts: posts.data, accounts: accounts.data, tags: tags.data, postsLoading: posts.isLoading, accountsLoading: accounts.isLoading, tagsLoading: tags.isLoading };
+  queryRefs.value = { posts: posts.data, accounts: accounts.data, tags: tags.data, postsLoading: posts.isLoading, accountsLoading: accounts.isLoading, tagsLoading: tags.isLoading };
 }, { immediate: true });
 
-// Sync the query result refs into our local refs (reactive bridge)
 watchEffect(() => {
-  if (currentQueryRefs) {
-    postResults.value = currentQueryRefs.posts.value;
-    accountResults.value = currentQueryRefs.accounts.value;
-    tagResults.value = currentQueryRefs.tags.value;
-    isSearchLoading.value = currentQueryRefs.postsLoading.value || currentQueryRefs.accountsLoading.value || currentQueryRefs.tagsLoading.value;
+  const refs = queryRefs.value;
+  if (refs) {
+    postResults.value = refs.posts.value;
+    accountResults.value = refs.accounts.value;
+    tagResults.value = refs.tags.value;
+    isSearchLoading.value = refs.postsLoading.value || refs.accountsLoading.value || refs.tagsLoading.value;
   }
 });
 

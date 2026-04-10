@@ -65,7 +65,7 @@ export default defineNuxtConfig({
       title: 'Fediway',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content' },
         { name: 'description', content: 'Your feed, your way' },
         { name: 'theme-color', content: '#0a0a0a' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },

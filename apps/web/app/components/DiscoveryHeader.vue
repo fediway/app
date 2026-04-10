@@ -32,6 +32,7 @@ const tab = defineModel<string>('tab');
 
 const route = useRoute();
 const NuxtLink = resolveComponent('NuxtLink');
+const { hidden: mobileHeaderHidden } = useScrollDirection();
 
 function isRouteTab(t: Tab): t is RouteTab {
   return 'to' in t;
@@ -65,7 +66,7 @@ function clearSearch() {
 </script>
 
 <template>
-  <div class="sticky top-0 z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:top-14">
+  <div class="sticky z-10 border-b border-border bg-card/80 px-4 py-3 backdrop-blur transition-[top] duration-300 lg:top-14" :class="mobileHeaderHidden ? 'top-0' : 'top-14'">
     <!-- Search Input -->
     <div class="relative">
       <PhMagnifyingGlass :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
