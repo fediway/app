@@ -228,6 +228,9 @@ const editor = useEditor({
           return results.map(t => ({ ...t, id: t.name }));
         },
         render: createSuggestionRenderer(HashtagList),
+        command: ({ editor, range, props: item }) => {
+          editor.chain().focus().deleteRange(range).insertContent(`#${item.id} `).run();
+        },
       },
       renderLabel({ node }) {
         return `#${node.attrs.id}`;
