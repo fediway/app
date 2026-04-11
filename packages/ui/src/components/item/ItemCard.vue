@@ -82,7 +82,7 @@ const sublabel = computed(() => {
 </script>
 
 <template>
-  <div v-if="item" class="inline-flex items-center gap-3">
+  <div v-if="item" class="flex items-center gap-3">
     <img
       v-if="item.image"
       v-fade-on-load

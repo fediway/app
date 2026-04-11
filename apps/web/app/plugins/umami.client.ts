@@ -10,5 +10,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   script.defer = true;
   script.src = url;
   script.dataset.websiteId = websiteId;
+  script.dataset.autoTrack = 'false';
   document.head.appendChild(script);
 });
