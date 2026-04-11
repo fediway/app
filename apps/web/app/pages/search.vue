@@ -13,11 +13,9 @@ import {
   Skeleton,
   Timeline,
 } from '@repo/ui';
-import { onActivated, ref, shallowRef, watch, watchEffect } from 'vue';
+import { ref, shallowRef, watch, watchEffect } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
-
-definePageMeta({ keepalive: true });
 
 const route = useRoute();
 const router = useRouter();
@@ -39,16 +37,9 @@ const searchTabs = [
   { label: 'Links', value: 'links' },
 ];
 
-// Sync query param → searchQuery (normal navigation + KeepAlive reactivation)
+// Sync query param → searchQuery
 watch(() => route.query.q, (newQuery) => {
   searchQuery.value = (newQuery as string) || '';
-});
-
-onActivated(() => {
-  const q = (route.query.q as string) || '';
-  if (q !== searchQuery.value) {
-    searchQuery.value = q;
-  }
 });
 
 // Search results — createQuery returns stable refs for the same key,

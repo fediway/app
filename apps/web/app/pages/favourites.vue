@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { PageHeader, Skeleton } from '@repo/ui';
 
-definePageMeta({ keepalive: true });
-
 const { getFavouritedStatusesPaginated } = useTimelineData();
 const { data: rawStatuses, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getFavouritedStatusesPaginated();
 const statuses = useWebActions().withStoreState(rawStatuses);

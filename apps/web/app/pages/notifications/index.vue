@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Notification } from '@repo/types';
-import { useNotificationMarker } from '@repo/api';
-import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
+import { useClient, useNotificationMarker } from '@repo/api';
+import { EmptyState, NotificationList, Skeleton, useToast } from '@repo/ui';
 import { computed, watch } from 'vue';
 import { useFollows } from '~/composables/useFollows';
 
@@ -11,6 +11,8 @@ const { getProfilePath, getStatusPath } = useAccountData();
 const { lastReadId } = useNotificationMarker();
 const { toggleFollow, getRelationship, fetchRelationships } = useFollows();
 
+const client = useClient();
+const { toast } = useToast();
 const { data: notifications, isLoading, error, refetch } = getNotifications();
 
 const followNotificationAccts = computed(() => {
@@ -53,12 +55,26 @@ function handleFollowBack(acct: string) {
   }
 }
 
-function handleAcceptRequest(_accountId: string) {
-  // TODO(#follow-requests): wire to client.rest.v1.followRequests.$select(accountId).authorize()
+async function handleAcceptRequest(accountId: string) {
+  try {
+    await client.rest.v1.followRequests.$select(accountId).authorize();
+    toast.success('Follow request accepted');
+    refetch();
+  }
+  catch {
+    toast.error('Failed to accept request');
+  }
 }
 
-function handleRejectRequest(_accountId: string) {
-  // TODO(#follow-requests): wire to client.rest.v1.followRequests.$select(accountId).reject()
+async function handleRejectRequest(accountId: string) {
+  try {
+    await client.rest.v1.followRequests.$select(accountId).reject();
+    toast.success('Follow request declined');
+    refetch();
+  }
+  catch {
+    toast.error('Failed to decline request');
+  }
 }
 </script>
 

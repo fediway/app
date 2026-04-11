@@ -84,10 +84,9 @@ defineExpose({ onKeyDown });
         type="button"
         role="option"
         :aria-selected="index === selectedIndex"
-        class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left transition-colors"
+        class="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-1.5 text-left transition-colors"
         :class="index === selectedIndex ? 'bg-accent' : 'hover:bg-muted'"
-        @mousedown.prevent
-        @click="selectItem(index)"
+        @mousedown.prevent="selectItem(index)"
         @mouseenter="selectedIndex = index"
       >
         <span class="text-sm font-medium text-foreground">#{{ suggestion.name }}</span>

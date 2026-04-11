@@ -98,10 +98,9 @@ onMounted(() => {
         type="button"
         role="option"
         :aria-selected="index === selectedIndex"
-        class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors"
+        class="flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors"
         :class="index === selectedIndex ? 'bg-accent' : 'hover:bg-muted'"
-        @mousedown.prevent
-        @click="selectItem(index)"
+        @mousedown.prevent="selectItem(index)"
         @mouseenter="selectedIndex = index"
       >
         <Avatar :src="suggestion.avatar" :alt="suggestion.displayName" size="sm" />

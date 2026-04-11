@@ -8,8 +8,6 @@ import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
 import { useSendMessageModal } from '~/composables/useSendMessageModal';
 
-definePageMeta({ keepalive: true });
-
 const { hidden: mobileHeaderHidden } = useScrollDirection();
 
 const router = useRouter();
@@ -209,13 +207,8 @@ watch(feedType, () => {
   fetchActiveFeed();
 });
 
-onActivated(() => {
+onMounted(() => {
   activeTimeline.value?.startPolling(30_000);
-});
-
-onDeactivated(() => {
-  homeTimeline?.stopPolling();
-  publicTimeline?.stopPolling();
 });
 
 onUnmounted(() => {

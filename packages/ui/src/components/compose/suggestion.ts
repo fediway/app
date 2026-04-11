@@ -39,9 +39,12 @@ export function createSuggestionRenderer(component: Component): SuggestionOption
         if (!props.clientRect)
           return;
 
+        const editorEl = props.editor.view.dom;
+        const container = editorEl.closest('[role="dialog"]') || document.body;
+
         popup = tippy(document.body, {
           getReferenceClientRect: props.clientRect as () => DOMRect,
-          appendTo: () => document.body,
+          appendTo: () => container,
           content: renderer.element!,
           showOnCreate: true,
           interactive: true,
