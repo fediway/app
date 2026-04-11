@@ -104,7 +104,7 @@ function handleOpen() {
               v-model="search"
               type="text"
               placeholder="Search custom emoji..."
-              class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/70"
+              class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             >
             <button v-if="search" type="button" class="shrink-0 text-muted-foreground" @click="search = ''">
               <PhX :size="14" />

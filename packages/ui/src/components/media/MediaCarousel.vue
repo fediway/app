@@ -79,11 +79,11 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
       class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-muted cursor-pointer"
       @click="toggleReveal"
     >
-      <svg class="w-8 h-8 text-muted-foreground/60 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-8 h-8 text-muted-foreground mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
       </svg>
       <span class="text-sm text-muted-foreground font-medium">Sensitive content</span>
-      <span class="text-xs text-muted-foreground/60 mt-1">Click to reveal</span>
+      <span class="text-xs text-muted-foreground mt-1">Click to reveal</span>
     </div>
 
     <!-- Swiper Carousel -->
@@ -154,7 +154,7 @@ function focalPointStyle(attachment: MediaAttachment): Record<string, string> {
               v-else-if="attachment.type === 'audio'"
               class="w-full h-full flex items-center justify-center bg-accent"
             >
-              <svg class="w-12 h-12 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
               </svg>
             </div>

@@ -100,7 +100,7 @@ function handleOpenChange(open: boolean) {
               v-model="search"
               type="text"
               placeholder="Search emoji..."
-              class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/70"
+              class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             >
           </div>
         </div>

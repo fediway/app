@@ -47,7 +47,7 @@ const domain = computed(() => {
         class="flex h-40 w-full items-center justify-center rounded-lg bg-muted"
         style="background-image: linear-gradient(138deg, rgba(53, 13, 255, 0.056) 15%, rgba(168, 0, 253, 0.07) 35%, rgba(191, 128, 255, 0.063) 69%, rgba(255, 255, 255, 0.07) 92%);"
       >
-        <PhLink :size="32" class="text-muted-foreground/50" />
+        <PhLink :size="32" class="text-muted-foreground" />
       </div>
     </div>
 

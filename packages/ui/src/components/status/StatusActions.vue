@@ -78,7 +78,7 @@ const canReblog = computed(() =>
 <template>
   <div
     data-slot="status-actions"
-    :class="cn('flex items-center justify-between', !authenticated && 'opacity-50', props.class)"
+    :class="cn('flex items-center justify-between', !authenticated && 'opacity-60', props.class)"
   >
     <!-- Left cluster: favourite, reply, reblog -->
     <div class="flex items-center gap-2">

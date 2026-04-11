@@ -46,7 +46,7 @@ defineEmits<{
               :show-instance="false"
               class="block w-full truncate text-xs"
             />
-            <div class="mb-3 mt-1 text-xs text-muted-foreground/60">
+            <div class="mb-3 mt-1 text-xs text-muted-foreground">
               {{ account.followersCount != null ? formatCount(account.followersCount) : 0 }} followers
             </div>
             <!-- Action slot for follow button -->

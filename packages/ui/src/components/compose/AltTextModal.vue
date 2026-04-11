@@ -64,7 +64,7 @@ function handleOpenChange(open: boolean) {
           v-model="localAlt"
           placeholder="Describe this image for people who can't see it..."
           rows="3"
-          class="w-full resize-none rounded-xl border border-border bg-transparent px-3 py-2 text-base text-foreground outline-none placeholder:text-muted-foreground/70 focus:border-ring"
+          class="w-full resize-none rounded-xl border border-border bg-transparent px-3 py-2 text-base text-foreground outline-none placeholder:text-muted-foreground focus:border-ring"
           :maxlength="limit"
         />
 

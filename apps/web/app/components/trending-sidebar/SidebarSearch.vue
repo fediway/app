@@ -19,7 +19,7 @@ function handleSearch() {
     <InputGroupInput
       v-model="searchQuery"
       placeholder="Search"
-      class="text-base placeholder:text-muted-foreground/70"
+      class="text-base placeholder:text-muted-foreground"
       @keydown.enter="handleSearch"
     />
   </InputGroup>

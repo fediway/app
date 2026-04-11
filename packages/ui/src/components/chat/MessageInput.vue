@@ -34,7 +34,7 @@ defineEmits<{
       :class="[
         modelValue.trim()
           ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-          : 'cursor-not-allowed bg-muted text-muted-foreground/60',
+          : 'cursor-not-allowed bg-muted text-muted-foreground',
       ]"
     >
       <PhPaperPlaneRight :size="20" />

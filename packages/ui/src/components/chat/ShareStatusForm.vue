@@ -132,7 +132,7 @@ defineExpose({ reset });
         v-model="searchQuery"
         type="text"
         :placeholder="selectedRecipients.length > 0 ? 'Add more people...' : 'Search people...'"
-        class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/70"
+        class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
       >
     </div>
 
@@ -175,7 +175,7 @@ defineExpose({ reset });
           v-model="message"
           placeholder="Add a message..."
           rows="2"
-          class="w-full resize-none rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/70 focus:border-ring"
+          class="w-full resize-none rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring"
         />
       </div>
       <div class="flex items-center justify-between">

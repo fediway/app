@@ -64,7 +64,7 @@ function dismiss() {
       <p class="text-sm font-medium text-primary-foreground">
         {{ toast.title }}
       </p>
-      <p v-if="toast.description" class="text-sm text-primary-foreground/70">
+      <p v-if="toast.description" class="text-sm text-primary-foreground/80">
         {{ toast.description }}
       </p>
     </div>

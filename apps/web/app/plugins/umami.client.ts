@@ -1,7 +1,7 @@
-export default defineNuxtPlugin(() => {
-  const config = useRuntimeConfig();
-  const url = config.public.umamiUrl;
-  const websiteId = config.public.umamiWebsiteId;
+export default defineNuxtPlugin((nuxtApp) => {
+  const config = nuxtApp.$config.public as Record<string, string>;
+  const url = config.umamiUrl;
+  const websiteId = config.umamiWebsiteId;
 
   if (!url || !websiteId)
     return;

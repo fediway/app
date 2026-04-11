@@ -266,7 +266,7 @@ function thumbSrc(a: MediaAttachment): string {
             </div>
             <p
               class="line-clamp-2 text-xs"
-              :class="[isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground']"
+              :class="[isOwn ? 'text-primary-foreground/80' : 'text-muted-foreground']"
             >
               {{ sharedStatus.content }}
             </p>
@@ -295,7 +295,7 @@ function thumbSrc(a: MediaAttachment): string {
             <div class="p-2">
               <div
                 class="text-[11px]"
-                :class="[isOwn ? 'text-primary-foreground/50' : 'text-muted-foreground']"
+                :class="[isOwn ? 'text-primary-foreground/80' : 'text-muted-foreground']"
               >
                 {{ getDomain(card!.url) }}
               </div>
