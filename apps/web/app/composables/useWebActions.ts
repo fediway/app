@@ -1,8 +1,8 @@
 import type { Status } from '@repo/types';
+import type { AnalyticsSource } from './useAnalytics';
 import { useClient, useStatusActions, useStatusStore } from '@repo/api';
 import { useToast } from '@repo/ui';
 import { computed } from 'vue';
-import { useAuthGate } from './useAuthGate';
 
 /**
  * Web-specific wrapper around useStatusActions.
@@ -13,10 +13,30 @@ import { useAuthGate } from './useAuthGate';
  * - Errors: dev mode shows error detail, prod shows generic message
  * - Favourite/reblog: no toast (icon state change is sufficient feedback)
  */
+function detectSource(path: string): AnalyticsSource {
+  if (path === '/' || path === '/home')
+    return 'feed';
+  if (path.startsWith('/notifications'))
+    return 'notification';
+  if (path.startsWith('/messages'))
+    return 'message';
+  if (path.startsWith('/search'))
+    return 'search';
+  if (path.startsWith('/explore'))
+    return 'explore';
+  if (path.match(/^\/@[^/]+\/\d+/))
+    return 'status_detail';
+  if (path.match(/^\/@/))
+    return 'profile';
+  return 'feed';
+}
+
 export function useWebActions() {
   const store = useStatusStore();
   const { toast, removeToast } = useToast();
   const { requireAuth, isAuthenticated } = useAuthGate();
+  const route = useRoute();
+  const { trackFavourite, trackReblog, trackBookmark } = useAnalytics();
 
   // Track bookmark toast so we can dismiss it on error
   let bookmarkToastId: string | undefined;
@@ -225,10 +245,25 @@ export function useWebActions() {
     return { ...raw, ...stored } as Status;
   }
 
+  function trackedFavourite(statusId: string) {
+    toggleFavourite(statusId);
+    trackFavourite(detectSource(route.path));
+  }
+
+  function trackedReblog(statusId: string) {
+    toggleReblog(statusId);
+    trackReblog(detectSource(route.path));
+  }
+
+  function trackedBookmark(statusId: string) {
+    handleBookmark(statusId);
+    trackBookmark(detectSource(route.path));
+  }
+
   return {
-    toggleFavourite: requireAuth(toggleFavourite, 'like this post'),
-    toggleReblog: requireAuth(toggleReblog, 'repost this'),
-    handleBookmark: requireAuth(handleBookmark, 'save this post'),
+    toggleFavourite: requireAuth(trackedFavourite, 'like this post'),
+    toggleReblog: requireAuth(trackedReblog, 'repost this'),
+    handleBookmark: requireAuth(trackedBookmark, 'save this post'),
     handleCopyLink,
     handleShare,
     handleDelete: requireAuth(handleDelete, 'delete this post'),

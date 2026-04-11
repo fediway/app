@@ -73,6 +73,21 @@ export default defineNuxtPlugin(async () => {
   }
 
   const { toast } = useToast();
+  const { identify: identifyUser, trackPageView } = useAnalytics();
+  const router = useRouter();
+
+  // Identify user for analytics after auth is established
+  if (isAuthenticated.value) {
+    const store = useAccountStore();
+    if (store.currentUser.value?.acct) {
+      identifyUser(store.currentUser.value.acct);
+    }
+  }
+
+  // Track SPA page views with normalized routes
+  router.afterEach((to) => {
+    trackPageView(to.path);
+  });
 
   watch(isAuthenticated, (authenticated) => {
     if (authenticated) {

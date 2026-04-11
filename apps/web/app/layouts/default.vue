@@ -119,6 +119,8 @@ registerBackHandler(50, () => {
   return false;
 });
 
+const { trackPostCreated } = useAnalytics();
+
 function handlePost(data: { content: string; spoilerText: string; visibility: string; poll?: any; mediaIds?: string[]; idempotencyKey?: string }) {
   addPost({
     content: data.content,
@@ -130,6 +132,7 @@ function handlePost(data: { content: string; spoilerText: string; visibility: st
     mediaIds: data.mediaIds,
     idempotencyKey: data.idempotencyKey,
   });
+  trackPostCreated({ hasMedia: !!data.mediaIds?.length, isReply: !!replyingTo.value });
 }
 
 const { feedEl } = useFeedScroll();

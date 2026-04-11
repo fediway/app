@@ -34,6 +34,7 @@ onMounted(async () => {
   try {
     await handleOAuthCallback(code);
     setMode('live');
+    useAnalytics().trackLogin('oauth');
 
     // Restore redirect destination saved before OAuth round-trip
     const raw = sessionStorage.getItem('fediway_login_redirect') || '/';

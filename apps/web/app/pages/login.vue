@@ -239,6 +239,7 @@ function handleSubmit() {
             rel="noopener noreferrer"
             class="font-semibold text-foreground decoration-secondary underline underline-offset-2 transition-colors hover:text-foreground/70"
             :class="{ 'opacity-40 pointer-events-none': !isValidDomain }"
+            @click="useAnalytics().trackSignupStarted()"
           >
             Sign up
           </a>

@@ -46,6 +46,7 @@ async function handleSensitiveToggle() {
 }
 
 function handleLogout() {
+  useAnalytics().trackLogout();
   apiLogout();
   router.push('/');
 }
