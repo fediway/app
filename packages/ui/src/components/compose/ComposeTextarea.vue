@@ -200,6 +200,7 @@ const editor = useEditor({
     // @mention autocomplete
     Mention.configure({
       HTMLAttributes: { class: 'compose-mention' },
+      deleteTriggerWithBackspace: true,
       suggestion: {
         char: '@',
         allowSpaces: false,
@@ -214,9 +215,9 @@ const editor = useEditor({
         return `@${node.attrs.id ?? node.attrs.label}`;
       },
     }),
-    // #hashtag autocomplete (reuse Mention extension with different name)
     Mention.extend({ name: 'hashtag' }).configure({
       HTMLAttributes: { class: 'compose-hashtag' },
+      deleteTriggerWithBackspace: true,
       suggestion: {
         char: '#',
         allowSpaces: false,
@@ -224,7 +225,6 @@ const editor = useEditor({
           if (!query || !props.searchHashtags)
             return [];
           const results = await props.searchHashtags(query);
-          // Map name → id (Tiptap Mention expects item.id for node attrs)
           return results.map(t => ({ ...t, id: t.name }));
         },
         render: createSuggestionRenderer(HashtagList),
@@ -236,6 +236,7 @@ const editor = useEditor({
     // :emoji: autocomplete (reuse Mention extension with different name)
     Mention.extend({ name: 'emoji' }).configure({
       HTMLAttributes: { class: 'compose-emoji' },
+      deleteTriggerWithBackspace: true,
       suggestion: {
         char: ':',
         allowSpaces: false,
