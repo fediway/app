@@ -43,6 +43,24 @@ vi.mock('@repo/ui', () => ({
   }),
 }));
 
+// Mock Nuxt auto-imports
+vi.stubGlobal('useAuthGate', () => ({
+  requireAuth: (fn: (...args: unknown[]) => unknown) => fn,
+  isAuthenticated: ref(true),
+}));
+
+vi.stubGlobal('useRoute', () => ({
+  path: '/',
+}));
+
+vi.stubGlobal('useAnalytics', () => ({
+  trackFavourite: vi.fn(),
+  trackReblog: vi.fn(),
+  trackBookmark: vi.fn(),
+}));
+
+vi.stubGlobal('navigateTo', vi.fn());
+
 // Must import after mocks are set up
 const { useWebActions } = await import('../useWebActions');
 
