@@ -43,7 +43,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     items: [{ id: '1', label: 'Test' }],
     command: vi.fn(),
     clientRect: () => new DOMRect(0, 0, 100, 20),
-    editor: {},
+    editor: { view: { dom: document.createElement('div') } },
     ...overrides,
   } as any;
 }
