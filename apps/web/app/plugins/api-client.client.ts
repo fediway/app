@@ -85,6 +85,8 @@ export default defineNuxtPlugin(async () => {
   }
 
   // Track SPA page views with normalized routes
+  // Initial page load (afterEach doesn't fire for the first navigation)
+  trackPageView(router.currentRoute.value.path);
   router.afterEach((to) => {
     trackPageView(to.path);
   });

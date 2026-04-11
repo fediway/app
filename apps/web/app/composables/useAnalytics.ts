@@ -15,6 +15,8 @@ function track(event: string, data?: Record<string, string | number>) {
 }
 
 function normalizeRoute(path: string): { url: string; title: string } {
+  if (path.match(/^\/@[^/]+\/\d+\/(favourites|reblogs)/))
+    return { url: '/status/engagement', title: 'Status Engagement' };
   if (path.match(/^\/@[^/]+\/\d+/))
     return { url: '/status', title: 'Status Detail' };
   if (path.match(/^\/@[^/]+\/(followers|following)/))
@@ -31,6 +33,12 @@ function normalizeRoute(path: string): { url: string; title: string } {
     return { url: '/messages/new', title: 'New Message' };
   if (path.match(/^\/messages\/.+/))
     return { url: '/messages/thread', title: 'Message Thread' };
+  if (path.match(/^\/notifications\/.+/))
+    return { url: '/notifications/filtered', title: 'Notifications Filtered' };
+  if (path.startsWith('/settings/'))
+    return { url: '/settings/sub', title: 'Settings' };
+  if (path === '/oauth/callback')
+    return { url: '/oauth/callback', title: 'OAuth Callback' };
   return { url: path, title: '' };
 }
 
