@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Notification } from '@repo/types';
+import type { NotificationGroupType } from '@repo/ui';
 import type { NotificationFilter } from '~/composables/useNotificationData';
 import { useNotificationMarker } from '@repo/api';
 import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
@@ -16,12 +16,14 @@ const filterLabel = computed(() => NOTIFICATION_FILTERS[filter.value]?.label ?? 
 
 const { data: notifications, isLoading, isLoadingMore, error, hasMore, loadMore, refetch } = getNotificationsPaginated(filter.value);
 
-function handleNotificationClick(notification: Notification) {
-  if (notification.status) {
-    router.push(getStatusPath(notification.status.id, notification.status.account.acct));
+function handleGroupClick(group: NotificationGroupType) {
+  if (group.status) {
+    router.push(getStatusPath(group.status.id, group.status.account.acct));
   }
-  else if (notification.type === 'follow') {
-    router.push(getProfilePath(notification.account.acct));
+  else if (group.type === 'follow' || group.type === 'follow_request') {
+    const acct = group.accounts[0]?.acct;
+    if (acct)
+      router.push(getProfilePath(acct));
   }
 }
 
@@ -54,7 +56,7 @@ function navigateToProfile(acct: string) {
       :loading-more="isLoadingMore"
       :has-more="hasMore"
       :last-read-id="lastReadId ?? undefined"
-      @click="handleNotificationClick"
+      @group-click="handleGroupClick"
       @profile-click="navigateToProfile"
       @tag-click="(tag) => router.push(`/tags/${tag}`)"
       @load-more="loadMore()"

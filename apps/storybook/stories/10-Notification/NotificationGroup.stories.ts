@@ -37,12 +37,32 @@ export const Follow: Story = {
   args: { group: createMockNotificationGroup('follow', 1) },
 };
 
+export const FollowWithFollowBack: Story = {
+  args: {
+    group: createMockNotificationGroup('follow', 1),
+    showFollowBack: true,
+  },
+};
+
 export const MultipleFollows: Story = {
   args: { group: createMockNotificationGroup('follow', 5, { totalCount: 12 }) },
 };
 
+export const MultipleFollowsNoButton: Story = {
+  name: 'Multiple Follows (no follow-back button)',
+  args: {
+    group: createMockNotificationGroup('follow', 3),
+    showFollowBack: true,
+  },
+};
+
 export const FollowRequest: Story = {
   args: { group: createMockNotificationGroup('follow_request', 1) },
+};
+
+export const MultipleFollowRequests: Story = {
+  name: 'Multiple Follow Requests (no action buttons)',
+  args: { group: createMockNotificationGroup('follow_request', 3) },
 };
 
 export const Mention: Story = {

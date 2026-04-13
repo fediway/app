@@ -50,8 +50,8 @@ function groupKey(n: Notification): string {
   if (n.status && (n.type === 'favourite' || n.type === 'reblog')) {
     return `${n.type}:${n.status.id}`;
   }
-  if (n.type === 'follow') {
-    return `follow:${n.groupKey ?? n.id}`;
+  if (n.type === 'follow' || n.type === 'follow_request') {
+    return `${n.type}:${n.groupKey ?? n.id}`;
   }
   return `${n.type}:${n.id}`;
 }

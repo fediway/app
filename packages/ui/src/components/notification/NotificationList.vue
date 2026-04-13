@@ -88,7 +88,7 @@ const { sentinelRef } = useInfiniteScroll({
       :key="group.id"
       :group="group"
       :unread="isUnread(group.mostRecentId)"
-      :show-follow-back="group.type === 'follow' && !!followBackAccts?.has(group.accounts[0]?.acct ?? '')"
+      :show-follow-back="group.type === 'follow' && group.accounts.length === 1 && !!followBackAccts?.has(group.accounts[0]?.acct ?? '')"
       @click="handleGroupClick"
       @profile-click="acct => $emit('profileClick', acct)"
       @follow-back="acct => $emit('followBack', acct)"

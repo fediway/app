@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Notification } from '@repo/types';
+import type { NotificationGroupType } from '@repo/ui';
 import { useClient, useNotificationMarker } from '@repo/api';
 import { EmptyState, NotificationList, Skeleton, useToast } from '@repo/ui';
 import { computed, watch } from 'vue';
@@ -39,12 +39,15 @@ const followBackAccts = computed(() => {
   return set;
 });
 
-function handleNotificationClick(notification: Notification) {
-  if (notification.status) {
-    router.push(getStatusPath(notification.status.id, notification.status.account.acct));
+function handleGroupClick(group: NotificationGroupType) {
+  if (group.status) {
+    router.push(getStatusPath(group.status.id, group.status.account.acct));
   }
-  else if (notification.type === 'follow' || notification.type === 'follow_request') {
-    router.push(getProfilePath(notification.account.acct));
+  else if (group.type === 'follow' || group.type === 'follow_request') {
+    // Navigate to the first displayed account's profile (matches displayed name order)
+    const acct = group.accounts[0]?.acct;
+    if (acct)
+      router.push(getProfilePath(acct));
   }
 }
 
@@ -102,7 +105,7 @@ async function handleRejectRequest(accountId: string) {
         :loading="isLoading && notifications.length === 0"
         :last-read-id="lastReadId ?? undefined"
         :follow-back-accts="followBackAccts"
-        @click="handleNotificationClick"
+        @group-click="handleGroupClick"
         @profile-click="acct => router.push(getProfilePath(acct))"
         @tag-click="tag => router.push(`/tags/${tag}`)"
         @follow-back="handleFollowBack"

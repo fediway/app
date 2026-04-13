@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
 import type { NotificationGroup } from './groupNotifications';
-import { PhArrowsClockwise, PhBell, PhChatCircle, PhHeart, PhPencilSimple, PhQuotes, PhStar, PhUser } from '@phosphor-icons/vue';
+import { PhArrowsClockwise, PhBell, PhChartBar, PhChatCircle, PhConfetti, PhFlag, PhHeart, PhLinkBreak, PhMegaphone, PhPencilSimple, PhQuotes, PhUserCheck, PhUserPlus, PhWarning } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import Avatar from '../ui/avatar/Avatar.vue';
 import Button from '../ui/button/Button.vue';
@@ -28,15 +28,20 @@ interface TypeConfig {
 }
 
 const TYPE_MAP: Record<string, TypeConfig> = {
-  favourite: { icon: PhHeart, color: 'text-rose-500', text: 'liked your post' },
-  reblog: { icon: PhArrowsClockwise, color: 'text-green', text: 'reposted your post' },
-  follow: { icon: PhUser, color: 'text-primary', text: 'followed you' },
-  follow_request: { icon: PhUser, color: 'text-primary', text: 'requested to follow you' },
-  mention: { icon: PhChatCircle, color: 'text-primary', text: 'mentioned you' },
-  status: { icon: PhBell, color: 'text-primary', text: 'posted' },
-  poll: { icon: PhStar, color: 'text-yellow', text: 'A poll you voted in has ended' },
-  update: { icon: PhPencilSimple, color: 'text-primary', text: 'edited a post' },
-  quote: { icon: PhQuotes, color: 'text-primary', text: 'quoted your post' },
+  'favourite': { icon: PhHeart, color: 'text-rose-500', text: 'liked your post' },
+  'reblog': { icon: PhArrowsClockwise, color: 'text-green-600 dark:text-green-500', text: 'reposted your post' },
+  'follow': { icon: PhUserPlus, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'followed you' },
+  'follow_request': { icon: PhUserCheck, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'requested to follow you' },
+  'mention': { icon: PhChatCircle, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'mentioned you' },
+  'status': { icon: PhMegaphone, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'posted' },
+  'poll': { icon: PhChartBar, color: 'text-amber-500', text: 'A poll you voted in has ended' },
+  'update': { icon: PhPencilSimple, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'edited a post' },
+  'quote': { icon: PhQuotes, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'quoted your post' },
+  'quoted_update': { icon: PhPencilSimple, color: 'text-galaxy-500 dark:text-galaxy-400', text: 'edited a post you quoted' },
+  'severed_relationships': { icon: PhLinkBreak, color: 'text-rose-500', text: 'Some follow relationships were severed' },
+  'moderation_warning': { icon: PhWarning, color: 'text-amber-500', text: 'You received a moderation warning' },
+  'admin.sign_up': { icon: PhConfetti, color: 'text-violet-500', text: 'signed up' },
+  'admin.report': { icon: PhFlag, color: 'text-rose-500', text: 'submitted a report' },
 };
 
 const config = computed(() => TYPE_MAP[props.group.type] ?? { icon: PhBell, color: 'text-muted-foreground', text: 'interacted with you' });
@@ -85,9 +90,10 @@ const firstMediaUrl = computed(() => {
 const isMention = computed(() => props.group.type === 'mention' || props.group.type === 'status');
 const isFollow = computed(() => props.group.type === 'follow');
 const isFollowRequest = computed(() => props.group.type === 'follow_request');
+const isSingleAccount = computed(() => props.group.accounts.length === 1);
 const hasRightAction = computed(() =>
   (isFollow.value && props.showFollowBack)
-  || isFollowRequest.value
+  || (isFollowRequest.value && isSingleAccount.value)
   || firstMediaUrl.value,
 );
 </script>
@@ -130,12 +136,16 @@ const hasRightAction = computed(() =>
           <!-- Name + action + time -->
           <p class="flex flex-wrap items-baseline gap-x-1 text-sm leading-snug">
             <button
+              v-if="isSingleAccount"
               type="button"
               class="cursor-pointer font-semibold text-foreground hover:underline"
               @click.stop="firstAccount && emit('profileClick', firstAccount.acct)"
             >
               {{ namesHtml }}
             </button>
+            <span v-else class="font-semibold text-foreground">
+              {{ namesHtml }}
+            </span>
             <span class="text-muted-foreground">{{ config.text }}</span>
             <span class="text-muted-foreground-subtle">·</span>
             <RelativeTime :datetime="group.createdAt" class="text-xs text-muted-foreground-subtle" />
@@ -167,7 +177,7 @@ const hasRightAction = computed(() =>
             Follow back
           </Button>
 
-          <div v-else-if="isFollowRequest && firstAccount" class="flex gap-2">
+          <div v-else-if="isFollowRequest && isSingleAccount && firstAccount" class="flex gap-2">
             <Button size="sm" @click="emit('acceptRequest', firstAccount.id)">
               Confirm
             </Button>
