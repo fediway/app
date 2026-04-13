@@ -27,6 +27,9 @@ export default defineNuxtConfig({
     feedbackKaneoProjectId: process.env.FEEDBACK_KANEO_PROJECT_ID || '',
     public: {
       defaultInstance: process.env.NUXT_PUBLIC_DEFAULT_INSTANCE || 'fediway.com',
+      fediwayAuthDirect: process.env.NUXT_PUBLIC_FEDIWAY_AUTH_DIRECT === 'true',
+      fediwayClientId: process.env.NUXT_PUBLIC_FEDIWAY_CLIENT_ID || '',
+      fediwayClientSecret: process.env.NUXT_PUBLIC_FEDIWAY_CLIENT_SECRET || '',
       umamiUrl: process.env.NUXT_PUBLIC_UMAMI_URL || '',
       umamiWebsiteId: process.env.NUXT_PUBLIC_UMAMI_WEBSITE_ID || '',
     },

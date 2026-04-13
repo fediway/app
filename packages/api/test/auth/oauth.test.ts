@@ -1,11 +1,13 @@
 import { createRestAPIClient } from 'masto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  bridgeSession,
   buildAuthUrl,
   exchangeCode,
   generateCodeChallenge,
   generateCodeVerifier,
   getRedirectUri,
+  passwordGrant,
   registerApp,
 } from '../../src/auth/oauth';
 
@@ -250,5 +252,119 @@ describe('exchangeCode', () => {
     await expect(exchangeCode('https://mastodon.social', registration, 'bad-code', 'verifier'))
       .rejects
       .toThrow('Token exchange failed (400)');
+  });
+});
+
+describe('passwordGrant', () => {
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    mockFetch.mockClear();
+    vi.stubGlobal('fetch', mockFetch);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns the access token on success', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: 'returned-token' }),
+    });
+
+    const token = await passwordGrant('https://fediway.com', 'client-id', 'client-secret', 'user@example.com', 'pw');
+    expect(token).toBe('returned-token');
+  });
+
+  it('posts to /oauth/token with grant_type=password and credentials in body', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: 'token' }),
+    });
+
+    await passwordGrant('https://fediway.com', 'client-id', 'client-secret', 'user@example.com', 'secret');
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://fediway.com/oauth/token',
+      expect.objectContaining({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+    expect(body).toMatchObject({
+      grant_type: 'password',
+      client_id: 'client-id',
+      client_secret: 'client-secret',
+      username: 'user@example.com',
+      password: 'secret',
+    });
+  });
+
+  it('throws with the server error_description on failure', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: () => Promise.resolve({ error: 'invalid_grant', error_description: 'Invalid email or password' }),
+    });
+
+    await expect(passwordGrant('https://fediway.com', 'client-id', 'client-secret', 'user@example.com', 'wrong'))
+      .rejects
+      .toThrow('Invalid email or password');
+  });
+
+  it('falls back to a generic message when the server response is empty', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: () => Promise.reject(new Error('unparseable')),
+    });
+
+    await expect(passwordGrant('https://fediway.com', 'client-id', 'client-secret', 'user@example.com', 'pw'))
+      .rejects
+      .toThrow('password grant failed (500)');
+  });
+});
+
+describe('bridgeSession', () => {
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    mockFetch.mockClear();
+    vi.stubGlobal('fetch', mockFetch);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns true on a successful bridge', async () => {
+    mockFetch.mockResolvedValue({ ok: true });
+    expect(await bridgeSession('https://fediway.com', 'token')).toBe(true);
+  });
+
+  it('returns false on a failed response', async () => {
+    mockFetch.mockResolvedValue({ ok: false });
+    expect(await bridgeSession('https://fediway.com', 'token')).toBe(false);
+  });
+
+  it('returns false when fetch throws', async () => {
+    mockFetch.mockRejectedValue(new Error('network'));
+    expect(await bridgeSession('https://fediway.com', 'token')).toBe(false);
+  });
+
+  it('posts with the bearer token in the Authorization header', async () => {
+    mockFetch.mockResolvedValue({ ok: true });
+    await bridgeSession('https://fediway.com', 'my-token');
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://fediway.com/api/fediway/v1/sessions/bridge',
+      expect.objectContaining({
+        method: 'POST',
+        headers: { Authorization: 'Bearer my-token' },
+        credentials: 'include',
+      }),
+    );
   });
 });

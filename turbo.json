@@ -8,7 +8,19 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["VITE_API_MODE", "FEEDBACK_KANEO_BASE_URL", "FEEDBACK_KANEO_API_KEY", "FEEDBACK_KANEO_PROJECT_ID"]
+      "env": [
+        "VITE_API_MODE",
+        "FEEDBACK_KANEO_BASE_URL",
+        "FEEDBACK_KANEO_API_KEY",
+        "FEEDBACK_KANEO_PROJECT_ID",
+        "NUXT_MASTODON_API_URL",
+        "NUXT_PUBLIC_DEFAULT_INSTANCE",
+        "NUXT_PUBLIC_FEDIWAY_AUTH_DIRECT",
+        "NUXT_PUBLIC_FEDIWAY_CLIENT_ID",
+        "NUXT_PUBLIC_FEDIWAY_CLIENT_SECRET",
+        "NUXT_PUBLIC_UMAMI_URL",
+        "NUXT_PUBLIC_UMAMI_WEBSITE_ID"
+      ]
     },
     "lint": {
       "dependsOn": ["^build"]

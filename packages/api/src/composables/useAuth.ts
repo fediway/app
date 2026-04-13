@@ -3,11 +3,13 @@ import { computed, ref } from 'vue';
 import { useAccountStore } from '../auth/account-store';
 import { discoverInstance, normalizeInstanceUrl } from '../auth/instance-discovery';
 import {
+  bridgeSession,
   buildAuthUrl,
   exchangeCode,
   generateCodeChallenge,
   generateCodeVerifier,
   getRedirectUri,
+  passwordGrant,
   registerApp,
 } from '../auth/oauth';
 import { createMastoClient } from '../client';
@@ -129,6 +131,55 @@ export function useAuth() {
   }
 
   /**
+   * Direct password-grant login for the home Fediway instance. POSTs email + password,
+   * gets a bearer token, opportunistically bridges to a Devise session cookie so the
+   * same login also unlocks `/admin` and other server-rendered pages.
+   */
+  async function loginWithDirectAuth(
+    instanceInput: string,
+    email: string,
+    password: string,
+    clientId: string,
+    clientSecret: string,
+  ) {
+    store.isLoading.value = true;
+    store.error.value = null;
+
+    try {
+      const url = normalizeInstanceUrl(instanceInput);
+      const info = await discoverInstance(url);
+
+      const accessToken = await passwordGrant(url, clientId, clientSecret, email, password);
+      await bridgeSession(url, accessToken);
+
+      const tempClient = createMastoClient({ url, accessToken });
+      const user = await tempClient.rest.v1.accounts.verifyCredentials();
+
+      const opts: AddAccountOptions = {
+        instanceUrl: url,
+        instanceDomain: info.domain,
+        accountId: user.id,
+        username: user.username,
+        acct: user.acct,
+        displayName: user.displayName ?? undefined,
+        avatarUrl: user.avatar ?? undefined,
+        accessToken,
+        appRegistration: { clientId, clientSecret },
+      };
+
+      await store.addAccount(opts);
+      store.currentUser.value = user;
+    }
+    catch (err) {
+      store.error.value = err instanceof Error ? err : new Error('Direct auth failed');
+      throw store.error.value;
+    }
+    finally {
+      store.isLoading.value = false;
+    }
+  }
+
+  /**
    * Handle the OAuth callback — exchange code for token, initialize session
    */
   async function handleOAuthCallback(code: string) {
@@ -246,6 +297,7 @@ export function useAuth() {
     // Actions
     login,
     loginWithOAuth,
+    loginWithDirectAuth,
     handleOAuthCallback,
     handle401,
     logout,

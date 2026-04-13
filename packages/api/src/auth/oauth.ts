@@ -129,3 +129,59 @@ export async function exchangeCode(
   const data = await response.json() as { access_token: string };
   return data.access_token;
 }
+
+/**
+ * OAuth 2.0 Resource Owner Password Credentials grant (RFC 6749 §4.3).
+ * Used when the home instance has the Fediway direct-auth flag enabled — POST email + password,
+ * get back a bearer token without the OAuth redirect dance. Only safe for first-party clients.
+ */
+export async function passwordGrant(
+  instanceUrl: string,
+  clientId: string,
+  clientSecret: string,
+  email: string,
+  password: string,
+): Promise<string> {
+  const response = await fetch(`${instanceUrl}/oauth/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(30_000),
+    body: JSON.stringify({
+      grant_type: 'password',
+      client_id: clientId,
+      client_secret: clientSecret,
+      username: email,
+      password,
+      scope: SCOPES,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null) as { error_description?: string; error?: string } | null;
+    const message = body?.error_description ?? body?.error ?? `password grant failed (${response.status})`;
+    throw new Error(message);
+  }
+
+  const data = await response.json() as { access_token: string };
+  return data.access_token;
+}
+
+/**
+ * Exchange a bearer token for a Devise session cookie via the Fediway SSO bridge.
+ * Lets the same login give access to both the JSON API (bearer) and the server-rendered
+ * admin / settings pages (session cookie). Best-effort — failure does not block login.
+ */
+export async function bridgeSession(instanceUrl: string, accessToken: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${instanceUrl}/api/fediway/v1/sessions/bridge`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: 'include',
+      signal: AbortSignal.timeout(10_000),
+    });
+    return response.ok;
+  }
+  catch {
+    return false;
+  }
+}

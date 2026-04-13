@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowLeft, PhCircleNotch, PhGlobe, PhLock } from '@phosphor-icons/vue';
+import { PhArrowLeft, PhCircleNotch, PhEnvelope, PhGlobe, PhLock } from '@phosphor-icons/vue';
 import { useAuth } from '@repo/api';
 import { Button, InputGroup, InputGroupAddon, InputGroupInput } from '@repo/ui';
 import { computed, ref } from 'vue';
@@ -16,7 +16,7 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const config = useRuntimeConfig();
-const { login, loginWithOAuth } = useAuth();
+const { login, loginWithOAuth, loginWithDirectAuth } = useAuth();
 const { mode, setMode } = useDataMode();
 
 // The redirect destination after successful login (preserved from middleware)
@@ -28,6 +28,8 @@ const accessToken = ref('');
 const isLoading = ref(false);
 const errorMessage = ref('');
 const showDevLogin = ref(false);
+const email = ref('');
+const password = ref('');
 
 // Validation
 const normalizedUrl = computed(() => {
@@ -58,6 +60,16 @@ const canSignIn = computed(() => {
 const canDevLogin = computed(() => {
   return isValidDomain.value && accessToken.value.trim() && !isLoading.value;
 });
+
+// Direct-auth password grant — shown only when typing the home instance with the flag on
+const homeInstance = computed(() => String(config.public.defaultInstance ?? '').toLowerCase());
+const directAuthEnabled = computed(() => Boolean(config.public.fediwayAuthDirect));
+const showPasswordForm = computed(() =>
+  directAuthEnabled.value && !!homeInstance.value && normalizedDomain.value === homeInstance.value,
+);
+const canDirectLogin = computed(() =>
+  showPasswordForm.value && !!email.value.trim() && !!password.value && !isLoading.value,
+);
 
 async function handleOAuthLogin() {
   if (!canSignIn.value)
@@ -100,16 +112,49 @@ async function handleDevLogin() {
   }
 }
 
+async function handleDirectLogin() {
+  if (!canDirectLogin.value)
+    return;
+
+  const clientId = String(config.public.fediwayClientId ?? '');
+  const clientSecret = String(config.public.fediwayClientSecret ?? '');
+  if (!clientId || !clientSecret) {
+    errorMessage.value = 'Direct login is not configured.';
+    return;
+  }
+
+  isLoading.value = true;
+  errorMessage.value = '';
+
+  try {
+    await loginWithDirectAuth(normalizedDomain.value, email.value.trim(), password.value, clientId, clientSecret);
+    setMode('live');
+    navigateTo(redirectTo.value, { replace: true });
+  }
+  catch (err) {
+    errorMessage.value = err instanceof Error ? err.message : 'Failed to sign in';
+  }
+  finally {
+    isLoading.value = false;
+  }
+}
+
 function handleMockMode() {
   setMode('mock');
   navigateTo('/', { replace: true });
 }
 
 function handleSubmit() {
+  if (showPasswordForm.value) {
+    if (canDirectLogin.value)
+      handleDirectLogin();
+    return;
+  }
   if (showDevLogin.value && canDevLogin.value) {
     handleDevLogin();
+    return;
   }
-  else if (canSignIn.value) {
+  if (canSignIn.value) {
     handleOAuthLogin();
   }
 }
@@ -222,9 +267,43 @@ function handleSubmit() {
             Fediway is built on Mastodon. Sign in with any Mastodon server.
           </p>
 
+          <!-- Email + password — only when typing the home instance with direct auth enabled -->
+          <div v-if="showPasswordForm" class="mt-4 space-y-3">
+            <InputGroup class="h-12 rounded-full">
+              <InputGroupAddon>
+                <PhEnvelope :size="20" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="login-email"
+                v-model="email"
+                type="email"
+                placeholder="Email"
+                aria-label="Email"
+                autocomplete="email"
+                required
+                class="h-12 text-base"
+              />
+            </InputGroup>
+            <InputGroup class="h-12 rounded-full">
+              <InputGroupAddon>
+                <PhLock :size="20" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="login-password"
+                v-model="password"
+                type="password"
+                placeholder="Password"
+                aria-label="Password"
+                autocomplete="current-password"
+                required
+                class="h-12 text-base"
+              />
+            </InputGroup>
+          </div>
+
           <Button
             type="submit"
-            :disabled="!canSignIn"
+            :disabled="showPasswordForm ? !canDirectLogin : !canSignIn"
             class="mt-4 w-full"
           >
             <PhCircleNotch v-if="isLoading" :size="20" class="animate-spin" aria-hidden="true" />
