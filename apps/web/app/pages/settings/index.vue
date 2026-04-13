@@ -233,15 +233,21 @@ function handleLogout() {
         About
       </h2>
 
-      <div class="space-y-3 text-sm">
-        <div class="flex justify-between">
-          <span class="text-muted-foreground">Version</span>
-          <span class="text-foreground">0.1.0-beta</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-muted-foreground">Source code</span>
-          <a href="https://github.com/fediway/app" target="_blank" rel="noopener noreferrer" class="text-galaxy-500 dark:text-galaxy-400 hover:underline">GitHub</a>
-        </div>
+      <div class="-mx-2 space-y-1">
+        <NuxtLink
+          to="/settings/about"
+          class="flex items-center justify-between rounded-full px-3 py-2.5 transition-colors hover:bg-muted"
+        >
+          <span class="text-sm text-foreground">About Fediway</span>
+          <span class="text-sm text-muted-foreground">&rsaquo;</span>
+        </NuxtLink>
+        <NuxtLink
+          to="/settings/acknowledgments"
+          class="flex items-center justify-between rounded-full px-3 py-2.5 transition-colors hover:bg-muted"
+        >
+          <span class="text-sm text-foreground">Open source acknowledgments</span>
+          <span class="text-sm text-muted-foreground">&rsaquo;</span>
+        </NuxtLink>
       </div>
     </section>
 

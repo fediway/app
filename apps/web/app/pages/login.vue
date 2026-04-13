@@ -190,6 +190,12 @@ function handleSubmit() {
           </div>
 
           <!-- Instance input -->
+          <label
+            for="instance-domain"
+            class="mb-1.5 block text-sm font-semibold text-foreground"
+          >
+            Your Mastodon server
+          </label>
           <InputGroup class="h-12 rounded-full">
             <InputGroupAddon>
               <PhGlobe :size="20" aria-hidden="true" />
@@ -198,9 +204,9 @@ function handleSubmit() {
               id="instance-domain"
               v-model="instanceDomain"
               type="text"
-              placeholder="Instance (e.g. mastodon.social)"
-              aria-label="Mastodon instance domain"
-              :aria-describedby="errorMessage ? 'login-error' : undefined"
+              placeholder="fediway.com"
+              aria-label="Your Mastodon server"
+              :aria-describedby="errorMessage ? 'login-error' : 'instance-help'"
               :aria-invalid="errorMessage ? true : undefined"
               required
               autocomplete="off"
@@ -209,6 +215,12 @@ function handleSubmit() {
               class="h-12 text-base"
             />
           </InputGroup>
+          <p
+            id="instance-help"
+            class="mt-2 text-xs text-muted-foreground"
+          >
+            Fediway is built on Mastodon. Sign in with any Mastodon server.
+          </p>
 
           <Button
             type="submit"

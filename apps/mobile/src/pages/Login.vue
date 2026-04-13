@@ -36,16 +36,29 @@ async function handleLogin() {
         {{ errorMessage }}
       </div>
 
-      <input
-        v-model="instanceDomain"
-        type="text"
-        placeholder="Instance (e.g. mastodon.social)"
-        autocomplete="off"
-        autocapitalize="none"
-        spellcheck="false"
-        class="w-full px-4 py-3 border border-gray-200 rounded-lg"
-        @keydown.enter="handleLogin"
-      >
+      <div>
+        <label
+          for="mobile-instance-domain"
+          class="mb-1.5 block text-sm font-semibold text-foreground"
+        >
+          Your Mastodon server
+        </label>
+        <input
+          id="mobile-instance-domain"
+          v-model="instanceDomain"
+          type="text"
+          placeholder="fediway.com"
+          aria-describedby="mobile-instance-help"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          class="w-full px-4 py-3 border border-gray-200 rounded-lg"
+          @keydown.enter="handleLogin"
+        >
+        <p id="mobile-instance-help" class="mt-2 text-xs text-muted-foreground">
+          Fediway is built on Mastodon. Sign in with any Mastodon server.
+        </p>
+      </div>
 
       <button
         type="button"
