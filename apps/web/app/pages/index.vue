@@ -2,7 +2,7 @@
 import type { MediaAttachment, Status } from '@repo/types';
 import { PhCircleNotch } from '@phosphor-icons/vue';
 import { useAuth, useTimeline } from '@repo/api';
-import { EmptyState, NewPostsPill, Skeleton, Status as StatusComponent, useInfiniteScroll } from '@repo/ui';
+import { EmptyState, NewPostsPill, shapeFeedThreads, Skeleton, Status as StatusComponent, useInfiniteScroll } from '@repo/ui';
 import { useFeedType } from '~/composables/useFeedType';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
 import { usePostComposer } from '~/composables/usePostComposer';
@@ -63,13 +63,6 @@ watch(isLoading, (loading) => {
   }
 }, { immediate: true });
 
-function getReplyParent(status: Status): Status | null {
-  const displayStatus = status.reblog ?? status;
-  if (!displayStatus.inReplyToId)
-    return null;
-  return store.get(displayStatus.inReplyToId) ?? null;
-}
-
 const homeStatuses = computed(() => homeTimeline?.statuses.value ?? []);
 const publicStatuses = computed(() => publicTimeline?.statuses.value ?? []);
 const trendingStatuses = computed(() => trending.data.value ?? []);
@@ -92,6 +85,8 @@ watch(rawStatuses, (statuses) => {
 }, { immediate: true });
 
 const allStatuses = withStoreState(rawStatuses);
+
+const threadPositions = computed(() => shapeFeedThreads(allStatuses.value, id => store.get(id)));
 
 const firstStatuses = computed(() => allStatuses.value.slice(0, 2));
 const remainingStatuses = computed(() => allStatuses.value.slice(2));
@@ -277,7 +272,7 @@ onUnmounted(() => {
               :key="status.id"
               :status="status"
               :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
-              :reply-parent="getReplyParent(status)"
+              :thread-position="threadPositions[index]"
               :authenticated="isAuthed"
               :is-own-post="isOwnPost(status)"
               :feed-position="index + 1"
@@ -305,7 +300,7 @@ onUnmounted(() => {
               :key="status.id"
               :status="status"
               :profile-url="getProfilePath(status.reblog?.account.acct ?? status.account.acct)"
-              :reply-parent="getReplyParent(status)"
+              :thread-position="threadPositions[index + firstStatuses.length]"
               :authenticated="isAuthed"
               :is-own-post="isOwnPost(status)"
               :feed-position="index + firstStatuses.length + 1"

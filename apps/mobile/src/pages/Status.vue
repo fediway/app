@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PhWarningCircle } from '@phosphor-icons/vue';
 import { useStatus, useStatusActions } from '@repo/api';
-import { EmptyState, Skeleton, StatusAncestor, StatusDetailMain, StatusReply } from '@repo/ui';
-import { computed, onMounted, watch } from 'vue';
+import { DeletedStatusTombstone, EmptyState, shapeThreadContext, Status, StatusDetailMain, StatusReply, ThreadCollapseNode, ThreadSkeleton } from '@repo/ui';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useHaptics } from '../composables/useHaptics';
 import { usePostComposer } from '../composables/usePostComposer';
@@ -56,16 +56,35 @@ async function handleBookmark(id: string) {
 function handleTagClick(tagName: string) {
   router.push(`/tags/${encodeURIComponent(tagName)}`);
 }
+
+const expandedCollapseKeys = ref<Set<string>>(new Set());
+
+watch(statusId, () => {
+  expandedCollapseKeys.value = new Set();
+});
+
+const shapedThread = computed(() => {
+  const main = statusData.status.value;
+  if (!main) {
+    return { ancestors: [], descendants: [] };
+  }
+  return shapeThreadContext({
+    ancestors: statusData.context.value?.ancestors ?? [],
+    main,
+    descendants: statusData.context.value?.descendants ?? [],
+    expandedKeys: expandedCollapseKeys.value,
+  });
+});
+
+function expandCollapse(key: string) {
+  expandedCollapseKeys.value = new Set([...expandedCollapseKeys.value, key]);
+}
 </script>
 
 <template>
   <div class="w-full">
-    <!-- Loading -->
-    <div v-if="statusData.isLoading.value && !statusData.status.value" class="space-y-4 p-4">
-      <Skeleton class="h-12 w-full rounded-lg" />
-      <Skeleton class="h-32 w-full rounded-lg" />
-      <Skeleton class="h-8 w-full rounded-lg" />
-    </div>
+    <!-- Loading skeleton — thread-shaped so the page doesn't visually shift on load -->
+    <ThreadSkeleton v-if="statusData.isLoading.value && !statusData.status.value" :ancestors="1" :descendants="3" />
 
     <!-- Error -->
     <EmptyState
@@ -85,15 +104,34 @@ function handleTagClick(tagName: string) {
     />
 
     <template v-else>
-      <!-- Ancestors -->
-      <StatusAncestor
-        v-for="(ancestor, i) in statusData.context.value?.ancestors"
-        :key="ancestor.id"
-        :status="ancestor"
-        :show-connector="i < (statusData.context.value?.ancestors?.length ?? 0) - 1 || !!statusData.status.value"
-        @click="navigateToStatus(ancestor.id)"
-        @profile-click="navigateToProfile"
-      />
+      <!-- Ancestors — Status, ThreadCollapseNode, or DeletedStatusTombstone -->
+      <template v-for="item in shapedThread.ancestors" :key="item.kind === 'status' ? item.status.id : item.key">
+        <Status
+          v-if="item.kind === 'status'"
+          :status="item.status"
+          :thread-position="item.position"
+          :is-author-reply="item.isAuthorReply"
+          :hide-actions="true"
+          :show-separator="false"
+          @status-click="navigateToStatus"
+          @profile-click="navigateToProfile"
+          @tag-click="handleTagClick"
+        />
+        <ThreadCollapseNode
+          v-else-if="item.kind === 'collapse'"
+          :accounts="item.accounts"
+          :hidden-count="item.hiddenCount"
+          :thread-position="item.position"
+          :show-separator="false"
+          @expand="expandCollapse(item.key)"
+        />
+        <DeletedStatusTombstone
+          v-else
+          :reason="item.reason"
+          :thread-position="item.position"
+          :show-separator="false"
+        />
+      </template>
 
       <!-- Main Status -->
       <StatusDetailMain

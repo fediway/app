@@ -84,20 +84,33 @@ export type { NotificationGroupType } from './components/notification';
 
 // Status components
 export {
+  DeletedStatusTombstone,
+  isConnectedAbove,
+  isConnectedBelow,
   PollDisplay,
   QuickReply,
+  shapeFeedStatus,
+  shapeFeedThreads,
+  shapeThreadContext,
   Status,
   StatusActions,
-  StatusAncestor,
   StatusCard,
   StatusContent,
   StatusDetailMain,
   StatusMedia,
   StatusQuote,
   StatusReply,
+  StatusSkeleton,
   StatusStats,
   StatusTags,
-  ThreadConnector,
+  ThreadAvatarColumn,
+  ThreadCollapseNode,
+  ThreadSkeleton,
+} from './components/status';
+export type {
+  ShapedThreadItem,
+  ThreadContext,
+  ThreadPosition,
 } from './components/status';
 
 // Timeline components

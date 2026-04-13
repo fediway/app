@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
 import { useAuth } from '@repo/api';
-import { EmptyState, PageHeader, QuickReply, Skeleton, StatusAncestor, Status as StatusComponent, StatusDetailMain } from '@repo/ui';
+import { DeletedStatusTombstone, EmptyState, PageHeader, QuickReply, shapeThreadContext, Status as StatusComponent, StatusDetailMain, ThreadCollapseNode, ThreadSkeleton } from '@repo/ui';
 import { useMediaQuery } from '@vueuse/core';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -151,47 +151,27 @@ function handleSendMessage(s: Status) {
   openSendMessage(s);
 }
 
-// Determine if a descendant's parent is directly above (previous item or main post)
-function hasReplyAbove(reply: Status, index: number): boolean {
-  if (!reply.inReplyToId)
-    return false;
-  // Parent is the main post and this is the first descendant
-  if (reply.inReplyToId === status.value?.id)
-    return false; // Main post handles its own line via StatusDetailMain
-  // Parent is the previous descendant
-  if (index > 0) {
-    const prev = context.value.descendants[index - 1];
-    if (prev && prev.id === reply.inReplyToId)
-      return true;
-  }
-  return false;
-}
+const expandedCollapseKeys = ref<Set<string>>(new Set());
 
-// Determine if a descendant has a reply directly below it in the thread
-function hasReplyBelow(index: number): boolean {
-  const descendants = context.value.descendants;
-  if (index >= descendants.length - 1)
-    return false;
-  const current = descendants[index];
-  const next = descendants[index + 1];
-  return !!next && !!current && next.inReplyToId === current.id;
-}
+// Reset expansion state when navigating to a different status.
+watch(statusId, () => {
+  expandedCollapseKeys.value = new Set();
+});
 
-// Find the reply parent for a descendant (for thread context)
-// Skip if parent is the main post or already the previous item in the list
-function getReplyParent(reply: Status, index?: number): Status | null {
-  if (!reply.inReplyToId)
-    return null;
-  if (reply.inReplyToId === status.value?.id)
-    return null;
-  // If the parent is the previous descendant, it's already visible above — skip
-  if (index != null && index > 0) {
-    const prev = context.value.descendants[index - 1];
-    if (prev && prev.id === reply.inReplyToId)
-      return null;
+const shapedThread = computed(() => {
+  if (!status.value) {
+    return { ancestors: [], descendants: [] };
   }
-  const all = [...context.value.ancestors, ...(rawStatus.value ? [rawStatus.value] : []), ...context.value.descendants];
-  return all.find(s => s.id === reply.inReplyToId) ?? null;
+  return shapeThreadContext({
+    ancestors: context.value.ancestors,
+    main: status.value,
+    descendants: context.value.descendants,
+    expandedKeys: expandedCollapseKeys.value,
+  });
+});
+
+function expandCollapse(key: string) {
+  expandedCollapseKeys.value = new Set([...expandedCollapseKeys.value, key]);
 }
 </script>
 
@@ -200,18 +180,8 @@ function getReplyParent(reply: Status, index?: number): Status | null {
     <PageHeader title="Post" show-back class="lg:hidden" @back="goBack" />
 
     <ClientOnly>
-      <!-- Loading skeleton -->
-      <div v-if="isStatusLoading && !status" class="space-y-4 p-4">
-        <div class="flex items-center gap-3">
-          <Skeleton class="size-12 rounded-full" />
-          <div class="space-y-1.5">
-            <Skeleton class="h-4 w-32" />
-            <Skeleton class="h-3 w-20" />
-          </div>
-        </div>
-        <Skeleton class="h-24 w-full" />
-        <Skeleton class="h-8 w-48" />
-      </div>
+      <!-- Loading skeleton — thread-shaped so the page doesn't visually shift on load -->
+      <ThreadSkeleton v-if="isStatusLoading && !status" :ancestors="1" :descendants="3" />
 
       <!-- Not found state (only after loading finishes) -->
       <EmptyState
@@ -224,24 +194,35 @@ function getReplyParent(reply: Status, index?: number): Status | null {
       />
 
       <template v-else>
-        <!-- Ancestors (parent chain) -->
-        <StatusAncestor
-          v-for="(ancestor, index) in context.ancestors"
-          :key="ancestor.id"
-          :status="ancestor"
-          :show-connector="index < context.ancestors.length - 1 || !!status"
-          @click="navigateToStatus"
-          @profile-click="navigateToProfile"
-          @tag-click="handleTagClick"
-        />
-
-        <!-- Connector from last ancestor to main -->
-        <div
-          v-if="context.ancestors.length"
-          class="relative h-3"
-        >
-          <div class="absolute left-8 bottom-0 top-0 w-0.5 bg-accent" />
-        </div>
+        <!-- Ancestors (parent chain) — Status, ThreadCollapseNode, or DeletedStatusTombstone -->
+        <template v-for="item in shapedThread.ancestors" :key="item.kind === 'status' ? item.status.id : item.key">
+          <StatusComponent
+            v-if="item.kind === 'status'"
+            :status="item.status"
+            :thread-position="item.position"
+            :is-author-reply="item.isAuthorReply"
+            :hide-actions="true"
+            :show-separator="false"
+            @status-click="handleStatusClick"
+            @profile-click="navigateToProfile"
+            @tag-click="handleTagClick"
+            @media-click="handleMediaClick"
+          />
+          <ThreadCollapseNode
+            v-else-if="item.kind === 'collapse'"
+            :accounts="item.accounts"
+            :hidden-count="item.hiddenCount"
+            :thread-position="item.position"
+            :show-separator="false"
+            @expand="expandCollapse(item.key)"
+          />
+          <DeletedStatusTombstone
+            v-else
+            :reason="item.reason"
+            :thread-position="item.position"
+            :show-separator="false"
+          />
+        </template>
 
         <!-- Main (focused) status -->
         <StatusDetailMain
@@ -272,27 +253,41 @@ function getReplyParent(reply: Status, index?: number): Status | null {
           @expand="handleExpandComposer"
         />
 
-        <!-- Descendants (replies) -->
-        <StatusComponent
-          v-for="(reply, index) in context.descendants"
-          :key="reply.id"
-          :status="reply"
-          :profile-url="getProfilePath(reply.account.acct)"
-          :has-reply-above="hasReplyAbove(reply, index)"
-          :has-reply-below="hasReplyBelow(index)"
-          :reply-parent="getReplyParent(reply, index)"
-          @reply="handleReply"
-          @reblog="handleReblog"
-          @favourite="handleFavourite"
-          @bookmark="handleBookmark"
-          @share="handleShare"
-          @copy-link="handleCopyLink"
-          @tag-click="handleTagClick"
-          @status-click="handleStatusClick"
-          @profile-click="navigateToProfile"
-          @media-click="handleMediaClick"
-          @send-message="handleSendMessage"
-        />
+        <!-- Descendants (replies) — Status, ThreadCollapseNode, or DeletedStatusTombstone -->
+        <template v-for="item in shapedThread.descendants" :key="item.kind === 'status' ? item.status.id : item.key">
+          <StatusComponent
+            v-if="item.kind === 'status'"
+            :status="item.status"
+            :thread-position="item.position"
+            :is-author-reply="item.isAuthorReply"
+            :profile-url="getProfilePath(item.status.account.acct)"
+            @reply="handleReply"
+            @reblog="handleReblog"
+            @favourite="handleFavourite"
+            @bookmark="handleBookmark"
+            @share="handleShare"
+            @copy-link="handleCopyLink"
+            @tag-click="handleTagClick"
+            @status-click="handleStatusClick"
+            @profile-click="navigateToProfile"
+            @media-click="handleMediaClick"
+            @send-message="handleSendMessage"
+          />
+          <ThreadCollapseNode
+            v-else-if="item.kind === 'collapse'"
+            :accounts="item.accounts"
+            :hidden-count="item.hiddenCount"
+            :thread-position="item.position"
+            :show-separator="false"
+            @expand="expandCollapse(item.key)"
+          />
+          <DeletedStatusTombstone
+            v-else
+            :reason="item.reason"
+            :thread-position="item.position"
+            :show-separator="false"
+          />
+        </template>
       </template>
     </ClientOnly>
   </div>

@@ -5,6 +5,7 @@ import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { computed } from 'vue';
 import { useInfiniteScroll } from '../../composables/useInfiniteScroll';
 import Status from '../status/Status.vue';
+import { shapeFeedThreads } from '../status/thread';
 
 interface Props {
   statuses: StatusType[];
@@ -83,13 +84,9 @@ function checkIsOwnPost(status: StatusType): boolean {
   return authorId === props.currentUserId;
 }
 
-function getReplyParent(status: StatusType): StatusType | null {
-  const displayStatus = status.reblog ?? status;
-  if (!displayStatus.inReplyToId || !props.getStatus) {
-    return null;
-  }
-  return props.getStatus(displayStatus.inReplyToId) ?? null;
-}
+const threadPositions = computed(() =>
+  shapeFeedThreads(props.statuses, id => props.getStatus?.(id) ?? null),
+);
 </script>
 
 <template>
@@ -120,7 +117,7 @@ function getReplyParent(status: StatusType): StatusType | null {
         <Status
           :status="statuses[item.index]!"
           :profile-url="getProfileUrlForStatus(statuses[item.index]!)"
-          :reply-parent="getReplyParent(statuses[item.index]!)"
+          :thread-position="threadPositions[item.index]"
           :hide-card="hideCards"
           :is-own-post="checkIsOwnPost(statuses[item.index]!)"
           @reply="emit('reply', $event)"

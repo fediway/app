@@ -1,35 +1,41 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status as StatusType } from '@repo/types';
+import type { ThreadPosition } from './thread';
 import { PhArrowsClockwise } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { cn } from '../../lib/utils';
-import { Avatar } from '../ui/avatar';
-import { RelativeTime } from '../ui/relative-time';
+import RelativeTime from '../ui/relative-time/RelativeTime.vue';
 import StatusActions from './StatusActions.vue';
 import StatusCard from './StatusCard.vue';
 import StatusContent from './StatusContent.vue';
 import StatusMedia from './StatusMedia.vue';
 import StatusQuote from './StatusQuote.vue';
 import StatusTags from './StatusTags.vue';
+import { isConnectedAbove, isConnectedBelow } from './thread';
+import ThreadAvatarColumn from './ThreadAvatarColumn.vue';
 import { useCleanContent } from './useCleanContent';
 
 interface Props {
   status: StatusType;
-  /** URL to the author's profile */
+  /**
+   * Position of this status within a thread. Defaults to `{ kind: 'standalone' }`.
+   * Use `shapeThreadContext()` or `shapeFeedStatus()` to compute positions for
+   * a list of statuses — never hand-author the position for each call site.
+   */
+  threadPosition?: ThreadPosition;
   profileUrl?: string;
-  /** Whether to show the reblog indicator */
+  /** Show the reblog indicator row when this status is a reblog */
   showReblogIndicator?: boolean;
-  /** Parent status for reply context (resolved by consumer) */
-  replyParent?: StatusType | null;
-  /** Show vertical thread connector above avatar */
-  hasReplyAbove?: boolean;
-  /** Show vertical thread connector below avatar */
-  hasReplyBelow?: boolean;
-  /** Show bottom separator line */
+  /**
+   * Render a small "Author" badge in the header. Set when this status is by
+   * the same author as the focused `main` post — populated by `shapeThreadContext`.
+   */
+  isAuthorReply?: boolean;
+  /** Show the bottom 1px separator. Auto-hidden when connected below. */
   showSeparator?: boolean;
-  /** Hide the action bar */
+  /** Hide the action bar (e.g. ancestor rendering in thread detail) */
   hideActions?: boolean;
-  /** Hide the link preview card (e.g. on an item page where the card is redundant) */
+  /** Hide the link preview card (e.g. item page where card is redundant) */
   hideCard?: boolean;
   /** Whether the user is authenticated (mutes actions when false) */
   authenticated?: boolean;
@@ -41,11 +47,10 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  threadPosition: () => ({ kind: 'standalone' }),
   profileUrl: undefined,
   showReblogIndicator: true,
-  replyParent: null,
-  hasReplyAbove: false,
-  hasReplyBelow: false,
+  isAuthorReply: false,
   showSeparator: true,
   hideActions: false,
   hideCard: false,
@@ -73,14 +78,14 @@ const emit = defineEmits<{
   mediaClick: [attachments: MediaAttachment[], index: number];
 }>();
 
-// If this is a reblog, show the original status but indicate who boosted it
 const isReblog = computed(() => props.status.reblog !== null);
 const displayStatus = computed(() => props.status.reblog ?? props.status);
-const booster = computed(() => isReblog.value ? props.status.account : null);
-const hasAnimatedMedia = computed(() => displayStatus.value.mediaAttachments.some(a => a.type === 'gifv' || a.type === 'video'));
+const booster = computed(() => (isReblog.value ? props.status.account : null));
+const hasAnimatedMedia = computed(() =>
+  displayStatus.value.mediaAttachments.some(a => a.type === 'gifv' || a.type === 'video'),
+);
 
 const quote = computed(() => displayStatus.value.quote);
-
 const quotedStatus = computed(() => {
   const q = quote.value;
   if (q && 'quotedStatus' in q && q.quotedStatus) {
@@ -97,6 +102,12 @@ const cleanedContent = useCleanContent(
 
 const isRemoteUser = computed(() => displayStatus.value.account.acct.includes('@'));
 
+const parentPreview = computed(() =>
+  props.threadPosition.kind === 'reply-with-parent-preview' ? props.threadPosition.parent : null,
+);
+const mainConnectAbove = computed(() => isConnectedAbove(props.threadPosition));
+const mainConnectBelow = computed(() => isConnectedBelow(props.threadPosition));
+
 function getDomain(acct: string): string {
   const parts = acct.split('@');
   return parts.length > 1 ? parts[1]! : '';
@@ -104,7 +115,11 @@ function getDomain(acct: string): string {
 
 function handleStatusClick(event: MouseEvent) {
   const target = event.target as HTMLElement;
-  if (target.closest('a, button, video, [role="button"], [data-video-id], [data-slot="status-actions"], [data-slot="button-action"]')) {
+  if (
+    target.closest(
+      'a, button, video, [role="button"], [data-video-id], [data-slot="status-actions"], [data-slot="button-action"]',
+    )
+  ) {
     return;
   }
   emit('statusClick', displayStatus.value.id);
@@ -113,45 +128,54 @@ function handleStatusClick(event: MouseEvent) {
 
 <template>
   <div>
-    <!-- Reply parent context -->
+    <!-- Parent context preview (feed-only, rendered for `reply-with-parent-preview`) -->
     <article
-      v-if="replyParent"
+      v-if="parentPreview"
       class="contain-layout-style-paint content-visibility-auto cursor-pointer transition-colors hover:bg-foreground/[0.03]"
-      @click="emit('statusClick', replyParent.id)"
+      @click="emit('statusClick', parentPreview.id)"
     >
-      <div class="flex gap-3 px-4 pt-3 pb-0">
-        <div class="flex shrink-0 flex-col items-center self-stretch">
-          <button type="button" class="shrink-0" @click.stop="emit('profileClick', replyParent.account.acct)">
-            <Avatar :src="replyParent.account.avatar" :alt="replyParent.account.displayName" size="md" />
-          </button>
-          <div class="mt-1 w-0.5 flex-1 bg-foreground/20" />
-        </div>
-        <div class="min-w-0 flex-1">
+      <div class="flex gap-3 px-4">
+        <ThreadAvatarColumn
+          :src="parentPreview.account.avatar"
+          :alt="parentPreview.account.displayName"
+          :connect-below="true"
+          @click="emit('profileClick', parentPreview.account.acct)"
+        />
+        <div class="min-w-0 flex-1 pt-3">
           <div class="flex items-baseline gap-1 text-base">
-            <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
-              {{ replyParent.account.displayName || replyParent.account.username }}
+            <button
+              type="button"
+              class="truncate font-bold text-foreground hover:underline cursor-pointer"
+              @click.stop="emit('profileClick', parentPreview.account.acct)"
+            >
+              {{ parentPreview.account.displayName || parentPreview.account.username }}
             </button>
-            <button type="button" class="shrink truncate text-muted-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', replyParent.account.acct)">
-              @{{ replyParent.account.acct }}
+            <button
+              type="button"
+              class="shrink truncate text-muted-foreground hover:underline cursor-pointer"
+              @click.stop="emit('profileClick', parentPreview.account.acct)"
+            >
+              @{{ parentPreview.account.acct }}
             </button>
-            <RelativeTime :datetime="replyParent.createdAt" class="ml-auto shrink-0 text-muted-foreground" />
-          </div>
-          <div>
-            <StatusContent
-              :content="replyParent.content"
-              :spoiler-text="replyParent.spoilerText"
-              :emojis="replyParent.emojis"
-              :mentions="replyParent.mentions"
-              :max-lines="4"
-              @mention-click="emit('profileClick', $event)"
-              @hashtag-click="emit('tagClick', $event)"
+            <RelativeTime
+              :datetime="parentPreview.createdAt"
+              class="ml-auto shrink-0 text-muted-foreground"
             />
           </div>
+          <StatusContent
+            :content="parentPreview.content"
+            :spoiler-text="parentPreview.spoilerText"
+            :emojis="parentPreview.emojis"
+            :mentions="parentPreview.mentions"
+            :max-lines="4"
+            @mention-click="emit('profileClick', $event)"
+            @hashtag-click="emit('tagClick', $event)"
+          />
         </div>
       </div>
     </article>
 
-    <!-- Main status -->
+    <!-- Main status row -->
     <article
       :class="cn(
         'cursor-pointer transition-colors hover:bg-foreground/[0.03]',
@@ -164,7 +188,6 @@ function handleStatusClick(event: MouseEvent) {
       :aria-label="feedPosition ? `Post by ${displayStatus.account.displayName || displayStatus.account.username}` : undefined"
       @click="handleStatusClick"
     >
-      <!-- Reblog indicator -->
       <div
         v-if="isReblog && showReblogIndicator && booster"
         class="flex items-center gap-3 px-4 pt-2 text-sm text-muted-foreground"
@@ -175,43 +198,54 @@ function handleStatusClick(event: MouseEvent) {
         <span class="truncate">{{ booster.displayName || booster.username }} reposted</span>
       </div>
 
-      <div class="flex gap-3 px-4 py-3" :class="{ 'pt-0': replyParent || hasReplyAbove, 'pt-1': isReblog && showReblogIndicator && booster }">
-        <!-- Left: avatar + thread connector -->
-        <div class="flex shrink-0 flex-col items-center" :class="{ 'self-stretch': hasReplyBelow }">
-          <div v-if="replyParent || hasReplyAbove" class="w-0.5 h-3 bg-foreground/20" />
-          <button type="button" class="shrink-0 cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
-            <Avatar :src="displayStatus.account.avatar" :alt="displayStatus.account.displayName" size="md" />
-          </button>
-          <div v-if="hasReplyBelow" class="mt-1 w-0.5 flex-1 bg-foreground/20" />
-        </div>
+      <div class="flex gap-3 px-4">
+        <ThreadAvatarColumn
+          :src="displayStatus.account.avatar"
+          :alt="displayStatus.account.displayName"
+          :connect-above="mainConnectAbove"
+          :connect-below="mainConnectBelow"
+          @click="emit('profileClick', displayStatus.account.acct)"
+        />
 
-        <!-- Right: header + content + actions -->
-        <div class="min-w-0 flex-1">
-          <!-- Header row -->
+        <div class="min-w-0 flex-1 py-3">
           <div class="flex items-baseline gap-1 mb-1 text-base">
-            <button type="button" class="truncate font-bold text-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
+            <button
+              type="button"
+              class="truncate font-bold text-foreground hover:underline cursor-pointer"
+              @click.stop="emit('profileClick', displayStatus.account.acct)"
+            >
               {{ displayStatus.account.displayName || displayStatus.account.username }}
             </button>
-            <button type="button" class="shrink truncate text-muted-foreground hover:underline cursor-pointer" @click.stop="emit('profileClick', displayStatus.account.acct)">
+            <span
+              v-if="isAuthorReply"
+              class="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground"
+              aria-label="Author of the focused post"
+            >
+              Author
+            </span>
+            <button
+              type="button"
+              class="shrink truncate text-muted-foreground hover:underline cursor-pointer"
+              @click.stop="emit('profileClick', displayStatus.account.acct)"
+            >
               @{{ displayStatus.account.acct }}
             </button>
-            <RelativeTime :datetime="displayStatus.createdAt" class="ml-auto shrink-0 text-muted-foreground" />
-          </div>
-
-          <!-- Content -->
-          <div>
-            <StatusContent
-              :content="cleanedContent"
-              :spoiler-text="displayStatus.spoilerText"
-              :emojis="displayStatus.emojis"
-              :mentions="displayStatus.mentions"
-              :max-lines="8"
-              @mention-click="emit('profileClick', $event)"
-              @hashtag-click="emit('tagClick', $event)"
+            <RelativeTime
+              :datetime="displayStatus.createdAt"
+              class="ml-auto shrink-0 text-muted-foreground"
             />
           </div>
 
-          <!-- Media Attachments -->
+          <StatusContent
+            :content="cleanedContent"
+            :spoiler-text="displayStatus.spoilerText"
+            :emojis="displayStatus.emojis"
+            :mentions="displayStatus.mentions"
+            :max-lines="8"
+            @mention-click="emit('profileClick', $event)"
+            @hashtag-click="emit('tagClick', $event)"
+          />
+
           <StatusMedia
             v-if="displayStatus.mediaAttachments.length > 0"
             :attachments="displayStatus.mediaAttachments"
@@ -220,14 +254,12 @@ function handleStatusClick(event: MouseEvent) {
             @media-click="(attachment, index) => emit('mediaClick', displayStatus.mediaAttachments, index)"
           />
 
-          <!-- Preview Card -->
           <StatusCard
             v-if="displayStatus.card && !hideCard"
             :card="displayStatus.card"
             class="mt-3"
           />
 
-          <!-- Quoted Status -->
           <StatusQuote
             v-if="quotedStatus"
             :status="quotedStatus"
@@ -237,7 +269,6 @@ function handleStatusClick(event: MouseEvent) {
             @tag-click="emit('tagClick', $event)"
           />
 
-          <!-- Hashtags -->
           <StatusTags
             v-if="displayStatus.tags.length > 0"
             :tags="displayStatus.tags"
@@ -245,7 +276,6 @@ function handleStatusClick(event: MouseEvent) {
             @tag-click="emit('tagClick', $event)"
           />
 
-          <!-- Actions -->
           <StatusActions
             v-if="!hideActions"
             class="mt-2"
@@ -275,8 +305,10 @@ function handleStatusClick(event: MouseEvent) {
         </div>
       </div>
 
-      <!-- Separator (hidden when connected to reply below) -->
-      <div v-if="showSeparator && !hasReplyBelow" class="h-px w-full bg-border" />
+      <div
+        v-if="showSeparator && !mainConnectBelow"
+        class="h-px w-full bg-border"
+      />
     </article>
   </div>
 </template>

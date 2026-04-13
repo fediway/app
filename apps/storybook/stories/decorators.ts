@@ -29,3 +29,26 @@ export function wideDecorator() {
     template: '<div style="max-width: 600px"><story /></div>',
   };
 }
+
+/**
+ * Renders the story twice side-by-side: light mode on the left, dark mode
+ * on the right, both at the wide (600px) status width. Intended for visual
+ * audit of components that need to look balanced in both themes — rails,
+ * tombstones, badges, anything that uses a muted token.
+ */
+export function lightDarkDecorator() {
+  return {
+    template: `
+      <div style="display: flex; gap: 24px; align-items: flex-start;">
+        <div style="flex: 1; max-width: 600px; background: var(--background); color: var(--foreground); padding: 12px; border-radius: 8px;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.5; margin-bottom: 8px;">Light</div>
+          <story />
+        </div>
+        <div class="dark" style="flex: 1; max-width: 600px; background: var(--background); color: var(--foreground); padding: 12px; border-radius: 8px;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.5; margin-bottom: 8px;">Dark</div>
+          <story />
+        </div>
+      </div>
+    `,
+  };
+}
