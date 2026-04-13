@@ -69,8 +69,10 @@ export function useConversationData() {
 
   async function findConversationByAcct(acct: string): Promise<string | null> {
     const conversations = await client.rest.v1.conversations.list({ limit: 80 });
+    // Only match 1:1 conversations — skip group chats that happen to include this user
     const match = conversations.find(c =>
-      c.accounts.some(a => a.acct === acct || a.acct.split('@')[0] === acct),
+      c.accounts.length === 1
+      && (c.accounts[0].acct === acct || c.accounts[0].acct.split('@')[0] === acct),
     );
     return match?.id ?? null;
   }

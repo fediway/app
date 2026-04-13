@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { MessageBubble, MessageInput, useToast } from '@repo/ui';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
+import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
 
 const route = useRoute();
@@ -21,36 +22,37 @@ usePageHeader({
   image: computed(() => account.value?.avatar),
 });
 
-const message = ref('');
 const isSending = ref(false);
 const sentMessages = ref<Array<{ id: string; content: string; sentAt: string }>>([]);
 const messagesContainer = ref<HTMLElement>();
 
-async function handleSend() {
-  const content = message.value.trim();
-  if (!content || !acct.value)
+const { chatMessage, set: setChatTarget, clear: clearChatTarget } = useMobileChatInput();
+
+async function handleSend(content: string) {
+  const trimmed = content.trim();
+  if (!trimmed || !acct.value)
     return;
 
   isSending.value = true;
-  const savedContent = content;
-  message.value = '';
+  const savedContent = trimmed;
+  chatMessage.value = '';
 
   const tempId = `temp-${Date.now()}`;
   sentMessages.value.push({
     id: tempId,
-    content,
+    content: trimmed,
     sentAt: new Date().toISOString(),
   });
 
   try {
-    await sendDirectMessage(acct.value, content);
+    await sendDirectMessage(acct.value, trimmed);
     const conversationId = await findConversationByAcct(acct.value);
     if (conversationId) {
       router.replace(`/messages/${conversationId}`);
     }
   }
   catch {
-    message.value = savedContent;
+    chatMessage.value = savedContent;
     sentMessages.value = sentMessages.value.filter(m => m.id !== tempId);
     toast.error('Failed to send message');
   }
@@ -58,6 +60,20 @@ async function handleSend() {
     isSending.value = false;
   }
 }
+
+// Wire up mobile bottom nav input (same pattern as [id].vue)
+watch(acct, (value) => {
+  if (value) {
+    setChatTarget({
+      participantAcct: value,
+      onSend: handleSend,
+    });
+  }
+}, { immediate: true });
+
+onUnmounted(() => {
+  clearChatTarget();
+});
 
 watch(() => sentMessages.value.length, () => {
   nextTick(() => {
@@ -70,7 +86,7 @@ watch(() => sentMessages.value.length, () => {
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col">
+  <div class="-mb-26 flex h-[calc(100dvh-3.5rem-6.5rem)] flex-col overflow-hidden lg:h-[calc(100dvh-3.5rem)]">
     <ClientOnly>
       <div v-if="isLoading" class="flex-1 p-4">
         <div class="flex items-center gap-3">
@@ -111,20 +127,20 @@ watch(() => sentMessages.value.length, () => {
             />
           </TransitionGroup>
         </div>
-
-        <!-- Input -->
-        <div class="border-t border-border p-3">
-          <form class="flex items-end gap-2" @submit.prevent="handleSend">
-            <MessageInput
-              v-model="message"
-              :disabled="isSending"
-              :placeholder="`Message @${acct}...`"
-              class="flex-1"
-              @send="handleSend"
-            />
-          </form>
-        </div>
       </template>
+
+      <!-- Desktop input (mobile uses bottom nav via useMobileChatInput) -->
+      <div v-if="!isLoading" class="hidden border-t border-border p-3 lg:block">
+        <form class="flex items-end gap-2" @submit.prevent="handleSend(chatMessage)">
+          <MessageInput
+            v-model="chatMessage"
+            :disabled="isSending"
+            :placeholder="`Message @${acct}...`"
+            class="flex-1"
+            @send="handleSend(chatMessage)"
+          />
+        </form>
+      </div>
     </ClientOnly>
   </div>
 </template>

@@ -146,11 +146,19 @@ export const mockTrendingLinks = [
 ];
 
 export const mockConversations = [
+  // 1:1 with Alex
   {
     id: 'conv-1',
     accounts: [mockAccount2],
     unread: true,
     lastStatus: makeStatus('200', 'Hey, have you seen the latest update?', mockAccount2),
+  },
+  // Group chat that also includes Alex — should NOT be opened when clicking "Message" on Alex's profile
+  {
+    id: 'conv-group',
+    accounts: [mockAccount2, mockRemoteAccount],
+    unread: false,
+    lastStatus: makeStatus('201', 'Let\'s sync on the release plan', mockRemoteAccount),
   },
 ];
 

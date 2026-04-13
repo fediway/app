@@ -64,6 +64,15 @@ export const mockConversations: Conversation[] = [
     '2024-03-14T20:45:00.000Z',
     false,
   ),
+  // Group chat that includes Sarah — used to test that "Message" on Sarah's profile opens a 1:1, not this group
+  createConversation(
+    '4',
+    [sarahAccount, marcusAccount],
+    'Let\'s sync on the release plan tomorrow',
+    '2024-03-15T16:00:00.000Z',
+    false,
+    marcusAccount,
+  ),
 ];
 
 export const mockMessages: Record<string, Array<{ id: string; content: string; accountId: string; createdAt: string; favourited?: boolean }>> = {
@@ -85,5 +94,9 @@ export const mockMessages: Record<string, Array<{ id: string; content: string; a
     { id: 'msg-3-2', content: 'Jane!! How have you been?', accountId: emilyAccount.id, createdAt: '2024-03-14T18:30:00.000Z' },
     { id: 'msg-3-3', content: 'Great! Been super busy with work but loving it', accountId: janeAccount.id, createdAt: '2024-03-14T19:00:00.000Z' },
     { id: 'msg-3-4', content: 'The photography meetup is next Saturday at Golden Gate Park. You in? 📷', accountId: emilyAccount.id, createdAt: '2024-03-14T20:45:00.000Z' },
+  ],
+  4: [
+    { id: 'msg-4-1', content: 'Hey team, we need to plan the release', accountId: sarahAccount.id, createdAt: '2024-03-15T15:00:00.000Z' },
+    { id: 'msg-4-2', content: 'Let\'s sync on the release plan tomorrow', accountId: marcusAccount.id, createdAt: '2024-03-15T16:00:00.000Z' },
   ],
 };
