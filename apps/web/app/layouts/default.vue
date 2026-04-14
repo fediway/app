@@ -169,7 +169,7 @@ async function handleFeedbackSubmit(data: { category: 'bug' | 'suggestion' | 'ot
   });
 
   if (success) {
-    toast.success('Thanks for sharing', { description: 'We read every one.' });
+    toast.success('Thanks for sharing');
     closeFeedback();
   }
   else {
