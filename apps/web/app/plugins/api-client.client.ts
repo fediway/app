@@ -73,23 +73,16 @@ export default defineNuxtPlugin(async () => {
   }
 
   const { toast } = useToast();
-  const { identify: identifyUser, trackPageView } = useAnalytics();
-  const router = useRouter();
+  const { identify: identifyUser } = useAnalytics();
 
-  // Identify user for analytics after auth is established
+  // Page views are auto-tracked by Umami itself (it hooks pushState/replaceState)
+  // and normalized via the `data-before-send` hook in `00.umami.client.ts`.
   if (isAuthenticated.value) {
     const store = useAccountStore();
     if (store.currentUser.value?.acct) {
       identifyUser(store.currentUser.value.acct);
     }
   }
-
-  // Track SPA page views with normalized routes
-  // Initial page load (afterEach doesn't fire for the first navigation)
-  trackPageView(router.currentRoute.value.path);
-  router.afterEach((to) => {
-    trackPageView(to.path);
-  });
 
   watch(isAuthenticated, (authenticated) => {
     if (authenticated) {

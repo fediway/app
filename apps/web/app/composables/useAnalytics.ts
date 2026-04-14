@@ -64,6 +64,18 @@ export function normalizeRoute(path: string): UmamiTrackPayload {
   return { url: path, title: 'Other' };
 }
 
+/**
+ * Normalizes a payload object (as received by Umami's `data-before-send` hook)
+ * by collapsing dynamic route URLs to canonical ones. Returned payload is a
+ * new object — never mutates the input.
+ */
+export function normalizeUmamiPayload<T extends Record<string, unknown>>(payload: T): T {
+  if (typeof payload.url !== 'string')
+    return payload;
+  const normalized = normalizeRoute(payload.url);
+  return { ...payload, url: normalized.url, title: normalized.title };
+}
+
 // Umami's tracker preserves a pre-existing `window.umami` and will not install
 // the real client on top of a stub, so we queue calls here instead of stubbing.
 const pending: Array<() => void> = [];
@@ -109,11 +121,6 @@ export function useAnalytics() {
   return {
     identify: (acct: string) => {
       callUmami(u => u.identify({ acct }));
-    },
-
-    trackPageView: (path: string) => {
-      const normalized = normalizeRoute(path);
-      callUmami(u => u.track(normalized));
     },
 
     trackPostCreated: (opts?: { hasMedia?: boolean; isReply?: boolean }) => {

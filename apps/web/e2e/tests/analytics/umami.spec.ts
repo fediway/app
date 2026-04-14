@@ -1,6 +1,6 @@
 import { loginWithMock } from '../../helpers/auth';
 import { expect, test } from '../../helpers/base';
-import { getUmamiCalls, installRecordingUmamiScript } from '../../helpers/umami';
+import { installRecordingUmamiScript } from '../../helpers/umami';
 
 const WEBSITE_ID = 'e2e-website-id';
 
@@ -9,7 +9,7 @@ test.describe('Umami analytics', () => {
     await installRecordingUmamiScript(page);
   });
 
-  test('injects the umami script with data-website-id', async ({ page }) => {
+  test('injects the umami script with data-website-id and data-before-send', async ({ page }) => {
     await loginWithMock(page);
     await page.goto('/');
 
@@ -19,6 +19,7 @@ test.describe('Umami analytics', () => {
         ? {
             src: el.getAttribute('src'),
             websiteId: el.getAttribute('data-website-id'),
+            beforeSend: el.getAttribute('data-before-send'),
             autoTrack: el.getAttribute('data-auto-track'),
           }
         : null;
@@ -27,7 +28,74 @@ test.describe('Umami analytics', () => {
     expect(attrs).not.toBeNull();
     expect(attrs?.src).toContain('analytics.fediway.com/script.js');
     expect(attrs?.websiteId).toBe(WEBSITE_ID);
-    expect(attrs?.autoTrack).toBe('false');
+    expect(attrs?.beforeSend).toBe('fediwayUmamiBeforeSend');
+    expect(attrs?.autoTrack).toBeNull();
+  });
+
+  test('window.fediwayUmamiBeforeSend normalizes dynamic routes', async ({ page }) => {
+    await loginWithMock(page);
+    await page.goto('/');
+
+    const result = await page.evaluate(() => {
+      const hook = (window as unknown as {
+        fediwayUmamiBeforeSend?: (
+          type: string,
+          payload: Record<string, unknown>,
+        ) => Record<string, unknown>;
+      }).fediwayUmamiBeforeSend;
+      if (!hook)
+        return null;
+      return hook('event', {
+        website: 'aa13804e-2def-4135-8778-fa0c1bf64f9d',
+        hostname: 'fediway.com',
+        url: '/@alice/12345',
+        title: 'Raw Title',
+        screen: '1920x1080',
+      });
+    });
+
+    expect(result).toMatchObject({
+      website: 'aa13804e-2def-4135-8778-fa0c1bf64f9d',
+      hostname: 'fediway.com',
+      url: '/status',
+      title: 'Status Detail',
+      screen: '1920x1080',
+    });
+  });
+
+  test('before-send hook collapses a tag route to /tags', async ({ page }) => {
+    await loginWithMock(page);
+    await page.goto('/');
+
+    const result = await page.evaluate(() => {
+      const hook = (window as unknown as {
+        fediwayUmamiBeforeSend?: (
+          type: string,
+          payload: Record<string, unknown>,
+        ) => Record<string, unknown>;
+      }).fediwayUmamiBeforeSend;
+      return hook?.('event', { url: '/tags/webdev', title: 'original' });
+    });
+
+    expect(result).toMatchObject({ url: '/tags', title: 'Tag' });
+  });
+
+  test('before-send hook preserves payload when url is missing', async ({ page }) => {
+    await loginWithMock(page);
+    await page.goto('/');
+
+    const result = await page.evaluate(() => {
+      const hook = (window as unknown as {
+        fediwayUmamiBeforeSend?: (
+          type: string,
+          payload: Record<string, unknown>,
+        ) => Record<string, unknown>;
+      }).fediwayUmamiBeforeSend;
+      return hook?.('event', { website: 'wid', title: 'no url' });
+    });
+
+    expect(result).toMatchObject({ website: 'wid', title: 'no url' });
+    expect(result).not.toHaveProperty('url');
   });
 
   test('window.umami is available after the script loads', async ({ page }) => {
@@ -37,76 +105,5 @@ test.describe('Umami analytics', () => {
     await page.waitForFunction(() => typeof window.umami?.track === 'function', undefined, {
       timeout: 5_000,
     });
-  });
-
-  test('home page visit fires a track call with { url: "/", title: "Home" }', async ({ page }) => {
-    await loginWithMock(page);
-    await page.goto('/');
-
-    await expect.poll(async () => {
-      const calls = await getUmamiCalls(page);
-      return calls.find(c =>
-        c.method === 'track'
-        && typeof c.args[0] === 'object'
-        && c.args[0] !== null
-        && (c.args[0] as { url?: string }).url === '/',
-      );
-    }, { timeout: 5_000 }).toBeDefined();
-
-    const calls = await getUmamiCalls(page);
-    const pageView = calls.find(c =>
-      c.method === 'track'
-      && typeof c.args[0] === 'object'
-      && c.args[0] !== null
-      && (c.args[0] as { url?: string }).url === '/',
-    );
-    expect(pageView?.args[0]).toMatchObject({ url: '/', title: 'Home' });
-  });
-
-  test('SPA navigation fires additional track calls', async ({ page }) => {
-    await loginWithMock(page);
-    await page.goto('/');
-
-    await expect.poll(async () => {
-      const calls = await getUmamiCalls(page);
-      return calls.some(c =>
-        c.method === 'track'
-        && typeof c.args[0] === 'object'
-        && (c.args[0] as { url?: string }).url === '/',
-      );
-    }, { timeout: 5_000 }).toBe(true);
-
-    await page.goto('/explore');
-
-    await expect.poll(async () => {
-      const calls = await getUmamiCalls(page);
-      return calls.some(c =>
-        c.method === 'track'
-        && typeof c.args[0] === 'object'
-        && (c.args[0] as { url?: string }).url === '/explore',
-      );
-    }, { timeout: 5_000 }).toBe(true);
-
-    const calls = await getUmamiCalls(page);
-    const explorePageView = calls.find(c =>
-      c.method === 'track'
-      && typeof c.args[0] === 'object'
-      && (c.args[0] as { url?: string }).url === '/explore',
-    );
-    expect(explorePageView?.args[0]).toMatchObject({ url: '/explore', title: 'Explore' });
-  });
-
-  test('identify is called with current user after mock login', async ({ page }) => {
-    await loginWithMock(page);
-    await page.goto('/');
-
-    await expect.poll(async () => {
-      const calls = await getUmamiCalls(page);
-      return calls.find(c => c.method === 'identify');
-    }, { timeout: 5_000 }).toBeDefined();
-
-    const calls = await getUmamiCalls(page);
-    const identifyCall = calls.find(c => c.method === 'identify');
-    expect(identifyCall?.args[0]).toHaveProperty('acct');
   });
 });

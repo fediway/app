@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { _resetAnalyticsState, flushPendingAnalytics, normalizeRoute, useAnalytics } from '../useAnalytics';
+import { _resetAnalyticsState, flushPendingAnalytics, normalizeRoute, normalizeUmamiPayload, useAnalytics } from '../useAnalytics';
 
 interface MockUmami {
   track: ReturnType<typeof vi.fn>;
@@ -143,26 +143,6 @@ describe('useAnalytics — call dispatch', () => {
 
       expect(mock.identify).toHaveBeenCalledWith({ acct: 'alice@fediway.com' });
     });
-
-    it('fires page view with the normalized payload', () => {
-      const mock = installMockUmami();
-      const { trackPageView } = useAnalytics();
-
-      trackPageView('/explore/news');
-
-      expect(mock.track).toHaveBeenCalledWith({ url: '/explore/news', title: 'Explore — News' });
-    });
-
-    it('fires page view for the home route (regression guard)', () => {
-      // This was the primary bug — the home feed never tracked because the
-      // empty-title guard silently dropped every unmapped route.
-      const mock = installMockUmami();
-      const { trackPageView } = useAnalytics();
-
-      trackPageView('/');
-
-      expect(mock.track).toHaveBeenCalledWith({ url: '/', title: 'Home' });
-    });
   });
 
   describe('when window.umami is NOT yet available', () => {
@@ -175,10 +155,10 @@ describe('useAnalytics — call dispatch', () => {
 
     it('queues calls and replays them when flushPendingAnalytics is called', () => {
       clearUmami();
-      const { trackFavourite, trackPageView, identify } = useAnalytics();
+      const { trackFavourite, trackReblog, identify } = useAnalytics();
 
       trackFavourite('feed');
-      trackPageView('/');
+      trackReblog('status_detail');
       identify('alice');
 
       const mock = installMockUmami();
@@ -186,7 +166,7 @@ describe('useAnalytics — call dispatch', () => {
 
       expect(mock.track).toHaveBeenCalledTimes(2);
       expect(mock.track).toHaveBeenNthCalledWith(1, 'favourite', { source: 'feed' });
-      expect(mock.track).toHaveBeenNthCalledWith(2, { url: '/', title: 'Home' });
+      expect(mock.track).toHaveBeenNthCalledWith(2, 'reblog', { source: 'status_detail' });
       expect(mock.identify).toHaveBeenCalledWith({ acct: 'alice' });
     });
 
@@ -300,5 +280,86 @@ describe('useAnalytics — call dispatch', () => {
         expect(mock.track).toHaveBeenCalledWith('share', { source });
       },
     );
+  });
+});
+
+describe('normalizeUmamiPayload (before-send hook)', () => {
+  it('collapses a dynamic status-detail URL', () => {
+    const input = {
+      website: 'wid',
+      hostname: 'fediway.com',
+      url: '/@alice/12345',
+      title: 'Some Post',
+      screen: '1920x1080',
+      language: 'en-US',
+    };
+    const output = normalizeUmamiPayload(input);
+
+    expect(output.url).toBe('/status');
+    expect(output.title).toBe('Status Detail');
+  });
+
+  it('preserves non-url payload fields verbatim', () => {
+    const input = {
+      website: 'wid',
+      hostname: 'fediway.com',
+      url: '/',
+      title: 'Original',
+      screen: '1920x1080',
+      language: 'en-US',
+      referrer: 'https://example.com',
+      id: 'user-id',
+    };
+    const output = normalizeUmamiPayload(input);
+
+    expect(output.website).toBe('wid');
+    expect(output.hostname).toBe('fediway.com');
+    expect(output.screen).toBe('1920x1080');
+    expect(output.language).toBe('en-US');
+    expect(output.referrer).toBe('https://example.com');
+    expect(output.id).toBe('user-id');
+  });
+
+  it('replaces url and title for home', () => {
+    const input = { url: '/', title: 'fediway.com' };
+    const output = normalizeUmamiPayload(input);
+    expect(output).toMatchObject({ url: '/', title: 'Home' });
+  });
+
+  it('replaces url and title for a profile route', () => {
+    const input = { url: '/@bob@example.com', title: 'Bob on Fediway' };
+    const output = normalizeUmamiPayload(input);
+    expect(output).toMatchObject({ url: '/profile', title: 'Profile' });
+  });
+
+  it('collapses a tag route', () => {
+    const input = { url: '/tags/webdev', title: '#webdev' };
+    const output = normalizeUmamiPayload(input);
+    expect(output).toMatchObject({ url: '/tags', title: 'Tag' });
+  });
+
+  it('falls back to { path, "Other" } for unknown routes', () => {
+    const input = { url: '/experimental-route', title: 'Experimental' };
+    const output = normalizeUmamiPayload(input);
+    expect(output).toMatchObject({ url: '/experimental-route', title: 'Other' });
+  });
+
+  it('returns payload untouched when url is missing', () => {
+    const input = { website: 'wid', title: 'no url here' };
+    const output = normalizeUmamiPayload(input);
+    expect(output).toEqual(input);
+  });
+
+  it('returns payload untouched when url is not a string', () => {
+    const input = { website: 'wid', url: 123 as unknown as string, title: 'bad' };
+    const output = normalizeUmamiPayload(input);
+    expect(output).toEqual(input);
+  });
+
+  it('does not mutate the input payload', () => {
+    const input = { url: '/@alice/12345', title: 'Original', extra: 'keep' };
+    const before = JSON.stringify(input);
+    normalizeUmamiPayload(input);
+    expect(JSON.stringify(input)).toBe(before);
   });
 });
