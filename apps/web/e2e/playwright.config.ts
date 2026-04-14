@@ -78,5 +78,12 @@ export default defineConfig({
     reuseExistingServer: !isCI,
     cwd: appDir,
     stdout: isCI ? 'pipe' : 'ignore',
+    env: {
+      // Force the Umami plugin to install at runtime so the analytics e2e
+      // test can assert end-to-end. Real network requests to analytics.fediway.com
+      // are intercepted in the Playwright base fixture — no data leaves the test.
+      NUXT_PUBLIC_UMAMI_URL: 'https://analytics.fediway.com/script.js',
+      NUXT_PUBLIC_UMAMI_WEBSITE_ID: 'e2e-website-id',
+    },
   },
 });

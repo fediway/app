@@ -1,5 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 import { setupMockApi } from './mock-api';
+import { installNoOpUmamiScript } from './umami';
 
 export { expect };
 
@@ -9,12 +10,16 @@ export { expect };
  * 1. Intercepts all API calls with mock data (network-level mocking).
  *    The production build has zero mock code — mocking happens in Playwright.
  *
- * 2. Waits for Nuxt SPA hydration after page.goto().
+ * 2. Intercepts the Umami analytics script so no test touches a real
+ *    analytics endpoint. Tests that want to assert tracking behavior can
+ *    override the route with `installRecordingUmamiScript` from `helpers/umami.ts`.
+ *
+ * 3. Waits for Nuxt SPA hydration after page.goto().
  */
 export const test = base.extend({
   page: async ({ page }, use) => {
-    // Set up API mocking before any navigation
     await setupMockApi(page);
+    await installNoOpUmamiScript(page);
 
     // Wrap goto to wait for SPA hydration
     const originalGoto = page.goto.bind(page);

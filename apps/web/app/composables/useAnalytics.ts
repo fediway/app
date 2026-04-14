@@ -1,6 +1,3 @@
-// The window.umami typing is declared in `plugins/00.umami.client.ts` so
-// the stub + real client share one shape across the app.
-
 export type AnalyticsSource = 'feed' | 'status_detail' | 'profile' | 'notification' | 'message' | 'search' | 'explore' | 'composer' | 'sidebar';
 
 interface UmamiTrackPayload {
@@ -9,19 +6,12 @@ interface UmamiTrackPayload {
 }
 
 /**
- * Normalizes an SPA path into a stable `{ url, title }` payload for Umami.
- *
- * Two goals:
- * 1. **Track every route.** A route with no explicit mapping falls through
- *    to `{ url: path, title: 'Other' }` so it still reaches Umami. The old
- *    behavior (empty `title` silently dropping the call) meant the home feed,
- *    explore, notifications, and every top-level nav target never tracked.
- * 2. **Collapse high-cardinality dynamic routes** (user profiles, status
- *    detail, tags, etc.) to a shared canonical URL so Umami doesn't explode
- *    into one row per status id.
+ * Resolves an SPA path to a `{ url, title }` payload for Umami. Dynamic
+ * routes collapse to canonical URLs so Umami cardinality stays bounded;
+ * unmapped routes fall through to `{ url: path, title: 'Other' }` so every
+ * navigation is tracked.
  */
-function normalizeRoute(path: string): UmamiTrackPayload {
-  // Static top-level routes — tracked verbatim.
+export function normalizeRoute(path: string): UmamiTrackPayload {
   if (path === '/')
     return { url: '/', title: 'Home' };
   if (path === '/login')
@@ -38,8 +28,6 @@ function normalizeRoute(path: string): UmamiTrackPayload {
     return { url: '/messages', title: 'Messages' };
   if (path === '/settings')
     return { url: '/settings', title: 'Settings' };
-
-  // Explore hub and its tabs.
   if (path === '/explore')
     return { url: '/explore', title: 'Explore' };
   if (path === '/explore/news')
@@ -48,8 +36,6 @@ function normalizeRoute(path: string): UmamiTrackPayload {
     return { url: '/explore/people', title: 'Explore — People' };
   if (path === '/explore/tags')
     return { url: '/explore/tags', title: 'Explore — Tags' };
-
-  // Dynamic routes — collapsed to canonical URLs to keep Umami cardinality low.
   if (path.match(/^\/@[^/]+\/\d+\/(favourites|reblogs)/))
     return { url: '/status/engagement', title: 'Status Engagement' };
   if (path.match(/^\/@[^/]+\/\d+/))
@@ -75,47 +61,41 @@ function normalizeRoute(path: string): UmamiTrackPayload {
   if (path === '/oauth/callback')
     return { url: '/oauth/callback', title: 'OAuth Callback' };
 
-  // Unknown — track the raw path so we catch anything missed, with a neutral title.
   return { url: path, title: 'Other' };
 }
 
-/**
- * Module-level deferred call queue. Calls made before `window.umami` is
- * available (i.e. before the Umami script finishes loading) are buffered
- * here and replayed once the `umami:ready` event fires from the plugin.
- *
- * We deliberately do NOT stub `window.umami` — Umami's tracker preserves an
- * existing `window.umami` if one is already there, which would prevent the
- * real client from ever being installed. Queueing at the composable level
- * sidesteps that collision entirely.
- */
+// Umami's tracker preserves a pre-existing `window.umami` and will not install
+// the real client on top of a stub, so we queue calls here instead of stubbing.
 const pending: Array<() => void> = [];
-let umamiReady = false;
 
-if (import.meta.client) {
-  if (window.umami) {
-    umamiReady = true;
-  }
-  else {
-    window.addEventListener('umami:ready', () => {
-      umamiReady = true;
-      while (pending.length > 0) {
-        const fn = pending.shift();
-        try {
-          fn?.();
-        }
-        catch {
-          // One bad call shouldn't block the rest of the queue.
-        }
-      }
-    }, { once: true });
+function hasWindow(): boolean {
+  return typeof window !== 'undefined';
+}
+
+export function flushPendingAnalytics(): void {
+  if (!hasWindow() || !window.umami)
+    return;
+  while (pending.length > 0) {
+    const fn = pending.shift();
+    try {
+      fn?.();
+    }
+    catch {
+      // Drop the failing call so one broken entry cannot block the rest.
+    }
   }
 }
 
-function callUmami(fn: (umami: NonNullable<typeof window.umami>) => void) {
-  if (!import.meta.client)
+export function _resetAnalyticsState(): void {
+  pending.length = 0;
+}
+
+function callUmami(fn: (umami: NonNullable<typeof window.umami>) => void): void {
+  if (!hasWindow())
     return;
-  if (umamiReady && window.umami) {
+  if (window.umami) {
+    if (pending.length > 0)
+      flushPendingAnalytics();
     fn(window.umami);
     return;
   }
