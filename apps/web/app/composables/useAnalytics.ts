@@ -79,34 +79,87 @@ function normalizeRoute(path: string): UmamiTrackPayload {
   return { url: path, title: 'Other' };
 }
 
-function track(event: string, data?: Record<string, string | number>) {
-  window.umami?.track(event, data);
+/**
+ * Module-level deferred call queue. Calls made before `window.umami` is
+ * available (i.e. before the Umami script finishes loading) are buffered
+ * here and replayed once the `umami:ready` event fires from the plugin.
+ *
+ * We deliberately do NOT stub `window.umami` — Umami's tracker preserves an
+ * existing `window.umami` if one is already there, which would prevent the
+ * real client from ever being installed. Queueing at the composable level
+ * sidesteps that collision entirely.
+ */
+const pending: Array<() => void> = [];
+let umamiReady = false;
+
+if (import.meta.client) {
+  if (window.umami) {
+    umamiReady = true;
+  }
+  else {
+    window.addEventListener('umami:ready', () => {
+      umamiReady = true;
+      while (pending.length > 0) {
+        const fn = pending.shift();
+        try {
+          fn?.();
+        }
+        catch {
+          // One bad call shouldn't block the rest of the queue.
+        }
+      }
+    }, { once: true });
+  }
+}
+
+function callUmami(fn: (umami: NonNullable<typeof window.umami>) => void) {
+  if (!import.meta.client)
+    return;
+  if (umamiReady && window.umami) {
+    fn(window.umami);
+    return;
+  }
+  pending.push(() => {
+    if (window.umami)
+      fn(window.umami);
+  });
 }
 
 export function useAnalytics() {
   return {
     identify: (acct: string) => {
-      window.umami?.identify({ acct });
+      callUmami(u => u.identify({ acct }));
     },
 
     trackPageView: (path: string) => {
       const normalized = normalizeRoute(path);
-      window.umami?.track(normalized);
+      callUmami(u => u.track(normalized));
     },
 
-    trackPostCreated: (opts?: { hasMedia?: boolean; isReply?: boolean }) =>
-      track('post_created', {
+    trackPostCreated: (opts?: { hasMedia?: boolean; isReply?: boolean }) => {
+      const data = {
         ...(opts?.hasMedia && { has_media: 1 }),
         ...(opts?.isReply && { is_reply: 1 }),
-      }),
-    trackFavourite: (source: AnalyticsSource) => track('favourite', { source }),
-    trackReblog: (source: AnalyticsSource) => track('reblog', { source }),
-    trackBookmark: (source: AnalyticsSource) => track('bookmark', { source }),
-    trackFollow: (source: AnalyticsSource) => track('follow', { source }),
-    trackMessageSent: () => track('message_sent'),
-    trackShare: (source: AnalyticsSource) => track('share', { source }),
-    trackLogin: (method: 'oauth' | 'mock') => track('login', { method }),
-    trackLogout: () => track('logout'),
-    trackSignupStarted: () => track('signup_started'),
+      };
+      callUmami(u => u.track('post_created', data));
+    },
+    trackFavourite: (source: AnalyticsSource) =>
+      callUmami(u => u.track('favourite', { source })),
+    trackReblog: (source: AnalyticsSource) =>
+      callUmami(u => u.track('reblog', { source })),
+    trackBookmark: (source: AnalyticsSource) =>
+      callUmami(u => u.track('bookmark', { source })),
+    trackFollow: (source: AnalyticsSource) =>
+      callUmami(u => u.track('follow', { source })),
+    trackMessageSent: () =>
+      callUmami(u => u.track('message_sent')),
+    trackShare: (source: AnalyticsSource) =>
+      callUmami(u => u.track('share', { source })),
+    trackLogin: (method: 'oauth' | 'mock') =>
+      callUmami(u => u.track('login', { method })),
+    trackLogout: () =>
+      callUmami(u => u.track('logout')),
+    trackSignupStarted: () =>
+      callUmami(u => u.track('signup_started')),
   };
 }
