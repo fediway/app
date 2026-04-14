@@ -82,8 +82,6 @@ function formatDateLabel(date: Date): string {
 }
 
 function showSender(index: number): boolean {
-  if (!isGroupChat.value)
-    return false;
   const status = threadStatuses.value[index];
   if (!status || isOwnMessage(status))
     return false;
@@ -211,7 +209,7 @@ watch(() => threadStatuses.value.length, (newLen) => {
                 :sent-at="status.createdAt"
                 :media-attachments="status.mediaAttachments"
                 :card="status.card"
-                :sender-name="status.account.displayName"
+                :sender-name="isGroupChat ? status.account.displayName : undefined"
                 :sender-avatar="status.account.avatar"
                 :show-sender="showSender(index)"
                 @media-click="(_, idx) => openLightbox(status.mediaAttachments, idx)"
