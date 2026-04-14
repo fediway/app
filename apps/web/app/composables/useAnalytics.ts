@@ -1,20 +1,55 @@
-declare global {
-  interface Window {
-    umami?: {
-      track: ((event: string, data?: Record<string, string | number>) => void)
-        & ((payload: { url: string; title: string }) => void);
-      identify: (data: Record<string, string | number>) => void;
-    };
-  }
-}
+// The window.umami typing is declared in `plugins/00.umami.client.ts` so
+// the stub + real client share one shape across the app.
 
 export type AnalyticsSource = 'feed' | 'status_detail' | 'profile' | 'notification' | 'message' | 'search' | 'explore' | 'composer' | 'sidebar';
 
-function track(event: string, data?: Record<string, string | number>) {
-  window.umami?.track(event, data);
+interface UmamiTrackPayload {
+  url: string;
+  title: string;
 }
 
-function normalizeRoute(path: string): { url: string; title: string } {
+/**
+ * Normalizes an SPA path into a stable `{ url, title }` payload for Umami.
+ *
+ * Two goals:
+ * 1. **Track every route.** A route with no explicit mapping falls through
+ *    to `{ url: path, title: 'Other' }` so it still reaches Umami. The old
+ *    behavior (empty `title` silently dropping the call) meant the home feed,
+ *    explore, notifications, and every top-level nav target never tracked.
+ * 2. **Collapse high-cardinality dynamic routes** (user profiles, status
+ *    detail, tags, etc.) to a shared canonical URL so Umami doesn't explode
+ *    into one row per status id.
+ */
+function normalizeRoute(path: string): UmamiTrackPayload {
+  // Static top-level routes — tracked verbatim.
+  if (path === '/')
+    return { url: '/', title: 'Home' };
+  if (path === '/login')
+    return { url: '/login', title: 'Login' };
+  if (path === '/search')
+    return { url: '/search', title: 'Search' };
+  if (path === '/saved')
+    return { url: '/saved', title: 'Saved' };
+  if (path === '/favourites')
+    return { url: '/favourites', title: 'Favourites' };
+  if (path === '/notifications')
+    return { url: '/notifications', title: 'Notifications' };
+  if (path === '/messages')
+    return { url: '/messages', title: 'Messages' };
+  if (path === '/settings')
+    return { url: '/settings', title: 'Settings' };
+
+  // Explore hub and its tabs.
+  if (path === '/explore')
+    return { url: '/explore', title: 'Explore' };
+  if (path === '/explore/news')
+    return { url: '/explore/news', title: 'Explore — News' };
+  if (path === '/explore/people')
+    return { url: '/explore/people', title: 'Explore — People' };
+  if (path === '/explore/tags')
+    return { url: '/explore/tags', title: 'Explore — Tags' };
+
+  // Dynamic routes — collapsed to canonical URLs to keep Umami cardinality low.
   if (path.match(/^\/@[^/]+\/\d+\/(favourites|reblogs)/))
     return { url: '/status/engagement', title: 'Status Engagement' };
   if (path.match(/^\/@[^/]+\/\d+/))
@@ -29,7 +64,7 @@ function normalizeRoute(path: string): { url: string; title: string } {
     return { url: '/tags', title: 'Tag' };
   if (path.startsWith('/links/'))
     return { url: '/links', title: 'Link Detail' };
-  if (path.startsWith('/messages/new'))
+  if (path === '/messages/new')
     return { url: '/messages/new', title: 'New Message' };
   if (path.match(/^\/messages\/.+/))
     return { url: '/messages/thread', title: 'Message Thread' };
@@ -39,7 +74,13 @@ function normalizeRoute(path: string): { url: string; title: string } {
     return { url: '/settings/sub', title: 'Settings' };
   if (path === '/oauth/callback')
     return { url: '/oauth/callback', title: 'OAuth Callback' };
-  return { url: path, title: '' };
+
+  // Unknown — track the raw path so we catch anything missed, with a neutral title.
+  return { url: path, title: 'Other' };
+}
+
+function track(event: string, data?: Record<string, string | number>) {
+  window.umami?.track(event, data);
 }
 
 export function useAnalytics() {
@@ -50,9 +91,7 @@ export function useAnalytics() {
 
     trackPageView: (path: string) => {
       const normalized = normalizeRoute(path);
-      if (normalized.title) {
-        window.umami?.track(normalized);
-      }
+      window.umami?.track(normalized);
     },
 
     trackPostCreated: (opts?: { hasMedia?: boolean; isReply?: boolean }) =>
