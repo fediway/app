@@ -6,6 +6,11 @@ import { useAuth } from './useAuth';
 let mockClientSingleton: MastoClient | null = null;
 let publicClientSingleton: MastoClient | null = null;
 
+export function _resetClientSingletons(): void {
+  mockClientSingleton = null;
+  publicClientSingleton = null;
+}
+
 function isMockMode(): boolean {
   try {
     // eslint-disable-next-line ts/ban-ts-comment
@@ -17,15 +22,30 @@ function isMockMode(): boolean {
   }
 }
 
+interface NuxtWindow {
+  __NUXT__?: { config?: { public?: { defaultInstance?: string } } };
+}
+
+// Never fall back to `mastodon.social`: a third-party instance would receive
+// unauthenticated browsing activity from users who never signed in there, with
+// Fediway's Origin and User-Agent headers attached.
 function getDefaultInstanceUrl(): string {
+  if (typeof window !== 'undefined') {
+    const fromNuxt = (window as unknown as NuxtWindow).__NUXT__?.config?.public?.defaultInstance;
+    if (fromNuxt)
+      return `https://${fromNuxt}`;
+  }
+
   try {
     // eslint-disable-next-line ts/ban-ts-comment
-    // @ts-ignore
-    return `https://${import.meta.env?.NUXT_PUBLIC_DEFAULT_INSTANCE || 'mastodon.social'}`;
+    // @ts-ignore -- import.meta.env is typed in Nuxt/Vite consumers but not in base TS
+    const fromVite = import.meta.env?.VITE_DEFAULT_INSTANCE;
+    if (typeof fromVite === 'string' && fromVite.length > 0)
+      return `https://${fromVite}`;
   }
-  catch {
-    return 'https://mastodon.social';
-  }
+  catch {}
+
+  return 'https://fediway.com';
 }
 
 function getMockClient(): MastoClient {
