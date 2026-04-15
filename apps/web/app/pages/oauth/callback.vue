@@ -51,8 +51,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-5">
-    <!-- Happy path: just logo + subtle text, feels like a transition -->
+  <div class="flex min-h-[100dvh] flex-col items-center justify-center px-5">
     <template v-if="isLoading">
       <img
         src="/images/app-icon.svg"
@@ -60,12 +59,11 @@ onMounted(async () => {
         aria-hidden="true"
         class="h-14 w-14"
       >
-      <p class="mt-4 text-sm text-[#232b37]/50 dark:text-white/50">
+      <p class="mt-4 text-sm text-muted-foreground">
         Signing in…
       </p>
     </template>
 
-    <!-- Error: show card with action -->
     <template v-else>
       <div class="mb-10 flex items-center gap-3">
         <img
@@ -74,10 +72,10 @@ onMounted(async () => {
           aria-hidden="true"
           class="h-12 w-12"
         >
-        <span class="text-3xl font-bold text-[#232b37] dark:text-white">Fediway</span>
+        <span class="text-3xl font-bold text-foreground">Fediway</span>
       </div>
 
-      <div class="w-full max-w-md rounded-3xl bg-[#fefeff] px-5 py-8 text-center shadow-2xl dark:bg-[#232b37]">
+      <div class="w-full max-w-md rounded-3xl border border-border bg-background px-5 py-8 text-center shadow-2xl">
         <div class="space-y-4">
           <div
             role="alert"
