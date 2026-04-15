@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment } from '@repo/types';
 import { useAuth } from '@repo/api';
-import { EmptyState, MediaLightbox, MessageBubble, MessageInput, Skeleton, useToast } from '@repo/ui';
+import { EmptyState, formatCalendarLabel, MediaLightbox, MessageBubble, MessageInput, Skeleton, useToast } from '@repo/ui';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
@@ -55,30 +55,10 @@ function dateSeparator(index: number): string | null {
   if (!status)
     return null;
   const date = new Date(status.createdAt);
-  if (index === 0)
-    return formatDateLabel(date);
-  const prev = threadStatuses.value[index - 1];
-  if (!prev)
+  const prev = index > 0 ? threadStatuses.value[index - 1] : null;
+  if (prev && new Date(prev.createdAt).toDateString() === date.toDateString())
     return null;
-  const prevDate = new Date(prev.createdAt);
-  if (date.toDateString() !== prevDate.toDateString())
-    return formatDateLabel(date);
-  return null;
-}
-
-function formatDateLabel(date: Date): string {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const diff = today.getTime() - target.getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days === 0)
-    return 'Today';
-  if (days === 1)
-    return 'Yesterday';
-  if (days < 7)
-    return date.toLocaleDateString(undefined, { weekday: 'long' });
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+  return formatCalendarLabel(date);
 }
 
 function showSender(index: number): boolean {
@@ -198,7 +178,7 @@ watch(() => threadStatuses.value.length, (newLen) => {
                 :key="`sep-${status.id}`"
                 class="flex items-center justify-center py-2"
               >
-                <span class="text-xs font-medium text-muted-foreground">
+                <span class="text-xs font-medium text-muted-foreground first-letter:uppercase">
                   {{ dateSeparator(index) }}
                 </span>
               </div>

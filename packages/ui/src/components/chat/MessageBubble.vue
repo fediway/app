@@ -4,6 +4,7 @@ import { PhHeart, PhPlay } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { blurhashStyle } from '../../utils/blurhash';
+import { formatTimeOfDay } from '../../utils/date';
 
 const props = defineProps<{
   content?: string;
@@ -36,16 +37,6 @@ const hasCard = computed(() => props.card && !hasMedia.value && !props.sharedSta
 
 function m(index: number): MediaAttachment {
   return media.value[index]!;
-}
-
-function formatTime(dateString: string): string {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime()))
-    return '';
-  return date.toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
 }
 
 function getDomain(url: string): string {
@@ -330,7 +321,7 @@ function thumbSrc(a: MediaAttachment): string {
           <PhHeart :size="12" weight="fill" />
         </span>
         <span class="text-xs text-muted-foreground-subtle">
-          {{ formatTime(sentAt) }}
+          {{ formatTimeOfDay(sentAt) }}
         </span>
       </div>
     </div>

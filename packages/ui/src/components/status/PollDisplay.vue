@@ -2,6 +2,7 @@
 import type { Poll } from '@repo/types';
 import { PhCheck } from '@phosphor-icons/vue';
 import { computed } from 'vue';
+import { formatRelativeDuration } from '../../utils/date';
 
 const props = defineProps<{
   poll: Poll;
@@ -24,20 +25,11 @@ function isVoted(index: number): boolean {
 }
 
 const timeRemaining = computed(() => {
-  if (props.poll.expired)
-    return 'Closed';
   if (!props.poll.expiresAt)
     return '';
-  const diff = new Date(props.poll.expiresAt).getTime() - Date.now();
-  if (diff <= 0)
+  if (props.poll.expired || new Date(props.poll.expiresAt).getTime() <= Date.now())
     return 'Closed';
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(hours / 24);
-  if (days > 0)
-    return `${days}d left`;
-  if (hours > 0)
-    return `${hours}h left`;
-  return `${Math.floor(diff / 60000)}m left`;
+  return formatRelativeDuration(props.poll.expiresAt);
 });
 </script>
 
