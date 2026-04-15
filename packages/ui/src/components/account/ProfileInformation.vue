@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { computed } from 'vue';
+import { formatRelativeDuration } from '../../utils/date';
 import { formatCount } from '../../utils/format';
 import { Badge } from '../ui/badge';
 import { RichText } from '../ui/rich-text';
@@ -21,20 +22,9 @@ const stats = computed(() => [
   { key: 'posts' as const, count: props.account.statusesCount, label: 'Posts' },
 ]);
 
-const accountAge = computed(() => {
-  if (!props.account.createdAt)
-    return null;
-  const created = new Date(props.account.createdAt);
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - created.getTime()) / 86400000);
-  if (diffDays < 30)
-    return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-  const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths < 12)
-    return `${diffMonths} month${diffMonths !== 1 ? 's' : ''}`;
-  const diffYears = Math.floor(diffMonths / 12);
-  return `${diffYears} year${diffYears !== 1 ? 's' : ''}`;
-});
+const accountAge = computed(() =>
+  props.account.createdAt ? formatRelativeDuration(props.account.createdAt) : null,
+);
 
 const HREF_RE = /<a[^>]*href="([^"]*)"[^>]*>/i;
 const STRIP_TAGS_RE = /<[^>]*>/g;
@@ -95,7 +85,7 @@ function extractText(html: string): string {
     <!-- Profile fields + Join date -->
     <div v-if="account.fields.length > 0 || accountAge" class="flex flex-wrap items-center gap-2">
       <Badge v-if="accountAge" variant="muted">
-        Joined {{ accountAge }} ago
+        Joined {{ accountAge }}
       </Badge>
       <template v-for="field in account.fields" :key="field.name">
         <a

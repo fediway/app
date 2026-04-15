@@ -188,4 +188,15 @@ export { vFadeOnLoad } from './directives/fadeOnLoad';
 // Utilities
 export { cn } from './lib/utils';
 
-export { blurhashStyle, decodeBlurhash, isBlurhashValid } from './utils';
+export {
+  blurhashStyle,
+  decodeBlurhash,
+  formatCalendarLabel,
+  formatCompactTimestamp,
+  formatCount,
+  formatFullDate,
+  formatRelativeDuration,
+  formatTimeOfDay,
+  isBlurhashValid,
+} from './utils';
+export type { DateInput, FormatDateOptions } from './utils';
