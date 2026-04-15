@@ -28,8 +28,10 @@ function isOwnPost(status: Status): boolean {
 // Feed type switching (authenticated users can pick; unauthenticated get trending only)
 const { feedType } = useFeedType();
 
-const homeTimeline = isAuthenticated.value ? useTimeline({ type: 'home', cache: true }) : null;
-const publicTimeline = isAuthenticated.value ? useTimeline({ type: 'public' }) : null;
+// Gating creation on `isAuthenticated.value` races the async auth plugin —
+// if the const captures `null`, the feed never recovers.
+const homeTimeline = useTimeline({ type: 'home', cache: true });
+const publicTimeline = useTimeline({ type: 'public' });
 const { getTrendingStatuses } = useExploreData();
 const trending = getTrendingStatuses();
 
@@ -43,9 +45,10 @@ const activeTimeline = computed(() => {
   return null;
 });
 
-// Unified status list
 const isLoading = computed(() => activeTimeline.value?.isLoading.value ?? trending.isLoading.value ?? false);
-const errorValue = computed(() => activeTimeline.value?.error.value ?? trending.error.value ?? null);
+const errorValue = computed(() =>
+  activeTimeline.value ? activeTimeline.value.error.value : trending.error.value,
+);
 
 // Delayed skeleton gate — only show skeleton after 300ms to avoid flash
 const showSkeleton = ref(false);
@@ -63,8 +66,8 @@ watch(isLoading, (loading) => {
   }
 }, { immediate: true });
 
-const homeStatuses = computed(() => homeTimeline?.statuses.value ?? []);
-const publicStatuses = computed(() => publicTimeline?.statuses.value ?? []);
+const homeStatuses = computed(() => homeTimeline.statuses.value ?? []);
+const publicStatuses = computed(() => publicTimeline.statuses.value ?? []);
 const trendingStatuses = computed(() => trending.data.value ?? []);
 
 const rawStatuses = computed(() => {
@@ -183,32 +186,26 @@ function handleRetry() {
   }
 }
 
-// Fetch the active feed and switch on feed type change
 function fetchActiveFeed() {
   const tl = activeTimeline.value;
-  if (tl) {
-    tl.fetch();
-    tl.startPolling(30_000);
-  }
+  if (!tl)
+    return;
+  tl.fetch();
+  tl.startPolling(30_000);
 }
 
-// Fetch eagerly in setup
-fetchActiveFeed();
-
-// Re-fetch when feed type changes
-watch(feedType, () => {
-  homeTimeline?.stopPolling();
-  publicTimeline?.stopPolling();
-  fetchActiveFeed();
-});
-
-onMounted(() => {
-  activeTimeline.value?.startPolling(30_000);
-});
+// `isAuthenticated` is in the deps so fetching kicks off the moment the async
+// auth plugin finishes — not only when the user switches feeds.
+watch([isAuthenticated, feedType], () => {
+  homeTimeline.stopPolling();
+  publicTimeline.stopPolling();
+  if (isAuthenticated.value)
+    fetchActiveFeed();
+}, { immediate: true });
 
 onUnmounted(() => {
-  homeTimeline?.stopPolling();
-  publicTimeline?.stopPolling();
+  homeTimeline.stopPolling();
+  publicTimeline.stopPolling();
 });
 </script>
 

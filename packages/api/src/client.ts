@@ -29,23 +29,20 @@ export interface MastoClient {
  */
 patchRelativeLinkHeaders();
 
-/**
- * Identifies Fediway to Mastodon instance admins in their request logs.
- * Etiquette in the Mastodon ecosystem — admins use this to spot which clients
- * are hitting their server. Only takes effect for server-side fetches; the
- * browser strips the User-Agent header from `fetch()` per the spec.
- */
+// Identifies Fediway in instance admins' request logs. Server-only:
+// setting it in the browser triggers a CORS preflight that third-party
+// Mastodon servers reject for `user-agent` in `Access-Control-Allow-Headers`.
 const FEDIWAY_USER_AGENT = 'Fediway/0.1.0 (+https://fediway.com)';
 
 export function createMastoClient(config: MastoClientConfig): MastoClient {
+  const requestInit = typeof window === 'undefined'
+    ? { headers: { 'User-Agent': FEDIWAY_USER_AGENT } }
+    : undefined;
+
   const rest = createRestAPIClient({
     url: config.url,
     accessToken: config.accessToken,
-    requestInit: {
-      headers: {
-        'User-Agent': FEDIWAY_USER_AGENT,
-      },
-    },
+    requestInit,
   });
 
   // Streaming client is lazy — only created when first accessed.
