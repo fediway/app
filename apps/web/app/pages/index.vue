@@ -20,6 +20,12 @@ const { open: openComposer } = usePostComposer();
 const { requireAuth } = useAuthGate();
 const { isAuthenticated, currentUser } = useAuth();
 
+// The auth cookie is set immediately (SSR-safe), but useAuth().isAuthenticated
+// only becomes true after the async plugin calls restoreSession(). During that
+// gap, avoid showing trending posts — show skeleton instead.
+const { isAuthenticated: hasAuthCookie } = useAuthState();
+const isAuthResolving = computed(() => hasAuthCookie.value && !isAuthenticated.value);
+
 function isOwnPost(status: Status): boolean {
   const acct = status.reblog?.account.id ?? status.account.id;
   return !!currentUser.value && currentUser.value.id === acct;
@@ -45,7 +51,7 @@ const activeTimeline = computed(() => {
   return null;
 });
 
-const isLoading = computed(() => activeTimeline.value?.isLoading.value ?? trending.isLoading.value ?? false);
+const isLoading = computed(() => isAuthResolving.value || activeTimeline.value?.isLoading.value || trending.isLoading.value || false);
 const errorValue = computed(() =>
   activeTimeline.value ? activeTimeline.value.error.value : trending.error.value,
 );
@@ -71,6 +77,9 @@ const publicStatuses = computed(() => publicTimeline.statuses.value ?? []);
 const trendingStatuses = computed(() => trending.data.value ?? []);
 
 const rawStatuses = computed(() => {
+  // Auth cookie exists but session not restored yet — don't flash trending posts
+  if (isAuthResolving.value)
+    return [];
   if (!isAuthenticated.value)
     return trendingStatuses.value;
   if (feedType.value === 'home')
@@ -189,27 +198,29 @@ function handleRetry() {
   }
 }
 
+let lastFetchedFeed: string | null = null;
+
 function fetchActiveFeed() {
   const tl = activeTimeline.value;
   if (!tl)
     return;
   tl.fetch();
-  tl.startPolling(30_000);
 }
 
-// `isAuthenticated` is in the deps so fetching kicks off the moment the async
-// auth plugin finishes — not only when the user switches feeds.
+// Fetch the active feed when auth resolves or feed type changes.
+// Guard: skip if we already fetched this exact feed (prevents the
+// double-fire from isAuthenticated changing while feedType stays the same).
 watch([isAuthenticated, feedType], () => {
-  homeTimeline.stopPolling();
-  publicTimeline.stopPolling();
-  if (isAuthenticated.value)
-    fetchActiveFeed();
+  if (!isAuthenticated.value) {
+    lastFetchedFeed = null;
+    return;
+  }
+  const key = feedType.value;
+  if (lastFetchedFeed === key)
+    return;
+  lastFetchedFeed = key;
+  fetchActiveFeed();
 }, { immediate: true });
-
-onUnmounted(() => {
-  homeTimeline.stopPolling();
-  publicTimeline.stopPolling();
-});
 </script>
 
 <template>
