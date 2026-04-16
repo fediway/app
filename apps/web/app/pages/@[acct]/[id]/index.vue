@@ -238,6 +238,7 @@ function expandCollapse(key: string) {
           @delete="handleDelete"
           @tag-click="handleTagClick"
           @profile-click="navigateToProfile"
+          @status-click="handleStatusClick"
           @media-click="handleMediaClick"
         />
 

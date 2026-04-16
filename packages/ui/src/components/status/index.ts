@@ -25,3 +25,4 @@ export {
 export { default as ThreadAvatarColumn } from './ThreadAvatarColumn.vue';
 export { default as ThreadCollapseNode } from './ThreadCollapseNode.vue';
 export { default as ThreadSkeleton } from './ThreadSkeleton.vue';
+export { extractQuoteUrl } from './useCleanContent';

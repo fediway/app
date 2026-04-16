@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
+import { computed } from 'vue';
 import AccountDisplayName from '../account/AccountDisplayName.vue';
 import AccountHandle from '../account/AccountHandle.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
@@ -7,6 +8,7 @@ import FullTimestamp from '../ui/full-timestamp/FullTimestamp.vue';
 import RichText from '../ui/rich-text/RichText.vue';
 import StatusActions from './StatusActions.vue';
 import StatusMedia from './StatusMedia.vue';
+import StatusQuote from './StatusQuote.vue';
 import StatusTags from './StatusTags.vue';
 import { useCleanContent } from './useCleanContent';
 
@@ -32,13 +34,22 @@ const emit = defineEmits<{
   delete: [statusId: string];
   tagClick: [tagName: string];
   profileClick: [acct: string];
+  statusClick: [statusId: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
 }>();
+
+const quotedStatus = computed(() => {
+  const q = props.status.quote;
+  if (!q)
+    return null;
+  const raw = q as unknown as Record<string, unknown>;
+  const qs = raw.quotedStatus ?? raw.quoted_status;
+  return (qs as Status) ?? null;
+});
 
 const cleanedContent = useCleanContent(
   () => props.status.content,
   () => props.status.tags,
-  () => !!props.status.quote,
 );
 </script>
 
@@ -80,6 +91,16 @@ const cleanedContent = useCleanContent(
         class="mb-2 text-lg leading-relaxed text-foreground"
         @mention-click="emit('profileClick', $event)"
         @hashtag-click="emit('tagClick', $event)"
+      />
+
+      <!-- Quoted post -->
+      <StatusQuote
+        v-if="quotedStatus"
+        :status="quotedStatus"
+        class="mb-3"
+        @click="emit('statusClick', $event)"
+        @profile-click="emit('profileClick', $event)"
+        @tag-click="emit('tagClick', $event)"
       />
 
       <!-- Tags -->
