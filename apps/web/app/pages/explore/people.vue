@@ -69,6 +69,7 @@ const isReady = computed(() =>
               :is-following="isFollowing(account.id)"
               :requested="getRelationship(account.id).requested"
               size="sm"
+              @click.prevent.stop
               @follow="toggleFollow(account.id)"
               @unfollow="toggleFollow(account.id)"
             />
