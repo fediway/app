@@ -16,7 +16,7 @@ const router = useRouter();
 
 const { getStatusById, getStatusContext } = useStatusData();
 const { getProfilePath, getStatusPath } = useAccountData();
-const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleShare, handleDelete, getStoreStatus, store } = useWebActions();
+const { toggleFavourite, toggleReblog, handleBookmark, handleCopyLink, handleShare, handleDelete, handleMute, handleBlock, handleBlockDomain, handleReport, getStoreStatus, store } = useWebActions();
 const { open: openLightbox } = useMediaLightbox();
 const { open: openComposer } = usePostComposer();
 const { open: openSendMessage } = useSendMessageModal();
@@ -236,6 +236,10 @@ function expandCollapse(key: string) {
           @copy-link="handleCopyLink"
           @send-message="handleSendMessage"
           @delete="handleDelete"
+          @mute="handleMute"
+          @block="handleBlock"
+          @block-domain="handleBlockDomain"
+          @report="handleReport"
           @tag-click="handleTagClick"
           @profile-click="navigateToProfile"
           @status-click="handleStatusClick"
