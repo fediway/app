@@ -163,6 +163,15 @@ export async function setupMockApi(page: Page) {
       });
     }
 
+    if (url.match(/\/api\/v1\/accounts\/\d+\/follow$/) && method === 'POST') {
+      const accountId = url.match(/\/accounts\/(\d+)\/follow/)?.[1];
+      return route.fulfill({ json: { ...mockRelationship, id: accountId, following: true } });
+    }
+    if (url.match(/\/api\/v1\/accounts\/\d+\/unfollow$/) && method === 'POST') {
+      const accountId = url.match(/\/accounts\/(\d+)\/unfollow/)?.[1];
+      return route.fulfill({ json: { ...mockRelationship, id: accountId, following: false } });
+    }
+
     if (url.match(/\/api\/v1\/accounts\/\d+\/mute$/) && method === 'POST') {
       const accountId = url.match(/\/accounts\/(\d+)\/mute/)?.[1];
       return route.fulfill({ json: { ...mockRelationship, id: accountId, muting: true } });

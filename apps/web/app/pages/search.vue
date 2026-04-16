@@ -287,8 +287,9 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
                 :is-following="isFollowing(account.id)"
                 :requested="getRelationship(account.id).requested"
                 size="sm"
-                @follow.prevent.stop="toggleFollow(account.id)"
-                @unfollow.prevent.stop="toggleFollow(account.id)"
+                @click.prevent.stop
+                @follow="toggleFollow(account.id)"
+                @unfollow="toggleFollow(account.id)"
               />
             </NuxtLink>
           </Section>
