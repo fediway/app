@@ -88,16 +88,17 @@ const hasAnimatedMedia = computed(() =>
 const quote = computed(() => displayStatus.value.quote);
 const quotedStatus = computed(() => {
   const q = quote.value;
-  if (q && 'quotedStatus' in q && q.quotedStatus) {
-    return q.quotedStatus;
-  }
-  return null;
+  if (!q)
+    return null;
+  // masto.js types use camelCase but some servers return snake_case
+  const raw = q as unknown as Record<string, unknown>;
+  const qs = raw.quotedStatus ?? raw.quoted_status;
+  return (qs as typeof displayStatus.value) ?? null;
 });
 
 const cleanedContent = useCleanContent(
   () => displayStatus.value.content,
   () => displayStatus.value.tags,
-  () => !!quote.value,
 );
 
 const isRemoteUser = computed(() => displayStatus.value.account.acct.includes('@'));

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status } from '@repo/types';
 import { PhCircleNotch } from '@phosphor-icons/vue';
-import { useAuth, useTimeline } from '@repo/api';
+import { useAuth, useQuoteResolver, useTimeline } from '@repo/api';
 import { EmptyState, NewPostsPill, shapeFeedThreads, Skeleton, Status as StatusComponent, useInfiniteScroll } from '@repo/ui';
 import { useFeedType } from '~/composables/useFeedType';
 import { useMediaLightbox } from '~/composables/useMediaLightbox';
@@ -88,6 +88,9 @@ watch(rawStatuses, (statuses) => {
 }, { immediate: true });
 
 const allStatuses = withStoreState(rawStatuses);
+
+// Lazily resolve quote posts where the server didn't populate the quote field
+useQuoteResolver(() => allStatuses.value);
 
 const threadPositions = computed(() => shapeFeedThreads(allStatuses.value, id => store.get(id)));
 

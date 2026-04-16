@@ -1,36 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { useCleanContent } from '../useCleanContent';
+import { extractQuoteUrl, useCleanContent } from '../useCleanContent';
 
-function clean(content: string, tags: { name: string }[] = [], hasQuote = false): string {
-  const result = useCleanContent(() => content, () => tags, () => hasQuote);
+function clean(content: string, tags: { name: string }[] = []): string {
+  const result = useCleanContent(() => content, () => tags);
   return result.value;
 }
 
 describe('useCleanContent', () => {
   describe('quote stripping', () => {
-    it('strips RE: quote paragraph when hasQuote is true', () => {
+    it('always strips RE: quote paragraph', () => {
       const html = '<p>RE: <a href="https://example.com/post">https://example.com/post</a></p><p>My reply</p>';
-      expect(clean(html, [], true)).toBe('<p>My reply</p>');
-    });
-
-    it('keeps RE: paragraph when hasQuote is false', () => {
-      const html = '<p>RE: <a href="https://example.com/post">https://example.com/post</a></p><p>My reply</p>';
-      expect(clean(html, [], false)).toBe(html);
+      expect(clean(html)).toBe('<p>My reply</p>');
     });
 
     it('strips RE: with plain text URL (no anchor tag)', () => {
       const html = '<p>RE: https://berlin.social/@user/12345</p><p>My reply</p>';
-      expect(clean(html, [], true)).toBe('<p>My reply</p>');
+      expect(clean(html)).toBe('<p>My reply</p>');
     });
 
     it('strips RE: with quote-inline class', () => {
       const html = '<p class="quote-inline">RE: <a href="https://example.com/post">https://example.com/post</a></p><p>My reply</p>';
-      expect(clean(html, [], true)).toBe('<p>My reply</p>');
+      expect(clean(html)).toBe('<p>My reply</p>');
+    });
+
+    it('strips RE: with nested spans inside anchor (Mastodon link format)', () => {
+      const html = '<p class="quote-inline">RE: <a href="https://social.kit.edu/@KIT_Karlsruhe/116407744130800865" rel="nofollow noopener" translate="no" target="_blank"><span class="invisible">https://</span><span class="ellipsis">social.kit.edu/@KIT_Karlsruhe/</span><span class="invisible">116407744130800865</span></a></p><p>My reply</p>';
+      expect(clean(html)).toBe('<p>My reply</p>');
     });
 
     it('handles content with no RE: paragraph', () => {
       const html = '<p>Just a normal post</p>';
-      expect(clean(html, [], true)).toBe(html);
+      expect(clean(html)).toBe(html);
     });
   });
 
@@ -98,5 +98,36 @@ describe('useCleanContent', () => {
       const elapsed = performance.now() - start;
       expect(elapsed).toBeLessThan(100);
     });
+  });
+});
+
+describe('extractQuoteUrl', () => {
+  it('extracts URL from anchor tag in RE: paragraph', () => {
+    const html = '<p>RE: <a href="https://example.com/@user/123">https://example.com/@user/123</a></p><p>My reply</p>';
+    expect(extractQuoteUrl(html)).toBe('https://example.com/@user/123');
+  });
+
+  it('extracts URL from plain text RE: paragraph', () => {
+    const html = '<p>RE: https://berlin.social/@user/12345</p><p>My reply</p>';
+    expect(extractQuoteUrl(html)).toBe('https://berlin.social/@user/12345');
+  });
+
+  it('extracts URL with quote-inline class', () => {
+    const html = '<p class="quote-inline">RE: <a href="https://social.kit.edu/@KIT/116407744130800865">https://social.kit.edu/@KIT/116407744130800865</a></p><p>Content</p>';
+    expect(extractQuoteUrl(html)).toBe('https://social.kit.edu/@KIT/116407744130800865');
+  });
+
+  it('extracts URL when anchor contains nested spans (Mastodon link format)', () => {
+    const html = '<p class="quote-inline">RE: <a href="https://social.kit.edu/@KIT_Karlsruhe/116407744130800865" rel="nofollow noopener" translate="no" target="_blank"><span class="invisible">https://</span><span class="ellipsis">social.kit.edu/@KIT_Karlsruhe/</span><span class="invisible">116407744130800865</span></a></p><p>Content here</p>';
+    expect(extractQuoteUrl(html)).toBe('https://social.kit.edu/@KIT_Karlsruhe/116407744130800865');
+  });
+
+  it('returns null when no RE: paragraph', () => {
+    const html = '<p>Just a normal post</p>';
+    expect(extractQuoteUrl(html)).toBeNull();
+  });
+
+  it('returns null for empty content', () => {
+    expect(extractQuoteUrl('')).toBeNull();
   });
 });
