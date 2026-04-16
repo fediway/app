@@ -24,8 +24,18 @@ export function useFollows(callbacks?: UseFollowsCallbacks) {
 
   function toggleFollow(accountId: string) {
     const previous = followState.get(accountId) ?? false;
-    followState.set(accountId, !previous);
-    callbacks?.onToggle?.(accountId, !previous);
+    // A pending request counts as "engaged" — toggling should cancel it
+    const requested = relationshipCache.get(accountId)?.requested ?? false;
+    const wasEngaged = previous || requested;
+
+    followState.set(accountId, !wasEngaged);
+    // Optimistically clear requested so the button updates immediately
+    if (requested) {
+      const cached = relationshipCache.get(accountId);
+      if (cached)
+        relationshipCache.set(accountId, { ...cached, requested: false });
+    }
+    callbacks?.onToggle?.(accountId, !wasEngaged);
 
     // Sequence counter — only the latest toggle writes to state
     const seq = (toggleSeq.get(accountId) ?? 0) + 1;
@@ -38,7 +48,7 @@ export function useFollows(callbacks?: UseFollowsCallbacks) {
       return;
     }
 
-    const apiCall = previous
+    const apiCall = wasEngaged
       ? client.rest.v1.accounts.$select(accountId).unfollow()
       : client.rest.v1.accounts.$select(accountId).follow();
 
@@ -52,6 +62,12 @@ export function useFollows(callbacks?: UseFollowsCallbacks) {
       .catch((err) => {
         if (toggleSeq.get(accountId) === seq) {
           followState.set(accountId, previous);
+          // Restore the original relationship state on error
+          if (requested) {
+            const cached = relationshipCache.get(accountId);
+            if (cached)
+              relationshipCache.set(accountId, { ...cached, requested: true });
+          }
         }
         callbacks?.onError?.(accountId, err);
       });
