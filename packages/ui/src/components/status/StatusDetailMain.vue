@@ -5,8 +5,9 @@ import AccountDisplayName from '../account/AccountDisplayName.vue';
 import AccountHandle from '../account/AccountHandle.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
 import FullTimestamp from '../ui/full-timestamp/FullTimestamp.vue';
-import RichText from '../ui/rich-text/RichText.vue';
 import StatusActions from './StatusActions.vue';
+import StatusCard from './StatusCard.vue';
+import StatusContent from './StatusContent.vue';
 import StatusMedia from './StatusMedia.vue';
 import StatusQuote from './StatusQuote.vue';
 import StatusTags from './StatusTags.vue';
@@ -32,11 +33,17 @@ const emit = defineEmits<{
   copyLink: [statusId: string];
   sendMessage: [status: Status];
   delete: [statusId: string];
+  mute: [accountId: string];
+  block: [accountId: string];
+  blockDomain: [domain: string];
+  report: [statusId: string];
   tagClick: [tagName: string];
   profileClick: [acct: string];
   statusClick: [statusId: string];
   mediaClick: [attachments: MediaAttachment[], index: number];
 }>();
+
+const isRemoteUser = computed(() => props.status.account.acct.includes('@'));
 
 const quotedStatus = computed(() => {
   const q = props.status.quote;
@@ -51,6 +58,11 @@ const cleanedContent = useCleanContent(
   () => props.status.content,
   () => props.status.tags,
 );
+
+function getDomain(acct: string): string {
+  const parts = acct.split('@');
+  return parts.length > 1 ? parts[1]! : '';
+}
 </script>
 
 <template>
@@ -83,14 +95,22 @@ const cleanedContent = useCleanContent(
         @media-click="(att, idx) => $emit('mediaClick', status.mediaAttachments, idx)"
       />
 
-      <!-- Content (larger text for detail view) -->
-      <RichText
+      <!-- Content with CW/spoiler support (larger text for detail view) -->
+      <StatusContent
         :content="cleanedContent"
+        :spoiler-text="status.spoilerText"
         :emojis="status.emojis"
         :mentions="status.mentions"
-        class="mb-2 text-lg leading-relaxed text-foreground"
+        class="mb-2 text-lg leading-relaxed"
         @mention-click="emit('profileClick', $event)"
         @hashtag-click="emit('tagClick', $event)"
+      />
+
+      <!-- Link preview card -->
+      <StatusCard
+        v-if="status.card"
+        :card="status.card"
+        class="mb-3"
       />
 
       <!-- Quoted post -->
@@ -127,6 +147,7 @@ const cleanedContent = useCleanContent(
           :visibility="status.visibility"
           :authenticated="authenticated"
           :is-own-post="isOwnPost"
+          :is-remote-user="isRemoteUser"
           @reply="$emit('reply', status.id)"
           @reblog="$emit('reblog', status.id)"
           @favourite="$emit('favourite', status.id)"
@@ -135,6 +156,10 @@ const cleanedContent = useCleanContent(
           @copy-link="$emit('copyLink', status.id)"
           @send-message="$emit('sendMessage', status)"
           @delete="$emit('delete', status.id)"
+          @mute="$emit('mute', status.account.id)"
+          @block="$emit('block', status.account.id)"
+          @block-domain="$emit('blockDomain', getDomain(status.account.acct))"
+          @report="$emit('report', status.id)"
         />
       </div>
     </div>
