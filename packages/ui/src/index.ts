@@ -82,6 +82,9 @@ export type {
 export { NotificationGroup, NotificationList } from './components/notification';
 export type { NotificationGroupType } from './components/notification';
 
+// Settings components
+export { SettingsNavItem, SettingsSection } from './components/settings';
+
 // Status components
 export {
   DeletedStatusTombstone,

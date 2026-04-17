@@ -4,6 +4,7 @@ export { _resetPaginatedQueryCache, createPaginatedQuery, invalidateAllPaginated
 export { _resetQueryCache, createQuery, invalidateAllQueries, type QueryOptions, type QueryResult } from './createQuery';
 export * from './queries';
 export { useAccount, type UseAccountReturn } from './useAccount';
+export { type AccountPreferencesUpdate, useAccountPreferences, type UseAccountPreferencesReturn } from './useAccountPreferences';
 export { type ActionQueueError, useActionQueue, type UseActionQueueOptions, type UseActionQueueReturn } from './useActionQueue';
 export { type AppRestoredResult, type SavedAppState, useAppLifecycle, type UseAppLifecycleOptions } from './useAppLifecycle';
 export { useAuth } from './useAuth';
@@ -16,6 +17,7 @@ export { type FeedbackCategory, type FeedbackReport, useFeedbackReport, type Use
 export { type CreateFilterParams, type FilterError, type UpdateFilterParams, useFilters, type UseFiltersOptions, type UseFiltersReturn } from './useFilters';
 export { type ModerationError, type MuteAccountParams, useModeration, type UseModerationOptions, type UseModerationReturn } from './useModeration';
 export { resetNotificationMarkerState, useNotificationMarker, type UseNotificationMarkerReturn } from './useNotificationMarker';
+export { type PushAlerts, type PushPolicy, usePushSubscription, type UsePushSubscriptionReturn } from './usePushSubscription';
 export { useQuoteResolver } from './useQuoteResolver';
 export { type ReportCategory, type ReportError, type SubmitReportParams, useReport, type UseReportOptions, type UseReportReturn } from './useReport';
 export { type SharedContent, type ShareReceivedEvent, useShareTarget } from './useShareTarget';
