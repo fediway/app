@@ -52,3 +52,15 @@ const SPECIAL_CHARS_RE = /[.*+?^${}()|[\]\\]/g;
 export function escapeRegExp(str: string): string {
   return str.replace(SPECIAL_CHARS_RE, '\\$&');
 }
+
+const UNRESOLVED_SHORTCODE_RE = /(<[^>]*>)|:[a-z_]\w*:/gi;
+
+/**
+ * Strip `:shortcode:` patterns that weren't replaced by custom-emoji images.
+ * Matches only outside HTML tags so we don't touch `alt=":foo:"` attributes on
+ * img tags produced by emoji substitution. Requires a letter or underscore as
+ * the first char so timestamps like `12:30:45` stay intact.
+ */
+export function stripUnresolvedEmojiShortcodes(html: string): string {
+  return html.replace(UNRESOLVED_SHORTCODE_RE, (_, tag) => tag ?? '');
+}

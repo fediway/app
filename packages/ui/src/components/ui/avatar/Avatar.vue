@@ -1,14 +1,22 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
+
 interface Props {
   src?: string | null;
   alt?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   src: null,
   alt: 'Avatar',
   size: 'md',
+});
+
+const hasError = ref(false);
+
+watch(() => props.src, () => {
+  hasError.value = false;
 });
 
 const sizeClasses = {
@@ -29,11 +37,12 @@ const sizeClasses = {
     :aria-label="alt"
   >
     <img
-      v-if="src"
+      v-if="src && !hasError"
       :src="src"
       :alt="alt"
       decoding="async"
       class="w-full h-full object-cover"
+      @error="hasError = true"
     >
   </div>
 </template>

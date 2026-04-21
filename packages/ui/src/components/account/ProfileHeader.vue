@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { Avatar } from '../ui/avatar';
 import { Badge } from '../ui/badge';
@@ -10,11 +11,17 @@ interface Props {
   followsYou?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   headerImage: null,
   avatarSrc: null,
   avatarAlt: 'Avatar',
   followsYou: false,
+});
+
+const headerError = ref(false);
+
+watch(() => props.headerImage, () => {
+  headerError.value = false;
 });
 </script>
 
@@ -26,12 +33,13 @@ withDefaults(defineProps<Props>(), {
       style="background-image: linear-gradient(138deg, rgba(53, 13, 255, 0.056) 15%, rgba(168, 0, 253, 0.07) 35%, rgba(191, 128, 255, 0.063) 69%, rgba(255, 255, 255, 0.07) 92%);"
     >
       <img
-        v-if="headerImage"
+        v-if="headerImage && !headerError"
         v-fade-on-load
         :src="headerImage"
         alt="Profile header"
         decoding="async"
         class="w-full h-full object-cover"
+        @error="headerError = true"
       >
     </div>
 

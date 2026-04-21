@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CustomEmoji } from '@repo/types';
 import { computed } from 'vue';
-import { escapeRegExp, sanitizeHtml } from '../../utils/sanitize';
+import { escapeRegExp, sanitizeHtml, stripUnresolvedEmojiShortcodes } from '../../utils/sanitize';
 
 const props = withDefaults(defineProps<Props>(), {
   emojis: () => [],
@@ -34,7 +34,7 @@ const processedName = computed(() => {
     );
   }
 
-  return html;
+  return stripUnresolvedEmojiShortcodes(html);
 });
 </script>
 

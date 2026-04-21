@@ -3,7 +3,7 @@ import type { CustomEmoji } from '@repo/types';
 import type { StatusMention } from '../../../utils/content-links';
 import { computed } from 'vue';
 import { extractTagName, resolveMentionAcct } from '../../../utils/content-links';
-import { escapeRegExp, sanitizeHtml } from '../../../utils/sanitize';
+import { escapeRegExp, sanitizeHtml, stripUnresolvedEmojiShortcodes } from '../../../utils/sanitize';
 
 interface Props {
   /** HTML content to render */
@@ -38,7 +38,7 @@ const processedContent = computed(() => {
     );
   }
 
-  return html;
+  return stripUnresolvedEmojiShortcodes(html);
 });
 
 function handleContentClick(e: MouseEvent) {
