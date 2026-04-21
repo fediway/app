@@ -2,7 +2,7 @@
 import type { FediwayStatus } from '@repo/types';
 import { PhUser, PhWarningCircle } from '@phosphor-icons/vue';
 import { useAccount, useAuth, useStatusActions, useStatusStore } from '@repo/api';
-import { EmptyState, ProfileActions, ProfileHeader, ProfileInformation, Skeleton, Status } from '@repo/ui';
+import { EmptyState, PinnedSection, ProfileActions, ProfileHeader, ProfileInformation, Skeleton, Status } from '@repo/ui';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useHaptics } from '../composables/useHaptics';
@@ -34,8 +34,16 @@ const isOwnProfile = computed(() => {
   return authUser.value.acct === accountData.account.value.acct;
 });
 
+const pinnedStatuses = computed(() =>
+  (accountData.pinnedStatuses.value ?? []).map(s => (store.get(s.id) as typeof s) ?? s),
+);
+
+const pinnedIds = computed(() => new Set(pinnedStatuses.value.map(s => s.id)));
+
 const statuses = computed(() =>
-  (accountData.statuses.value ?? []).map(s => (store.get(s.id) as typeof s) ?? s),
+  (accountData.statuses.value ?? [])
+    .map(s => (store.get(s.id) as typeof s) ?? s)
+    .filter(s => !pinnedIds.value.has(s.id)),
 );
 
 async function load() {
@@ -144,6 +152,15 @@ async function handleUnfollow() {
 
     <!-- Statuses -->
     <div class="border-t border-gray-200 dark:border-gray-800">
+      <PinnedSection
+        :statuses="pinnedStatuses"
+        @favourite="handleFavourite"
+        @reblog="handleReblog"
+        @bookmark="handleBookmark"
+        @status-click="handleStatusClick"
+        @profile-click="handleProfileClick"
+        @tag-click="handleTagClick"
+      />
       <div v-for="status in statuses" :key="status.id">
         <Status
           :status="status"
@@ -160,7 +177,7 @@ async function handleUnfollow() {
 
     <!-- Empty statuses -->
     <EmptyState
-      v-if="!accountData.isLoading.value && statuses.length === 0"
+      v-if="!accountData.isLoading.value && statuses.length === 0 && pinnedStatuses.length === 0"
       :icon="PhUser"
       title="No posts yet"
     />

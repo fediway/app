@@ -52,11 +52,14 @@ export function createAccountsHandler(state: MockState) {
           return account;
         },
         statuses: {
-          async list(params?: { limit?: number; maxId?: string; sinceId?: string; onlyMedia?: boolean }) {
+          async list(params?: { limit?: number; maxId?: string; sinceId?: string; onlyMedia?: boolean; pinned?: boolean }) {
             await delay();
             const account = findAccountById(id);
             if (account) {
               let statuses = mockAccountStatuses[account.acct] || [];
+              if (params?.pinned) {
+                return statuses.filter(s => s.pinned).slice(0, params?.limit ?? 5);
+              }
               if (params?.onlyMedia) {
                 statuses = statuses.filter(s => s.mediaAttachments && s.mediaAttachments.length > 0);
               }

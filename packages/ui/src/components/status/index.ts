@@ -1,4 +1,6 @@
 export { default as DeletedStatusTombstone } from './DeletedStatusTombstone.vue';
+export { default as PinnedOverflowCard } from './PinnedOverflowCard.vue';
+export { default as PinnedSection } from './PinnedSection.vue';
 export { default as PollDisplay } from './PollDisplay.vue';
 export { default as QuickReply } from './QuickReply.vue';
 export { default as Status } from './Status.vue';
