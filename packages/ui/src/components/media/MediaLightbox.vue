@@ -2,6 +2,7 @@
 import type { MediaAttachment } from '@repo/types';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
+import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 
 interface Props {
   attachments: MediaAttachment[];
@@ -22,6 +23,7 @@ const scale = ref(1);
 const isDragging = ref(false);
 const position = ref({ x: 0, y: 0 });
 const dragStart = ref({ x: 0, y: 0 });
+const showAltText = ref(false);
 
 const currentAttachment = computed(() => props.attachments[currentIndex.value]);
 const hasMultiple = computed(() => props.attachments.length > 1);
@@ -34,11 +36,18 @@ watch(() => props.isOpen, (isOpen) => {
     currentIndex.value = props.initialIndex;
     resetZoom();
   }
+  else {
+    showAltText.value = false;
+  }
 });
 
 watch(() => props.initialIndex, (index) => {
   currentIndex.value = index;
   resetZoom();
+});
+
+watch(currentIndex, () => {
+  showAltText.value = false;
 });
 
 function resetZoom() {
@@ -72,6 +81,8 @@ function handleBackdropClick(event: MouseEvent) {
 
 function handleKeydown(event: KeyboardEvent) {
   if (!props.isOpen)
+    return;
+  if (showAltText.value)
     return;
 
   switch (event.key) {
@@ -333,18 +344,31 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Alt text / Description -->
-        <div
+        <!-- Alt text badge — tap to read full description -->
+        <button
           v-if="currentAttachment.description"
-          class="absolute bottom-16 left-4 right-4 z-10 mx-auto max-w-2xl"
+          type="button"
+          class="absolute bottom-4 left-4 z-10 px-2.5 py-1 text-xs font-bold tracking-wide text-white bg-black/70 hover:bg-black/90 rounded-md transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
+          aria-label="View image description"
+          @click="showAltText = true"
         >
-          <div class="px-4 py-2 bg-black/70 text-white text-sm rounded-lg">
-            <span class="font-medium text-white/60 mr-2">ALT:</span>
-            {{ currentAttachment.description }}
-          </div>
-        </div>
+          ALT
+        </button>
       </div>
     </Transition>
+
+    <Dialog :open="showAltText" @update:open="(v) => (showAltText = v)">
+      <DialogContent size="md" class="max-h-[80vh] flex flex-col">
+        <DialogTitle class="px-5 pt-5 pb-3 text-base font-semibold">
+          Image description
+        </DialogTitle>
+        <div class="px-5 pb-5 overflow-y-auto">
+          <p class="text-sm leading-relaxed text-foreground whitespace-pre-wrap break-words">
+            {{ currentAttachment?.description }}
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
   </Teleport>
 </template>
 
