@@ -7,6 +7,7 @@ export interface UseAccountReturn {
   account: ReturnType<typeof shallowRef<Account | null>>;
   relationship: ReturnType<typeof shallowRef<Relationship | null>>;
   statuses: ReturnType<typeof shallowRef<Status[]>>;
+  pinnedStatuses: ReturnType<typeof shallowRef<Status[]>>;
   isLoading: ReturnType<typeof ref<boolean>>;
   error: ReturnType<typeof ref<Error | null>>;
   fetch: (accountId: string) => Promise<void>;
@@ -28,6 +29,7 @@ export function useAccount(): UseAccountReturn {
   const account = shallowRef<Account | null>(null);
   const relationship = shallowRef<Relationship | null>(null);
   const statuses = shallowRef<Status[]>([]);
+  const pinnedStatuses = shallowRef<Status[]>([]);
   const isLoading = ref(false);
   const error = ref<Error | null>(null);
 
@@ -52,11 +54,19 @@ export function useAccount(): UseAccountReturn {
         relationship.value = relationships[0] ?? null;
       }
 
-      // Fetch recent statuses
-      statuses.value = await client.rest.v1.accounts.$select(accountId).statuses.list({
-        limit: 20,
-        excludeReplies: true,
-      });
+      // Fetch recent + pinned statuses in parallel
+      const [recent, pinned] = await Promise.all([
+        client.rest.v1.accounts.$select(accountId).statuses.list({
+          limit: 20,
+          excludeReplies: true,
+        }),
+        client.rest.v1.accounts.$select(accountId).statuses.list({
+          limit: 5,
+          pinned: true,
+        }),
+      ]);
+      statuses.value = recent;
+      pinnedStatuses.value = pinned;
     }
     catch (err) {
       error.value = err instanceof Error ? err : new Error('Failed to fetch account');
@@ -192,6 +202,7 @@ export function useAccount(): UseAccountReturn {
     account,
     relationship,
     statuses,
+    pinnedStatuses,
     isLoading,
     error,
     fetch,

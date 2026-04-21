@@ -723,6 +723,20 @@ export const mockAccountStatuses: Record<string, Status[]> = {
   ],
 };
 
+function markPinned(acct: string, ids: string[]) {
+  const list = mockAccountStatuses[acct];
+  if (!list)
+    return;
+  for (const id of ids) {
+    const s = list.find(x => x.id === id);
+    if (s)
+      s.pinned = true;
+  }
+}
+
+markPinned('jane@social.network', ['jane-1', 'jane-2', 'jane-3']);
+markPinned('sarah@social.network', ['sarah-1']);
+
 export const favouritedStatuses: Status[] = [
   { ...mockStatuses[1]!, favourited: true },
   { ...mockStatuses[3]!, favourited: true },

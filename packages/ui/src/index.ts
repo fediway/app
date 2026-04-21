@@ -90,6 +90,8 @@ export {
   DeletedStatusTombstone,
   isConnectedAbove,
   isConnectedBelow,
+  PinnedOverflowCard,
+  PinnedSection,
   PollDisplay,
   QuickReply,
   shapeFeedStatus,

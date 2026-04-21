@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MediaAttachment, Status as StatusType } from '@repo/types';
 import type { ThreadPosition } from './thread';
-import { PhArrowsClockwise } from '@phosphor-icons/vue';
+import { PhArrowsClockwise, PhPushPin } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { cn } from '../../lib/utils';
 import RelativeTime from '../ui/relative-time/RelativeTime.vue';
@@ -26,6 +26,8 @@ interface Props {
   profileUrl?: string;
   /** Show the reblog indicator row when this status is a reblog */
   showReblogIndicator?: boolean;
+  /** Show a "Pinned" indicator row above the status header. Used on profile pages. */
+  isPinned?: boolean;
   /**
    * Render a small "Author" badge in the header. Set when this status is by
    * the same author as the focused `main` post — populated by `shapeThreadContext`.
@@ -50,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
   threadPosition: () => ({ kind: 'standalone' }),
   profileUrl: undefined,
   showReblogIndicator: true,
+  isPinned: false,
   isAuthorReply: false,
   showSeparator: true,
   hideActions: false,
@@ -81,6 +84,9 @@ const emit = defineEmits<{
 const isReblog = computed(() => props.status.reblog !== null);
 const displayStatus = computed(() => props.status.reblog ?? props.status);
 const booster = computed(() => (isReblog.value ? props.status.account : null));
+const hasIndicator = computed(() =>
+  props.isPinned || (isReblog.value && props.showReblogIndicator && booster.value !== null),
+);
 const hasAnimatedMedia = computed(() =>
   displayStatus.value.mediaAttachments.some(a => a.type === 'gifv' || a.type === 'video'),
 );
@@ -190,6 +196,16 @@ function handleStatusClick(event: MouseEvent) {
       @click="handleStatusClick"
     >
       <div
+        v-if="isPinned"
+        class="flex items-center gap-3 px-4 pt-2 text-sm text-muted-foreground"
+      >
+        <div class="flex w-11 shrink-0 justify-end">
+          <PhPushPin :size="14" weight="fill" />
+        </div>
+        <span class="truncate">Pinned</span>
+      </div>
+
+      <div
         v-if="isReblog && showReblogIndicator && booster"
         class="flex items-center gap-3 px-4 pt-2 text-sm text-muted-foreground"
       >
@@ -208,7 +224,7 @@ function handleStatusClick(event: MouseEvent) {
           @click="emit('profileClick', displayStatus.account.acct)"
         />
 
-        <div class="min-w-0 flex-1 py-3">
+        <div class="min-w-0 flex-1" :class="[hasIndicator ? 'pt-1' : 'pt-3', hideActions ? 'pb-3' : 'pb-1']">
           <div class="flex items-baseline gap-1 mb-1 text-base">
             <button
               type="button"

@@ -29,6 +29,18 @@ export function useAccountData() {
     });
   }
 
+  function getAccountPinnedStatuses(acct: string): QueryResult<Status[]> {
+    return createQuery(`accountPinned:${acct}`, [] as Status[], async () => {
+      const account = await client.rest.v1.accounts.lookup({ acct });
+      const statuses = await client.rest.v1.accounts.$select(account.id).statuses.list({
+        limit: 5,
+        pinned: true,
+      });
+      store.setMany(statuses as FediwayStatus[]);
+      return statuses;
+    });
+  }
+
   function getAccountStatusesPaginated(acct: string): PaginatedQueryResult<Status> {
     // Cache the account ID to avoid redundant lookups on loadMore
     let accountId: string | undefined;
@@ -150,6 +162,7 @@ export function useAccountData() {
   return {
     getAccountByAcct,
     getAccountStatuses,
+    getAccountPinnedStatuses,
     getAccountStatusesPaginated,
     getAccountStatusesWithReplies,
     getAccountStatusesWithRepliesPaginated,
