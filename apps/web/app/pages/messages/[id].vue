@@ -192,6 +192,7 @@ watch(() => threadStatuses.value.length, (newLen) => {
                 :media-attachments="status.mediaAttachments"
                 :card="status.card"
                 :sender-name="isGroupChat ? status.account.displayName : undefined"
+                :sender-emojis="isGroupChat ? status.account.emojis : undefined"
                 :sender-avatar="status.account.avatar"
                 :show-sender="showSender(index)"
                 @media-click="(_, idx) => openLightbox(status.mediaAttachments, idx)"

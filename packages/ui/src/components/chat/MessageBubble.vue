@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { MediaAttachment, PreviewCard } from '@repo/types';
+import type { CustomEmoji, MediaAttachment, PreviewCard } from '@repo/types';
 import { PhHeart, PhPlay } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { blurhashStyle } from '../../utils/blurhash';
+import { renderCustomEmojis } from '../../utils/customEmojis';
 import { formatTimeOfDay } from '../../utils/date';
 
 const props = defineProps<{
@@ -14,11 +15,13 @@ const props = defineProps<{
   mediaAttachments?: MediaAttachment[];
   card?: PreviewCard | null;
   senderName?: string;
+  senderEmojis?: readonly CustomEmoji[];
   senderAvatar?: string;
   showSender?: boolean;
   sharedStatus?: {
     authorName: string;
     authorAvatar: string;
+    authorEmojis?: readonly CustomEmoji[];
     content: string;
     imageUrl?: string;
   };
@@ -29,6 +32,18 @@ defineEmits<{
   mediaClick: [attachment: MediaAttachment, index: number];
   senderClick: [];
 }>();
+
+const senderNameHtml = computed(() =>
+  props.senderName
+    ? renderCustomEmojis(props.senderName, props.senderEmojis ?? [], 'inline-block h-3.5 w-3.5 align-text-bottom')
+    : '',
+);
+
+const sharedAuthorNameHtml = computed(() =>
+  props.sharedStatus
+    ? renderCustomEmojis(props.sharedStatus.authorName, props.sharedStatus.authorEmojis ?? [], 'inline-block h-3.5 w-3.5 align-text-bottom')
+    : '',
+);
 
 const media = computed(() => props.mediaAttachments?.slice(0, 4) ?? []);
 const mediaCount = computed(() => media.value.length);
@@ -83,9 +98,8 @@ function thumbSrc(a: MediaAttachment): string {
         v-if="!isOwn && showSender && senderName"
         class="mb-0.5 cursor-pointer px-1 text-xs font-medium text-muted-foreground hover:underline"
         @click="$emit('senderClick')"
-      >
-        {{ senderName }}
-      </button>
+        v-html="senderNameHtml"
+      />
 
       <!-- Bubble -->
       <div
@@ -251,9 +265,8 @@ function thumbSrc(a: MediaAttachment): string {
               <span
                 class="truncate text-xs font-medium"
                 :class="[isOwn ? 'text-primary-foreground' : 'text-foreground']"
-              >
-                {{ sharedStatus.authorName }}
-              </span>
+                v-html="sharedAuthorNameHtml"
+              />
             </div>
             <p
               class="line-clamp-2 text-xs"

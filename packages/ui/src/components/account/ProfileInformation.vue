@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
 import { computed } from 'vue';
+import { renderCustomEmojis } from '../../utils/customEmojis';
 import { formatRelativeDuration } from '../../utils/date';
 import { formatCount } from '../../utils/format';
 import { Badge } from '../ui/badge';
@@ -44,6 +45,10 @@ function extractText(html: string): string {
     .replace(/^https?:\/\//, '')
     .replace(/^www\./, '')
     .replace(/\/$/, '');
+}
+
+function renderFieldText(text: string): string {
+  return renderCustomEmojis(text, props.account.emojis ?? [], 'inline-block h-4 w-4 align-text-bottom');
 }
 </script>
 
@@ -99,14 +104,14 @@ function extractText(html: string): string {
           class="no-underline"
         >
           <Badge :variant="field.verifiedAt ? 'default' : 'muted'" class="gap-1 transition-colors hover:opacity-80">
-            <span class="text-muted-foreground">{{ field.name }}</span> {{ extractText(field.value) }}
+            <span class="text-muted-foreground" v-html="renderFieldText(field.name)" /> <span v-html="renderFieldText(extractText(field.value))" />
             <svg v-if="field.verifiedAt" class="size-4 text-green" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
             </svg>
           </Badge>
         </a>
         <Badge v-else variant="muted">
-          <span class="text-muted-foreground">{{ field.name }}</span> {{ extractText(field.value) }}
+          <span class="text-muted-foreground" v-html="renderFieldText(field.name)" /> <span v-html="renderFieldText(extractText(field.value))" />
         </Badge>
       </template>
     </div>
