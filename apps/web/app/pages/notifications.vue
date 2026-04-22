@@ -48,6 +48,6 @@ function handleTabChange(tab: string) {
       @update:model-value="handleTabChange"
     />
 
-    <NuxtPage :key="route.path" />
+    <NuxtPage />
   </div>
 </template>

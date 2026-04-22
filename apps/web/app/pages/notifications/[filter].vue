@@ -5,6 +5,13 @@ import { useNotificationMarker } from '@repo/api';
 import { EmptyState, NotificationList, Skeleton } from '@repo/ui';
 import { NOTIFICATION_FILTERS } from '~/composables/useNotificationData';
 
+// Remount when the filter param changes so the paginated query re-keys to the
+// new filter. Scoping the key to this page (not the parent NuxtPage) avoids a
+// DOM race with the outer page transition.
+definePageMeta({
+  key: route => route.path,
+});
+
 const route = useRoute();
 const router = useRouter();
 const { getNotificationsPaginated } = useNotificationData();
