@@ -5,6 +5,7 @@ import { formatRelativeDuration } from '../../utils/date';
 import { formatCount } from '../../utils/format';
 import { Badge } from '../ui/badge';
 import { RichText } from '../ui/rich-text';
+import AccountDisplayName from './AccountDisplayName.vue';
 
 const props = defineProps<{
   account: Account;
@@ -50,9 +51,11 @@ function extractText(html: string): string {
   <div class="flex flex-col gap-3 px-5 pt-1">
     <!-- Display Name + Handle -->
     <div class="flex flex-col">
-      <p class="text-xl font-bold leading-normal text-foreground break-words">
-        {{ account.displayName || account.username }}
-      </p>
+      <AccountDisplayName
+        :name="account.displayName || account.username"
+        :emojis="account.emojis"
+        class="text-xl font-bold leading-normal text-foreground"
+      />
       <p class="text-sm text-muted-foreground">
         @{{ account.acct }}
       </p>

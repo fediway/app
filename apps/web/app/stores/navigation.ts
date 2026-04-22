@@ -1,3 +1,4 @@
+import type { CustomEmoji } from '@repo/types';
 import type { NavIconName } from '@repo/ui';
 import { useAuth, useNotificationMarker } from '@repo/api';
 
@@ -120,6 +121,7 @@ export function useNavigationStore() {
   // Page header state — set by pages via usePageHeader composable
   const pageHeaderOverride = useState<{
     title: string;
+    titleEmojis?: readonly CustomEmoji[];
     subtitle?: string;
     image?: string;
     icon?: string;
@@ -155,6 +157,7 @@ export function useNavigationStore() {
     return item?.label ?? 'Home';
   });
 
+  const pageTitleEmojis = computed(() => pageHeaderOverride.value?.titleEmojis ?? null);
   const pageSubtitle = computed(() => pageHeaderOverride.value?.subtitle ?? null);
   const pageImage = computed(() => pageHeaderOverride.value?.image ?? null);
   const pageIcon = computed(() => pageHeaderOverride.value?.icon ?? null);
@@ -176,6 +179,7 @@ export function useNavigationStore() {
     activeItemId,
     hasUnreadNotifications,
     pageTitle,
+    pageTitleEmojis,
     pageSubtitle,
     pageImage,
     pageIcon,

@@ -36,7 +36,7 @@ const emit = defineEmits<{
             <AccountDisplayName
               :name="status.account.displayName || status.account.username"
               :emojis="status.account.emojis"
-              class="truncate text-sm"
+              class="truncate text-sm font-semibold text-foreground"
               @click.stop="emit('profileClick', status.account.acct)"
             />
             <AccountHandle :acct="status.account.acct" class="truncate text-sm" />

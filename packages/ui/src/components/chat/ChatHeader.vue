@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import type { CustomEmoji } from '@repo/types';
 import { PhArrowLeft } from '@phosphor-icons/vue';
+import AccountDisplayName from '../account/AccountDisplayName.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
 import Button from '../ui/button/Button.vue';
 
@@ -8,6 +10,7 @@ defineProps<{
     avatar: string;
     displayName: string;
     acct: string;
+    emojis?: readonly CustomEmoji[];
   };
 }>();
 
@@ -23,9 +26,11 @@ defineEmits<{
     </Button>
     <Avatar :src="participant.avatar" :alt="participant.displayName" size="md" />
     <div class="min-w-0 flex-1">
-      <div class="truncate font-semibold text-foreground">
-        {{ participant.displayName }}
-      </div>
+      <AccountDisplayName
+        :name="participant.displayName"
+        :emojis="participant.emojis"
+        class="block truncate font-semibold text-foreground"
+      />
       <div class="truncate text-xs text-muted-foreground">
         @{{ participant.acct }}
       </div>

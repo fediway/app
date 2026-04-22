@@ -2,6 +2,7 @@
 import type { Account, Status } from '@repo/types';
 import { PhX } from '@phosphor-icons/vue';
 import { computed, ref, watch } from 'vue';
+import AccountDisplayName from '../account/AccountDisplayName.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
 import Button from '../ui/button/Button.vue';
 import RelativeTime from '../ui/relative-time/RelativeTime.vue';
@@ -97,7 +98,11 @@ defineExpose({ reset });
     <div class="flex items-center gap-2.5 border-b border-border px-4 py-3">
       <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="sm" />
       <div class="min-w-0 flex-1">
-        <span class="text-sm font-semibold text-foreground">{{ status.account.displayName }}</span>
+        <AccountDisplayName
+          :name="status.account.displayName || status.account.username"
+          :emojis="status.account.emojis"
+          class="text-sm font-semibold text-foreground"
+        />
         <span class="ml-1 text-sm text-muted-foreground">·</span>
         <RelativeTime :datetime="status.createdAt" class="ml-1 text-sm text-muted-foreground-subtle" />
         <p class="truncate text-sm text-muted-foreground">
@@ -158,9 +163,11 @@ defineExpose({ reset });
           </div>
         </div>
         <div class="min-w-0 flex-1 text-left">
-          <div class="truncate text-sm font-semibold text-foreground">
-            {{ account.displayName }}
-          </div>
+          <AccountDisplayName
+            :name="account.displayName || account.username"
+            :emojis="account.emojis"
+            class="block truncate text-sm font-semibold text-foreground"
+          />
           <div class="truncate text-xs text-muted-foreground">
             @{{ account.acct }}
           </div>

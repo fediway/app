@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Conversation } from '@repo/types';
 import { computed } from 'vue';
+import { stripUnresolvedEmojiShortcodes } from '../../utils/sanitize';
 import AvatarStack from '../ui/avatar-stack/AvatarStack.vue';
 import Avatar from '../ui/avatar/Avatar.vue';
 import RelativeTime from '../ui/relative-time/RelativeTime.vue';
@@ -19,11 +20,11 @@ const isGroup = computed(() => props.conversation.accounts.length > 1);
 
 const displayName = computed(() => {
   const accounts = props.conversation.accounts;
+  const names = accounts.map(a => stripUnresolvedEmojiShortcodes(a.displayName || a.username));
   if (accounts.length <= 3) {
-    return accounts.map(a => a.displayName || a.username).join(', ');
+    return names.join(', ');
   }
-  const shown = accounts.slice(0, 2).map(a => a.displayName || a.username).join(', ');
-  return `${shown} +${accounts.length - 2}`;
+  return `${names.slice(0, 2).join(', ')} +${accounts.length - 2}`;
 });
 
 const avatarStackItems = computed(() =>
@@ -45,7 +46,7 @@ function getSenderName(conversation: Conversation): string | null {
   if (isOwnMessage(conversation))
     return 'You';
   const sender = conversation.lastStatus.account;
-  return sender.displayName || sender.username;
+  return stripUnresolvedEmojiShortcodes(sender.displayName || sender.username);
 }
 
 function getMessageText(conversation: Conversation): string {

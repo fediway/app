@@ -4,6 +4,7 @@ import type { AccountListUser } from '@repo/ui';
 import type { Ref } from 'vue';
 import { previewCardToItem, useItemStore } from '@repo/api';
 import {
+  AccountDisplayName,
   AccountList,
   Avatar,
   EmptyState,
@@ -275,9 +276,11 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
             >
               <Avatar :src="account.avatar" :alt="account.displayName" size="md" />
               <div class="min-w-0 flex-1">
-                <p class="truncate text-base font-bold text-foreground">
-                  {{ account.displayName || account.username }}
-                </p>
+                <AccountDisplayName
+                  :name="account.displayName || account.username"
+                  :emojis="account.emojis"
+                  class="block truncate text-base font-bold text-foreground"
+                />
                 <p class="truncate text-sm text-muted-foreground">
                   @{{ account.acct }}
                 </p>

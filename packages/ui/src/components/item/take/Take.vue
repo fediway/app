@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { CustomEmoji } from '@repo/types';
 import type { HTMLAttributes } from 'vue';
 import { PhStar } from '@phosphor-icons/vue';
 import { cn } from '../../../lib/utils';
+import AccountDisplayName from '../../account/AccountDisplayName.vue';
 import { StatusActions } from '../../status';
 import { Avatar } from '../../ui/avatar';
 
@@ -9,6 +11,7 @@ interface Props {
   avatarSrc?: string | null;
   avatarAlt?: string;
   displayName: string;
+  displayNameEmojis?: readonly CustomEmoji[];
   rating: number;
   timeAgo: string;
   content?: string;
@@ -62,7 +65,11 @@ const emit = defineEmits<{
       <div class="min-w-0 flex-1">
         <!-- Header: name + stars -->
         <div class="flex items-center justify-between gap-2">
-          <span class="font-bold text-base text-foreground truncate">{{ displayName }}</span>
+          <AccountDisplayName
+            :name="displayName"
+            :emojis="displayNameEmojis"
+            class="font-bold text-base text-foreground truncate"
+          />
           <div class="flex shrink-0 gap-0.5">
             <PhStar
               v-for="i in 5"

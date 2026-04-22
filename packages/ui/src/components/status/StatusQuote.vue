@@ -3,6 +3,7 @@ import type { Status } from '@repo/types';
 import { computed } from 'vue';
 import { vFadeOnLoad } from '../../directives/fadeOnLoad';
 import { blurhashStyle } from '../../utils/blurhash';
+import AccountDisplayName from '../account/AccountDisplayName.vue';
 import { Avatar } from '../ui/avatar';
 import { RelativeTime } from '../ui/relative-time';
 import { RichText } from '../ui/rich-text';
@@ -45,7 +46,11 @@ const firstMediaUrl = computed(() => {
       <!-- Author row -->
       <div class="flex items-center gap-1.5 mb-1.5">
         <Avatar :src="status.account.avatar" :alt="status.account.displayName" size="xs" />
-        <span class="font-medium text-sm truncate">{{ status.account.displayName }}</span>
+        <AccountDisplayName
+          :name="status.account.displayName || status.account.username"
+          :emojis="status.account.emojis"
+          class="font-medium text-sm truncate"
+        />
         <span class="text-muted-foreground text-sm truncate">@{{ status.account.acct }}</span>
         <span class="text-muted-foreground text-sm">·</span>
         <RelativeTime :datetime="status.createdAt" class="text-sm text-muted-foreground" />
