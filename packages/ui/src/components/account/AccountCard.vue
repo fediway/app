@@ -41,7 +41,7 @@ interface Props {
       <AccountDisplayName
         :name="account.displayName || account.username"
         :emojis="account.emojis"
-        class="truncate"
+        class="truncate font-semibold text-foreground"
         :class="size === 'sm' ? 'text-sm' : 'text-base'"
       />
       <AccountHandle :acct="account.acct" class="truncate" :class="size === 'sm' ? 'text-xs' : 'text-sm'" />

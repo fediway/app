@@ -1,7 +1,13 @@
+import type { CustomEmoji } from '@repo/types';
 import type { MaybeRef } from 'vue';
 
 export interface PageHeaderOptions {
   title: MaybeRef<string>;
+  /**
+   * Optional custom emojis for rendering `:shortcode:` references in the title.
+   * When present, the header renders the title as HTML with inline emoji images.
+   */
+  titleEmojis?: MaybeRef<readonly CustomEmoji[] | undefined>;
   subtitle?: MaybeRef<string | undefined>;
   image?: MaybeRef<string | undefined>;
   icon?: MaybeRef<string | undefined>;
@@ -25,6 +31,7 @@ export function usePageHeader(options: PageHeaderOptions) {
   const id = ++nextId;
   const override = useState<{
     title: string;
+    titleEmojis?: readonly CustomEmoji[];
     subtitle?: string;
     image?: string;
     icon?: string;
@@ -34,6 +41,7 @@ export function usePageHeader(options: PageHeaderOptions) {
     activeId.value = id;
     override.value = {
       title: toValue(options.title),
+      titleEmojis: toValue(options.titleEmojis),
       subtitle: toValue(options.subtitle),
       image: toValue(options.image),
       icon: toValue(options.icon),

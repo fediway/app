@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FeedType } from '~/composables/useFeedType';
 import { PhArrowLeft, PhBell, PhCaretDown, PhList } from '@phosphor-icons/vue';
-import { AppBar, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@repo/ui';
+import { AppBar, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, renderCustomEmojis } from '@repo/ui';
 import { useFeedType } from '~/composables/useFeedType';
 import { useScrollDirection } from '~/composables/useScrollDirection';
 
@@ -13,6 +13,10 @@ const { hidden } = useScrollDirection();
 const { feedType, set: setFeedType } = useFeedType();
 
 const isHome = computed(() => navigation.activeItemId === 'home' && !navigation.showBack);
+
+const titleHtml = computed(() =>
+  renderCustomEmojis(navigation.pageTitle, navigation.pageTitleEmojis ?? [], 'inline-block h-4 w-4 align-text-bottom'),
+);
 
 const feedLabels: Record<FeedType, string> = {
   home: 'Home',
@@ -71,7 +75,6 @@ function handleBack() {
     <!-- All other pages: standard AppBar -->
     <AppBar
       v-else
-      :title="!isHome && !navigation.pageSubtitle ? navigation.pageTitle : undefined"
       :left-icon="navigation.showBack ? 'back' : undefined"
       :left-label="navigation.showBack ? 'Go back' : undefined"
       :bordered="false"
@@ -103,15 +106,18 @@ function handleBack() {
       </template>
 
       <!-- Rich title with subtitle (for conversations, profiles) -->
-      <template v-else-if="navigation.pageSubtitle" #title>
+      <template v-if="!isHome && navigation.pageSubtitle" #title>
         <div class="min-w-0 text-center">
-          <div class="truncate text-sm font-semibold leading-tight text-foreground">
-            {{ navigation.pageTitle }}
-          </div>
+          <div class="truncate text-sm font-semibold leading-tight text-foreground" v-html="titleHtml" />
           <div class="truncate text-xs leading-tight text-muted-foreground">
             {{ navigation.pageSubtitle }}
           </div>
         </div>
+      </template>
+
+      <!-- Simple title (no subtitle) — still render with emoji support -->
+      <template v-else-if="!isHome" #title>
+        <h1 class="m-0 truncate text-lg font-semibold text-foreground" v-html="titleHtml" />
       </template>
 
       <template #trailing>

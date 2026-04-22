@@ -39,7 +39,7 @@ defineEmits<{
             <AccountDisplayName
               :name="account.displayName || account.username"
               :emojis="account.emojis"
-              class="block w-full truncate text-sm"
+              class="block w-full truncate text-sm font-semibold text-foreground"
             />
             <AccountHandle
               :acct="account.acct"

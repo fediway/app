@@ -203,5 +203,7 @@ export {
   formatRelativeDuration,
   formatTimeOfDay,
   isBlurhashValid,
+  renderCustomEmojis,
+  stripUnresolvedEmojiShortcodes,
 } from './utils';
 export type { DateInput, FormatDateOptions } from './utils';

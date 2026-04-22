@@ -43,6 +43,7 @@ const isRemoteUser = computed(() => {
 // Set desktop header — show profile info
 usePageHeader({
   title: computed(() => account.value?.displayName || account.value?.username || `@${acct.value}`),
+  titleEmojis: computed(() => account.value?.emojis ?? []),
   subtitle: computed(() => account.value ? `@${account.value.acct}` : undefined),
   image: computed(() => account.value?.avatar),
 });

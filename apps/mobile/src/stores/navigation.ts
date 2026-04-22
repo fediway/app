@@ -1,3 +1,4 @@
+import type { CustomEmoji } from '@repo/types';
 import type { NavIconName } from '@repo/ui';
 import { useAuth } from '@repo/api';
 import { computed, onScopeDispose, reactive, ref, watch } from 'vue';
@@ -55,7 +56,7 @@ const TAB_ITEMS: Omit<MenuItem, 'to'>[] = [
 ];
 
 const isDrawerOpen = ref(false);
-const pageTitleOverride = ref<{ title: string; avatar?: string } | null>(null);
+const pageTitleOverride = ref<{ title: string; avatar?: string; emojis?: readonly CustomEmoji[] } | null>(null);
 
 export function useNavigationStore() {
   const route = useRoute();
@@ -119,15 +120,16 @@ export function useNavigationStore() {
   });
 
   const pageTitleAvatar = computed(() => pageTitleOverride.value?.avatar ?? null);
+  const pageTitleEmojis = computed(() => pageTitleOverride.value?.emojis ?? null);
 
-  function setPageTitle(title: string | null, avatar?: string) {
-    pageTitleOverride.value = title ? { title, avatar } : null;
+  function setPageTitle(title: string | null, avatar?: string, emojis?: readonly CustomEmoji[]) {
+    pageTitleOverride.value = title ? { title, avatar, emojis } : null;
   }
 
   /**
-   * Set a custom page title (with optional avatar) that auto-resets when the calling component unmounts.
+   * Set a custom page title (with optional avatar + emojis) that auto-resets when the calling component unmounts.
    */
-  function usePageTitle(titleInfo: () => { title: string; avatar?: string } | null) {
+  function usePageTitle(titleInfo: () => { title: string; avatar?: string; emojis?: readonly CustomEmoji[] } | null) {
     const stop = watch(titleInfo, (val) => {
       pageTitleOverride.value = val;
     }, { immediate: true });
@@ -154,6 +156,7 @@ export function useNavigationStore() {
     activeTab,
     pageTitle,
     pageTitleAvatar,
+    pageTitleEmojis,
     isDrawerOpen,
     openDrawer,
     closeDrawer,

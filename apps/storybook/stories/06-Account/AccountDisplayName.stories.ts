@@ -14,8 +14,22 @@ export const Default: Story = {
   args: { name: 'Alice Chen' },
 };
 
-export const AsLink: Story = {
-  args: { name: 'Alice Chen', asLink: true, href: '#' },
+export const WithEmojis: Story = {
+  args: {
+    name: 'Alice :sparkles: Chen',
+    emojis: [
+      {
+        shortcode: 'sparkles',
+        url: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2728.png',
+        staticUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2728.png',
+        visibleInPicker: true,
+      },
+    ],
+  },
+};
+
+export const UnresolvedEmojiStripped: Story = {
+  args: { name: 'Alice :missing: Chen' },
 };
 
 export const LongName: Story = {

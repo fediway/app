@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MessageBubble, MessageInput, useToast } from '@repo/ui';
+import { AccountDisplayName, MessageBubble, MessageInput, useToast } from '@repo/ui';
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import { useMobileChatInput } from '~/composables/useMobileChatInput';
 import { usePageHeader } from '~/composables/usePageHeader';
@@ -18,6 +18,7 @@ const { data: account, isLoading } = useAccountData().getAccountByAcct(acct.valu
 
 usePageHeader({
   title: computed(() => account.value?.displayName ?? 'New Message'),
+  titleEmojis: computed(() => account.value?.emojis ?? []),
   subtitle: computed(() => account.value ? `@${account.value.acct}` : undefined),
   image: computed(() => account.value?.avatar),
 });
@@ -106,9 +107,11 @@ watch(() => sentMessages.value.length, () => {
             decoding="async"
           >
           <div class="text-center">
-            <div class="font-semibold">
-              {{ account.displayName }}
-            </div>
+            <AccountDisplayName
+              :name="account.displayName"
+              :emojis="account.emojis"
+              class="font-semibold"
+            />
             <div class="text-sm text-muted-foreground">
               @{{ account.acct }}
             </div>

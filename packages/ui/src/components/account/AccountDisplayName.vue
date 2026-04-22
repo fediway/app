@@ -1,51 +1,26 @@
 <script setup lang="ts">
 import type { CustomEmoji } from '@repo/types';
+import type { HTMLAttributes } from 'vue';
 import { computed } from 'vue';
-import { escapeRegExp, sanitizeHtml, stripUnresolvedEmojiShortcodes } from '../../utils/sanitize';
+import { renderCustomEmojis } from '../../utils/customEmojis';
+
+interface Props {
+  /** Display name — caller is responsible for fallback (e.g. `displayName || username`). */
+  name: string;
+  /** Custom emoji definitions from the account. */
+  emojis?: readonly CustomEmoji[];
+  class?: HTMLAttributes['class'];
+}
 
 const props = withDefaults(defineProps<Props>(), {
   emojis: () => [],
-  asLink: false,
-  href: undefined,
 });
 
-const QUOTE_RE = /"/g;
-
-interface Props {
-  /** Display name */
-  name: string;
-  /** Custom emoji in the name */
-  emojis?: CustomEmoji[];
-  /** Whether to render as a link */
-  asLink?: boolean;
-  /** URL for the link */
-  href?: string;
-}
-
-// Process display name to replace custom emoji shortcodes
-const processedName = computed(() => {
-  let html = sanitizeHtml(props.name);
-
-  for (const emoji of props.emojis) {
-    const pattern = new RegExp(`:${escapeRegExp(emoji.shortcode)}:`, 'g');
-    html = html.replace(
-      pattern,
-      `<img loading="lazy" decoding="async" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-4 w-4 align-text-bottom" draggable="false" />`,
-    );
-  }
-
-  return stripUnresolvedEmojiShortcodes(html);
-});
+const processedName = computed(() =>
+  renderCustomEmojis(props.name, props.emojis, 'inline-block h-4 w-4 align-text-bottom'),
+);
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-v-text-v-html-on-component -->
-  <component
-    :is="asLink && href ? 'a' : 'span'"
-    :href="asLink && href ? href : undefined"
-    class="font-semibold text-foreground break-words" :class="[
-      asLink && href && 'no-underline hover:underline',
-    ]"
-    v-html="processedName"
-  />
+  <span class="break-words" :class="props.class" v-html="processedName" />
 </template>

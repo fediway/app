@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import type { CustomEmoji } from '@repo/types';
 import type { HTMLAttributes } from 'vue';
 import { cn } from '../../lib/utils';
 import { Avatar } from '../ui/avatar';
 import { Button } from '../ui/button';
+import AccountDisplayName from './AccountDisplayName.vue';
 
 export interface UserSuggestion {
   displayName: string;
   handle: string;
   avatarSrc?: string | null;
   avatarAlt?: string;
+  emojis?: readonly CustomEmoji[];
 }
 
 interface Props {
@@ -43,9 +46,11 @@ defineEmits<{
       />
 
       <div class="min-w-0 flex-1">
-        <p class="truncate text-base font-bold leading-tight text-primary">
-          {{ user.displayName }}
-        </p>
+        <AccountDisplayName
+          :name="user.displayName"
+          :emojis="user.emojis"
+          class="block truncate text-base font-bold leading-tight text-primary"
+        />
         <p class="truncate text-sm leading-tight text-primary/80">
           {{ user.handle }}
         </p>

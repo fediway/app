@@ -59,6 +59,7 @@ onUnmounted(() => {
 // Set the desktop header — show post author info
 usePageHeader({
   title: computed(() => status.value?.account.displayName || status.value?.account.username || 'Post'),
+  titleEmojis: computed(() => status.value?.account.emojis ?? []),
   subtitle: computed(() => status.value ? `@${status.value.account.acct}` : undefined),
   image: computed(() => status.value?.account.avatar),
 });

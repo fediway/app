@@ -24,7 +24,7 @@ const pageTitleInfo = computed(() => {
   const account = conversation.value?.accounts[0];
   if (!account)
     return null;
-  return { title: account.displayName, avatar: account.avatar };
+  return { title: account.displayName, avatar: account.avatar, emojis: account.emojis };
 });
 navigation.usePageTitle(() => pageTitleInfo.value);
 

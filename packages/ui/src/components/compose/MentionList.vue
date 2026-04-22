@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import type { CustomEmoji } from '@repo/types';
 import { nextTick, onMounted, ref, watch } from 'vue';
+import AccountDisplayName from '../account/AccountDisplayName.vue';
 import { Avatar } from '../ui/avatar';
 import { Skeleton } from '../ui/skeleton';
 
@@ -8,6 +10,7 @@ export interface MentionSuggestion {
   acct: string;
   displayName: string;
   avatar: string;
+  emojis?: readonly CustomEmoji[];
 }
 
 interface Props {
@@ -105,9 +108,11 @@ onMounted(() => {
       >
         <Avatar :src="suggestion.avatar" :alt="suggestion.displayName" size="sm" />
         <div class="min-w-0 flex-1">
-          <div class="truncate text-sm font-medium text-foreground">
-            {{ suggestion.displayName }}
-          </div>
+          <AccountDisplayName
+            :name="suggestion.displayName"
+            :emojis="suggestion.emojis"
+            class="block truncate text-sm font-medium text-foreground"
+          />
           <div class="truncate text-xs text-muted-foreground">
             @{{ suggestion.acct }}
           </div>

@@ -1,4 +1,5 @@
 export { blurhashStyle, decodeBlurhash, isBlurhashValid } from './blurhash';
+export { renderCustomEmojis } from './customEmojis';
 export {
   formatCalendarLabel,
   formatCompactTimestamp,
@@ -8,4 +9,4 @@ export {
 } from './date';
 export type { DateInput, FormatDateOptions } from './date';
 export { formatCount } from './format';
-export { escapeRegExp, sanitizeHtml } from './sanitize';
+export { escapeRegExp, sanitizeHtml, stripUnresolvedEmojiShortcodes } from './sanitize';

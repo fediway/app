@@ -2,6 +2,7 @@
 import type { Poll } from '@repo/types';
 import { PhCheck } from '@phosphor-icons/vue';
 import { computed } from 'vue';
+import { renderCustomEmojis } from '../../utils/customEmojis';
 import { formatRelativeDuration } from '../../utils/date';
 
 const props = defineProps<{
@@ -31,6 +32,10 @@ const timeRemaining = computed(() => {
     return 'Closed';
   return formatRelativeDuration(props.poll.expiresAt);
 });
+
+function renderTitle(option: Poll['options'][number]): string {
+  return renderCustomEmojis(option.title, option.emojis ?? [], 'inline-block h-4 w-4 align-text-bottom');
+}
 </script>
 
 <template>
@@ -57,7 +62,7 @@ const timeRemaining = computed(() => {
             class="shrink-0 text-primary"
             weight="bold"
           />
-          <span class="text-sm text-foreground">{{ option.title }}</span>
+          <span class="text-sm text-foreground" v-html="renderTitle(option)" />
         </div>
         <span class="text-sm font-medium text-muted-foreground">{{ getPercentage(option.votesCount) }}%</span>
       </div>

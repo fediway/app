@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
 import { PhArrowLeft, PhBell, PhBookmarkSimple, PhChatCircle, PhHash, PhHeart, PhLink } from '@phosphor-icons/vue';
+import { renderCustomEmojis } from '@repo/ui';
 import { useNavigationStore } from '~/stores/navigation';
 
 const router = useRouter();
 const navigation = useNavigationStore();
+
+const titleHtml = computed(() =>
+  renderCustomEmojis(navigation.pageTitle, navigation.pageTitleEmojis ?? [], 'inline-block h-4 w-4 align-text-bottom'),
+);
 
 const iconMap: Record<string, Component> = {
   PhHash,
@@ -60,9 +65,7 @@ function goBack() {
 
         <!-- Title + subtitle — show when page sets a header override, or on non-tab pages -->
         <div class="text-center" :class="{ 'text-left': navigation.pageIcon }">
-          <h1 class="text-base font-bold leading-tight">
-            {{ navigation.pageTitle }}
-          </h1>
+          <h1 class="text-base font-bold leading-tight" v-html="titleHtml" />
           <p v-if="navigation.pageSubtitle" class="text-xs leading-tight text-muted-foreground-subtle">
             {{ navigation.pageSubtitle }}
           </p>

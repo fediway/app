@@ -3,7 +3,7 @@ import type { CustomEmoji } from '@repo/types';
 import type { StatusMention } from '../../../utils/content-links';
 import { computed } from 'vue';
 import { extractTagName, resolveMentionAcct } from '../../../utils/content-links';
-import { escapeRegExp, sanitizeHtml, stripUnresolvedEmojiShortcodes } from '../../../utils/sanitize';
+import { renderCustomEmojis } from '../../../utils/customEmojis';
 
 interface Props {
   /** HTML content to render */
@@ -24,22 +24,9 @@ const emit = defineEmits<{
   hashtagClick: [tag: string];
 }>();
 
-const QUOTE_RE = /"/g;
-
-// Process content to replace custom emoji shortcodes with images
-const processedContent = computed(() => {
-  let html = sanitizeHtml(props.content);
-
-  for (const emoji of props.emojis) {
-    const pattern = new RegExp(`:${escapeRegExp(emoji.shortcode)}:`, 'g');
-    html = html.replace(
-      pattern,
-      `<img loading="lazy" decoding="async" src="${encodeURI(emoji.url).replace(QUOTE_RE, '%22')}" alt=":${escapeRegExp(emoji.shortcode)}:" class="inline-block h-5 w-5 align-text-bottom" draggable="false" />`,
-    );
-  }
-
-  return stripUnresolvedEmojiShortcodes(html);
-});
+const processedContent = computed(() =>
+  renderCustomEmojis(props.content, props.emojis),
+);
 
 function handleContentClick(e: MouseEvent) {
   // Allow modifier keys to work normally (Cmd-click to open in new tab)

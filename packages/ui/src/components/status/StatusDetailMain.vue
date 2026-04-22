@@ -79,6 +79,7 @@ function getDomain(acct: string): string {
           <AccountDisplayName
             :name="status.account.displayName || status.account.username"
             :emojis="status.account.emojis"
+            class="font-semibold text-foreground"
           />
           <AccountHandle :acct="status.account.acct" class="block text-sm" />
         </div>

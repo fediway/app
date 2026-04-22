@@ -4,6 +4,7 @@ import type { ThreadPosition } from './thread';
 import { PhArrowsClockwise, PhPushPin } from '@phosphor-icons/vue';
 import { computed } from 'vue';
 import { cn } from '../../lib/utils';
+import AccountDisplayName from '../account/AccountDisplayName.vue';
 import RelativeTime from '../ui/relative-time/RelativeTime.vue';
 import StatusActions from './StatusActions.vue';
 import StatusCard from './StatusCard.vue';
@@ -152,10 +153,14 @@ function handleStatusClick(event: MouseEvent) {
           <div class="flex items-baseline gap-1 text-base">
             <button
               type="button"
-              class="truncate font-bold text-foreground hover:underline cursor-pointer"
+              class="truncate cursor-pointer hover:underline"
               @click.stop="emit('profileClick', parentPreview.account.acct)"
             >
-              {{ parentPreview.account.displayName || parentPreview.account.username }}
+              <AccountDisplayName
+                :name="parentPreview.account.displayName || parentPreview.account.username"
+                :emojis="parentPreview.account.emojis"
+                class="font-bold text-foreground"
+              />
             </button>
             <button
               type="button"
@@ -212,7 +217,13 @@ function handleStatusClick(event: MouseEvent) {
         <div class="flex w-11 shrink-0 justify-end">
           <PhArrowsClockwise :size="16" class="text-green" />
         </div>
-        <span class="truncate">{{ booster.displayName || booster.username }} reposted</span>
+        <span class="truncate">
+          <AccountDisplayName
+            :name="booster.displayName || booster.username"
+            :emojis="booster.emojis"
+          />
+          reposted
+        </span>
       </div>
 
       <div class="flex gap-3 px-4">
@@ -228,10 +239,14 @@ function handleStatusClick(event: MouseEvent) {
           <div class="flex items-baseline gap-1 mb-1 text-base">
             <button
               type="button"
-              class="truncate font-bold text-foreground hover:underline cursor-pointer"
+              class="truncate cursor-pointer hover:underline"
               @click.stop="emit('profileClick', displayStatus.account.acct)"
             >
-              {{ displayStatus.account.displayName || displayStatus.account.username }}
+              <AccountDisplayName
+                :name="displayStatus.account.displayName || displayStatus.account.username"
+                :emojis="displayStatus.account.emojis"
+                class="font-bold text-foreground"
+              />
             </button>
             <span
               v-if="isAuthorReply"
