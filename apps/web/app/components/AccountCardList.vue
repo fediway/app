@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Account } from '@repo/types';
+import { useAuth } from '@repo/api';
 import { AccountListItem, EmptyState, FollowButton } from '@repo/ui';
 import { watch } from 'vue';
 import { useFollows } from '~/composables/useFollows';
@@ -13,6 +14,7 @@ const props = defineProps<{
 
 const { getProfilePath } = useAccountData();
 const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
+const { isCurrentUser } = useAuth();
 
 // Batch-fetch relationships when accounts change
 watch(() => props.accounts, (accts) => {
@@ -40,7 +42,7 @@ watch(() => props.accounts, (accts) => {
     >
       <template #action>
         <FollowButton
-          v-if="hasRelationship(account.id)"
+          v-if="!isCurrentUser(account.id) && hasRelationship(account.id)"
           :is-following="isFollowing(account.id)"
           :requested="getRelationship(account.id).requested"
           size="sm"

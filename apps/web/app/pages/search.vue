@@ -2,7 +2,7 @@
 import type { Item, MediaAttachment, Status } from '@repo/types';
 import type { AccountListUser } from '@repo/ui';
 import type { Ref } from 'vue';
-import { previewCardToItem, useItemStore } from '@repo/api';
+import { previewCardToItem, useAuth, useItemStore } from '@repo/api';
 import {
   AccountDisplayName,
   AccountList,
@@ -25,6 +25,7 @@ usePageHeader({ title: 'Search' });
 const { searchStatuses, searchAccounts, searchTags } = useSearchData();
 const { getProfilePath, getStatusPath, getSuggestedAccounts } = useAccountData();
 const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
+const { isCurrentUser } = useAuth();
 const { open: openSendMessage } = useSendMessageModal();
 const { open: openLightbox } = useMediaLightbox();
 
@@ -286,7 +287,7 @@ function handleMediaClick(attachments: MediaAttachment[], index: number) {
                 </p>
               </div>
               <FollowButton
-                v-if="hasRelationship(account.id)"
+                v-if="!isCurrentUser(account.id) && hasRelationship(account.id)"
                 :is-following="isFollowing(account.id)"
                 :requested="getRelationship(account.id).requested"
                 size="sm"
