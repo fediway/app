@@ -107,9 +107,9 @@ function getDomain(acct: string): string {
         @hashtag-click="emit('tagClick', $event)"
       />
 
-      <!-- Link preview card -->
+      <!-- Link preview card — hidden when media is attached (attached media wins) -->
       <StatusCard
-        v-if="status.card"
+        v-if="status.card && status.mediaAttachments.length === 0"
         :card="status.card"
         class="mb-3"
       />

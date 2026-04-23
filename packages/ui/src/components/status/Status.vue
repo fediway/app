@@ -287,7 +287,7 @@ function handleStatusClick(event: MouseEvent) {
           />
 
           <StatusCard
-            v-if="displayStatus.card && !hideCard"
+            v-if="displayStatus.card && !hideCard && displayStatus.mediaAttachments.length === 0"
             :card="displayStatus.card"
             class="mt-3"
           />
