@@ -42,6 +42,18 @@ export function useAuth() {
   const error = store.error;
 
   /**
+   * Returns true when the given account id matches the currently-authenticated
+   * user. Safe when not logged in (returns false). Use at call sites that
+   * render self-referential UI (e.g. Follow buttons in account lists) to skip
+   * rendering for the current user.
+   */
+  function isCurrentUser(accountId: string | undefined | null): boolean {
+    if (!accountId)
+      return false;
+    return currentUser.value?.id === accountId;
+  }
+
+  /**
    * Login with access token (for dev/testing)
    */
   async function login(url: string, accessToken: string) {
@@ -293,6 +305,9 @@ export function useAuth() {
     instanceUrl,
     isLoading,
     error,
+
+    // Predicates
+    isCurrentUser,
 
     // Actions
     login,

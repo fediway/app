@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useAuth } from '@repo/api';
 import { AccountCard, EmptyState, FollowButton, Skeleton } from '@repo/ui';
 import { computed, watch } from 'vue';
 
 const { getAllAccounts, getProfilePath } = useAccountData();
 const { toggleFollow, isFollowing, hasRelationship, getRelationship, fetchRelationships } = useFollows();
+const { isCurrentUser } = useAuth();
 
 const { data: accounts, isLoading, error, refetch } = getAllAccounts();
 
@@ -65,7 +67,7 @@ const isReady = computed(() =>
               class="min-w-0 flex-1"
             />
             <FollowButton
-              v-if="hasRelationship(account.id)"
+              v-if="!isCurrentUser(account.id) && hasRelationship(account.id)"
               :is-following="isFollowing(account.id)"
               :requested="getRelationship(account.id).requested"
               size="sm"

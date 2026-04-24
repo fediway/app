@@ -3,6 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 const isCI = !!process.env.CI;
 const appDir = fileURLToPath(new URL('..', import.meta.url));
+const port = Number.parseInt(process.env.E2E_PORT ?? '3000', 10);
+const baseURL = `http://localhost:${port}`;
 
 /**
  * Playwright config for Fediway E2E tests.
@@ -32,7 +34,7 @@ export default defineConfig({
     : 'list',
 
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
@@ -72,8 +74,8 @@ export default defineConfig({
   // Locally: reuseExistingServer=true skips if preview is already running.
   // CI: starts fresh (reuseExistingServer=false).
   webServer: {
-    command: 'npx nuxt preview --port 3000',
-    url: 'http://localhost:3000',
+    command: `npx nuxt preview --port ${port}`,
+    url: baseURL,
     timeout: 30_000,
     reuseExistingServer: !isCI,
     cwd: appDir,
